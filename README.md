@@ -9,7 +9,7 @@ CCFatigue platform is an initiative from CCLab that aims at facilitating manipul
 # Contents
 
 ### Standardizing data
-Use notebook Standarsizing_data.ipynb to convert data from ... to standard format
+Use notebook Standarsizing_data.ipynb to convert raw data from use cases to the standard format
 
 
 ### Plotting
