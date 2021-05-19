@@ -1,8 +1,14 @@
 # CCFatigue Platform
 
-CCFatigue platform is an initiative from CCLab that aims at facilitating manipulation and storage of new and pre-existing data. It is composed of two main sections, the database is where all the data is stored, whereas the modules section is used for manipulating data.
+CCFatiguePlatform is an initiative from CCLab that aims to develop a web application to faciltate manipulation and harmonized storage of composite materials testing datasets. 
 
-# Standard data format
+# Data
+## Standard data format
+>>>> HERE NEEDS A LINK TO SAMPLE DATA IN STANDARD FORMAT.
+
+
+>>>> HERE ADD METADATA SCHEME (FIGURE 1 WHEN FINAL)
+
 |Directory naming convention|
 |---------------------------|
 |\Laboratory\Researcher\Test Type\Date\ *filename*
@@ -25,22 +31,24 @@ CCFatigue platform is an initiative from CCLab that aims at facilitating manipul
 # Contents
 
 ### Standardizing data
-Use notebook Standarsizing_data.ipynb to convert raw data from use cases to the standard format
+Notebook Standarsizing_data.ipynb converts raw data from use cases to the standard format
+Raw data format supported: SCOTT PUT SOME DETAILS HERE!
+Usage (SCOTT: DO PEOPLE NEED TO USE THE NOTEBOOK, OR CAN THEY CALL DIRECTLY A PYTHON SCRIPT TO STANDARDIZE DATA?)
 
-
-### Plotting
-Use the notebook Plotting.ipynb to create plots using the outputs of various modules or raw data
+### Plots
+Notebook Plotting.ipynb creates the following plots:
+>>>> SCOTT LIST THE PLOTS (with inputs ideally)
 
 ### Modules
 Using the notebooks in the modules folder, one can compute the right parameters for plotting i.e. the notebook 'Hysteresis loops.ipynb' uses stress/strain info to compute the TDE and evolution of stiffness
 
 
-
 # Reproduce
 
-environment.yml file 
+environment.yml file --> SCOTT YOU NEED TO EXPORT YOUR ENVIRONMENT FILE AND PUT IT HERE!!
 
 # License
+TBD.
 
-#Authors
-
+# Authors
+Charlotte Weil, Scott M. Salmon, Samuel Bancal.
