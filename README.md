@@ -11,7 +11,7 @@ CCFatiguePlatform is an initiative from CCLab that aims to develop a web applica
 
 |Directory naming convention|
 |---------------------------|
-|\Laboratory\Researcher\Test Type\Date\ *filename*
+|\Laboratory\Researcher\Test Type\Date\ *filename
 |Laboratory: Full accronym (i.e. CCLab, RESSLab, IBeton,...)
 |Researcher: Last name
 |Test type: Standard Fatigue, Combined Fatigue Fracture, Standard Quasi-Static, Combined Quasi-Static Fracture
