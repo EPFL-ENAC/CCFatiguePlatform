@@ -1,2 +1,2 @@
-"LA_CureTemp, LA_CurePres",CM_AreaDen,Fracture,CM_FiberGeo,TC_GP,Fracture_Mode,TC_Temp,CM_Adhesive,TC_RH,LA_FiberCont,Geo_T,P_maxFat,Sig_maxFat,File_Name,QS_TestType,TC_CM,Geo_w,CM_FiberMat,LA_CureTime,LT,R_Ratio,Geo_L,Measuring_equipment,File_Format,File_size,LA_StackSeq,Fat_Type
-,425,,Unidirectional,Not specified,,20,,Not specified,62,2.25,,47.4,VAH_20210420_FAT_RAW_001,,,25,E-glass fiber,8,Fatigue,0.1,250,Instron 8800,CSV,1.8 MB,(±45)_2s,CA
+File_Name,File_Format,File_size,TC_Temp,TC_RH,TC_CM,TC_GP,Geo_L,Geo_w,Geo_T,Measuring_equipment,CM_FiberMat,CM_FiberGeo,CM_AreaDen,CM_Adhesive,LA_CureTime,"LA_CureTemp, LA_CurePres",LA_FiberCont,LA_StackSeq,LT,Fat_Type,R_Ratio,P_maxFat,Sig_maxFat,QS_TestType,Fracture,Fracture_Mode
+VAH_20210420_FAT_RAW_001,CSV,1.8 MB,20,Not specified,,Not specified,250,25,2.25,Instron 8800,E-glass fiber,Unidirectional,425,,8,,62,(±45)_2s,Fatigue,CA,0.1,,47.4,,,
