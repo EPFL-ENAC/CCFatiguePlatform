@@ -44,10 +44,14 @@ Notebook Plotting.ipynb creates the following plots:
 Stress / strain curve:
 
 ![Stress - Strain](/Users/scottmatthewssalmon/Desktop/github/CCFatigue/Markdown images/stress-strain.png "Stress - Strain")
+
+<center><src="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/main/Markdown%20images/stress-strain.png"></center>
+
+
 >On this graph we use the raw inputs for Stress and Strain, specific loops have been selected in order for the graph not to be too busy
 
 ![Stiffness Evolution](/Users/scottmatthewssalmon/Desktop/github/CCFatigue/Markdown images/stiffness-evolution.png "Stiffness evolution")
->This graph shows the evolution of the sample's stiffness. Stiffness corresponds to the slope of hysteresis loops and is closely linked to hooke's law. E is comparable to the constant k in the context of springs. The analysis is made from the stress - strain raw data, for each hysteresis loop, we evaluate the slope between the maximum and minimum values for stress and strain.
+>This graph shows the evolution of the sample's stiffness. Stiffness corresponds to the slope of hysteresis loops and is closely linked to hooke's law. E is comparable to the constant k in the context of springs. The analysis is made from the stress - strain raw data, for each hysteresis loop, we evaluate the slope with a linear regression for each hysteresis loops for stress and strain.
 
 ![Hysteresis area evolution](/Users/scottmatthewssalmon/Desktop/github/CCFatigue/Markdown images/hysteresis-area.png "Hysteresis area evolution")
 >Here we see how the area of each hysteresis loop evolves as the fatigue test goes on. The hysteresis loop area is closely related to the amount of energy dissipated through deformations, the sum of hysteresis areas is denoted as TDE, or total dissipated energy
@@ -55,7 +59,7 @@ Stress / strain curve:
 ![Creep evolution](/Users/scottmatthewssalmon/Desktop/github/CCFatigue/Markdown images/creep-evolution.png "Creep evolution")
 >Creep corresponds to the residual deformations during a test or life cycle of a sample
 
-%>>>> SCOTT LIST THE PLOTS (with inputs ideally)
+%>>>> 
 
 ### Modules
 Using the notebooks in the modules folder, one can compute the right parameters for plotting i.e. the notebook 'Hysteresis loops.ipynb' uses stress/strain info to compute the TDE and evolution of stiffness
