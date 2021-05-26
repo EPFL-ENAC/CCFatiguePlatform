@@ -43,7 +43,7 @@ Notebook Plotting.ipynb creates the following plots:
 
 Stress / strain curve:
 
-![Stress - Strain](/Users/scottmatthewssalmon/Desktop/github/CCFatigue/Markdown images/stress-strain.png "Stress - Strain")
+![Stress - Strain](images/stress-strain.png "Stress - Strain")
 
 <center><src="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/main/Markdown%20images/stress-strain.png"></center>
 
