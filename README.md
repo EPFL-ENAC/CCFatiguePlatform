@@ -53,7 +53,7 @@ Stress / strain curve:
 ![Stiffness Evolution](/Users/scottmatthewssalmon/Desktop/github/CCFatigue/Markdown images/stiffness-evolution.png "Stiffness evolution")
 >This graph shows the evolution of the sample's stiffness. Stiffness corresponds to the slope of hysteresis loops and is closely linked to hooke's law. E is comparable to the constant k in the context of springs. The analysis is made from the stress - strain raw data, for each hysteresis loop, we evaluate the slope with a linear regression for each hysteresis loops for stress and strain.
 
-![Hysteresis area evolution](Markdown images/hysteresis-area.png "Hysteresis area evolution")
+![Hysteresis area evolution](images/hysteresis-area.png "Hysteresis area evolution")
 >Here we see how the area of each hysteresis loop evolves as the fatigue test goes on. The hysteresis loop area is closely related to the amount of energy dissipated through deformations, the sum of hysteresis areas is denoted as TDE, or total dissipated energy
 
 ![Creep evolution](/Users/scottmatthewssalmon/Desktop/github/CCFatigue/Markdown images/creep-evolution.png "Creep evolution")
