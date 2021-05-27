@@ -9,7 +9,7 @@ CCFatiguePlatform is an initiative from CCLab that aims to develop a web applica
 
 
 
-![Metadata Scheme](Images/Metadata Scheme - visual.png "Metadata Scheme")
+![Metadata Scheme](Images/metadata-scheme.png "Metadata Scheme")
 
 
 |Directory naming convention|
