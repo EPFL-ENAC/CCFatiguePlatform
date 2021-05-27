@@ -9,7 +9,7 @@ CCFatiguePlatform is an initiative from CCLab that aims to develop a web applica
 
 
 
-![Metadata Scheme](/Users/scottmatthewssalmon/Desktop/github/CCFatigue/Markdown images/Metadata Scheme - visual.png "Metadata Scheme")
+![Metadata Scheme](images/Metadata Scheme - visual.png "Metadata Scheme")
 
 
 |Directory naming convention|
@@ -36,7 +36,8 @@ CCFatiguePlatform is an initiative from CCLab that aims to develop a web applica
 ### Standardizing data
 Notebook Standardizing_data.ipynb converts raw data from use cases to the standard format
 Raw data format supported: The raw data is read in CSV format
-Usage (SCOTT: DO PEOPLE NEED TO USE THE NOTEBOOK, OR CAN THEY CALL DIRECTLY A PYTHON SCRIPT TO STANDARDIZE DATA?)
+
+Usage: Right now one needs to use python notebooks to call all methods
 
 ### Plots
 Notebook Plotting.ipynb creates the following plots:
@@ -63,7 +64,7 @@ Using the notebooks in the modules folder, one can compute the right parameters 
 
 # Reproduce
 
-environment.yml file --> SCOTT YOU NEED TO EXPORT YOUR ENVIRONMENT FILE AND PUT IT HERE!!
+environment.yml file --> will be available when .py methods are created
 
 # License
 TBD.
