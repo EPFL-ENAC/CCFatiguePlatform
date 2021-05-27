@@ -25,11 +25,11 @@ CCFatiguePlatform is an initiative from CCLab that aims to develop a web applica
 |-----------------------|
 |{Researcher} _ {Date} _ {Test type} _ {status code} _ {###}|
 |Researcher: 3 first letters of last name {i.e. VAS, WEI, MAT,...}
-|Date: YYYYMMDD
-|Test type: {FAT} = standard fatigue, {QST} = standard quasi-static, {FAF} = combined fatigue/fracture, {QSF} = combined quasi-static/fracture
+|Date: YYMMDD
+|Test type: {FA} = standard fatigue, {QS} = standard quasi-static, {FF} = combined fatigue/fracture, {SF} = combined quasi-static/fracture
 |Status code: {RAW} = raw data, {TRE} = treated
 |###: numerical identifier
-|Example: SHA _ 20210420 _ FAF _ RAW _ 001
+|Example: SHA _ 210420 _ FF _ RAW _ 001
 
 # Contents
 
