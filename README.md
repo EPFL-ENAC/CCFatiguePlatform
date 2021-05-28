@@ -64,7 +64,29 @@ Using the notebooks in the modules folder, one can compute the right parameters 
 
 # Reproduce
 
-environment.yml file --> will be available when .py methods are created
+import matplotlib.pyplot as plt
+
+import os
+
+import pandas as pd
+
+import numpy as np
+
+from bokeh.plotting import figure
+
+from bokeh.palettes import Spectral6
+
+from bokeh.io import export_png, output_file, show
+
+from bokeh.models import ColumnDataSource, HoverTool, LinearColorMapper
+
+import bokeh.plotting as bk
+
+from bokeh.transform import linear_cmap
+
+from collections import Counter
+
+from scipy import stats
 
 # License
 TBD.
