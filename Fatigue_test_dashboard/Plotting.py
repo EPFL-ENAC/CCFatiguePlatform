@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import matplotlib.pyplot as plt
 import os
 import pandas as pd
@@ -14,13 +8,10 @@ from bokeh.io import export_png, output_file, show
 from bokeh.models import ColumnDataSource, HoverTool, LinearColorMapper
 import bokeh.plotting as bk
 from bokeh.transform import linear_cmap
-#from bokeh.sampledata.stocks import AAPL
 
 
-# In[2]:
 
-
-## Inputs
+## Importing input file
 data_dir = '/Users/scottmatthewssalmon/Desktop/github/CCFatigue/Outputs'
 filename = 'Vahid_std.csv'
 filepath = os.path.join(data_dir,filename)
@@ -29,26 +20,13 @@ df = pd.read_csv(filepath)
 print(df)
 
 
-# ## Plotting plot Stress - Strain
-# 
-# def plot_stress_strain(df):
-#     plt.figure(0, figsize = (10,7))
-#     plt.title("Stress - Strain")
-#     plt.xlabel("Strain")
-#     plt.ylabel("Stress")
-#     plt.plot(df.Machine_Displacement, df.Machine_Load)
-#     save_dir = '/Users/scottmatthewssalmon/Desktop/github/CCFatigue/saved_plots/Stress_strain.png'
-#     plt.savefig(save_dir)
-# print(plot_stress_strain(df))
-
-# In[3]:
-
-
 ### Conditional plotting of hysteresis loops
 
 sub_hystloops_strain = []
 sub_hystloops_stress = []
 sub_hystloops_ncycles = []
+
+### We select loops for plotting on an arbitrary basis (subject to modifications)
 sub_index = [0, 1, 5, 10, 100, 200, 1000, 2000, 10000, 50000, 100000, 500000, 1000000]
 
 for i in range(len(df)):
@@ -79,22 +57,8 @@ def plot_select_stress_strain(sub_hystloops):
 print(plot_select_stress_strain(sub_hystloops))
 
 
-# In[ ]:
 
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[5]:
-
-
-## Plotting Stress - Strain with Bokeh library
+### Plotting Stress - Strain with Bokeh library
 
 total_strain = df.Machine_Displacement
 total_stress = df.Machine_Load
@@ -113,19 +77,8 @@ def plot_total_stress_strain(df):
 print(plot_total_stress_strain(df))
 
 
-# ## Plotting plot Load curve
-# 
-# def plot_Load_curve(df):
-#     plt.figure(1,figsize = (10,7))
-#     plt.title("Load curve")
-#     plt.xlabel("Number of cycles")
-#     plt.ylabel("Stress")
-#     plt.plot(df.Machine_N_cycles, df.Machine_Load)
-#     save_dir = '/Users/scottmatthewssalmon/Desktop/github/CCFatigue/saved_plots/Load_curve.png'
-#     plt.savefig(save_dir)
-# print(plot_Load_curve(df))
 
-# In[6]:
+##* Plotting Load curve with Bokeh library
 
 
 def plot_Load_curve(df):
@@ -136,29 +89,8 @@ def plot_Load_curve(df):
 print(plot_Load_curve(df))
 
 
-# In[7]:
 
-
-#save_dir = '/Users/scottmatthewssalmon/Desktop/github/CCFatigue/saved_plots/Load_curve.png'
-
-#plt.savefig(save_dir)
-
-##function to save plots!
-
-
-# ## Plotting plot Strain - N_cycles
-# 
-# def plot_Strain_evolution(df):
-#     plt.figure(1, figsize = (10,7))
-#     plt.title("Strain evolution with N cycles")
-#     plt.xlabel("Number of cycles")
-#     plt.ylabel("Strain")
-#     plt.plot(df.Machine_N_cycles, df.Machine_Displacement)
-#     save_dir = '/Users/scottmatthewssalmon/Desktop/github/CCFatigue/saved_plots/Strain_curve.png'
-#     plt.savefig(save_dir)
-# print(plot_Strain_evolution(df))
-
-# In[8]:
+### Plotting strain envelope with Bokeh library
 
 
 def plot_Strain_envelope(df):
@@ -170,15 +102,6 @@ def plot_Strain_envelope(df):
 print(plot_Strain_envelope(df))
 
 
-# In[ ]:
-
-
-
-
-
-# In[9]:
-
-
 ### Importing Hysteresis loops analysis file
 
 filename = 'Vahid_hysteresis_analysis.csv'
@@ -186,8 +109,6 @@ filepath = os.path.join(data_dir, filename)
 
 hyst_df = pd.read_csv(filepath, sep = ',', header = 0)
 
-
-# In[10]:
 
 
 ### Importing Hysteresis loops areas
@@ -241,20 +162,6 @@ def plot_creep(hyst_df):
 print(plot_creep(hyst_df))
 
 
-# ### Hysteresis loops area evolution plots
-# 
-# def plot_hysteresis_area(hyst_df):
-#     plt.figure(1, figsize = (10,7))
-#     plt.title("Hysteresis loops area evolution")
-#     plt.xlabel("Number of cycles")
-#     plt.ylabel("Area")
-#     plt.plot(hyst_df.n_cycles, hyst_df.hysteresis_area)
-#     save_dir = '/Users/scottmatthewssalmon/Desktop/github/CCFatigue/saved_plots/hysteresis_area_curve.png'
-#     plt.savefig(save_dir)
-# print(plot_hysteresis_area(hyst_df))
-
-# In[18]:
-
 
 ### Hysteresis area plot
 
@@ -283,17 +190,6 @@ print(plot_hystarea(hyst_df))
 print(TDE)
 
 
-# def plot_stiffness(hyst_df):
-#     plt.figure(1, figsize = (10,7))
-#     plt.title("Stiffness evolution")
-#     plt.xlabel("Number of cycles")
-#     plt.ylabel("Stiffness")
-#     plt.plot(hyst_df.n_cycles, hyst_df.stiffness)
-#     save_dir = '/Users/scottmatthewssalmon/Desktop/github/CCFatigue/saved_plots/stiffness.png'
-#     plt.savefig(save_dir)
-# print(plot_stiffness(hyst_df))
-
-# In[16]:
 
 
 ### Stiffness evolution plot
@@ -316,13 +212,7 @@ def plot_stiffness(hyst_df):
 print(plot_stiffness(hyst_df))
 
 
-# In[17]:
 
-
-print(hyst_df)
-
-
-# In[ ]:
 
 
 
