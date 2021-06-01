@@ -26,6 +26,7 @@ df = pd.DataFrame(columns = col)
 df.Machine_N_cycles = dat.N
 df.Machine_Load = dat.Stress
 df.Machine_Displacement = dat.Strain
+print(df)
 
 df.to_csv(path_or_buf='/Users/scottmatthewssalmon/Desktop/github/CCFatigue/Outputs/Vahid_std.csv', index=False)
 
