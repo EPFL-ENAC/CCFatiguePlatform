@@ -29,9 +29,6 @@ df.Machine_Displacement = dat.Strain
 
 df.to_csv(path_or_buf='/Users/scottmatthewssalmon/Desktop/github/CCFatigue/Outputs/Vahid_std.csv', index=False)
 
-#print(dat)
-#print(df)
-#df.to_csv('out.zip', index=False, compression=compression_opts)
 
 
 # In[17]:
@@ -172,16 +169,3 @@ meta_df.to_csv(path_or_buf='/Users/scottmatthewssalmon/Desktop/github/CCFatigue/
 
 
 print(meta_df)
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
