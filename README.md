@@ -64,7 +64,7 @@ Using the notebooks in the modules folder, one can compute the right parameters 
 
 # Reproduce
 
-
+[Environment file](environment.yml "Environment file")
 
 # License
 TBD.
