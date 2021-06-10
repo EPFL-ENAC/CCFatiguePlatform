@@ -6,6 +6,7 @@
 
 import matplotlib.pyplot as plt
 import os
+from numpy.core.numeric import NaN
 import pandas as pd
 import numpy as np
 import bokeh as bk
@@ -25,7 +26,6 @@ df = pd.read_csv(filepath)
 
 hyst_col = ['n_cycles', 'hysteresis_area', 'stiffness', 'creep']
 hyst_df = pd.DataFrame(columns = hyst_col)
-#hyst_df.n_cycles = n_cycles
 
 
 
@@ -59,13 +59,14 @@ def PolyArea(x,y):
 Hysteresis_Area = []
 Stiffness = []
 creep = []
+n = 0
 
 
 for j in range(len(n_cycles)):
     x=Stress_N[j]
     y=Strain_N[j]
     points=(x, y)
-    Hysteresis_Area.append(PolyArea(x, y))
+    Hysteresis_Area.append(PolyArea(x, y)*(n_cycles[i+1]-n_cycles[i]))
     if j > 0:
         slope, intercept, r_value, p_value, std_err = stats.linregress(y, x)
         Stiffness.append(slope)
@@ -94,8 +95,8 @@ for i in range(len(n_cycles)-1):
     creep.append(Strain_min[i])
     
 
-Stiffness.append(6331.946706)
-creep.append(0.008375)
+Stiffness.append(np.nan)
+creep.append(np.nan)
 hyst_df.stiffness = Stiffness
 hyst_df.creep = creep
 
