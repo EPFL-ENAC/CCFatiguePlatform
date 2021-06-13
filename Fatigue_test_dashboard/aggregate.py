@@ -5,9 +5,11 @@ from pathlib import Path
 import glob
 import os
 
-path = '/Users/scottmatthewssalmon/Desktop/github/CCFatigue/Data_tests/Aggregated_test'
 
-os.chdir(path)
+
+input_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/RAW'
+
+os.chdir(input_path)
 
 # get data file names
 filenames = [i for i in glob.glob("*.txt")]
@@ -84,6 +86,10 @@ SNdf.Residual_Strength = sortStress
 print(SNdf)
 
 # %%
-SNdf.to_csv(path_or_buf='/Users/scottmatthewssalmon/Desktop/github/CCFatigue/Outputs/Vahid_std_CCFat.csv', index=False)
+output_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/AGG'
+filename='AGG_VAH_210420_FA.txt'
+filepath = os.path.join(output_path,filename)
+
+SNdf.to_csv(path_or_buf=filepath, index=False)
 
 # %%

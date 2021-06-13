@@ -20,7 +20,12 @@ col=['Machine_N_cycles', 'Machine_Load', 'Machine_Displacement', 'DIC_index', 'D
      'Th_specimen_max', 'Th_specimen_mean', 'Th_chamber', 'Th_uppergrips', 'Th_lowergrips']
 
 
-dat = pd.read_csv('/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Use cases/Use case:Vahid_P1/Raw data Vahid/Conf-0.1-47-b-St.txt', sep='\t',header=0, decimal = ",")
+input_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/RAW'
+filename = 'RAW_VAH_210420_FA_002.txt'
+filepath = os.path.join(input_path,filename)
+
+
+dat = pd.read_csv(filepath, sep='\t',header=0, decimal = ",")
 
 df = pd.DataFrame(columns = col)
 df.Machine_N_cycles = dat.N
@@ -28,7 +33,10 @@ df.Machine_Load = dat.Stress
 df.Machine_Displacement = dat.Strain
 print(df)
 
-df.to_csv(path_or_buf='/Users/scottmatthewssalmon/Desktop/github/CCFatigue/Outputs/Vahid_std.csv', index=False)
+output_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/STD'
+filename='STD_VAH_210420_FA_002.txt'
+filepath = os.path.join(output_path,filename)
+df.to_csv(path_or_buf=filepath, index=False)
 
 
 
@@ -36,49 +44,49 @@ df.to_csv(path_or_buf='/Users/scottmatthewssalmon/Desktop/github/CCFatigue/Outpu
 
 
 
-compression_opts = {'method' : 'zip'}
+#compression_opts = {'method' : 'zip'}
 
-col2=['Machine_N_cycles', 'Machine_Load', 'Machine_Displacement', 'DIC_index', 'DIC_N_cycles',
-      'DIC_exx', 'DIC_eyy', 'DIC_exy', 'DIC_crack_length', 'Th_N_cycles', 'Th_time',
-      'Th_specimen_max', 'Th_specimen_mean', 'Th_chamber', 'Th_uppergrips', 'Th_lowergrips']
+#col2=['Machine_N_cycles', 'Machine_Load', 'Machine_Displacement', 'DIC_index', 'DIC_N_cycles',
+#      'DIC_exx', 'DIC_eyy', 'DIC_exy', 'DIC_crack_length', 'Th_N_cycles', 'Th_time',
+#      'Th_specimen_max', 'Th_specimen_mean', 'Th_chamber', 'Th_uppergrips', 'Th_lowergrips']
 #machine = pd.read_csv('Essai1.steps.trends.csv', sep=';',header=0)
 
 
 
-machine = pd.read_csv('/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Use cases/Data template - Shayan/Database Platform/Raw Data/DIC_Vic2D/CA_Pl1_S60_R0.1_LR1_1_cycles.txt', sep='\t',header=0, decimal=",")
-dic = pd.read_csv('/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Use cases/Data template - Shayan/Database Platform/Raw Data/DIC_Vic2D/exx_mean.csv', sep=',',header=1)
-thermal = pd.read_csv('/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Use cases/Data template - Shayan/Database Platform/Raw Data/Thermal/Temp-Time.dat', sep='\t',header=6, index_col=False)
+#machine = pd.read_csv('/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Use cases/Data template - Shayan/Database Platform/Raw Data/DIC_Vic2D/CA_Pl1_S60_R0.1_LR1_1_cycles.txt', sep='\t',header=0, decimal=",")
+#dic = pd.read_csv('/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Use cases/Data template - Shayan/Database Platform/Raw Data/DIC_Vic2D/exx_mean.csv', sep=',',header=1)
+#thermal = pd.read_csv('/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Use cases/Data template - Shayan/Database Platform/Raw Data/Thermal/Temp-Time.dat', sep='\t',header=6, index_col=False)
 
 
-df2 = pd.DataFrame(columns = col2)
+#df2 = pd.DataFrame(columns = col2)
 
-df2.Th_time = thermal.Time
-df2.Th_specimen_max = thermal.Specimen_Max
-df2.Th_specimen_mean = thermal.Specimen_Mean
-df2.Th_chamber = thermal.Chamber
-df2.Th_uppergrips = thermal.filter(items = ['Upper Grips'])
-df2.Th_lowergrips = thermal.filter(items = ['Lower Grips'])
+#df2.Th_time = thermal.Time
+#df2.Th_specimen_max = thermal.Specimen_Max
+#df2.Th_specimen_mean = thermal.Specimen_Mean
+#df2.Th_chamber = thermal.Chamber
+#df2.Th_uppergrips = thermal.filter(items = ['Upper Grips'])
+#df2.Th_lowergrips = thermal.filter(items = ['Lower Grips'])
 
-df2.DIC_index = dic.filter(items = ['Index [1]'])
-df2.DIC_exx = dic.filter(items = ['exx [1] - engr.'])
-df2.DIC_eyy = dic.filter(items = ['eyy [1] - engr.'])
-df2.DIC_exy = dic.filter(items = ['exy [1] - engr.'])
+#df2.DIC_index = dic.filter(items = ['Index [1]'])
+#df2.DIC_exx = dic.filter(items = ['exx [1] - engr.'])
+#df2.DIC_eyy = dic.filter(items = ['eyy [1] - engr.'])
+#df2.DIC_exy = dic.filter(items = ['exy [1] - engr.'])
 
-df2.Machine_N_cycles = machine.filter(items = ['Nb of cycle'])
-df2.Machine_Load = machine.ai0
-df2.Machine_Displacement = machine.ai1
+#df2.Machine_N_cycles = machine.filter(items = ['Nb of cycle'])
+#df2.Machine_Load = machine.ai0
+#df2.Machine_Displacement = machine.ai1
 
-df2 = df2[['Th_N_cycles','Th_time', 'Th_specimen_max', 'Th_specimen_mean',
-           'Th_chamber', 'Th_uppergrips', 'Th_lowergrips', 'DIC_index', 'DIC_N_cycles', 'DIC_exx',
-           'DIC_eyy', 'DIC_exy', 'Machine_N_cycles', 'Machine_Load', 'Machine_Displacement']]
+#df2 = df2[['Th_N_cycles','Th_time', 'Th_specimen_max', 'Th_specimen_mean',
+#           'Th_chamber', 'Th_uppergrips', 'Th_lowergrips', 'DIC_index', 'DIC_N_cycles', 'DIC_exx',
+#           'DIC_eyy', 'DIC_exy', 'Machine_N_cycles', 'Machine_Load', 'Machine_Displacement']]
 
 
 #print(thermal)
 
 
 #print(dic)
-print(df2)
-df2.to_csv(path_or_buf='/Users/scottmatthewssalmon/Desktop/github/CCFatigue/Outputs/Shayan_std.csv', index=False)
+#print(df2)
+#df2.to_csv(path_or_buf='/Users/scottmatthewssalmon/Desktop/github/CCFatigue/Outputs/Shayan_std.csv', index=False)
 #df2.to_csv(r'/Users/scottmatthewssalmon/Desktop/Projet de Master', index = False)
 
 
@@ -166,7 +174,12 @@ meta_df.R_Ratio.units = '[–]'
 meta_df.Sig_maxFat.value = 47.4
 meta_df.Sig_maxFat.units = '[MPa]'
 
-meta_df.to_csv(path_or_buf='/Users/scottmatthewssalmon/Desktop/github/CCFatigue/Outputs/Vahid_metadata.csv', index=False)
+output_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420'
+filename = 'MET_VAH_210420_FA_002.txt'
+filepath = os.path.join(output_path,filename)
+
+meta_df.to_csv(path_or_buf=filepath, index=False)
 
 
 print(meta_df)
+# %%
