@@ -14,9 +14,9 @@ from bokeh.transform import linear_cmap
 
 
 ## Importing input file
-data_dir = '/Users/scottmatthewssalmon/Desktop/github/CCFatigue/Outputs'
-filename = 'Vahid_std.csv'
-filepath = os.path.join(data_dir,filename)
+input_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/STD'
+filename='STD_VAH_210420_FA_002.txt'
+filepath = os.path.join(input_path,filename)
 
 df = pd.read_csv(filepath)
 print(df)
@@ -106,8 +106,9 @@ print(plot_Strain_envelope(df))
 
 ### Importing Hysteresis loops analysis file
 
-filename = 'Vahid_hysteresis_analysis.csv'
-filepath = os.path.join(data_dir, filename)
+input_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/HYS'
+filename='HYS_VAH_210420_FA_002.txt'
+filepath = os.path.join(input_path,filename)
 
 hyst_df = pd.read_csv(filepath, sep = ',', header = 0)
 
@@ -115,32 +116,6 @@ hyst_df = pd.read_csv(filepath, sep = ',', header = 0)
 
 ### Importing Hysteresis loops areas
 
-filename = 'Vahid_hystarea.csv'
-filepath = os.path.join(data_dir,filename)
-
-hystarea = pd.read_csv(filepath, sep='\t',header=0)
-
-
-# In[11]:
-
-
-### Importing N_cycles without duplicates
-
-filename = 'Vahid_n_cycles.csv'
-filepath = os.path.join(data_dir,filename)
-
-n_cycles = pd.read_csv(filepath, sep='\t',header=0)
-
-
-# In[12]:
-
-
-### Importing Stiffness values
-
-filename = 'Vahid_stiff.csv'
-filepath = os.path.join(data_dir,filename)
-
-stiffness = pd.read_csv(filepath, sep='\t',header=0)
 
 
 # In[13]:
@@ -219,3 +194,5 @@ print(plot_stiffness(hyst_df))
 
 
 
+
+# %%
