@@ -66,7 +66,9 @@ for j in range(len(n_cycles)):
     x=Stress_N[j]
     y=Strain_N[j]
     points=(x, y)
-    Hysteresis_Area.append(PolyArea(x, y)*(n_cycles[i+1]-n_cycles[i]))
+    if j<(len(n_cycles)-1):
+        Hysteresis_Area.append(PolyArea(x, y)*(n_cycles[j+1]-n_cycles[j]))
+    else: Hysteresis_Area.append(np.nan)
     if j > 0:
         slope, intercept, r_value, p_value, std_err = stats.linregress(y, x)
         Stiffness.append(slope)
