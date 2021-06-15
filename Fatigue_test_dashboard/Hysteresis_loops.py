@@ -32,7 +32,7 @@ hyst_df = pd.DataFrame(columns = hyst_col)
 ### Extract number of cycles without repeating values in other table, and store number of measurements per cycle
 
 n_cycles = sorted(set(df.Machine_N_cycles))
-n_measurements = Counter(df.Machine_N_cycles)  
+n_measurements = Counter(df.Machine_N_cycles)
 
 
 n_cycles_df = pd.DataFrame(n_cycles)
@@ -47,7 +47,7 @@ df0=np.array(df)
 for k in range(len(n_cycles)):
     Stress_N.append([df0[i,1] for i in range(df0.shape[0]) if df0[i,0]==n_cycles[k]])
     Strain_N.append([df0[i,2] for i in range(df0.shape[0]) if df0[i,0]==n_cycles[k]])
-    
+
 
 ### Definition of polyarea function
 def PolyArea(x,y):
@@ -72,12 +72,12 @@ for j in range(len(n_cycles)):
     if j > 0:
         slope, intercept, r_value, p_value, std_err = stats.linregress(y, x)
         Stiffness.append(slope)
-    
+
 hyst_df.hysteresis_area = Hysteresis_Area
 
 
 
-print(Stiffness)
+#print(Stiffness)
 
 
 
@@ -95,7 +95,7 @@ for i in range(len(n_cycles)-1):
     #dStrain = Strain_max[i]-Strain_min[i]
     #Stiffness.append(dStress/dStrain)
     creep.append(Strain_min[i])
-    
+
 
 Stiffness.append(np.nan)
 creep.append(np.nan)
@@ -104,7 +104,7 @@ hyst_df.creep = creep
 
 
 
-print(hyst_df)
+#print(hyst_df)
 
 
 # In[11]:

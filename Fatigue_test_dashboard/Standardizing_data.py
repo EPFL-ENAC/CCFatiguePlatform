@@ -31,7 +31,7 @@ df = pd.DataFrame(columns = col)
 df.Machine_N_cycles = dat.N
 df.Machine_Load = dat.Stress
 df.Machine_Displacement = dat.Strain
-print(df)
+#print(df)
 
 output_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/STD'
 filename='STD_VAH_210420_FA_002.txt'
@@ -181,5 +181,5 @@ filepath = os.path.join(output_path,filename)
 meta_df.to_csv(path_or_buf=filepath, index=False)
 
 
-print(meta_df)
+#print(meta_df)
 # %%

@@ -19,7 +19,7 @@ filename='STD_VAH_210420_FA_002.txt'
 filepath = os.path.join(input_path,filename)
 
 df = pd.read_csv(filepath)
-print(df)
+#print(df)
 
 
 ### Conditional plotting of hysteresis loops
@@ -37,7 +37,7 @@ for i in range(len(df)):
             sub_hystloops_strain.append(df.Machine_Displacement[i])
             sub_hystloops_stress.append(df.Machine_Load[i])
             sub_hystloops_ncycles.append(df.Machine_N_cycles[i])
-    
+
 
 
 # In[4]:
@@ -50,13 +50,13 @@ sub_hystloops = {'n_cycles': sub_hystloops_ncycles,
 def plot_select_stress_strain(sub_hystloops):
     stressStrain = figure(title = 'Stress - Strain', plot_width=1200, plot_height=800,
                           x_axis_label = "Strain", y_axis_label = "Stress")
-    
-    
+
+
     stressStrain.add_tools(HoverTool(tooltips=[("Stress", "@stress"), ("Strain", "@strain"),
                                                ("Nb. cycles", "@n_cycles")]))
     stressStrain.line(x = 'strain', y = 'stress', source = ColumnDataSource(data = sub_hystloops))
-    show(stressStrain)    
-print(plot_select_stress_strain(sub_hystloops))
+    show(stressStrain)
+plot_select_stress_strain(sub_hystloops)
 
 
 
@@ -75,8 +75,8 @@ def plot_total_stress_strain(df):
     stress_strain.add_tools(HoverTool(tooltips=[("Stress", "@stress"), ("Strain", "@strain")]))
     stress_strain.line(x = 'strain', y = 'stress', source = ColumnDataSource(data = total_stress_strain))
     show(stress_strain)
-    
-print(plot_total_stress_strain(df))
+
+plot_total_stress_strain(df)
 
 
 
@@ -87,8 +87,8 @@ def plot_Load_curve(df):
     loadCurve = figure(title = 'Load curve', plot_width=1200, plot_height=800, x_axis_label = "Number of cycles", y_axis_label = "Stress")
     loadCurve.line(df.Machine_N_cycles, df.Machine_Load)
     show(loadCurve)
-    
-print(plot_Load_curve(df))
+
+plot_Load_curve(df)
 
 
 
@@ -100,8 +100,8 @@ def plot_Strain_envelope(df):
                             x_axis_label = "Number of cycles", y_axis_label = "Strain")
     strainEnvelope.line(df.Machine_N_cycles, df.Machine_Displacement)
     show(strainEnvelope)
-    
-print(plot_Strain_envelope(df))
+
+plot_Strain_envelope(df)
 
 
 ### Importing Hysteresis loops analysis file
@@ -135,8 +135,8 @@ def plot_creep(hyst_df):
     creep.add_tools(HoverTool(tooltips=[("Creep", "@creep"), ("Nb. cycles", "@n_cycles")]))
     creep.line(x = 'n_cycles', y = 'creep', source = ColumnDataSource(data = sub_creep))
     show(creep)
-    
-print(plot_creep(hyst_df))
+
+plot_creep(hyst_df)
 
 
 
@@ -157,8 +157,8 @@ def plot_hystarea(hyst_df):
     area.add_tools(HoverTool(tooltips=[("area", "@area"), ("Nb. cycles", "@n_cycles")]))
     area.line(x = 'n_cycles', y = 'area', source = ColumnDataSource(data = sub_hyst))
     show(area)
-    
-print(plot_hystarea(hyst_df))
+
+plot_hystarea(hyst_df)
 
 
 # In[19]:
@@ -185,8 +185,8 @@ def plot_stiffness(hyst_df):
     stiff.add_tools(HoverTool(tooltips=[("stiffness", "@stiffness"), ("Nb. cycles", "@n_cycles")]))
     stiff.line(x = 'n_cycles', y = 'stiffness', source = ColumnDataSource(data = sub_hyst))
     show(stiff)
-    
-print(plot_stiffness(hyst_df))
+
+plot_stiffness(hyst_df)
 
 
 
