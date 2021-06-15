@@ -7,13 +7,15 @@ import os
 
 
 
-input_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/RAW'
+input_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/STD'
 
 os.chdir(input_path)
 
 # get data file names
 filenames = [i for i in glob.glob("*.txt")]
-df = [pd.read_csv(file, sep = "\t", header=0, decimal=',') for file in filenames]
+df = [pd.read_csv(file, sep = ",", header=0, decimal='.') for file in filenames]
+
+#print(df)
 
 #setup df
 cols = ['Stress_Ratio', 'Reliability_Level', 'Stress_Level_No', 'Stress_Parameter', 'Number_of_Cycles', 'Residual_Strength']
@@ -25,11 +27,11 @@ agg_n_cycles = []
 #select max stress for all tests
 
 for i in range(len(df)):
-    stress = df[i].Stress
+    stress = df[i].Machine_Load
     max_stress = max(stress)
     agg_stress.append(max_stress)
 
-    n_cycles = df[i].N
+    n_cycles = df[i].Machine_N_cycles
     max_n_cycles = max(n_cycles)
     agg_n_cycles.append(max_n_cycles)
 

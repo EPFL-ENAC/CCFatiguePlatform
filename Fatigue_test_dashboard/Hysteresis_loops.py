@@ -16,7 +16,7 @@ from scipy import stats
 ### Importing data from csv file
 
 input_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/STD'
-filename='STD_VAH_210420_FA_002.txt'
+filename='STD_VAH_210420_FA_012.txt'
 filepath = os.path.join(input_path,filename)
 
 df = pd.read_csv(filepath)
@@ -109,7 +109,7 @@ hyst_df.creep = creep
 
 # In[11]:
 output_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/HYS'
-filename='HYS_VAH_210420_FA_002.txt'
+filename='HYS_VAH_210420_FA_012.txt'
 filepath = os.path.join(output_path,filename)
 
 hyst_df.to_csv(path_or_buf=filepath, index=False)

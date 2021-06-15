@@ -21,7 +21,7 @@ col=['Machine_N_cycles', 'Machine_Load', 'Machine_Displacement', 'DIC_index', 'D
 
 
 input_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/RAW'
-filename = 'RAW_VAH_210420_FA_002.txt'
+filename = 'RAW_VAH_210420_FA_012.txt'
 filepath = os.path.join(input_path,filename)
 
 
@@ -34,7 +34,7 @@ df.Machine_Displacement = dat.Strain
 #print(df)
 
 output_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/STD'
-filename='STD_VAH_210420_FA_002.txt'
+filename='STD_VAH_210420_FA_012.txt'
 filepath = os.path.join(output_path,filename)
 df.to_csv(path_or_buf=filepath, index=False)
 
