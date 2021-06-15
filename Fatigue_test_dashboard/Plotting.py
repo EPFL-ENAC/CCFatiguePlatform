@@ -15,10 +15,19 @@ from bokeh.transform import linear_cmap
 
 ## Importing input file
 input_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/STD'
-filename='STD_VAH_210420_FA_002.txt'
+filename='STD_VAH_210420_FA_012.txt'
 filepath = os.path.join(input_path,filename)
 
 df = pd.read_csv(filepath)
+### Importing Hysteresis loops analysis file
+
+input_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/HYS'
+filename='HYS_VAH_210420_FA_012.txt'
+filepath = os.path.join(input_path,filename)
+
+hyst_df = pd.read_csv(filepath, sep = ',', header = 0)
+
+
 #print(df)
 
 
@@ -104,13 +113,7 @@ def plot_Strain_envelope(df):
 plot_Strain_envelope(df)
 
 
-### Importing Hysteresis loops analysis file
 
-input_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/HYS'
-filename='HYS_VAH_210420_FA_002.txt'
-filepath = os.path.join(input_path,filename)
-
-hyst_df = pd.read_csv(filepath, sep = ',', header = 0)
 
 
 
