@@ -36,9 +36,9 @@ for i in range(len(df)):
 
 # %%
 
-print(stress)
-print(agg_stress)
-print(agg_n_cycles)
+#print(stress)
+#print(agg_stress)
+#print(agg_n_cycles)
 
 
 # %% declaring other parameters
@@ -67,9 +67,9 @@ for i in range (0,len(sortStress)):
 
 
 # %% Checkpoint
-print(stressLev)
-print(len(stressLev))
-print(len(sortStress))
+#print(stressLev)
+#print(len(stressLev))
+#print(len(sortStress))
 
 # %% Constructing standard format for CCFatigue S-N curve
 
