@@ -20,9 +20,11 @@ col=['Machine_N_cycles', 'Machine_Load', 'Machine_Displacement', 'DIC_index', 'D
      'Th_specimen_max', 'Th_specimen_mean', 'Th_chamber', 'Th_uppergrips', 'Th_lowergrips']
 
 
-input_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/RAW'
-filename = 'RAW_VAH_210420_FA_012.txt'
-filepath = os.path.join(input_path,filename)
+data_directory, = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/"
+CCLab/Vahid/Fatigue/210420/RAW'
+filename = data_type+'_'+RAW_VAH_210420_FA_012.txt'
+lab = "CCLab"
+filepath = os.path.join(data_directory,lab, researcher, testfilename)
 
 
 dat = pd.read_csv(filepath, sep='\t',header=0, decimal = ",")
@@ -104,7 +106,7 @@ meta_df = pd.DataFrame(columns = metadata_col, index = ['value', 'units'])
 
 
 
-
+# Parametres injectés par expérience
 
 
 meta_df.File_Name.value = 'VAH_20210420_FAT_RAW_001'

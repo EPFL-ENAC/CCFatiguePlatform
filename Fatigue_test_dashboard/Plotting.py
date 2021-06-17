@@ -31,30 +31,34 @@ hyst_df = pd.read_csv(filepath, sep = ',', header = 0)
 #print(df)
 
 
-### Conditional plotting of hysteresis loops
 
-sub_hystloops_strain = []
-sub_hystloops_stress = []
-sub_hystloops_ncycles = []
 
 ### We select loops for plotting on an arbitrary basis (subject to modifications)
 sub_index = [0, 1, 5, 10, 100, 200, 1000, 2000, 10000, 50000, 100000, 500000, 1000000]
 
-for i in range(len(df)):
-    for j in range(len(sub_index)):
+nb_curve = len(sub_index)
+### Conditional plotting of hysteresis loops
+sub_hystloops = []
+for j in range(nb_curve):
+    sub_hystloops_strain = []
+    sub_hystloops_stress = []
+    sub_hystloops_ncycles = []
+    for i in range(len(df)):
         if df.Machine_N_cycles[i] == sub_index[j]:
             sub_hystloops_strain.append(df.Machine_Displacement[i])
             sub_hystloops_stress.append(df.Machine_Load[i])
             sub_hystloops_ncycles.append(df.Machine_N_cycles[i])
 
+    # make curve closed
+    if len(sub_hystloops_ncycles) != 0:
+        sub_hystloops_strain.append(sub_hystloops_strain[0])
+        sub_hystloops_stress.append(sub_hystloops_stress[0])
+        sub_hystloops_ncycles.append(sub_hystloops_ncycles[0])
 
+    sub_hystloops.append({'n_cycles': sub_hystloops_ncycles,
+                             'strain': sub_hystloops_strain,
+                             'stress': sub_hystloops_stress})
 
-# In[4]:
-
-
-sub_hystloops = {'n_cycles': sub_hystloops_ncycles,
-                 'strain': sub_hystloops_strain,
-                 'stress': sub_hystloops_stress}
 
 def plot_select_stress_strain(sub_hystloops):
     stressStrain = figure(title = 'Stress - Strain', plot_width=1200, plot_height=800,
@@ -63,7 +67,8 @@ def plot_select_stress_strain(sub_hystloops):
 
     stressStrain.add_tools(HoverTool(tooltips=[("Stress", "@stress"), ("Strain", "@strain"),
                                                ("Nb. cycles", "@n_cycles")]))
-    stressStrain.line(x = 'strain', y = 'stress', source = ColumnDataSource(data = sub_hystloops))
+    for curve in sub_hystloops:
+        stressStrain.line(x = 'strain', y = 'stress', source = ColumnDataSource(data = curve))
     show(stressStrain)
 plot_select_stress_strain(sub_hystloops)
 
