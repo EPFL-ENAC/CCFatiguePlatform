@@ -24,6 +24,7 @@ col=['Machine_N_cycles', 'Machine_Load', 'Machine_Displacement', 'DIC_index', 'D
 
 
 # Declaring inputs
+# Data has to be presented in 3 continuous columns: with number of cycles (N), Stress (machine load), and Strain (machine displacement)
 
 data_directory = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/'
 data_type = 'RAW'
