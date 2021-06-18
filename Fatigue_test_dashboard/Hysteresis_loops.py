@@ -106,7 +106,7 @@ for i in range(len(n_cycles)-1):
     #dStress = Stress_max[i]-Stress_min[i]
     #dStrain = Strain_max[i]-Strain_min[i]
     #Stiffness.append(dStress/dStrain)
-    creep.append(Strain_min[i])
+    creep.append((Strain_max[i]+Strain_min[i])/2)
 
 
 Stiffness.append(np.nan)
