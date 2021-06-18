@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[15]:
+
 
 
 import pandas as pd
@@ -9,25 +9,42 @@ import numpy as np
 import os
 
 
-# In[16]:
+
+
 
 
 
 compression_opts = dict(method ='zip', archive_name='out.csv')
 
+# Defining dataframe
+
 col=['Machine_N_cycles', 'Machine_Load', 'Machine_Displacement', 'DIC_index', 'DIC_N_cycles',
-     'DIC_exx', 'DIC_eyy', 'DIC_exy', 'DIC_crack_length', 'Th_N_cycles', 'Th_time',
+     'DIC_exx', 'DIC_eyy', 'DIC_exy', 'DIC_crack_length', 'Th_sN_cycles', 'Th_time',
      'Th_specimen_max', 'Th_specimen_mean', 'Th_chamber', 'Th_uppergrips', 'Th_lowergrips']
 
 
-data_directory, = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/"
-CCLab/Vahid/Fatigue/210420/RAW'
-filename = data_type+'_'+RAW_VAH_210420_FA_012.txt'
+# Declaring inputs
+
+data_directory = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/'
+data_type = 'RAW'
+res = 'VAH'
+date = '210420'
+test_type = 'FA'
+test_number = '002'
+filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
+
 lab = "CCLab"
-filepath = os.path.join(data_directory,lab, researcher, testfilename)
+researcher = 'Vahid'
+loading = 'Fatigue'
+
+
+filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
+
 
 
 dat = pd.read_csv(filepath, sep='\t',header=0, decimal = ",")
+
+# Populating dataframe
 
 df = pd.DataFrame(columns = col)
 df.Machine_N_cycles = dat.N
@@ -35,9 +52,23 @@ df.Machine_Load = dat.Stress
 df.Machine_Displacement = dat.Strain
 #print(df)
 
-output_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/STD'
-filename='STD_VAH_210420_FA_012.txt'
-filepath = os.path.join(output_path,filename)
+# Declaring outputs
+
+data_directory = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example'
+
+data_type = 'STD'
+res = 'VAH'
+date = '210420'
+test_type = 'FA'
+test_number = '002'
+filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
+
+lab = "CCLab"
+researcher = 'Vahid'
+loading = 'Fatigue'
+
+
+filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
 df.to_csv(path_or_buf=filepath, index=False)
 
 

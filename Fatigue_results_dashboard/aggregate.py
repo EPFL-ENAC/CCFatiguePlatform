@@ -7,9 +7,25 @@ import os
 
 
 
-input_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/STD'
 
-os.chdir(input_path)
+data_directory = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example'
+
+data_type = 'STD'
+res = 'VAH'
+date = '210420'
+test_type = 'FA'
+test_number = '002'
+filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
+
+lab = "CCLab"
+researcher = 'Vahid'
+loading = 'Fatigue'
+
+
+filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type)
+
+
+os.chdir(filepath)
 
 # get data file names
 filenames = [i for i in glob.glob("*.txt")]
@@ -90,6 +106,23 @@ print(SNdf)
 # %%
 output_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/AGG'
 filename='AGG_VAH_210420_FA.txt'
+data_directory = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example'
+
+data_type = 'AGG'
+res = 'VAH'
+date = '210420'
+test_type = 'FA'
+test_number = '002'
+filename = data_type+'_'+res+'_'+date+'_'+test_type+'.txt'
+
+lab = "CCLab"
+researcher = 'Vahid'
+loading = 'Fatigue'
+
+
+filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
+
+
 filepath = os.path.join(output_path,filename)
 
 SNdf.to_csv(path_or_buf=filepath, index=False)

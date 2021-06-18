@@ -13,17 +13,46 @@ from bokeh.transform import linear_cmap
 
 
 
-## Importing input file
-input_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/STD'
-filename='STD_VAH_210420_FA_002.txt'
-filepath = os.path.join(input_path,filename)
+## Importing input File_size
+
+# Data in standard format
+
+data_directory = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example'
+
+data_type = 'STD'
+res = 'VAH'
+date = '210420'
+test_type = 'FA'
+test_number = '002'
+filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
+
+lab = "CCLab"
+researcher = 'Vahid'
+loading = 'Fatigue'
+
+
+filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
 
 df = pd.read_csv(filepath)
 ### Importing Hysteresis loops analysis file
 
-input_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420/HYS'
-filename='HYS_VAH_210420_FA_002.txt'
-filepath = os.path.join(input_path,filename)
+# Data treated in hysteresis analysis
+
+data_directory = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example'
+
+data_type = 'HYS'
+res = 'VAH'
+date = '210420'
+test_type = 'FA'
+test_number = '002'
+filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
+
+lab = "CCLab"
+researcher = 'Vahid'
+loading = 'Fatigue'
+
+
+filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
 
 hyst_df = pd.read_csv(filepath, sep = ',', header = 0)
 
@@ -31,13 +60,13 @@ hyst_df = pd.read_csv(filepath, sep = ',', header = 0)
 #print(df)
 
 
-
+# Plotting Stress Strain curves, we use the stress - strain values from the data in standard format
 
 ### We select loops for plotting on an arbitrary basis (subject to modifications)
 sub_index = [0, 1, 5, 10, 100, 200, 1000, 2000, 10000, 50000, 100000, 500000, 1000000]
 
 nb_curve = len(sub_index)
-### Conditional plotting of hysteresis loops
+### Conditional plotting of hysteresis loops - we only plot the loops specified by sub_index
 sub_hystloops = []
 for j in range(nb_curve):
     sub_hystloops_strain = []
@@ -49,7 +78,7 @@ for j in range(nb_curve):
             sub_hystloops_stress.append(df.Machine_Load[i])
             sub_hystloops_ncycles.append(df.Machine_N_cycles[i])
 
-    # make curve closed
+    # make curve closed // Optional
     if len(sub_hystloops_ncycles) != 0:
         sub_hystloops_strain.append(sub_hystloops_strain[0])
         sub_hystloops_stress.append(sub_hystloops_stress[0])
@@ -74,7 +103,7 @@ plot_select_stress_strain(sub_hystloops)
 
 
 
-### Plotting Stress - Strain with Bokeh library
+### Plotting Stress - Strain (all loops) using data in standard format
 
 total_strain = df.Machine_Displacement
 total_stress = df.Machine_Load
@@ -94,7 +123,7 @@ plot_total_stress_strain(df)
 
 
 
-##* Plotting Load curve with Bokeh library
+##* Plotting Load curve with Bokeh library using standard format data
 
 
 def plot_Load_curve(df):
@@ -106,7 +135,7 @@ plot_Load_curve(df)
 
 
 
-### Plotting strain envelope with Bokeh library
+### Plotting strain envelope with Bokeh library usiing data in standard format
 
 
 def plot_Strain_envelope(df):
@@ -122,14 +151,7 @@ plot_Strain_envelope(df)
 
 
 
-### Importing Hysteresis loops areas
-
-
-
-# In[13]:
-
-
-### Creep envelope
+### Creep evolution - using data from hysteresis analysis
 creep_strain = hyst_df.creep
 creep_n_cycles = hyst_df.n_cycles
 
@@ -148,7 +170,7 @@ plot_creep(hyst_df)
 
 
 
-### Hysteresis area plot
+### Hysteresis area plot - using data from hysteresis analysis
 
 hyst_area = hyst_df.hysteresis_area
 hyst_n_cycles = hyst_df.n_cycles
@@ -169,15 +191,12 @@ def plot_hystarea(hyst_df):
 plot_hystarea(hyst_df)
 
 
-# In[19]:
-
-
 print(TDE)
 
 
 
 
-### Stiffness evolution plot
+### Stiffness evolution plot - data from hysteresis analysis
 
 hyst_stiff = hyst_df.stiffness
 hyst_n_cycles = hyst_df.n_cycles
