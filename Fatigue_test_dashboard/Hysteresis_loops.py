@@ -21,7 +21,7 @@ data_type = 'STD'
 res = 'VAH'
 date = '210420'
 test_type = 'FA'
-test_number = '002'
+test_number = '012'
 filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
 
 lab = "CCLab"
@@ -41,7 +41,7 @@ data_type = 'MET'
 res = 'VAH'
 date = '210420'
 test_type = 'FA'
-test_number = '002'
+#test_number = '005'
 filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
 
 lab = "CCLab"
@@ -145,7 +145,7 @@ data_type = 'HYS'
 res = 'VAH'
 date = '210420'
 test_type = 'FA'
-test_number = '002'
+#test_number = '005'
 filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
 
 lab = "CCLab"

@@ -31,7 +31,7 @@ data_type = 'RAW'
 res = 'VAH'
 date = '210420'
 test_type = 'FA'
-test_number = '002'
+test_number = '009'
 filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
 
 lab = "CCLab"
@@ -59,7 +59,7 @@ data_type = 'STD'
 res = 'VAH'
 date = '210420'
 test_type = 'FA'
-test_number = '002'
+test_number = '009'
 filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
 
 lab = "CCLab"
@@ -139,7 +139,7 @@ meta_df = pd.DataFrame(columns = metadata_col, index = ['value', 'units'])
 # Parametres injectés par expérience
 
 
-meta_df.File_Name.value = 'VAH_20210420_FAT_RAW_012'
+meta_df.File_Name.value = 'VAH_20210420_FAT_RAW_009'
 meta_df.File_Name.units = '[–]'
 
 meta_df.File_Format.value = 'CSV'
@@ -220,7 +220,7 @@ data_type = 'MET'
 res = 'VAH'
 date = '210420'
 test_type = 'FA'
-test_number = '012'
+test_number = '009'
 filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
 
 lab = "CCLab"
