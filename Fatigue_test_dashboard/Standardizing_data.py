@@ -139,7 +139,7 @@ meta_df = pd.DataFrame(columns = metadata_col, index = ['value', 'units'])
 # Parametres injectés par expérience
 
 
-meta_df.File_Name.value = 'VAH_20210420_FAT_RAW_001'
+meta_df.File_Name.value = 'VAH_20210420_FAT_RAW_012'
 meta_df.File_Name.units = '[–]'
 
 meta_df.File_Format.value = 'CSV'
@@ -203,10 +203,10 @@ meta_df.Fat_Type.units = '[–]'
 meta_df.R_Ratio.value = 0.1
 meta_df.R_Ratio.units = '[–]'
 
-meta_df.Sig_maxFat.value = 47.4
+meta_df.Sig_maxFat.value = 68.0
 meta_df.Sig_maxFat.units = '[MPa]'
 
-meta_df.N_fail.value = 1198627
+meta_df.N_fail.value = 1969
 meta_df.N_fail.units = '[-]'
 
 meta_df.Rel_level.value = 50
@@ -220,7 +220,7 @@ data_type = 'MET'
 res = 'VAH'
 date = '210420'
 test_type = 'FA'
-test_number = '002'
+test_number = '012'
 filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
 
 lab = "CCLab"
