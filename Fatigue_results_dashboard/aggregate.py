@@ -6,7 +6,7 @@ import glob
 import os
 
 
-
+### Importing all STD files
 
 data_directory = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example'
 
@@ -14,8 +14,7 @@ data_type = 'STD'
 res = 'VAH'
 date = '210420'
 test_type = 'FA'
-test_number = '002'
-filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
+filename = data_type+'_'+res+'_'+date+'_'+test_type+'.txt'
 
 lab = "CCLab"
 researcher = 'Vahid'
@@ -30,6 +29,29 @@ os.chdir(filepath)
 # get data file names
 filenames = [i for i in glob.glob("*.txt")]
 df = [pd.read_csv(file, sep = ",", header=0, decimal='.') for file in filenames]
+
+
+### Importing meta data from csv
+
+data_directory = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example'
+
+data_type = 'MET'
+res = 'VAH'
+date = '210420'
+test_type = 'FA'
+test_number = '002'
+filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
+
+lab = "CCLab"
+researcher = 'Vahid'
+loading = 'Fatigue'
+
+filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
+
+meta_df = pd.read_csv(filepath, header = 0)
+
+
+
 
 #print(df)
 
@@ -60,8 +82,8 @@ for i in range(len(df)):
 
 
 # %% declaring other parameters
-R_ratio = 0.1
-rel_level = 50
+R_ratio = float(meta_df.R_Ratio[0])
+rel_level = float(meta_df.Rel_level[0])
 percent = 0.05
 stressLev = []
 stressLevNo = 1

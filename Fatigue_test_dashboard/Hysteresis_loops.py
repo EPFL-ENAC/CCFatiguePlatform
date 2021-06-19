@@ -85,7 +85,6 @@ for k in range(len(n_cycles)):
 def PolyArea(x,y):
     return 0.5*np.abs(np.dot(x,np.roll(y,1))-np.dot(y,np.roll(x,1)))
 
-print(meta_df.N_fail[0])
 ### Hysteresis loops area computation
 
 Hysteresis_Area = []
@@ -157,14 +156,3 @@ loading = 'Fatigue'
 filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
 
 hyst_df.to_csv(path_or_buf=filepath, index=False)
-
-
-# In[ ]:
-
-
-
-
-
-# %%
-
-# %%

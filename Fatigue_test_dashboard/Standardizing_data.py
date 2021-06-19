@@ -129,7 +129,7 @@ metadata_col = ['File_Name', 'File_Format', 'File_size', 'TC_Temp', 'TC_RH', 'TC
                 'Geo_L', 'Geo_w', 'Geo_T', 'Measuring_equipment', 'CM_FiberMat', 'CM_FiberGeo',
                 'CM_AreaDen', 'CM_Adhesive', 'LA_CureTime', 'LA_CureTemp', 'LA_CurePres', 'LA_FiberCont',
                 'LA_StackSeq','LT', 'Fat_Type', 'R_Ratio', 'N_fail', 'Sig_maxFat',
-                'QS_TestType', 'Fracture', 'Fracture_Mode']
+                'Rel_level', 'QS_TestType', 'Fracture', 'Fracture_Mode']
 
 meta_df = pd.DataFrame(columns = metadata_col, index = ['value', 'units'])
 
@@ -208,6 +208,9 @@ meta_df.Sig_maxFat.units = '[MPa]'
 
 meta_df.N_fail.value = 1198627
 meta_df.N_fail.units = '[-]'
+
+meta_df.Rel_level.value = 50
+meta_df.Rel_level.units = '[-]'
 
 
 
