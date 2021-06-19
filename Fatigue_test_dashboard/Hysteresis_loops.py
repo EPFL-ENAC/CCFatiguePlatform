@@ -31,7 +31,27 @@ loading = 'Fatigue'
 
 filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
 
-df = pd.read_csv(filepath)
+df = pd.read_csv(filepath, header = 0)
+
+### Importing meta data from csv
+
+data_directory = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example'
+
+data_type = 'MET'
+res = 'VAH'
+date = '210420'
+test_type = 'FA'
+test_number = '002'
+filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
+
+lab = "CCLab"
+researcher = 'Vahid'
+loading = 'Fatigue'
+
+filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
+
+meta_df = pd.read_csv(filepath, header = 0)
+
 
 
 ### Creating dataframe structure
@@ -65,7 +85,7 @@ for k in range(len(n_cycles)):
 def PolyArea(x,y):
     return 0.5*np.abs(np.dot(x,np.roll(y,1))-np.dot(y,np.roll(x,1)))
 
-
+print(meta_df.N_fail[0])
 ### Hysteresis loops area computation
 
 Hysteresis_Area = []
@@ -80,12 +100,13 @@ for j in range(len(n_cycles)):
     points=(x, y)
     if j<(len(n_cycles)-1):
         Hysteresis_Area.append(PolyArea(x, y)*(n_cycles[j+1]-n_cycles[j]))
-    else: Hysteresis_Area.append(np.nan)
+    else: Hysteresis_Area.append(PolyArea(x, y)*(int(meta_df.N_fail[0])-n_cycles[j]))
     if j > 0:
         slope, intercept, r_value, p_value, std_err = stats.linregress(y, x)
         Stiffness.append(slope)
 
 hyst_df.hysteresis_area = Hysteresis_Area
+Stiffness.insert(0, np.nan)
 
 
 
@@ -109,8 +130,7 @@ for i in range(len(n_cycles)-1):
     creep.append((Strain_max[i]+Strain_min[i])/2)
 
 
-Stiffness.append(np.nan)
-creep.append(np.nan)
+creep.insert(0, np.nan)
 hyst_df.stiffness = Stiffness
 hyst_df.creep = creep
 

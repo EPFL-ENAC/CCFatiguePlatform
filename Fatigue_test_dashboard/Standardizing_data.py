@@ -41,8 +41,6 @@ loading = 'Fatigue'
 
 filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
 
-
-
 dat = pd.read_csv(filepath, sep='\t',header=0, decimal = ",")
 
 # Populating dataframe
@@ -130,7 +128,7 @@ df.to_csv(path_or_buf=filepath, index=False)
 metadata_col = ['File_Name', 'File_Format', 'File_size', 'TC_Temp', 'TC_RH', 'TC_CM', 'TC_GP',
                 'Geo_L', 'Geo_w', 'Geo_T', 'Measuring_equipment', 'CM_FiberMat', 'CM_FiberGeo',
                 'CM_AreaDen', 'CM_Adhesive', 'LA_CureTime', 'LA_CureTemp', 'LA_CurePres', 'LA_FiberCont',
-                'LA_StackSeq','LT', 'Fat_Type', 'R_Ratio', 'P_maxFat', 'Sig_maxFat',
+                'LA_StackSeq','LT', 'Fat_Type', 'R_Ratio', 'N_fail', 'Sig_maxFat',
                 'QS_TestType', 'Fracture', 'Fracture_Mode']
 
 meta_df = pd.DataFrame(columns = metadata_col, index = ['value', 'units'])
@@ -208,10 +206,25 @@ meta_df.R_Ratio.units = '[–]'
 meta_df.Sig_maxFat.value = 47.4
 meta_df.Sig_maxFat.units = '[MPa]'
 
-output_path = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/CCLab/Vahid/Fatigue/210420'
-filename = 'MET_VAH_210420_FA_002.txt'
-filepath = os.path.join(output_path,filename)
+meta_df.N_fail.value = 1198627
+meta_df.N_fail.units = '[-]'
 
+
+
+data_directory = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example'
+
+data_type = 'MET'
+res = 'VAH'
+date = '210420'
+test_type = 'FA'
+test_number = '002'
+filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
+
+lab = "CCLab"
+researcher = 'Vahid'
+loading = 'Fatigue'
+
+filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
 meta_df.to_csv(path_or_buf=filepath, index=False)
 
 
