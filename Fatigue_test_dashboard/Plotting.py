@@ -213,9 +213,6 @@ def plot_stiffness(hyst_df):
     stiff.line(x = 'n_cycles', y = 'stiffness', source = ColumnDataSource(data = sub_hyst))
     show(stiff)
 
-plot_stiffness(hyst_df)
-
-
 
 
 
