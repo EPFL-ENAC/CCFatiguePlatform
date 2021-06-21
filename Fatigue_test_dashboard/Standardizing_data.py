@@ -10,10 +10,6 @@ import os
 
 
 
-
-
-
-
 compression_opts = dict(method ='zip', archive_name='out.csv')
 
 # Defining dataframe
@@ -31,7 +27,7 @@ data_type = 'RAW'
 res = 'VAH'
 date = '210420'
 test_type = 'FA'
-test_number = '009'
+test_number = '002'
 filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
 
 lab = "CCLab"
