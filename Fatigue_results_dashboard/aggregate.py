@@ -48,9 +48,15 @@ def read_met():
     researcher = 'Vahid'
     loading = 'Fatigue'
 
-    filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
+    filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type)
 
-    return pd.read_csv(filepath, header = 0)
+
+    os.chdir(filepath)
+
+    # get data file names
+    filenames = [i for i in glob.glob("*.txt")]
+    meta_df = [pd.read_csv(file, sep = ",", header=0, decimal='.') for file in filenames]
+    return meta_df
 
 
 def write_agg(SNdf):
@@ -75,7 +81,7 @@ def write_agg(SNdf):
 #print(df)
 
 #setup df
-def stress_n_cycles(df):
+def stress_n_cycles(df, meta_df):
     agg_stress = []
     agg_n_cycles = []
 
@@ -86,9 +92,9 @@ def stress_n_cycles(df):
         max_stress = max(stress)
         agg_stress.append(max_stress)
 
-        n_cycles = df[i].Machine_N_cycles
-        max_n_cycles = max(n_cycles)
-        agg_n_cycles.append(max_n_cycles)
+        n_cycles = meta_df[i].N_fail[0]
+        #max_n_cycles = max(n_cycles)
+        agg_n_cycles.append(n_cycles)
 
     return agg_stress, agg_n_cycles
 
@@ -101,8 +107,18 @@ def stress_n_cycles(df):
 
 def calculate_stress_lev(meta_df, agg_stress, agg_n_cycles):
 # %% declaring other parameters
-    R_ratio = float(meta_df.R_Ratio[0])
-    rel_level = float(meta_df.Rel_level[0])
+    #R_ratio = float(meta_df.R_Ratio[0])
+    R_ratio = []
+    rel_level = []
+    for i in range(len(meta_df)):
+        r_ratio = float(meta_df[i].R_Ratio[0])
+        #rel_level = float(meta_df.Rel_level[0])
+        r_level = float(meta_df[i].Rel_level[0])
+
+        R_ratio.append(r_ratio)
+        rel_level.append(r_level)
+
+
     percent = 0.05
     stressLev = []
     stressLevNo = 1
@@ -135,9 +151,9 @@ def create_agg(R_ratio, rel_level, stressLev, sortStress, sortNCycles):
     cols = ['Stress_Ratio', 'Reliability_Level', 'Stress_Level_No', 'Stress_Parameter', 'Number_of_Cycles', 'Residual_Strength']
     SNdf = pd.DataFrame(columns = cols)
 
-    SNdf.Stress_Ratio = R_ratio * np.ones(len(sortStress))
-    SNdf.Reliability_Level = rel_level * np.ones(len(sortStress))
-    SNdf.Stress_Level_No = stressLev * np.ones(len(sortStress))
+    SNdf.Stress_Ratio = R_ratio
+    SNdf.Reliability_Level = rel_level
+    SNdf.Stress_Level_No = stressLev
     SNdf.Stress_Parameter = sortStress
     SNdf.Number_of_Cycles = sortNCycles
     SNdf.Residual_Strength = sortStress
@@ -150,7 +166,7 @@ def create_agg(R_ratio, rel_level, stressLev, sortStress, sortNCycles):
 def main ():
     df = read_df_list()
     meta_df = read_met()
-    agg_stress, agg_n_cycles = stress_n_cycles(df)
+    agg_stress, agg_n_cycles = stress_n_cycles(df, meta_df)
     sortStress, sortNCycles, stressLev, R_ratio, rel_level = calculate_stress_lev(meta_df, agg_stress, agg_n_cycles)
     SNdf = create_agg(R_ratio, rel_level, stressLev, sortStress, sortNCycles)
     write_agg(SNdf)
