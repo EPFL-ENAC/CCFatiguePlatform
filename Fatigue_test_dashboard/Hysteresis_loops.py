@@ -15,15 +15,15 @@ from scipy import stats
 
 ### Importing data from csv file
 def read_std(data_directory, data_type, res, date, test_type, test_number, lab, researcher, loading):
-        '''
-        Arguments:
-            hyst_df: DataFrame containing the following computed values: n_cycles, hysteresis_area, stiffness, creep_strain
-            data_directory, data_type, res, date, test_type, test_number, lab, researcher, loading: Information relative to file structure
+    '''
+    Arguments:
+        hyst_df: DataFrame containing the following computed values: n_cycles, hysteresis_area, stiffness, creep_strain
+        data_directory, data_type, res, date, test_type, test_number, lab, researcher, loading: Information relative to file structure
 
-        Returns: pandas dataframe with values in standard format
+    Returns: pandas dataframe with values in standard format
 
-        Description: This function reads the csv file created with the Standardizing_data.py method
-        '''
+    Description: This function reads the csv file created with the Standardizing_data.py method
+    '''
 
     filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
     filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
@@ -32,15 +32,14 @@ def read_std(data_directory, data_type, res, date, test_type, test_number, lab, 
 
 ### Importing meta data from csv
 def read_met(data_directory, data_type, res, date, test_type, test_number, lab, researcher, loading):
-        '''
-        Arguments:
-            hyst_df: DataFrame containing the following computed values: n_cycles, hysteresis_area, stiffness, creep_strain
-            data_directory, data_type, res, date, test_type, test_number, lab, researcher, loading: Information relative to file structure
+    '''
+    Arguments:
+        hyst_df: DataFrame containing the following computed values: n_cycles, hysteresis_area, stiffness, creep_strain
+        data_directory, data_type, res, date, test_type, test_number, lab, researcher, loading: Information relative to file structure
 
-        Returns: pandas dataframe with metadata
-
-        Description: This function reads the JSON file created with the Standardizing_data.py method
-        '''
+    Returns: pandas dataframe with metadata
+    Description: This function reads the JSON file created with the Standardizing_data.py method
+    '''
 
     filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
     filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
