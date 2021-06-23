@@ -17,12 +17,13 @@ from scipy import stats
 def read_std(data_directory, data_type, res, date, test_type, test_number, lab, researcher, loading):
     '''
     Arguments:
-        hyst_df: DataFrame containing the following computed values: n_cycles, hysteresis_area, stiffness, creep_strain
         data_directory, data_type, res, date, test_type, test_number, lab, researcher, loading: Information relative to file structure
 
-    Returns: pandas dataframe with values in standard format
+    Returns:
+        pandas dataframe with values in standard format
 
-    Description: This function reads the csv file created with the Standardizing_data.py method
+    Description:
+        This function reads the csv file created with the Standardizing_data.py method
     '''
 
     filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
@@ -34,11 +35,12 @@ def read_std(data_directory, data_type, res, date, test_type, test_number, lab, 
 def read_met(data_directory, data_type, res, date, test_type, test_number, lab, researcher, loading):
     '''
     Arguments:
-        hyst_df: DataFrame containing the following computed values: n_cycles, hysteresis_area, stiffness, creep_strain
         data_directory, data_type, res, date, test_type, test_number, lab, researcher, loading: Information relative to file structure
 
-    Returns: pandas dataframe with metadata
-    Description: This function reads the JSON file created with the Standardizing_data.py method
+    Returns:
+        pandas dataframe with metadata
+    Description:
+        This function reads the JSON file created with the Standardizing_data.py method
     '''
 
     filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
@@ -68,7 +70,7 @@ def create_hyst_df():
     '''
     Arguments: No Arguments
 
-    Returns: Initializes a dataframe with 4 empty ColumnDataSource
+    Returns: Initializes a dataframe with 4 empty columns
 
     Description: In this function we use the columns described by hyst_col and initialize an empty list that will contain all the computed information
 
@@ -109,7 +111,8 @@ def fill_hyst_df(df, meta_df, hyst_df):
 
     Returns: Void
 
-    Description: This function does all the computations on the hysteresis loops allowing to find values for hysteresis area, stiffness, creep and the number of cycles
+    Description:
+        This function does all the computations on the hysteresis loops allowing to find values for hysteresis area, stiffness, creep and the number of cycles
         In the first part we take the column Machine_N_cycles from the standard dataframe and make it more compact by allowing one row per cycles
         We then initialize 3 empty lists for the computations of hysteresis area, creep and stiffness
         The function get_stress_strain is then called, creating a list of len(n_cycles) lists each containing stress/strain information for a single hysteresis loop
@@ -130,6 +133,17 @@ def fill_hyst_df(df, meta_df, hyst_df):
     # HYSTERESIS & STIFFNESS
     ### Definition of polyarea function
     def PolyArea(x,y):
+    '''
+    Arguments:
+        x: values measured along the x axis (strain)
+        y: values measured along the y axis (stress)
+
+    Returns:
+        Single value for the area of the loop
+
+    Description:
+        The PolyArea function computes the area of each hysteresis loops using a shoelace algorithm
+    '''
         return 0.5*np.abs(np.dot(x,np.roll(y,1))-np.dot(y,np.roll(x,1)))
 
     Hysteresis_Area = []
