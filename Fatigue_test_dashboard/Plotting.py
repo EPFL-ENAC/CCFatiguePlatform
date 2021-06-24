@@ -1,4 +1,6 @@
 # In[1]:
+# test_dashboard.py
+
 
 import matplotlib.pyplot as plt
 import os
@@ -11,48 +13,38 @@ from bokeh.models import ColumnDataSource, HoverTool, LinearColorMapper
 import bokeh.plotting as bk
 from bokeh.transform import linear_cmap
 
+# Constantes
+
+DATA_DIRECTORY = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/'
+DATE = '2021-04-20'
+TEST_TYPE = 'FA'
+TEST_NUMBER = '002'
+LAB = "CCLAB"
+RESEARCHER = 'Vahid'
 
 
 ## Importing input File_size
 
 # Data in standard format
 
-data_directory = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example'
 
-data_type = 'STD'
-res = 'VAH'
-date = '210420'
-test_type = 'FA'
-test_number = '002'
-filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
-
-lab = "CCLab"
-researcher = 'Vahid'
-loading = 'Fatigue'
+data_in = 'STD'
+filename = data_in+'_'+DATE+'_'+TEST_TYPE+'_'+TEST_NUMBER+'.csv'
 
 
-filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
+
+filepath = os.path.join(DATA_DIRECTORY, LAB, RESEARCHER, TEST_TYPE, DATE, data_in, filename)
 
 df = pd.read_csv(filepath)
 ### Importing Hysteresis loops analysis file
 
 # Data treated in hysteresis analysis
 
-data_directory = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example'
-
-data_type = 'HYS'
-res = 'VAH'
-date = '210420'
-test_type = 'FA'
-test_number = '002'
-filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
-
-lab = "CCLab"
-researcher = 'Vahid'
-loading = 'Fatigue'
+data_in = 'HYS'
+filename = data_in+'_'+DATE+'_'+TEST_TYPE+'_'+TEST_NUMBER+'.csv'
 
 
-filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
+filepath = os.path.join(DATA_DIRECTORY, LAB, RESEARCHER, TEST_TYPE, DATE, data_in, filename)
 
 hyst_df = pd.read_csv(filepath, sep = ',', header = 0)
 
@@ -64,6 +56,14 @@ hyst_df = pd.read_csv(filepath, sep = ',', header = 0)
 
 ### We select loops for plotting on an arbitrary basis (subject to modifications)
 sub_index = [0, 1, 5, 10, 100, 200, 1000, 2000, 10000, 50000, 100000, 500000, 1000000]
+def calculate_sub_index(n_cycles_min, n_cycles_max):
+    '''
+    Ca va trouver les bon loops
+    Return sub_index
+    '''
+    # create range max_cycles - min cycles (n points log spaced)
+    # find closest value from previous range in dataset
+    return sub_index
 
 nb_curve = len(sub_index)
 ### Conditional plotting of hysteresis loops - we only plot the loops specified by sub_index
@@ -178,8 +178,9 @@ hyst_n_cycles = hyst_df.n_cycles
 
 sub_hyst = {'n_cycles': hyst_n_cycles,
              'area': hyst_area}
-
-TDE = np.sum(hyst_area)
+def calculate_tde(hyst_area):
+    tde = np.sum(hyst_area)
+    return tde
 
 def plot_hystarea(hyst_df):
     area = figure(title = 'Hysteresis loop area evolution', plot_width=1200, plot_height=800,
@@ -191,7 +192,7 @@ def plot_hystarea(hyst_df):
 plot_hystarea(hyst_df)
 
 
-print(TDE)
+print(tde)
 
 
 

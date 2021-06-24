@@ -1,16 +1,22 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-
+# Commentaires de ce que fait le script
 
 
 import pandas as pd
 import numpy as np
 import os
 
-
-
-compression_opts = dict(method ='zip', archive_name='out.csv')
+# Constantes (maj)
+DATA_DIRECTORY = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/'
+DATE = '2021-04-20'
+TEST_TYPE = 'FA'
+TEST_NUMBER = '008'
+LAB = "CCLAB"
+RESEARCHER = 'Vahid'
+DATA_STEP_IN = 'RAW'
+DATA_STEP_OUT = 'STD'
 
 # Defining dataframe
 
@@ -22,20 +28,14 @@ col=['Machine_N_cycles', 'Machine_Load', 'Machine_Displacement', 'DIC_index', 'D
 # Declaring inputs
 # Data has to be presented in 3 continuous columns: with number of cycles (N), Stress (machine load), and Strain (machine displacement)
 
-data_directory = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/'
-data_type = 'RAW'
-res = 'VAH'
-date = '210420'
-test_type = 'FA'
-test_number = '002'
-filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
-
-lab = "CCLab"
-researcher = 'Vahid'
-loading = 'Fatigue'
 
 
-filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
+filename = DATA_STEP_IN+'_'+DATE+'_'+TEST_TYPE+'_'+TEST_NUMBER+'.txt'
+
+
+
+
+filepath = os.path.join(DATA_DIRECTORY, LAB, RESEARCHER, TEST_TYPE, DATE, DATA_STEP_IN, filename)
 
 dat = pd.read_csv(filepath, sep='\t',header=0, decimal = ",")
 
@@ -49,22 +49,13 @@ df.Machine_Displacement = dat.Strain
 
 # Declaring outputs
 
-data_directory = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example'
 
-data_type = 'STD'
-res = 'VAH'
-date = '210420'
-test_type = 'FA'
-test_number = '009'
-filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
-
-lab = "CCLab"
-researcher = 'Vahid'
-loading = 'Fatigue'
+filename_out = DATA_STEP_OUT+'_'+DATE+'_'+TEST_TYPE+'_'+TEST_NUMBER+'.csv'
 
 
-filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
-df.to_csv(path_or_buf=filepath, index=False)
+
+filepath_out = os.path.join(DATA_DIRECTORY, LAB, RESEARCHER, TEST_TYPE, DATE, DATA_STEP_OUT, filename_out)
+df.to_csv(path_or_buf=filepath_out, index=False)
 
 
 
@@ -72,7 +63,6 @@ df.to_csv(path_or_buf=filepath, index=False)
 
 
 
-#compression_opts = {'method' : 'zip'}
 
 #col2=['Machine_N_cycles', 'Machine_Load', 'Machine_Displacement', 'DIC_index', 'DIC_N_cycles',
 #      'DIC_exx', 'DIC_eyy', 'DIC_exy', 'DIC_crack_length', 'Th_N_cycles', 'Th_time',
@@ -202,7 +192,7 @@ meta_df.R_Ratio.units = '[–]'
 meta_df.Sig_maxFat.value = 68.0
 meta_df.Sig_maxFat.units = '[MPa]'
 
-meta_df.N_fail.value = 1969
+meta_df.N_fail.value = 22321
 meta_df.N_fail.units = '[-]'
 
 meta_df.Rel_level.value = 50
@@ -210,21 +200,12 @@ meta_df.Rel_level.units = '[-]'
 
 
 
-data_directory = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example'
 
-data_type = 'MET'
-res = 'VAH'
-date = '210420'
-test_type = 'FA'
-test_number = '009'
-filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
+filename_out_metadata = DATA_STEP_OUT+'_'+DATE+'_'+TEST_TYPE+'_'+TEST_NUMBER+'.json'
 
-lab = "CCLab"
-researcher = 'Vahid'
-loading = 'Fatigue'
 
-filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
-meta_df.to_csv(path_or_buf=filepath, index=False)
+filepath_out_metadata = os.path.join(DATA_DIRECTORY, LAB, RESEARCHER, TEST_TYPE, DATE, DATA_STEP_OUT, filename_out_metadata)
+meta_df.to_json(path_or_buf=filepath_out_metadata, orient = 'index')
 
 
 #print(meta_df)
