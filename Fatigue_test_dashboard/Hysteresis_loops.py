@@ -13,8 +13,19 @@ import bokeh as bk
 from collections import Counter
 from scipy import stats
 
+# Constantes
+DATA_DIRECTORY = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/'
+DATE = '2021-04-20'
+TEST_TYPE = 'FA'
+TEST_NUMBER = '012'
+LAB = "CCLAB"
+RESEARCHER = 'Vahid'
+DATA_STEP_IN = 'STD'
+DATA_STEP_OUT = 'HYS'
+
+
 ### Importing data from csv file
-def read_std(data_directory, data_type, res, date, test_type, test_number, lab, researcher, loading):
+def read_std(DATA_DIRECTORY, DATA_STEP_IN, RESEARCHER, DATE, TEST_TYPE, TEST_NUMBER, LAB):
     '''
     Arguments:
         data_directory, data_type, res, date, test_type, test_number, lab, researcher, loading: Information relative to file structure
@@ -25,14 +36,13 @@ def read_std(data_directory, data_type, res, date, test_type, test_number, lab, 
     Description:
         This function reads the csv file created with the Standardizing_data.py method
     '''
-
-    filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
-    filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
+    filename = DATA_STEP_IN+'_'+DATE+'_'+TEST_TYPE+'_'+TEST_NUMBER+'.csv'
+    filepath = os.path.join(DATA_DIRECTORY, LAB, RESEARCHER, TEST_TYPE, DATE, DATA_STEP_IN, filename)
     return pd.read_csv(filepath, header = 0)
 
 
 ### Importing meta data from csv
-def read_met(data_directory, data_type, res, date, test_type, test_number, lab, researcher, loading):
+def read_met(DATA_DIRECTORY, DATA_STEP_IN, RESEARCHER, DATE, TEST_TYPE, TEST_NUMBER, LAB):
     '''
     Arguments:
         data_directory, data_type, res, date, test_type, test_number, lab, researcher, loading: Information relative to file structure
@@ -43,12 +53,12 @@ def read_met(data_directory, data_type, res, date, test_type, test_number, lab, 
         This function reads the JSON file created with the Standardizing_data.py method
     '''
 
-    filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
-    filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
-    return pd.read_csv(filepath, header = 0)
+    filename = DATA_STEP_IN+'_'+DATE+'_'+TEST_TYPE+'_'+TEST_NUMBER+'.json'
+    filepath = os.path.join(DATA_DIRECTORY, LAB, RESEARCHER, TEST_TYPE, DATE, DATA_STEP_IN, filename)
+    return pd.read_json(path_or_buf = filepath, orient = 'index')
 
 ### Writing output file (HYS)
-def write_hys(hyst_df, data_directory, data_type, res, date, test_type, test_number, lab, researcher, loading):
+def write_hys(DATA_DIRECTORY, DATA_STEP_OUT, RESEARCHER, DATE, TEST_TYPE, TEST_NUMBER, LAB, hyst_df):
     '''
     Arguments:
         hyst_df: DataFrame containing the following computed values: n_cycles, hysteresis_area, stiffness, creep_strain
@@ -58,8 +68,8 @@ def write_hys(hyst_df, data_directory, data_type, res, date, test_type, test_num
 
     Description: This function takes all the data computed within Hysteresis_loops.py and writes them as CSV to a specified location
     '''
-    filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
-    filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type, filename)
+    filename = DATA_STEP_OUT+'_'+DATE+'_'+TEST_TYPE+'_'+TEST_NUMBER+'.csv'
+    filepath = os.path.join(DATA_DIRECTORY, LAB, RESEARCHER, TEST_TYPE, DATE, DATA_STEP_OUT, filename)
     hyst_df.to_csv(path_or_buf=filepath, index=False)
     return
 
@@ -133,17 +143,17 @@ def fill_hyst_df(df, meta_df, hyst_df):
     # HYSTERESIS & STIFFNESS
     ### Definition of polyarea function
     def PolyArea(x,y):
-    '''
-    Arguments:
-        x: values measured along the x axis (strain)
-        y: values measured along the y axis (stress)
+        '''
+        Arguments:
+            x: values measured along the x axis (strain)
+            y: values measured along the y axis (stress)
 
-    Returns:
-        Single value for the area of the loop
+        Returns:
+            Single value for the area of the loop
 
-    Description:
-        The PolyArea function computes the area of each hysteresis loops using a shoelace algorithm
-    '''
+        Description:
+            The PolyArea function computes the area of each hysteresis loops using a shoelace algorithm
+        '''
         return 0.5*np.abs(np.dot(x,np.roll(y,1))-np.dot(y,np.roll(x,1)))
 
     Hysteresis_Area = []
@@ -157,7 +167,7 @@ def fill_hyst_df(df, meta_df, hyst_df):
         points=(x, y)
         if j<(len(n_cycles)-1):
             Hysteresis_Area.append(PolyArea(x, y)*(n_cycles[j+1]-n_cycles[j]))
-        else: Hysteresis_Area.append(PolyArea(x, y)*(int(meta_df.N_fail[0])-n_cycles[j]))
+        else: Hysteresis_Area.append(PolyArea(x, y)*(int(meta_df.N_fail.value)-n_cycles[j]))
         if j > 0:
             slope, _, _, _, _ = stats.linregress(y, x)
             Stiffness.append(slope)
@@ -185,21 +195,13 @@ def fill_hyst_df(df, meta_df, hyst_df):
 
 def main():
 
-    res = 'VAH'
-    date = '210420'
-    test_type = 'FA'
-    test_number = '002'
-    lab = "CCLab"
-    researcher = 'Vahid'
-    loading = 'Fatigue'
-    data_directory = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example'
 
-    df = read_std(data_directory, 'STD', res, date, test_type, test_number, lab, researcher, loading)
-    meta = read_met(data_directory, 'MET',  res, date, test_type, test_number, lab, researcher, loading)
-    hyst = create_hyst_df()
-    fill_hyst_df(df, meta, hyst)
 
-    write_hys(hyst, data_directory, 'HYS', res, date, test_type, test_number, lab, researcher, loading)
+    df = read_std(DATA_DIRECTORY, DATA_STEP_IN, RESEARCHER, DATE, TEST_TYPE, TEST_NUMBER, LAB)
+    meta_df = read_met(DATA_DIRECTORY, DATA_STEP_IN, RESEARCHER, DATE, TEST_TYPE, TEST_NUMBER, LAB)
+    hyst_df = create_hyst_df()
+    fill_hyst_df(df, meta_df, hyst_df)
+    write_hys(DATA_DIRECTORY, DATA_STEP_OUT, RESEARCHER, DATE, TEST_TYPE, TEST_NUMBER, LAB, hyst_df)
 
     return
 

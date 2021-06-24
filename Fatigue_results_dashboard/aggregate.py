@@ -9,11 +9,14 @@ import os
 ### Importing all STD files
 def read_df_list():
     """
-    Arguments: Void
+    Arguments:
+        Void
 
-    Returns: dataframe containing as many lists as there are files in the respository
+    Returns:
+        dataframe containing as many lists as there are files in the respository
 
-    Description: We specify a path to a repository containing all the tests in an experiment in their standard format
+    Description:
+        We specify a path to a repository containing all the tests in an experiment in their standard format
         Then a list is created for each test and stored in a dataframe with all other tests
     """
 
@@ -45,11 +48,14 @@ def read_df_list():
 ### Importing meta data from csv
 def read_met():
     """
-    Arguments: Void
+    Arguments:
+        Void
 
-    Returns: dataframe containing as many lists as there are files in the respository
+    Returns:
+        dataframe containing as many lists as there are files in the respository
 
-    Description: We specify a path to a repository containing all the metadata in an experiment
+    Description:
+        We specify a path to a repository containing all the metadata in an experiment
         Then a list is created for each test and stored in a dataframe with all other tests
     """
 
@@ -109,7 +115,8 @@ def stress_n_cycles(df, meta_df):
         agg_stress: list with the maximum stress for each test
         agg_n_cycles: list with the maximum number of cycles for each test
 
-    Description: In this function, we first go across all the individual testings in order to find the maximum value of stress. We then fetch inside the metadata files
+    Description:
+        In this function, we first go across all the individual testings in order to find the maximum value of stress. We then fetch inside the metadata files
         the maximum number of cycles for all testings. The values are stored in the lists agg_stress and agg_n_cycles respectively
     """
 
@@ -138,23 +145,23 @@ def stress_n_cycles(df, meta_df):
 
 def calculate_stress_lev(meta_df, agg_stress, agg_n_cycles):
         """
-        Arguments:
-            meta_df: dataframe containing metadata of all testings
-            agg_stress: list containing the maximum stress value for all testings
-            agg_n_cycles: list containing the number of cycles to failure for all testings
+    Arguments:
+        meta_df: dataframe containing metadata of all testings
+        agg_stress: list containing the maximum stress value for all testings
+        agg_n_cycles: list containing the number of cycles to failure for all testings
 
-        Returns:
-            sortStress: Same values as agg_stress only arranged in descending order
-            sortNCycles: Same values as agg_n_cycles arranged following the order of sortStress
-            stressLev: Different levels of stress defined for the experiment, takes integer values
-            R_ratio: list of stress ratio for all testings
-            rel_level: list of reliability level for all testings
+    Returns:
+        sortStress: Same values as agg_stress only arranged in descending order
+        sortNCycles: Same values as agg_n_cycles arranged following the order of sortStress
+        stressLev: Different levels of stress defined for the experiment, takes integer values
+        R_ratio: list of stress ratio for all testings
+        rel_level: list of reliability level for all testings
 
-        Description:
-            This function creates all the columns necessary for the aggregated format to be compatible with CCFatigue
-            First step is to create the R ratio and reliability level columns
-            Then we arrange the stress and cycles to failure columns and evaluate the stress level number by bunching up the tests that are supposed to
-            have the same values for stress (may vary slightly due to geometric factors)
+    Description:
+        This function creates all the columns necessary for the aggregated format to be compatible with CCFatigue
+        First step is to create the R ratio and reliability level columns
+        Then we arrange the stress and cycles to failure columns and evaluate the stress level number by bunching up the tests that are supposed to
+        have the same values for stress (may vary slightly due to geometric factors)
         """
 # %% declaring other parameters
     #R_ratio = float(meta_df.R_Ratio[0])
