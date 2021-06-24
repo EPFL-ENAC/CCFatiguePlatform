@@ -5,6 +5,16 @@ from pathlib import Path
 import glob
 import os
 
+# Constantes
+
+DATA_DIRECTORY = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/'
+DATE = '2021-04-20'
+TEST_TYPE = 'FA'
+TEST_NUMBER = '012'
+LAB = "CCLAB"
+RESEARCHER = 'Vahid'
+DATA_STEP_IN = 'STD'
+DATA_STEP_OUT = 'AGG'
 
 ### Importing all STD files
 def read_df_list():
@@ -20,28 +30,16 @@ def read_df_list():
         Then a list is created for each test and stored in a dataframe with all other tests
     """
 
-    data_directory = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example'
 
-    data_type = 'STD'
-    res = 'VAH'
-    date = '210420'
-    test_type = 'FA'
-    filename = data_type+'_'+res+'_'+date+'_'+test_type+'.txt'
-
-    lab = "CCLab"
-    researcher = 'Vahid'
-    loading = 'Fatigue'
-
-
-    filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type)
+    filepath = os.path.join(DATA_DIRECTORY, LAB, RESEARCHER, TEST_TYPE, DATE, DATA_STEP_IN)
 
 
     os.chdir(filepath)
 
     # get data file names
-    filenames = [i for i in glob.glob("*.txt")]
+    filenames = [i for i in glob.glob("*.csv")]
     df = [pd.read_csv(file, sep = ",", header=0, decimal='.') for file in filenames]
-
+    print(filenames)
     return df
 
 
@@ -59,43 +57,29 @@ def read_met():
         Then a list is created for each test and stored in a dataframe with all other tests
     """
 
-    data_directory = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example'
 
-    data_type = 'MET'
-    res = 'VAH'
-    date = '210420'
-    test_type = 'FA'
-    test_number = '002'
-    filename = data_type+'_'+res+'_'+date+'_'+test_type+'_'+test_number+'.txt'
 
-    lab = "CCLab"
-    researcher = 'Vahid'
-    loading = 'Fatigue'
-
-    filepath = os.path.join(data_directory, lab, researcher, loading, date, data_type)
+    filepath = os.path.join(DATA_DIRECTORY, LAB, RESEARCHER, TEST_TYPE, DATE, DATA_STEP_IN)
 
 
     os.chdir(filepath)
 
     # get data file names
-    filenames = [i for i in glob.glob("*.txt")]
-    meta_df = [pd.read_csv(file, sep = ",", header=0, decimal='.') for file in filenames]
+    filenames = [i for i in glob.glob("*.json")]
+    print(filenames)
+    meta_df = [pd.read_json(file, orient = 'index') for file in filenames]
     return meta_df
 
 
 def write_agg(SNdf):
-    data_directory = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example'
-    data_type = 'AGG'
-    res = 'VAH'
-    date = '210420'
-    test_type = 'FA'
-    filename = data_type+'_'+res+'_'+date+'_'+test_type+'.txt'
+
+    filename = DATA_STEP_OUT+'_'+DATE+'_'+TEST_TYPE+'.csv'
 
     lab = "CCLab"
     researcher = 'Vahid'
     loading = 'Fatigue'
 
-    output_path = os.path.join(data_directory, lab, researcher, loading, date, data_type)
+    output_path = os.path.join(DATA_DIRECTORY, LAB, RESEARCHER, TEST_TYPE, DATE, DATA_STEP_OUT)
     filepath = os.path.join(output_path,filename)
 
     SNdf.to_csv(path_or_buf=filepath, index=False)
@@ -124,13 +108,13 @@ def stress_n_cycles(df, meta_df):
     agg_n_cycles = []
 
     #select max stress for all tests
-
+    print(meta_df)
     for i in range(len(df)):
         stress = df[i].Machine_Load
         max_stress = max(stress)
         agg_stress.append(max_stress)
 
-        n_cycles = meta_df[i].N_fail[0]
+        n_cycles = meta_df[i].N_fail.value
         #max_n_cycles = max(n_cycles)
         agg_n_cycles.append(n_cycles)
 
@@ -144,7 +128,7 @@ def stress_n_cycles(df, meta_df):
 #print(agg_n_cycles)
 
 def calculate_stress_lev(meta_df, agg_stress, agg_n_cycles):
-        """
+    """
     Arguments:
         meta_df: dataframe containing metadata of all testings
         agg_stress: list containing the maximum stress value for all testings
@@ -162,15 +146,13 @@ def calculate_stress_lev(meta_df, agg_stress, agg_n_cycles):
         First step is to create the R ratio and reliability level columns
         Then we arrange the stress and cycles to failure columns and evaluate the stress level number by bunching up the tests that are supposed to
         have the same values for stress (may vary slightly due to geometric factors)
-        """
-# %% declaring other parameters
-    #R_ratio = float(meta_df.R_Ratio[0])
+    """
     R_ratio = []
     rel_level = []
     for i in range(len(meta_df)):
-        r_ratio = float(meta_df[i].R_Ratio[0])
+        r_ratio = float(meta_df[i].R_Ratio.value)
         #rel_level = float(meta_df.Rel_level[0])
-        r_level = float(meta_df[i].Rel_level[0])
+        r_level = float(meta_df[i].Rel_level.value)
 
         R_ratio.append(r_ratio)
         rel_level.append(r_level)
