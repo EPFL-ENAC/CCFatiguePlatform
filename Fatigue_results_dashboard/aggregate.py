@@ -39,7 +39,6 @@ def read_df_list():
     # get data file names
     filenames = [i for i in glob.glob("*.csv")]
     df = [pd.read_csv(file, sep = ",", header=0, decimal='.') for file in filenames]
-    print(filenames)
     return df
 
 
@@ -66,7 +65,6 @@ def read_met():
 
     # get data file names
     filenames = [i for i in glob.glob("*.json")]
-    print(filenames)
     meta_df = [pd.read_json(file, orient = 'index') for file in filenames]
     return meta_df
 
@@ -86,7 +84,6 @@ def write_agg(SNdf):
     return
 
 
-#print(df)
 
 #setup df
 def stress_n_cycles(df, meta_df):
@@ -108,7 +105,6 @@ def stress_n_cycles(df, meta_df):
     agg_n_cycles = []
 
     #select max stress for all tests
-    print(meta_df)
     for i in range(len(df)):
         stress = df[i].Machine_Load
         max_stress = max(stress)
@@ -123,9 +119,7 @@ def stress_n_cycles(df, meta_df):
 
 # %%
 
-#print(stress)
-#print(agg_stress)
-#print(agg_n_cycles)
+
 
 def calculate_stress_lev(meta_df, agg_stress, agg_n_cycles):
     """
@@ -179,9 +173,7 @@ def calculate_stress_lev(meta_df, agg_stress, agg_n_cycles):
 
 
 # %% Checkpoint
-#print(stressLev)
-#print(len(stressLev))
-#print(len(sortStress))
+
 
 # %% Constructing standard format for CCFatigue S-N curve
 
