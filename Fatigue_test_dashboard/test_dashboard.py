@@ -65,7 +65,7 @@ def calculate_sub_index(n_cycles_min, n_cycles_max):
     # find closest value from previous range in dataset
     return sub_index
 
-def select_loops(df, sub_index)
+def select_loops(df, sub_index):
     '''
     Arguments:
 
