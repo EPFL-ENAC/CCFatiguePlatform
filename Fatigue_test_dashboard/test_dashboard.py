@@ -65,29 +65,39 @@ def calculate_sub_index(n_cycles_min, n_cycles_max):
     # find closest value from previous range in dataset
     return sub_index
 
-nb_curve = len(sub_index)
-### Conditional plotting of hysteresis loops - we only plot the loops specified by sub_index
-sub_hystloops = []
-for j in range(nb_curve):
-    sub_hystloops_strain = []
-    sub_hystloops_stress = []
-    sub_hystloops_ncycles = []
-    for i in range(len(df)):
-        if df.Machine_N_cycles[i] == sub_index[j]:
-            sub_hystloops_strain.append(df.Machine_Displacement[i])
-            sub_hystloops_stress.append(df.Machine_Load[i])
-            sub_hystloops_ncycles.append(df.Machine_N_cycles[i])
+def select_loops(df, sub_index)
+    '''
+    Arguments:
 
-    # make curve closed // Optional
-    if len(sub_hystloops_ncycles) != 0:
-        sub_hystloops_strain.append(sub_hystloops_strain[0])
-        sub_hystloops_stress.append(sub_hystloops_stress[0])
-        sub_hystloops_ncycles.append(sub_hystloops_ncycles[0])
+    Returns:
 
-    sub_hystloops.append({'n_cycles': sub_hystloops_ncycles,
-                             'strain': sub_hystloops_strain,
-                             'stress': sub_hystloops_stress})
+    Description:
+    '''
 
+
+    nb_curve = len(sub_index)
+    ### Conditional plotting of hysteresis loops - we only plot the loops specified by sub_index
+    sub_hystloops = []
+    for j in range(nb_curve):
+        sub_hystloops_strain = []
+        sub_hystloops_stress = []
+        sub_hystloops_ncycles = []
+        for i in range(len(df)):
+            if df.Machine_N_cycles[i] == sub_index[j]:
+                sub_hystloops_strain.append(df.Machine_Displacement[i])
+                sub_hystloops_stress.append(df.Machine_Load[i])
+                sub_hystloops_ncycles.append(df.Machine_N_cycles[i])
+
+        # make curve closed // Optional
+        if len(sub_hystloops_ncycles) != 0:
+            sub_hystloops_strain.append(sub_hystloops_strain[0])
+            sub_hystloops_stress.append(sub_hystloops_stress[0])
+            sub_hystloops_ncycles.append(sub_hystloops_ncycles[0])
+
+        sub_hystloops.append({'n_cycles': sub_hystloops_ncycles,
+                                 'strain': sub_hystloops_strain,
+                                 'stress': sub_hystloops_stress})
+    return sub_hystloops
 
 def plot_select_stress_strain(sub_hystloops):
     stressStrain = figure(title = 'Stress - Strain', plot_width=1200, plot_height=800,
@@ -192,7 +202,6 @@ def plot_hystarea(hyst_df):
 plot_hystarea(hyst_df)
 
 
-print(tde)
 
 
 
