@@ -17,7 +17,7 @@ from scipy import stats
 DATA_DIRECTORY = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/'
 DATE = '2021-04-20'
 TEST_TYPE = 'FA'
-TEST_NUMBER = '012'
+TEST_NUMBER = '002'
 LAB = "CCLAB"
 RESEARCHER = 'Vahid'
 DATA_STEP_IN = 'STD'
