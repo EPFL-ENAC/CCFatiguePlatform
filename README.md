@@ -169,7 +169,10 @@ Plotting.py creates the following plots:
 
 Stress / strain curve:
 
-![Stress - Strain](/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/Captures d'ecran - plots/StressStrain.png "Stress - Strain")
+![Stress - Strain](https://drive.google.com/file/d/1-SIpuYornVK4nhq8atgAOistwIiKig5A/view?usp=sharing)
+
+<a href="https://drive.google.com/uc?export=view&id=1-SIpuYornVK4nhq8atgAOistwIiKig5A"><img src="https://drive.google.com/uc?export=view&id=1-SIpuYornVK4nhq8atgAOistwIiKig5A" style="width: 650px; max-width: 100%; height: auto" title="Click to enlarge picture" />
+
 >On this graph we use the raw inputs for Stress and Strain, specific loops have been selected in order for the graph not to be too busy
 
 ![Stiffness Evolution](/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/Captures d'ecran - plots/Stiffness.png "Stiffness evolution")
