@@ -9,7 +9,7 @@ CCFatiguePlatform is an initiative from CCLab that aims to develop a web applica
 
 
 
-![Metadata Scheme](/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/Metadata/Metadata Scheme - visual.png)
+<a href="https://drive.google.com/uc?export=view&id=1GOUXB5KgDwiakTjMCoWDSEOsvrMtjIb6"><img src="https://drive.google.com/uc?export=view&id=1GOUXB5KgDwiakTjMCoWDSEOsvrMtjIb6" style="width: 650px; max-width: 100%; height: auto" title="Click to enlarge picture" />
 
 
 
@@ -169,19 +169,22 @@ Plotting.py creates the following plots:
 
 Stress / strain curve:
 
-![Stress - Strain](https://drive.google.com/file/d/1-SIpuYornVK4nhq8atgAOistwIiKig5A/view?usp=sharing)
+
 
 <a href="https://drive.google.com/uc?export=view&id=1-SIpuYornVK4nhq8atgAOistwIiKig5A"><img src="https://drive.google.com/uc?export=view&id=1-SIpuYornVK4nhq8atgAOistwIiKig5A" style="width: 650px; max-width: 100%; height: auto" title="Click to enlarge picture" />
 
 >On this graph we use the raw inputs for Stress and Strain, specific loops have been selected in order for the graph not to be too busy
 
-![Stiffness Evolution](/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/Captures d'ecran - plots/Stiffness.png "Stiffness evolution")
+<a href="https://drive.google.com/uc?export=view&id=1-LDUhePw0yY00AnlKi3Rts-FyJ8mLl6Z"><img src="https://drive.google.com/uc?export=view&id=1-LDUhePw0yY00AnlKi3Rts-FyJ8mLl6Z" style="width: 650px; max-width: 100%; height: auto" title="Click to enlarge picture" />
+
 >This graph shows the evolution of the sample's stiffness. Stiffness corresponds to the slope of hysteresis loops and is closely linked to hooke's law. E is comparable to the constant k in the context of springs. The analysis is made from the stress - strain raw data, for each hysteresis loop, we evaluate the slope with a linear regression for each hysteresis loops for stress and strain.
 
-![Hysteresis area evolution](/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/Captures d'ecran - plots/hystarea.png "Hysteresis area evolution")
+<a href="https://drive.google.com/uc?export=view&id=1-DAFgVc8wKqIOcSvKcXtc7fzzkf8XjbX"><img src="https://drive.google.com/uc?export=view&id=1-DAFgVc8wKqIOcSvKcXtc7fzzkf8XjbX" style="width: 650px; max-width: 100%; height: auto" title="Click to enlarge picture" />
+
 >Here we see how the area of each hysteresis loop evolves as the fatigue test goes on. The hysteresis loop area is closely related to the amount of energy dissipated through deformations, the sum of hysteresis areas is denoted as TDE, or total dissipated energy
 
-![Creep evolution](/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/Captures d'ecran - plots/creep.png "Creep evolution")
+<a href="https://drive.google.com/uc?export=view&id=1-JyI8mopYgwfF1QvsY_bx17DqilkfFTD"><img src="https://drive.google.com/uc?export=view&id=1-JyI8mopYgwfF1QvsY_bx17DqilkfFTD" style="width: 650px; max-width: 100%; height: auto" title="Click to enlarge picture" />
+
 >Creep corresponds to the residual deformations during a test or life cycle of a sample
 
 %>>>> 
