@@ -37,6 +37,8 @@ CCFatiguePlatform is an initiative from CCLab that aims to develop a web applica
 ## Code structure
 <a href="https://drive.google.com/uc?export=view&id=148oUhO3_aIb8mcaS0nXiJbwZnd1sHW6X"><img src="https://drive.google.com/uc?export=view&id=148oUhO3_aIb8mcaS0nXiJbwZnd1sHW6X" style="width: 650px; max-width: 100%; height: auto" title="Click to enlarge picture" />
 
+Visual representation of how different data are generated and treated
+
 ## Standardizing data
 Code Standardizing_data.py converts raw data from use cases to the standard format
 Raw data format supported: The raw data is read in CSV format
@@ -164,8 +166,8 @@ The code is structured into a certain number of functions:
         The PolyArea function computes the area of each hysteresis loops using a shoelace algorithm
 
 
-## Plots
-Plotting.py creates the following plots:
+## Plots
+test_dashboard.py creates the following plots:
 
 Stress / strain curve:
 
