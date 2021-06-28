@@ -35,7 +35,7 @@ CCFatiguePlatform is an initiative from CCLab that aims to develop a web applica
 # Contents
 
 ## Code structure
-![Code Structure](/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/flowchart_CCFATIGUE.jpg)
+<a href="https://drive.google.com/uc?export=view&id=148oUhO3_aIb8mcaS0nXiJbwZnd1sHW6X"><img src="https://drive.google.com/uc?export=view&id=148oUhO3_aIb8mcaS0nXiJbwZnd1sHW6X" style="width: 650px; max-width: 100%; height: auto" title="Click to enlarge picture" />
 
 ## Standardizing data
 Code Standardizing_data.py converts raw data from use cases to the standard format
