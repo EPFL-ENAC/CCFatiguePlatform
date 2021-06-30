@@ -1,18 +1,9 @@
-# In[1]:
-# test_dashboard.py
-
-
-import matplotlib.pyplot as plt
 import os
 import pandas as pd
 import numpy as np
 from bokeh.plotting import figure
-from bokeh.palettes import Spectral6
-from bokeh.io import export_png, output_file, show
-from bokeh.models import ColumnDataSource, HoverTool, LinearColorMapper
-import bokeh.plotting as bk
-from bokeh.transform import linear_cmap
-
+from bokeh.io import show
+from bokeh.models import ColumnDataSource, HoverTool
 
 # Constantes
 
