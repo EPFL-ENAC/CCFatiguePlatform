@@ -7,7 +7,9 @@ from bokeh.models import ColumnDataSource, HoverTool
 
 # Constantes
 
-DATA_DIRECTORY = '../data/'
+#DATA_DIRECTORY = '../data/'
+DATA_DIRECTORY = '/Volumes/GoogleDrive/.shortcut-targets-by-id/306/FatigueDataPlatform files & data/Data Description/File directory example/'
+
 DATE = '2021-04-20'
 TEST_TYPE = 'FA'
 TEST_NUMBER = '002'

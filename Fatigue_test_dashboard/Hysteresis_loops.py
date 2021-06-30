@@ -168,6 +168,8 @@ def fill_hyst_df(df, meta_df, hyst_df):
         if j<(len(n_cycles)-1):
             Hysteresis_Area.append(PolyArea(x, y)*(n_cycles[j+1]-n_cycles[j]))
         else: Hysteresis_Area.append(PolyArea(x, y)*(int(meta_df.N_fail.value)-n_cycles[j]))
+        print(n_cycles[j])
+        print(meta_df.N_fail.value)
         if j > 0:
             slope, _, _, _, _ = stats.linregress(y, x)
             Stiffness.append(slope)
