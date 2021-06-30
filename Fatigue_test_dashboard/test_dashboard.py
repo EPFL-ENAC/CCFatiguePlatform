@@ -19,24 +19,19 @@ LOOP_SPACING = 1000
 MAGNITUDE = -3
 
 
-## Importing input File_size
+# Importing input File_size
 
 # Data in standard format
 
 
 data_in = 'STD'
 filename = data_in+'_'+DATE+'_'+TEST_TYPE+'_'+TEST_NUMBER+'.csv'
-jsonname =data_in+'_'+DATE+'_'+TEST_TYPE+'_'+TEST_NUMBER+'.json'
 
 
 filepath = os.path.join(DATA_DIRECTORY, LAB, RESEARCHER, TEST_TYPE, DATE, data_in, filename)
-jsonpath = os.path.join(DATA_DIRECTORY, LAB, RESEARCHER, TEST_TYPE, DATE, data_in, jsonname)
 
 df = pd.read_csv(filepath)
-meta_df = pd.read_json(jsonpath)
 ### Importing Hysteresis loops analysis file
-
-
 
 # Data treated in hysteresis analysis
 
