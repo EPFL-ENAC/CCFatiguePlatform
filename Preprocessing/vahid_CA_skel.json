@@ -36,7 +36,7 @@
     },
     "Constituent Materials": {
       "Fiber Material": "E-glass fiber",
-      "Fiber Beometry": "Unidirectional",
+      "Fiber Geometry": "Unidirectional",
       "Area Density": 425
     },
     "Standard Fatigue": {
