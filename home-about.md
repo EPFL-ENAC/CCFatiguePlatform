@@ -18,6 +18,7 @@ Additionally, our analysis tool allows for visualization of results over a compl
 
 
 # About
+
 ## Disclaimer
 The CCFatigue data platform was developped as a service to the research community in the field of composite materials. EPFL and the researchers who performed the experiments presented in the database make no warranties to the accuracy of the information that has been collected. For any questions, comments or suggestions please contact the [CCLab information desk](secretariat.cclab@epfl.ch)
 
