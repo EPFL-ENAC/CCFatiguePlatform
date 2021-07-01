@@ -42,7 +42,7 @@
     "Standard Fatigue": {
       "Fatigue Type": "Constant Amplitude",
       "Stress Ratio": 0.1,
-      "Number of Cycles to Failure": [533634, 1198627, 1198627, 289050, 277227, 29832, 6785, 22321, 2593, 18028, 1161, 1969]
+      "Number of Cycles to Failure": [533634, 1198627, 1198627, 289050, 277227, 29832, 6785, 22321, 2593, 18028, 1161, 1969],
       "Stress at Failure": [47.4, 47.4, 47.4, 48.6, 48.6, 53.4, 58.2, 58.2, 64.2, 58.2, 64.2, 68.0]
     }
   },
