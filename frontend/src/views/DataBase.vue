@@ -3,6 +3,7 @@
     <h1>Fatigue Test Dashboard - Individual test</h1>
     <Panel header="Test specifications">
       <div class="card">
+        <h4>Title TODO</h4>
         <div class="p-d-flex space-evenly">
           <div class="spec_column">
             <h4>General informations</h4>
