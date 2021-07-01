@@ -4,8 +4,8 @@ import Home from '../views/Home.vue'
 // route level code-splitting
 // this generates a separate chunk (name.[hash].js) for each route
 // which is lazy-loaded when the route is visited.
-const DataBase = () => import(/* webpackChunkName: "database" */ '../views/DataBase.vue')
-const DataUpload = () => import(/* webpackChunkName: "dataupload" */ '../views/DataUpload.vue')
+const TestDashboard = () => import(/* webpackChunkName: "test-dashboard" */ '../views/TestDashboard.vue')
+const DataUpload = () => import(/* webpackChunkName: "data-upload" */ '../views/DataUpload.vue')
 const About = () => import(/* webpackChunkName: "about" */ '../views/About.vue')
 
 Vue.use(VueRouter)
@@ -22,12 +22,12 @@ const routes = [
     component: Home
   },
   {
-    path: '/database',
-    name: 'DataBase',
-    component: DataBase
+    path: '/test-dashboard',
+    name: 'TestDashboard',
+    component: TestDashboard
   },
   {
-    path: '/dataupload',
+    path: '/data-upload',
     name: 'DataUpload',
     component: DataUpload
   },
