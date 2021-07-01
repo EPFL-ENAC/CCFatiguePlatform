@@ -13,8 +13,8 @@ export default {
     return {
       routerMenu: [
         {label: 'Home', icon: 'pi pi-fw pi-home', to: '/home'},
-        {label: 'Database', icon: 'pi pi-fw pi-table', to: '/database'},
-        {label: 'Data upload ', icon: 'pi pi-fw pi-send', to: '/dataupload'},
+        {label: 'Test dashboard', icon: 'pi pi-fw pi-table', to: '/test-dashboard'},
+        {label: 'Data upload ', icon: 'pi pi-fw pi-send', to: '/data-upload'},
         {label: 'About', icon: 'pi pi-fw pi-info-circle', to: '/about'},
       ]
     }

@@ -96,7 +96,7 @@ import Panel from 'primevue/panel'
 import Divider from 'primevue/divider'
 
 export default {
-  name: 'DataBase',
+  name: 'TestDashboard',
   components: {
     Panel,
     Divider,
