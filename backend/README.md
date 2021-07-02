@@ -6,6 +6,12 @@
 pipenv install
 ```
 
+## Copy data on localhost
+
+Copy to data/CCLAB :
+GDrive -> CCLAB - Fatigue Data Platform > FatigueDataPlatform files & data > Data Description > File directory example > CCLAB
+
+
 ## Serve on localhost
 
 ```bash
