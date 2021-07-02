@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import Axios from 'axios'
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -10,6 +11,9 @@ import 'primeflex/primeflex.css'
 
 Vue.config.productionTip = false
 Vue.use(PrimeVue)
+
+Axios.defaults.baseURL = 'http://localhost:8000/'
+Vue.prototype.$http = Axios
 
 new Vue({
   router,
