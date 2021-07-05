@@ -142,6 +142,50 @@
         </div>
       </div>
     </Panel>
+    <div id="graphs" class="p-d-flex">
+      <div class="p-d-flex p-flex-column">
+        <iframe id="plot_stress_strain" src="/plot_select_stress_strain.html" frameborder="0" width="800px" height="600px"/>
+        <iframe id="plot_creep" src="/plot_creep.html" frameborder="0" width="800px" height="600px"/>
+      </div>
+      <div class="p-d-flex p-flex-column">
+        <iframe id="plot_hystarea" src="/plot_hystarea.html" frameborder="0" width="800px" height="600px"/>
+        <iframe id="plot_stiffness" src="/plot_stiffness.html" frameborder="0" width="800px" height="600px"/>
+      </div>
+      <div class="spec_column">
+        <ul>
+          <li>
+            <span class="subject">Stress at failure:</span> &nbsp;
+            <span class="value">
+              47.4 MPa (TODO)
+            </span>
+          </li>
+          <li>
+            <span class="subject">Strain at failure:</span> &nbsp;
+            <span class="value">
+              1.4% (TODO)
+            </span>
+          </li>
+          <li>
+            <span class="subject">N_cycles:</span> &nbsp;
+            <span class="value">
+              1'198'627 (TODO)
+            </span>
+          </li>
+          <li>
+            <span class="subject">R:</span> &nbsp;
+            <span class="value">
+              0.1 (TODO)
+            </span>
+          </li>
+          <li>
+            <span class="subject">Total dissipated energy (TDE):</span> &nbsp;
+            <span class="value">
+              (TODO)
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
 </template>
 
