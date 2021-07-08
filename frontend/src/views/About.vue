@@ -1,5 +1,5 @@
 <template>
-  <div class="this-page">
+  <div class="p-m-3 p-text-left">
     <h1>About</h1>
     <h2>Disclaimer</h2>
     <p>
@@ -15,7 +15,4 @@ export default {
 </script>
 
 <style scoped>
-div.this-page {
-  text-align: left;
-}
 </style>
