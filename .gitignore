@@ -1,3 +1,6 @@
 data/
 .vscode/
-Icon?
+Icon[\r]
+Icon\r\r
+Icon
+._*
