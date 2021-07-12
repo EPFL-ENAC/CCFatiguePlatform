@@ -6,17 +6,9 @@ CCFatiguePlatform is an initiative from CCLab that aims to develop a web applica
 # Web app: Usage
 ## Setup & run locally
 
-```
-cd backend
-pipenv install
-pipenv run uvicorn main:app --reload
-```
+1. run backend according to [backend/README.md](backend/README.md)
+2. run frontend according to [frontend/README.md](frontend/README.md)
 
-```
-cd ../frontend
-npm install
-npm run serve
-```
 
 # Data
 ## Standard data format

@@ -1,6 +1,8 @@
 # Web backend
 
-## Env setup
+## Env install
+
+Do it only once
 
 ```bash
 pipenv install
@@ -14,12 +16,24 @@ pipenv run python
 
 ## Copy data on localhost
 
+Do it only once
+
 Copy to data/CCLAB :
 GDrive -> CCLAB - Fatigue Data Platform > FatigueDataPlatform files & data > Data Description > File directory example > CCLAB
 
 
 ## Serve on localhost
 
+Do it each time you open the terminal that will serve
+
 ```bash
-pipenv run uvicorn main:app --reload
+pipenv shell
+export PYTHONPATH=../Fatigue_test_dashboard/:$PYTHONPATH
+```
+
+
+## Serve on localhost
+
+```bash
+uvicorn main:app --reload
 ```
