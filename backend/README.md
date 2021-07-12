@@ -4,6 +4,12 @@
 
 ```bash
 pipenv install
+
+# Check default encoding is UTF-8
+pipenv run python
+>>> import locale
+>>> locale.getpreferredencoding()
+'UTF-8'
 ```
 
 ## Copy data on localhost
