@@ -1,8 +1,8 @@
 <template>
   <div class="p-m-3 p-text-left">
     <h1>Fatigue Test Dashboard - Individual test</h1>
-    <Skeleton v-if="!dataIsFetched" width="100%" height="10rem" />
-    <Panel v-else header="Test specifications">
+    <div v-if="!dataIsFetched" width="100%" height="10rem" />
+    <div v-else header="Test specifications">
       <h4 v-for="title in titles" :key="title">{{ title }}</h4>
       <div class="p-grid">
         <div class="p-col">
@@ -26,7 +26,7 @@
             </li>
           </ul>
         </div>
-        <Divider layout="vertical" />
+        <div layout="vertical" />
         <div class="p-col">
           <h4>Test conditions</h4>
           <ul>
@@ -57,7 +57,7 @@
             </li>
           </ul>
         </div>
-        <Divider layout="vertical" />
+        <div layout="vertical" />
         <div class="p-col">
           <h4>Laminate and assemblies</h4>
           <ul>
@@ -96,7 +96,7 @@
             </li>
           </ul>
         </div>
-        <Divider layout="vertical" />
+        <div layout="vertical" />
         <div class="p-col">
           <h4>Materials</h4>
           <ul>
@@ -139,8 +139,8 @@
           </ul>
         </div>
       </div>
-    </Panel>
-    <Divider layout="horizontal" />
+    </div>
+    <div layout="horizontal" />
     <div id="graphs" class="p-grid">
       <div class="p-col-10">
         <div class="p-grid">
@@ -190,16 +190,10 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import Skeleton from 'primevue/skeleton';
-import Panel from 'primevue/panel'
-import Divider from 'primevue/divider'
 
 export default {
   name: 'TestDashboard',
   components: {
-    Panel,
-    Divider,
-    Skeleton,
   },
   computed: {
     ...mapState([
