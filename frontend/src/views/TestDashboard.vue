@@ -1,11 +1,18 @@
 <template>
   <div class="p-m-3 p-text-left">
     <h1>Fatigue Test Dashboard - Individual test</h1>
-    <div v-if="!dataIsFetched" width="100%" height="10rem" />
-    <div v-else header="Test specifications">
+    <v-skeleton-loader v-if="!dataIsFetched"
+      max-width="100%" height="10rem"
+      type="paragraph" />
+
+    <v-container v-else header="Test specifications"
+      class="grey lighten-5 ma-5"
+      fluid
+    >
+
       <h4 v-for="title in titles" :key="title">{{ title }}</h4>
-      <div class="p-grid">
-        <div class="p-col">
+      <v-row no-gutters>
+        <v-col>
           <h4>General informations</h4>
           <ul>
             <li>
@@ -25,9 +32,8 @@
                 <a :href="pub.DOI" target="_blank">{{ pub.DOI }}</a>
             </li>
           </ul>
-        </div>
-        <div layout="vertical" />
-        <div class="p-col">
+        </v-col>
+        <v-col>
           <h4>Test conditions</h4>
           <ul>
             <li>
@@ -56,9 +62,8 @@
               <span class="value">{{ experience['Measuring Equipment'] }}</span>
             </li>
           </ul>
-        </div>
-        <div layout="vertical" />
-        <div class="p-col">
+        </v-col>
+        <v-col>
           <h4>Laminate and assemblies</h4>
           <ul>
             <li>
@@ -95,9 +100,8 @@
               </span>
             </li>
           </ul>
-        </div>
-        <div layout="vertical" />
-        <div class="p-col">
+        </v-col>
+        <v-col>
           <h4>Materials</h4>
           <ul>
             <li>
@@ -137,54 +141,68 @@
               </span>
             </li>
           </ul>
-        </div>
-      </div>
-    </div>
-    <div layout="horizontal" />
-    <div id="graphs" class="p-grid">
-      <div class="p-col-10">
-        <div class="p-grid">
-          <iframe class="p-col-6" id="plot_stress_strain" src="/plot_select_stress_strain.html" frameborder="0"/>
-          <iframe class="p-col-6" id="plot_creep" src="/plot_creep.html" frameborder="0"/>
-          <iframe class="p-col-6" id="plot_hystarea" src="/plot_hystarea.html" frameborder="0"/>
-          <iframe class="p-col-6" id="plot_stiffness" src="/plot_stiffness.html" frameborder="0"/>
-        </div>
-      </div>
-      <div class="p-col-2">
-        <ul>
-          <li>
-            <span class="subject">Stress at failure:</span> &nbsp;
-            <span class="value">
-              47.4 MPa (TODO)
-            </span>
-          </li>
-          <li>
-            <span class="subject">Strain at failure:</span> &nbsp;
-            <span class="value">
-              1.4% (TODO)
-            </span>
-          </li>
-          <li>
-            <span class="subject">N_cycles:</span> &nbsp;
-            <span class="value">
-              1'198'627 (TODO)
-            </span>
-          </li>
-          <li>
-            <span class="subject">R:</span> &nbsp;
-            <span class="value">
-              0.1 (TODO)
-            </span>
-          </li>
-          <li>
-            <span class="subject">Total dissipated energy (TDE):</span> &nbsp;
-            <span class="value">
-              (TODO)
-            </span>
-          </li>
-        </ul>
-      </div>
-    </div>
+        </v-col>
+      </v-row>
+    </v-container>
+
+    <v-container fluid>
+      <v-row no-gutters>
+        <v-col class="col-10">
+          <v-container>
+            <v-row no-gutters>
+              <v-col>
+                <iframe id="plot_stress_strain" src="/plot_select_stress_strain.html" frameborder="0"/>
+              </v-col>
+              <v-col>
+                <iframe id="plot_creep" src="/plot_creep.html" frameborder="0"/>
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col>
+                <iframe id="plot_hystarea" src="/plot_hystarea.html" frameborder="0"/>
+              </v-col>
+              <v-col>
+                <iframe id="plot_stiffness" src="/plot_stiffness.html" frameborder="0"/>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-col>
+        <v-col class="col-2">
+          <ul>
+            <li>
+              <span class="subject">Stress at failure:</span> &nbsp;
+              <span class="value">
+                47.4 MPa (TODO)
+              </span>
+            </li>
+            <li>
+              <span class="subject">Strain at failure:</span> &nbsp;
+              <span class="value">
+                1.4% (TODO)
+              </span>
+            </li>
+            <li>
+              <span class="subject">N_cycles:</span> &nbsp;
+              <span class="value">
+                1'198'627 (TODO)
+              </span>
+            </li>
+            <li>
+              <span class="subject">R:</span> &nbsp;
+              <span class="value">
+                0.1 (TODO)
+              </span>
+            </li>
+            <li>
+              <span class="subject">Total dissipated energy (TDE):</span> &nbsp;
+              <span class="value">
+                (TODO)
+              </span>
+            </li>
+          </ul>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 
@@ -193,8 +211,6 @@ import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: 'TestDashboard',
-  components: {
-  },
   computed: {
     ...mapState([
       'experience',
