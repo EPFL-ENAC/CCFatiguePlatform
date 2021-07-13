@@ -296,15 +296,15 @@ export default {
     fetch('/bokeh/creep.json')
       .then(response => response.json())
       .then(item => Bokeh.embed.embed_item(item, 'bokeh-creep'));
-    fetch('/bokeh/hystarea.json')
+    fetch('/bokeh/hyst_area.json')
       .then(response => response.json())
       .then(item => Bokeh.embed.embed_item(item, 'bokeh-hystarea'));
+    fetch('/bokeh/select_stress_strain.json')
+      .then(response => response.json())
+      .then(item => Bokeh.embed.embed_item(item, 'bokeh-stress-strain'));
     fetch('/bokeh/stiffness.json')
       .then(response => response.json())
       .then(item => Bokeh.embed.embed_item(item, 'bokeh-stiffness'));
-    fetch('/bokeh/stress_strain.json')
-      .then(response => response.json())
-      .then(item => Bokeh.embed.embed_item(item, 'bokeh-stress-strain'));
   },
 }
 </script>
