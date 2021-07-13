@@ -167,7 +167,7 @@
             </v-row>
           </v-container>
         </v-col>
-        <v-col class="col-2">
+        <v-col class="col-2 grey lighten-5 my-auto">
           <ul>
             <li>
               <span class="subject">Stress at failure:</span> &nbsp;
