@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar app color="#ff0000" dense dark>
+    <v-app-bar app color="primary" dense dark>
       <v-tabs align-with-title fixed-tabs>
         <v-tab
           v-for="(route, i) in routerMenu" :key="i"
