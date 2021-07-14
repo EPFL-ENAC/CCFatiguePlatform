@@ -87,7 +87,7 @@ def sub_r_ratio_whitney(linlog, R_RATIO):
 
     return sub_stress_whitney, sub_n_cycles_whitney
 
-def plot_sub_SN_linlog(sub_stress_linlog, sub_n_cycles_linlog, sub_stress_loglog, sub_n_cycles_loglog, sub_stress_sendeckyj, sub_n_cycles_sendeckyj, sub_stress_whitney, sub_n_cycles_whitney):
+def plot_sub_SN(sub_stress_linlog, sub_n_cycles_linlog, sub_stress_loglog, sub_n_cycles_loglog, sub_stress_sendeckyj, sub_n_cycles_sendeckyj, sub_stress_whitney, sub_n_cycles_whitney):
 
     sub_linlog_sn = {'n_cycles': sub_n_cycles_linlog,
                  'stress_param': sub_stress_linlog}
@@ -120,4 +120,4 @@ sub_stress_loglog, sub_n_cycles_loglog = sub_r_ratio_loglog(loglog, R_RATIO)
 sub_stress_sendeckyj, sub_n_cycles_sendeckyj = sub_r_ratio_sendeckyj(sendeckyj, R_RATIO)
 sub_stress_whitney, sub_n_cycles_whitney = sub_r_ratio_linlog(whitney, R_RATIO)
 
-sub_sn = plot_sub_SN_linlog(sub_stress_linlog, sub_n_cycles_linlog, sub_stress_loglog, sub_n_cycles_loglog, sub_stress_sendeckyj, sub_n_cycles_sendeckyj, sub_stress_whitney, sub_n_cycles_whitney)
+sub_sn = plot_sub_SN(sub_stress_linlog, sub_n_cycles_linlog, sub_stress_loglog, sub_n_cycles_loglog, sub_stress_sendeckyj, sub_n_cycles_sendeckyj, sub_stress_whitney, sub_n_cycles_whitney)
