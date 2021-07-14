@@ -101,13 +101,13 @@ def plot_sub_SN(sub_stress_linlog, sub_n_cycles_linlog, sub_stress_loglog, sub_n
     plotSN = figure(title = 'S-N curves', plot_width=1200, plot_height=800,
                   x_axis_label = "N", y_axis_label = "Maximum Cyclic Stress", x_axis_type = "log")
     plotSN.add_tools(HoverTool(tooltips=[("N", "@n_cycles"), ("Maximum cyclic stress", "@stress_param")]))
-    plotSN.line(x = 'n_cycles', y = 'stress_param', source = ColumnDataSource(data = sub_linlog_sn))
-    plotSN.line(x = 'n_cycles', y = 'stress_param', source = ColumnDataSource(data = sub_loglog_sn))
-    plotSN.line(x = 'n_cycles', y = 'stress_param', source = ColumnDataSource(data = sub_sendeckyj_sn))
-    plotSN.line(x = 'n_cycles', y = 'stress_param', source = ColumnDataSource(data = sub_whitney_sn))
+    plotSN.line(x = 'n_cycles', y = 'stress_param', source = ColumnDataSource(data = sub_linlog_sn), line_color = 'blue')
+    plotSN.line(x = 'n_cycles', y = 'stress_param', source = ColumnDataSource(data = sub_loglog_sn), line_color = 'red')
+    plotSN.line(x = 'n_cycles', y = 'stress_param', source = ColumnDataSource(data = sub_sendeckyj_sn), line_color = 'green')
+    plotSN.line(x = 'n_cycles', y = 'stress_param', source = ColumnDataSource(data = sub_whitney_sn), line_color = 'yellow')
 
     show(plotSN)
-    return sub_linlog_sn
+    return
 
 
 linlog = read_SN_linlog(DATA_DIRECTORY, file_toplot)
@@ -119,4 +119,4 @@ sub_stress_loglog, sub_n_cycles_loglog = sub_r_ratio_loglog(loglog, R_RATIO)
 sub_stress_sendeckyj, sub_n_cycles_sendeckyj = sub_r_ratio_sendeckyj(sendeckyj, R_RATIO)
 sub_stress_whitney, sub_n_cycles_whitney = sub_r_ratio_whitney(whitney, R_RATIO)
 
-sub_sn = plot_sub_SN(sub_stress_linlog, sub_n_cycles_linlog, sub_stress_loglog, sub_n_cycles_loglog, sub_stress_sendeckyj, sub_n_cycles_sendeckyj, sub_stress_whitney, sub_n_cycles_whitney)
+plot_sub_SN(sub_stress_linlog, sub_n_cycles_linlog, sub_stress_loglog, sub_n_cycles_loglog, sub_stress_sendeckyj, sub_n_cycles_sendeckyj, sub_stress_whitney, sub_n_cycles_whitney)
