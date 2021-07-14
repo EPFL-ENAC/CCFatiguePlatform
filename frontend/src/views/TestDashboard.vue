@@ -1,12 +1,12 @@
 <template>
-  <div class="p-m-3 p-text-left">
+  <div class="ma-5">
     <h1>Fatigue Test Dashboard - Individual test</h1>
     <v-skeleton-loader v-if="!dataIsFetched"
       max-width="100%" height="10rem"
       type="paragraph" />
 
     <v-container v-else header="Test specifications"
-      class="grey lighten-5 ma-5"
+      class="grey lighten-5"
       fluid
     >
 

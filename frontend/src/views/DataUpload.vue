@@ -1,7 +1,7 @@
 <template>
-  <div class="p-m-3 p-text-left">
+  <v-container>
     <h1>This is the Data Upload page</h1>
-  </div>
+  </v-container>
 </template>
 
 <script>
