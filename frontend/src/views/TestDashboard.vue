@@ -9,7 +9,13 @@
       fluid
     >
       <v-card-title>
-        Experiment specifications (metadata) <v-icon>mdi-information-outline</v-icon>
+        Experiment specifications (metadata)
+        <info-button>
+          <template v-slot:title>
+            Test results metadata
+          </template>
+          The metadata are the set of information that define all the test parameters, they also allow us to uniquely define each test.
+        </info-button>
       </v-card-title>
       <v-card-text>
         <v-row no-gutters>
@@ -219,9 +225,11 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
+import InfoButton from '@/components/InfoButton.vue'
 
 export default {
   name: 'TestDashboard',
+  components: { InfoButton },
   computed: {
     ...mapState([
       'experience',
