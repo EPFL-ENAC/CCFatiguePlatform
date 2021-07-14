@@ -165,19 +165,17 @@
         <v-col class="col-10">
           <v-container>
             <v-row no-gutters>
-              <v-col>
-                <iframe id="plot_stress_strain" src="/plot_select_stress_strain.html" frameborder="0"/>
+              <v-col cols="6">
+                <div id="bokeh-stress-strain"></div>
               </v-col>
-              <v-col>
-                <iframe id="plot_creep" src="/plot_creep.html" frameborder="0"/>
+              <v-col cols="6">
+                <div id="bokeh-creep"></div>
               </v-col>
-            </v-row>
-            <v-row no-gutters>
-              <v-col>
-                <iframe id="plot_hystarea" src="/plot_hystarea.html" frameborder="0"/>
+              <v-col cols="6">
+                <div id="bokeh-hystarea"></div>
               </v-col>
-              <v-col>
-                <iframe id="plot_stiffness" src="/plot_stiffness.html" frameborder="0"/>
+              <v-col cols="6">
+                <div id="bokeh-stiffness"></div>
               </v-col>
             </v-row>
           </v-container>
@@ -228,6 +226,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import InfoButton from '@/components/InfoButton.vue'
+import * as Bokeh from 'bokeh'
 
 export default {
   name: 'TestDashboard',
@@ -244,6 +243,20 @@ export default {
   },
   created() {
     this.$store.dispatch('fetchExperience')
+  },
+  mounted() {
+    fetch('bokeh/creep.json')
+      .then(response => response.json())
+      .then(item => Bokeh.embed.embed_item(item, 'bokeh-creep'));
+    fetch('bokeh/hystarea.json')
+      .then(response => response.json())
+      .then(item => Bokeh.embed.embed_item(item, 'bokeh-hystarea'));
+    fetch('bokeh/stiffness.json')
+      .then(response => response.json())
+      .then(item => Bokeh.embed.embed_item(item, 'bokeh-stiffness'));
+    fetch('bokeh/stress_strain.json')
+      .then(response => response.json())
+      .then(item => Bokeh.embed.embed_item(item, 'bokeh-stress-strain'));
   },
 }
 </script>
