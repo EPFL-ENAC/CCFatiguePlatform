@@ -1,5 +1,5 @@
 <template>
-  <v-container class="p-text-left">
+  <v-container>
     <h1>About</h1>
     <h2>Disclaimer</h2>
     <p>
