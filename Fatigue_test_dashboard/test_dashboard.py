@@ -126,7 +126,7 @@ def create_sub_hystloops(df, sub_index):
                                  'strain': sub_hystloops_strain,
                                  'stress': sub_hystloops_stress})
 
-
+    print(sub_hystloops)
     return sub_hystloops
 
 def plot_select_stress_strain(sub_hystloops):
@@ -237,7 +237,7 @@ sub_hyst = {'n_cycles': hyst_n_cycles,
 def calculate_tde(hyst_area):
     tde = np.sum(hyst_area)
     #tde2 = np.sum(hyst_area2)
-    return tde, tde2
+    return tde #, tde2
 
 def plot_hystarea(hyst_df):
 
