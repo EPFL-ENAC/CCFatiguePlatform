@@ -1,5 +1,5 @@
 <template>
-  <div class="this-page">
+  <v-container>
     <h1>Home</h1>
     
     <h2>Introduction</h2>
@@ -25,7 +25,7 @@
     <p>
       Additionally, our analysis tool allows for visualization of results over a complete experiment with modules allowing computations such as Cycle Counting, drawing S-N curves, computing CLD, Fatigue Failure criterion as well as damage summation. 
     </p>
-  </div>
+  </v-container>
 </template>
 
 <script>
@@ -35,7 +35,4 @@ export default {
 </script>
 
 <style scoped>
-div.this-page {
-  text-align: left;
-}
 </style>
