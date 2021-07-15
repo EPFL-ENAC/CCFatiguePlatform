@@ -6,7 +6,7 @@
           v-for="(route, i) in routerMenu" :key="i"
           :to="route.to"
           exact
-        ><v-icon>{{ route.icon }}</v-icon>&nbsp;{{ route.label}} </v-tab>
+        ><v-icon>{{ route.icon }}</v-icon><template v-if="!route.iconOnly">&nbsp;{{ route.label}} </template></v-tab>
       </v-tabs>
     </v-app-bar>
 
@@ -23,10 +23,10 @@ export default {
   data () {
     return {
       routerMenu: [
-        {label: 'Home', icon: 'mdi-home', to: '/home'},
-        {label: 'Test dashboard', icon: 'mdi-chart-line', to: '/test-dashboard'},
-        {label: 'Data upload ', icon: 'mdi-upload', to: '/data-upload'},
-        {label: 'About', icon: 'mdi-information', to: '/about'},
+        {label: 'Home', icon: 'mdi-home', to: '/home', iconOnly: true},
+        {label: 'Test dashboard', icon: 'mdi-chart-line', to: '/test-dashboard', iconOnly: false},
+        {label: 'Data upload ', icon: 'mdi-upload', to: '/data-upload', iconOnly: false},
+        {label: 'About', icon: 'mdi-information', to: '/about', iconOnly: true},
       ]
     }
   },
