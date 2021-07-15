@@ -1,181 +1,181 @@
 <template>
   <div class="ma-5">
-    <h1>Experiment : {{ experience['Experiment Type'] }} test, by {{ experience.Researcher }}, {{ experience.Laboratory }}, {{ experience.Experiment.Date }}</h1>
     <v-skeleton-loader v-if="!dataIsFetched"
       max-width="100%" height="10rem"
       type="paragraph" />
 
-    <v-card v-else header="Test specifications"
-      fluid
-    >
-      <v-card-title>
-        Experiment specifications (metadata)
-        <info-button>
-          <template v-slot:title>
-            Test results metadata
-          </template>
-          The metadata are the set of information that define all the test parameters, they also allow us to uniquely define each test.
-        </info-button>
-      </v-card-title>
-      <v-card-text>
-        <v-row no-gutters>
-          <v-col>
-            <h4>GENERAL INFORMATIONS</h4>
-            <ul>
-              <li>
-                <span class="subject">Specimen:</span> &nbsp;
-                <span class="value">
-                  TODO ... not found
-                </span>
-              </li>
-              <li>
-                <span class="subject">Publications:</span> &nbsp;
-                <span class="value">
-                  <span v-for="(pub, index) in experience.Publications" :key="index">
-                    <a :href="pub.DOI" target="_blank">{{ pub.Title }}</a>
-                    <span v-if="index != experience.Publications.length - 1">, </span>
+    <template v-else>
+      <h1>Experiment : {{ experience['Experiment Type'] }} test, by {{ experience.Researcher }}, {{ experience.Laboratory }}, {{ experience.Experiment.Date }}</h1>
+      <v-card header="Test specifications"
+        fluid
+      >
+        <v-card-title>
+          Experiment specifications (metadata)
+          <info-button>
+            <template v-slot:title>
+              Test results metadata
+            </template>
+            The metadata are the set of information that define all the test parameters, they also allow us to uniquely define each test.
+          </info-button>
+        </v-card-title>
+        <v-card-text>
+          <v-row no-gutters>
+            <v-col>
+              <h4>GENERAL INFORMATIONS</h4>
+              <ul>
+                <li>
+                  <span class="subject">Specimen:</span> &nbsp;
+                  <span class="value">
+                    TODO ... not found
                   </span>
-                </span>
-              </li>
-              <li>
-                <span class="subject">Author:</span> &nbsp;
-                <span class="value">
-                  {{ experience.Researcher }}
-                </span>
-              </li>
-            </ul>
-          </v-col>
-          <v-col>
-            <h4>TEST CONDITIONS</h4>
-            <ul>
-              <li>
-                <span class="subject">Temperature:</span> &nbsp;
-                <span class="value">
-                  {{ experience.Experiment['Test Conditions'].Temperature }}
-                  <template v-if="! isNaN(experience.Experiment['Test Conditions'].Temperature)" >{{ experience['Experiment Units'].Temperature }}</template>
-                </span>
-              </li>
-              <li>
-                <span class="subject">Relative humidity:</span> &nbsp;
-                <span class="value">
-                  {{ experience.Experiment['Test Conditions']['Relative Humidity'] }}
-                  <template v-if="! isNaN(experience.Experiment['Test Conditions']['Relative Humidity'])">%</template>
-                </span>
-              </li>
-              <li>
-                <span class="subject">Grip pressure:</span> &nbsp;
-                <span class="value">
-                  {{ experience.Experiment['Test Conditions']['Grip Pressure'] }}
-                  <template v-if="! isNaN(experience.Experiment['Test Conditions']['Grip Pressure'])">{{ experience['Experiment Units'].Pressure }}</template>
-                </span>
-              </li>
-              <li>
-                <span class="subject">Measuring equipment:</span> &nbsp;
-                <span class="value">{{ experience['Measuring Equipment'] }}</span>
-              </li>
-            </ul>
-          </v-col>
-          <v-col>
-            <h4>LAMINATE AND ASSEMBLIES</h4>
-            <ul>
-              <li>
-                <span class="subject">Curing time:</span> &nbsp;
-                <span class="value">
-                  {{ experience.Experiment['Laminates and Assemblies']['Curing Time'] }}
-                  <template v-if="! isNaN(experience.Experiment['Laminates and Assemblies']['Curing Time'])">{{ experience['Experiment Units'].Time }}</template>
-                </span>
-              </li>
-              <li>
-                <span class="subject">Curing temperature:</span> &nbsp;
-                <span class="value">
-                  {{ experience.Experiment['Laminates and Assemblies']['Curing Temperature'] }}
-                  <template v-if="! isNaN(experience.Experiment['Laminates and Assemblies']['Curing Temperature'])">{{ experience['Experiment Units'].Temperature }}</template>
-                </span>
-              </li>
-              <li>
-                <span class="subject">Curing Pressure:</span> &nbsp;
-                <span class="value">
-                  {{ experience.Experiment['Laminates and Assemblies']['Curing Pressure'] }}
-                  <template v-if="! isNaN(experience.Experiment['Laminates and Assemblies']['Curing Pressure'])">{{ experience['Experiment Units'].Pressure }}</template>
-                </span>
-              </li>
-              <li>
-                <span class="subject">Stacking sequence:</span> &nbsp;
-                <span class="value">
-                  {{ experience.Experiment['Laminates and Assemblies']['Stacking Sequence'] }}
-                </span>
-              </li>
-              <li>
-                <span class="subject">Fiber content:</span> &nbsp;
-                <span class="value">
-                  {{ experience.Experiment['Laminates and Assemblies']['Fiber Content'] }}
-                </span>
-              </li>
-            </ul>
-          </v-col>
-          <v-col>
-            <h4>MATERIALS</h4>
-            <ul>
-              <li>
-                <span class="subject">Resin:</span> &nbsp;
-                <span class="value">
-                  {{ experience.Experiment['Material Type']['Resin'] }}
-                </span>
-              </li>
-              <li>
-                <span class="subject">Hardener:</span> &nbsp;
-                <span class="value">
-                  {{ experience.Experiment['Material Type']['Hardener'] }}
-                </span>
-              </li>
-              <li>
-                <span class="subject">Mixing ration:</span> &nbsp;
-                <span class="value">
-                  {{ experience.Experiment['Material Type']['Mixing ratio'] }}
-                </span>
-              </li>
-              <li>
-                <span class="subject">Fiber Material:</span> &nbsp;
-                <span class="value">
-                  {{ experience.Experiment['Constituent Materials']['Fiber Material'] }}
-                </span>
-              </li>
-              <li>
-                <span class="subject">Fiber Geometry:</span> &nbsp;
-                <span class="value">
-                  {{ experience.Experiment['Constituent Materials']['Fiber Geometry'] }}
-                </span>
-              </li>
-              <li>
-                <span class="subject">Area Density:</span> &nbsp;
-                <span class="value">
-                  {{ experience.Experiment['Constituent Materials']['Area Density'] }}
-                </span>
-              </li>
-            </ul>
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
+                </li>
+                <li>
+                  <span class="subject">Publications:</span> &nbsp;
+                  <span class="value">
+                    <span v-for="(pub, index) in experience.Publications" :key="index">
+                      <a :href="pub.DOI" target="_blank">{{ pub.Title }}</a>
+                      <span v-if="index != experience.Publications.length - 1">, </span>
+                    </span>
+                  </span>
+                </li>
+                <li>
+                  <span class="subject">Author:</span> &nbsp;
+                  <span class="value">
+                    {{ experience.Researcher }}
+                  </span>
+                </li>
+              </ul>
+            </v-col>
+            <v-col>
+              <h4>TEST CONDITIONS</h4>
+              <ul>
+                <li>
+                  <span class="subject">Temperature:</span> &nbsp;
+                  <span class="value">
+                    {{ experience.Experiment['Test Conditions'].Temperature }}
+                    <template v-if="! isNaN(experience.Experiment['Test Conditions'].Temperature)" >{{ experience['Experiment Units'].Temperature }}</template>
+                  </span>
+                </li>
+                <li>
+                  <span class="subject">Relative humidity:</span> &nbsp;
+                  <span class="value">
+                    {{ experience.Experiment['Test Conditions']['Relative Humidity'] }}
+                    <template v-if="! isNaN(experience.Experiment['Test Conditions']['Relative Humidity'])">%</template>
+                  </span>
+                </li>
+                <li>
+                  <span class="subject">Grip pressure:</span> &nbsp;
+                  <span class="value">
+                    {{ experience.Experiment['Test Conditions']['Grip Pressure'] }}
+                    <template v-if="! isNaN(experience.Experiment['Test Conditions']['Grip Pressure'])">{{ experience['Experiment Units'].Pressure }}</template>
+                  </span>
+                </li>
+                <li>
+                  <span class="subject">Measuring equipment:</span> &nbsp;
+                  <span class="value">{{ experience['Measuring Equipment'] }}</span>
+                </li>
+              </ul>
+            </v-col>
+            <v-col>
+              <h4>LAMINATE AND ASSEMBLIES</h4>
+              <ul>
+                <li>
+                  <span class="subject">Curing time:</span> &nbsp;
+                  <span class="value">
+                    {{ experience.Experiment['Laminates and Assemblies']['Curing Time'] }}
+                    <template v-if="! isNaN(experience.Experiment['Laminates and Assemblies']['Curing Time'])">{{ experience['Experiment Units'].Time }}</template>
+                  </span>
+                </li>
+                <li>
+                  <span class="subject">Curing temperature:</span> &nbsp;
+                  <span class="value">
+                    {{ experience.Experiment['Laminates and Assemblies']['Curing Temperature'] }}
+                    <template v-if="! isNaN(experience.Experiment['Laminates and Assemblies']['Curing Temperature'])">{{ experience['Experiment Units'].Temperature }}</template>
+                  </span>
+                </li>
+                <li>
+                  <span class="subject">Curing Pressure:</span> &nbsp;
+                  <span class="value">
+                    {{ experience.Experiment['Laminates and Assemblies']['Curing Pressure'] }}
+                    <template v-if="! isNaN(experience.Experiment['Laminates and Assemblies']['Curing Pressure'])">{{ experience['Experiment Units'].Pressure }}</template>
+                  </span>
+                </li>
+                <li>
+                  <span class="subject">Stacking sequence:</span> &nbsp;
+                  <span class="value">
+                    {{ experience.Experiment['Laminates and Assemblies']['Stacking Sequence'] }}
+                  </span>
+                </li>
+                <li>
+                  <span class="subject">Fiber content:</span> &nbsp;
+                  <span class="value">
+                    {{ experience.Experiment['Laminates and Assemblies']['Fiber Content'] }}
+                  </span>
+                </li>
+              </ul>
+            </v-col>
+            <v-col>
+              <h4>MATERIALS</h4>
+              <ul>
+                <li>
+                  <span class="subject">Resin:</span> &nbsp;
+                  <span class="value">
+                    {{ experience.Experiment['Material Type']['Resin'] }}
+                  </span>
+                </li>
+                <li>
+                  <span class="subject">Hardener:</span> &nbsp;
+                  <span class="value">
+                    {{ experience.Experiment['Material Type']['Hardener'] }}
+                  </span>
+                </li>
+                <li>
+                  <span class="subject">Mixing ration:</span> &nbsp;
+                  <span class="value">
+                    {{ experience.Experiment['Material Type']['Mixing ratio'] }}
+                  </span>
+                </li>
+                <li>
+                  <span class="subject">Fiber Material:</span> &nbsp;
+                  <span class="value">
+                    {{ experience.Experiment['Constituent Materials']['Fiber Material'] }}
+                  </span>
+                </li>
+                <li>
+                  <span class="subject">Fiber Geometry:</span> &nbsp;
+                  <span class="value">
+                    {{ experience.Experiment['Constituent Materials']['Fiber Geometry'] }}
+                  </span>
+                </li>
+                <li>
+                  <span class="subject">Area Density:</span> &nbsp;
+                  <span class="value">
+                    {{ experience.Experiment['Constituent Materials']['Area Density'] }}
+                  </span>
+                </li>
+              </ul>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+    </template>
 
     <v-container fluid>
       <v-row no-gutters>
         <v-col class="col-10">
           <v-container>
             <v-row no-gutters>
-              <v-col>
-                <iframe id="plot_stress_strain" src="/plot_select_stress_strain.html" frameborder="0"/>
+              <v-col cols="6">
+                <div id="bokeh-stress-strain"></div>
               </v-col>
-              <v-col>
-                <iframe id="plot_creep" src="/plot_creep.html" frameborder="0"/>
+              <v-col cols="6">
+                <div id="bokeh-creep"></div>
               </v-col>
-            </v-row>
-            <v-row no-gutters>
-              <v-col>
-                <iframe id="plot_hystarea" src="/plot_hystarea.html" frameborder="0"/>
+              <v-col cols="6">
+                <div id="bokeh-hystarea"></div>
               </v-col>
-              <v-col>
-                <iframe id="plot_stiffness" src="/plot_stiffness.html" frameborder="0"/>
+              <v-col cols="6">
+                <div id="bokeh-stiffness"></div>
               </v-col>
             </v-row>
           </v-container>
@@ -226,6 +226,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import InfoButton from '@/components/InfoButton.vue'
+import * as Bokeh from 'bokeh'
 
 export default {
   name: 'TestDashboard',
@@ -242,6 +243,20 @@ export default {
   },
   created() {
     this.$store.dispatch('fetchExperience')
+  },
+  mounted() {
+    fetch('bokeh/creep.json')
+      .then(response => response.json())
+      .then(item => Bokeh.embed.embed_item(item, 'bokeh-creep'));
+    fetch('bokeh/hystarea.json')
+      .then(response => response.json())
+      .then(item => Bokeh.embed.embed_item(item, 'bokeh-hystarea'));
+    fetch('bokeh/stiffness.json')
+      .then(response => response.json())
+      .then(item => Bokeh.embed.embed_item(item, 'bokeh-stiffness'));
+    fetch('bokeh/stress_strain.json')
+      .then(response => response.json())
+      .then(item => Bokeh.embed.embed_item(item, 'bokeh-stress-strain'));
   },
 }
 </script>
