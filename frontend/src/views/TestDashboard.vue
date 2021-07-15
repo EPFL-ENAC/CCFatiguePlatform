@@ -245,16 +245,16 @@ export default {
     this.$store.dispatch('fetchExperience')
   },
   mounted() {
-    fetch('bokeh/creep.json')
+    fetch('/bokeh/creep.json')
       .then(response => response.json())
       .then(item => Bokeh.embed.embed_item(item, 'bokeh-creep'));
-    fetch('bokeh/hystarea.json')
+    fetch('/bokeh/hystarea.json')
       .then(response => response.json())
       .then(item => Bokeh.embed.embed_item(item, 'bokeh-hystarea'));
-    fetch('bokeh/stiffness.json')
+    fetch('/bokeh/stiffness.json')
       .then(response => response.json())
       .then(item => Bokeh.embed.embed_item(item, 'bokeh-stiffness'));
-    fetch('bokeh/stress_strain.json')
+    fetch('/bokeh/stress_strain.json')
       .then(response => response.json())
       .then(item => Bokeh.embed.embed_item(item, 'bokeh-stress-strain'));
   },
