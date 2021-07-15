@@ -6,6 +6,7 @@ import Home from '../views/Home.vue'
 // which is lazy-loaded when the route is visited.
 const TestDashboard = () => import(/* webpackChunkName: "test-dashboard" */ '../views/TestDashboard.vue')
 const DataUpload = () => import(/* webpackChunkName: "data-upload" */ '../views/DataUpload.vue')
+const CCFatigueAnalysis = () => import(/* webpackChunkName: "ccfatigue-analysis" */ '../views/CCFatigueAnalysis.vue')
 const About = () => import(/* webpackChunkName: "about" */ '../views/About.vue')
 
 Vue.use(VueRouter)
@@ -14,27 +15,42 @@ const routes = [
   {
     path: '/',
     name: 'Root',
-    redirect: '/home'
+    redirect: {name: 'Home'},
   },
   {
     path: '/home',
     name: 'Home',
-    component: Home
+    component: Home,
   },
   {
-    path: '/test-dashboard',
+    path: '/fatigue_database',
+    name: 'FatigueDatabase',
+    redirect: {name: 'SearchDatabase'},
+  },
+  {
+    path: '/fatigue_database/test-dashboard',
+    name: 'SearchDatabase',
+    redirect: {name: 'TestDashboard'},
+  },
+  {
+    path: '/fatigue_database/test-dashboard',
     name: 'TestDashboard',
-    component: TestDashboard
+    component: TestDashboard,
   },
   {
-    path: '/data-upload',
+    path: '/fatigue_database/data-upload',
     name: 'DataUpload',
-    component: DataUpload
+    component: DataUpload,
+  },
+  {
+    path: '/ccfatigue-analysis',
+    name: 'CCFatigueAnalysis',
+    component: CCFatigueAnalysis,
   },
   {
     path: '/about',
     name: 'About',
-    component: About
+    component: About,
   },
 ]
 
