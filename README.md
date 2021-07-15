@@ -2,6 +2,14 @@
 
 CCFatiguePlatform is an initiative from CCLab that aims to develop a web application to faciltate manipulation and harmonized storage of composite materials testing datasets. 
 
+
+# Web app: Usage
+## Setup & run locally
+
+1. run backend according to [backend/README.md](backend/README.md)
+2. run frontend according to [frontend/README.md](frontend/README.md)
+
+
 # Data
 ## Standard data format
 [Example of data in standard format](https://drive.google.com/file/d/1-SuUHPbW-xFr65yqVIbrqHl1vb4ejMzo/view?usp=sharing "Shayan's data in standard format")

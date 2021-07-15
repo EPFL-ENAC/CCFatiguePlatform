@@ -1,13 +1,26 @@
 <template>
-  <div class="this-page">
-    <h1>Fatigue Test Dashboard - Individual test</h1>
-    <Skeleton v-if="!dataIsFetched" width="100%" height="10rem" />
-    <Panel v-else header="Test specifications">
-      <div>
-        <h4 v-for="title in titles" :key="title">{{ title }}</h4>
-        <div class="p-d-flex space-evenly">
-          <div class="spec_column">
-            <h4>General informations</h4>
+  <div class="ma-5">
+    <h1>Experiment : {{ experience['Experiment Type'] }} test, by {{ experience.Researcher }}, {{ experience.Laboratory }}, {{ experience.Experiment.Date }}</h1>
+    <v-skeleton-loader v-if="!dataIsFetched"
+      max-width="100%" height="10rem"
+      type="paragraph" />
+
+    <v-card v-else header="Test specifications"
+      fluid
+    >
+      <v-card-title>
+        Experiment specifications (metadata)
+        <info-button>
+          <template v-slot:title>
+            Test results metadata
+          </template>
+          The metadata are the set of information that define all the test parameters, they also allow us to uniquely define each test.
+        </info-button>
+      </v-card-title>
+      <v-card-text>
+        <v-row no-gutters>
+          <v-col>
+            <h4>GENERAL INFORMATIONS</h4>
             <ul>
               <li>
                 <span class="subject">Specimen:</span> &nbsp;
@@ -16,20 +29,24 @@
                 </span>
               </li>
               <li>
-                <span class="subject">Researcher:</span> &nbsp;
+                <span class="subject">Publications:</span> &nbsp;
+                <span class="value">
+                  <span v-for="(pub, index) in experience.Publications" :key="index">
+                    <a :href="pub.DOI" target="_blank">{{ pub.Title }}</a>
+                    <span v-if="index != experience.Publications.length - 1">, </span>
+                  </span>
+                </span>
+              </li>
+              <li>
+                <span class="subject">Author:</span> &nbsp;
                 <span class="value">
                   {{ experience.Researcher }}
                 </span>
               </li>
-              <li v-for="pub in experience.Publications" :key="pub.doi">
-                {{ pub.Title }} <br>
-                 <a :href="pub.DOI" target="_blank">{{ pub.DOI }}</a>
-              </li>
             </ul>
-          </div>
-          <Divider layout="vertical" />
-          <div class="spec_column">
-            <h4>Test conditions</h4>
+          </v-col>
+          <v-col>
+            <h4>TEST CONDITIONS</h4>
             <ul>
               <li>
                 <span class="subject">Temperature:</span> &nbsp;
@@ -57,10 +74,9 @@
                 <span class="value">{{ experience['Measuring Equipment'] }}</span>
               </li>
             </ul>
-          </div>
-          <Divider layout="vertical" />
-          <div class="spec_column">
-            <h4>Laminate and assemblies</h4>
+          </v-col>
+          <v-col>
+            <h4>LAMINATE AND ASSEMBLIES</h4>
             <ul>
               <li>
                 <span class="subject">Curing time:</span> &nbsp;
@@ -96,10 +112,9 @@
                 </span>
               </li>
             </ul>
-          </div>
-          <Divider layout="vertical" />
-          <div class="spec_column">
-            <h4>Materials</h4>
+          </v-col>
+          <v-col>
+            <h4>MATERIALS</h4>
             <ul>
               <li>
                 <span class="subject">Resin:</span> &nbsp;
@@ -138,70 +153,83 @@
                 </span>
               </li>
             </ul>
-          </div>
-        </div>
-      </div>
-    </Panel>
-    <div id="graphs" class="p-d-flex">
-      <div class="p-d-flex p-flex-column">
-        <iframe id="plot_stress_strain" src="/plot_select_stress_strain.html" frameborder="0" width="800px" height="600px"/>
-        <iframe id="plot_creep" src="/plot_creep.html" frameborder="0" width="800px" height="600px"/>
-      </div>
-      <div class="p-d-flex p-flex-column">
-        <iframe id="plot_hystarea" src="/plot_hystarea.html" frameborder="0" width="800px" height="600px"/>
-        <iframe id="plot_stiffness" src="/plot_stiffness.html" frameborder="0" width="800px" height="600px"/>
-      </div>
-      <div class="spec_column">
-        <ul>
-          <li>
-            <span class="subject">Stress at failure:</span> &nbsp;
-            <span class="value">
-              47.4 MPa (TODO)
-            </span>
-          </li>
-          <li>
-            <span class="subject">Strain at failure:</span> &nbsp;
-            <span class="value">
-              1.4% (TODO)
-            </span>
-          </li>
-          <li>
-            <span class="subject">N_cycles:</span> &nbsp;
-            <span class="value">
-              1'198'627 (TODO)
-            </span>
-          </li>
-          <li>
-            <span class="subject">R:</span> &nbsp;
-            <span class="value">
-              0.1 (TODO)
-            </span>
-          </li>
-          <li>
-            <span class="subject">Total dissipated energy (TDE):</span> &nbsp;
-            <span class="value">
-              (TODO)
-            </span>
-          </li>
-        </ul>
-      </div>
-    </div>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
+
+    <v-container fluid>
+      <v-row no-gutters>
+        <v-col class="col-10">
+          <v-container>
+            <v-row no-gutters>
+              <v-col>
+                <iframe id="plot_stress_strain" src="/plot_select_stress_strain.html" frameborder="0"/>
+              </v-col>
+              <v-col>
+                <iframe id="plot_creep" src="/plot_creep.html" frameborder="0"/>
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col>
+                <iframe id="plot_hystarea" src="/plot_hystarea.html" frameborder="0"/>
+              </v-col>
+              <v-col>
+                <iframe id="plot_stiffness" src="/plot_stiffness.html" frameborder="0"/>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-col>
+        <v-col class="col-2 my-auto">
+          <v-card>
+            <v-card-text>
+              <ul>
+                <li>
+                  <span class="subject">Stress at failure:</span> &nbsp;
+                  <span class="value">
+                    47.4 MPa (TODO)
+                  </span>
+                </li>
+                <li>
+                  <span class="subject">Strain at failure:</span> &nbsp;
+                  <span class="value">
+                    1.4% (TODO)
+                  </span>
+                </li>
+                <li>
+                  <span class="subject">N_cycles:</span> &nbsp;
+                  <span class="value">
+                    1'198'627 (TODO)
+                  </span>
+                </li>
+                <li>
+                  <span class="subject">R:</span> &nbsp;
+                  <span class="value">
+                    0.1 (TODO)
+                  </span>
+                </li>
+                <li>
+                  <span class="subject">Total dissipated energy (TDE):</span> &nbsp;
+                  <span class="value">
+                    (TODO)
+                  </span>
+                </li>
+              </ul>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import Skeleton from 'primevue/skeleton';
-import Panel from 'primevue/panel'
-import Divider from 'primevue/divider'
+import InfoButton from '@/components/InfoButton.vue'
 
 export default {
   name: 'TestDashboard',
-  components: {
-    Panel,
-    Divider,
-    Skeleton,
-  },
+  components: { InfoButton },
   computed: {
     ...mapState([
       'experience',
@@ -219,21 +247,12 @@ export default {
 </script>
 
 <style scoped>
-div.this-page {
-  text-align: left;
-}
-div.space-evenly {
-  justify-content: space-evenly;
-}
-ul {
-  padding-left: 20px;
+iframe {
+  height: 600px;
 }
 span.subject {
   font-weight: bold;
   font-style: italic;
   color: rgb(143, 143, 143);
-}
-span.value {
-  white-space: nowrap;
 }
 </style>
