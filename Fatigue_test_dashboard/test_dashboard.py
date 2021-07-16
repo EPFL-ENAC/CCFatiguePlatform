@@ -125,7 +125,6 @@ def create_sub_hystloops(df, sub_index):
                                  'strain': sub_hystloops_strain,
                                  'stress': sub_hystloops_stress})
 
-    print(sub_hystloops)
     return sub_hystloops
 
 def plot_select_stress_strain(sub_hystloops):
@@ -234,9 +233,15 @@ sub_hyst = {'n_cycles': hyst_n_cycles,
 #             'area': hyst_area2}
 
 def calculate_tde(hyst_area):
+
     tde = np.sum(hyst_area)
     #tde2 = np.sum(hyst_area2)
     return tde #, tde2
+
+def strain_failure(hyst_df):
+    strain_fail = max(hyst_df.creep)
+    strain_fail = hyst_df["creep"].max()
+    return strain_fail
 
 def plot_hystarea(hyst_df):
 
@@ -247,6 +252,9 @@ def plot_hystarea(hyst_df):
     area.add_tools(HoverTool(tooltips=[("area", "@area"), ("Nb. cycles", "@n_cycles")]))
     area.line(x = 'n_cycles', y = 'area', source = ColumnDataSource(data = sub_hyst))
     #area.line(x = 'n_cycles', y = 'area', source = ColumnDataSource(data = sub_hyst2), line_color = 'red')
+
+
+
 
     show(area)
 
@@ -312,10 +320,13 @@ def main():
     plot_stiffness(hyst_df)
     #plot_stiffness(hyst_df, hyst_df2)
 
+    strain_fail = strain_failure(hyst_df)
+
     TDE = calculate_tde(hyst_area)
     #TDE = calculate_tde(hyst_area, hyst_area2)
 
     print(TDE)
+    print(strain_fail)
     return
 
 
