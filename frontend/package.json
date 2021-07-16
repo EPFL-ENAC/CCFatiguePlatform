@@ -10,6 +10,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "numeral": "^2.0.6",
     "vue": "^2.6.11",
     "vue-filter-number-format": "^3.0.1",
     "vue-router": "^3.2.0",
