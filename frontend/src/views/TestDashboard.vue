@@ -5,7 +5,14 @@
       type="paragraph" />
 
     <template v-else>
-      <h1>Experiment : {{ experience['Experiment Type'] }} test, by {{ experience.Researcher }}, {{ experience.Laboratory }}, {{ experience.Experiment.Date }}</h1>
+      <v-card elevation="0">
+        <v-card-title>
+          Experiment : {{ experience['Experiment Type'] }} test, by {{ experience.Researcher }}, {{ experience.Laboratory }}, {{ experience.Experiment.Date }}
+          <v-spacer />
+          <v-btn>Add test(s)</v-btn>
+        </v-card-title>
+      </v-card>
+
       <v-card header="Test specifications"
         fluid
       >
@@ -13,7 +20,7 @@
           Experiment specifications (metadata)
           <info-button>
             <template v-slot:title>
-              Test results metadata
+              Experiment specifications metadata info
             </template>
             The metadata are the set of information that define all the test parameters, they also allow us to uniquely define each test.
           </info-button>
@@ -24,9 +31,9 @@
               <h4>GENERAL INFORMATIONS</h4>
               <ul>
                 <li>
-                  <span class="subject">Specimen:</span> &nbsp;
+                  <span class="subject">Specimen number:</span> &nbsp;
                   <span class="value">
-                    TODO ... not found
+                    {{ experience.Experiment['Specimen number'] }}
                   </span>
                 </li>
                 <li>
@@ -158,68 +165,109 @@
           </v-row>
         </v-card-text>
       </v-card>
-    </template>
 
-    <v-container fluid>
-      <v-row no-gutters>
-        <v-col class="col-10">
-          <v-container>
-            <v-row no-gutters>
-              <v-col cols="6">
-                <div id="bokeh-stress-strain"></div>
-              </v-col>
-              <v-col cols="6">
-                <div id="bokeh-creep"></div>
-              </v-col>
-              <v-col cols="6">
-                <div id="bokeh-hystarea"></div>
-              </v-col>
-              <v-col cols="6">
-                <div id="bokeh-stiffness"></div>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-col>
-        <v-col class="col-2 my-auto">
-          <v-card>
-            <v-card-text>
-              <ul>
-                <li>
-                  <span class="subject">Stress at failure:</span> &nbsp;
-                  <span class="value">
-                    47.4 MPa (TODO)
-                  </span>
-                </li>
-                <li>
-                  <span class="subject">Strain at failure:</span> &nbsp;
-                  <span class="value">
-                    1.4% (TODO)
-                  </span>
-                </li>
-                <li>
-                  <span class="subject">N_cycles:</span> &nbsp;
-                  <span class="value">
-                    1'198'627 (TODO)
-                  </span>
-                </li>
-                <li>
-                  <span class="subject">R:</span> &nbsp;
-                  <span class="value">
-                    0.1 (TODO)
-                  </span>
-                </li>
-                <li>
-                  <span class="subject">Total dissipated energy (TDE):</span> &nbsp;
-                  <span class="value">
-                    (TODO)
-                  </span>
-                </li>
-              </ul>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
+      <v-container fluid>
+        <v-row no-gutters>
+          <v-col class="col-10">
+            <v-card header="Test results" elevation="0">
+              <v-card-title>
+                Test results
+                <info-button>
+                  <template v-slot:title>
+                    Test results info
+                  </template>
+                  <p>
+                    In the test results sections, we show information that can be derived from the testings using 4 graphs and 5 key values.
+                  </p>
+                  <p>
+                    Graph 1: Stress-Strain (x: strain, y: stress)
+                    This graph shows a selection of loading/unloading loops. These loops, also known as hysteresis loops are important because they provide a visual representation of what is being plotted in the next three graphs.
+                  </p>
+                  <p>
+                    Graph 2: Hysteresis loop area (x: number of cycles, y: hysteresis area)
+                    On this graph, we show the evolution of the hysteresis area. This value is defined as the area contained within a hysteresis loop. For visual representation, it represents the area defined by each closed loop on the (stress-strain) plane in graph 1. 
+                  </p>
+                  <p>
+                    Graph 3: Creep evolution (x: number of cycles, y: creep)
+                    Creep is defined as the average deformation during each loading/unloading cycle. It gives an understanding of how much deformation occurs at each cycle.
+                  </p>
+                  <p>
+                    Graph 4: Stiffness evolution (x: number of cycles, y: stiffness)
+                    Stiffness is representative of the resistance an object opposes to an applied force. On this graph, we show how this capacity evolves over a fatigue life cycle.
+                  </p>
+                  <p>
+                    Stress at failure: σ_fail is defined as the stress level that induced failure from the tested specimen and is measured in [MPa]
+                  </p>
+                  <p>
+                    Strain at failure: ε_fail is defined as the deformation at the time of failure and is measured in [%]
+                  </p>
+                  <p>
+                    N_cycles: is defined as the number of cycles to failure [-]
+                  </p>
+                  <p>
+                    R: is defined as the stress ratio (σ_min/σ_max) [-] and has relevance in the context of constant amplitude experiments.
+                    Total dissipated energy (TDE): defined as the sum of all the hysteresis areas over the course of an experiment. It gives a good measure of the amount of energy that has been dissipated in deformation and heat over the course of an experiment.
+                  </p>
+                </info-button>
+              </v-card-title>
+
+              <v-row no-gutters>
+                <v-col cols="6">
+                  <div id="bokeh-stress-strain"></div>
+                </v-col>
+                <v-col cols="6">
+                  <div id="bokeh-creep"></div>
+                </v-col>
+                <v-col cols="6">
+                  <div id="bokeh-hystarea"></div>
+                </v-col>
+                <v-col cols="6">
+                  <div id="bokeh-stiffness"></div>
+                </v-col>
+              </v-row>
+            </v-card>
+          </v-col>
+          <v-col class="col-2 my-auto">
+            <v-card>
+              <v-card-text>
+                <ul>
+                  <li>
+                    <span class="subject">Stress at failure:</span> &nbsp;
+                    <span class="value">
+                      {{ experience.Experiment['Standard Fatigue']['Stress at Failure'] }} {{ experience['Experiment Units'].Stress }}
+                    </span>
+                  </li>
+                  <li>
+                    <span class="subject">Strain at failure:</span> &nbsp;
+                    <span class="value">
+                      {{ experience.Experiment['Standard Fatigue']['Strain at Failure'] }}%
+                    </span>
+                  </li>
+                  <li>
+                    <span class="subject">N_cycles:</span> &nbsp;
+                    <span class="value">
+                      {{ experience.Experiment['Standard Fatigue']['Number of Cycles to Failure'] | numFormat('0,0') }}
+                    </span>
+                  </li>
+                  <li>
+                    <span class="subject">R:</span> &nbsp;
+                    <span class="value">
+                      {{ experience.Experiment['Standard Fatigue']['Stress Ratio'] }}
+                    </span>
+                  </li>
+                  <li>
+                    <span class="subject">Total dissipated energy (TDE):</span> &nbsp;
+                    <span class="value">
+                      {{ experience.Experiment['Standard Fatigue']['Total Dissipated Energy'] | numFormat('0,0') }}
+                    </span>
+                  </li>
+                </ul>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </template>
   </div>
 </template>
 
