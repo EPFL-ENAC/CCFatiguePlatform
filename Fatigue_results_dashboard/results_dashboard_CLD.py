@@ -12,7 +12,7 @@ SUB_INDEX = [1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000]
 def read_CLD_Linear(DATA_DIRECTORY, file_toplot):
     method = 'Linear'
     filepath = os.path.join(DATA_DIRECTORY, method, file_toplot)
-    linear = pd.read_fwf(filepath, widths = [17, 13, 16], index_col = False)
+    linear = pd.read_fwf(filepath, widths = [17, 13, 16], index_col = False, header = None)
     linear.columns = ['n_cycles', 'stress_range', 'stress_mean']
     linear = linear.fillna('')
     return linear
@@ -20,7 +20,7 @@ def read_CLD_Linear(DATA_DIRECTORY, file_toplot):
 def read_CLD_Piecewise_Linear(DATA_DIRECTORY, file_toplot):
     method = 'Piecewise-Linear'
     filepath = os.path.join(DATA_DIRECTORY, method, file_toplot)
-    piecewise_linear = pd.read_fwf(filepath, widths = [17, 13, 16], index_col = False)
+    piecewise_linear = pd.read_fwf(filepath, widths = [17, 13, 16], index_col = False, header = None)
     piecewise_linear.columns = ['n_cycles', 'stress_range', 'stress_mean']
     piecewise_linear = piecewise_linear.fillna('')
     return piecewise_linear
@@ -28,7 +28,7 @@ def read_CLD_Piecewise_Linear(DATA_DIRECTORY, file_toplot):
 def read_CLD_Piecewise_Nonlinear(DATA_DIRECTORY, file_toplot):
     method = 'Piecewise-Nonlinear'
     filepath = os.path.join(DATA_DIRECTORY, method, file_toplot)
-    piecewise_nonlinear = pd.read_fwf(filepath, widths = [17, 13, 16], index_col = False)
+    piecewise_nonlinear = pd.read_fwf(filepath, widths = [17, 13, 16], index_col = False, header = None)
     piecewise_nonlinear.columns = ['n_cycles', 'stress_range', 'stress_mean']
     piecewise_nonlinear = piecewise_nonlinear.fillna('')
     return piecewise_nonlinear
@@ -36,7 +36,7 @@ def read_CLD_Piecewise_Nonlinear(DATA_DIRECTORY, file_toplot):
 def read_CLD_Boerstra(DATA_DIRECTORY, file_toplot):
     method = 'Boerstra'
     filepath = os.path.join(DATA_DIRECTORY, method, file_toplot)
-    boerstra = pd.read_fwf(filepath, widths = [17, 17, 12], index_col = False)
+    boerstra = pd.read_fwf(filepath, widths = [17, 17, 12], index_col = False, header = None)
     boerstra.columns = ['n_cycles', 'stress_range', 'stress_mean']
     boerstra = boerstra.fillna('')
     return boerstra
@@ -44,7 +44,7 @@ def read_CLD_Boerstra(DATA_DIRECTORY, file_toplot):
 def read_CLD_Kawai(DATA_DIRECTORY, file_toplot):
     method = 'Kawai'
     filepath = os.path.join(DATA_DIRECTORY, method, file_toplot)
-    kawai = pd.read_fwf(filepath, widths = [17, 16, 13], index_col = False)
+    kawai = pd.read_fwf(filepath, widths = [17, 16, 13], index_col = False, header = None)
     kawai.columns = ['n_cycles', 'stress_range', 'stress_mean']
     kawai = kawai.fillna('')
     return kawai

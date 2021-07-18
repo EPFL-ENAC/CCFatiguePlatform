@@ -13,7 +13,7 @@ R_RATIO = -1.0
 def read_FF_ST(DATA_DIRECTORY, file_toplot):
     method = 'ST'
     filepath = os.path.join(DATA_DIRECTORY, method, file_toplot)
-    st = pd.read_fwf(filepath, widths = [13, 16, 13], index_col = False)
+    st = pd.read_fwf(filepath, widths = [13, 16, 13], index_col = False, header = None)
     st.columns = ['r_ratio', 'n_cycles', 'stress_param']
     st = st.fillna('')
     return st
@@ -21,7 +21,7 @@ def read_FF_ST(DATA_DIRECTORY, file_toplot):
 def read_FF_kawai(DATA_DIRECTORY, file_toplot):
     method = 'Kawai'
     filepath = os.path.join(DATA_DIRECTORY, method, file_toplot)
-    kawai = pd.read_fwf(filepath, widths = [13, 16, 12], index_col = False)
+    kawai = pd.read_fwf(filepath, widths = [13, 16, 12], index_col = False, header = None)
     kawai.columns = ['r_ratio', 'n_cycles', 'stress_param']
     kawai = kawai.fillna('')
     return kawai

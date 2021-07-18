@@ -12,7 +12,7 @@ R_RATIO = -1.0
 def read_SN_linlog(DATA_DIRECTORY, file_toplot):
     method = 'LinLog'
     filepath = os.path.join(DATA_DIRECTORY, method, file_toplot)
-    linlog = pd.read_fwf(filepath, widths = [17, 12, 12, 12, 12])
+    linlog = pd.read_fwf(filepath, widths = [17, 12, 12, 12, 12], header = None)
     linlog.columns = ['Col1', 'N_cycles', 'stress_param', 'low', 'high']
     linlog = linlog.fillna('')
     return linlog
@@ -21,7 +21,7 @@ def read_SN_linlog(DATA_DIRECTORY, file_toplot):
 def read_SN_loglog(DATA_DIRECTORY, file_toplot):
     method = 'LogLog'
     filepath = os.path.join(DATA_DIRECTORY, method, file_toplot)
-    loglog = pd.read_fwf(filepath, widths = [17, 12, 12, 12, 12])
+    loglog = pd.read_fwf(filepath, widths = [17, 12, 12, 12, 12], header = None)
     loglog.columns = ['Col1', 'N_cycles', 'stress_param', 'low', 'high']
     loglog = loglog.fillna('')
     return loglog
@@ -30,7 +30,7 @@ def read_SN_loglog(DATA_DIRECTORY, file_toplot):
 def read_SN_sendeckyj(DATA_DIRECTORY, file_toplot):
     method = 'Sendeckyj'
     filepath = os.path.join(DATA_DIRECTORY, method, file_toplot)
-    sendeckyj = pd.read_fwf(filepath, widths = [17, 12, 12])
+    sendeckyj = pd.read_fwf(filepath, widths = [17, 12, 12], header = None)
     sendeckyj.columns = ['Col1', 'N_cycles', 'stress_param']
     sendeckyj = sendeckyj.fillna('')
     return sendeckyj
@@ -39,7 +39,7 @@ def read_SN_sendeckyj(DATA_DIRECTORY, file_toplot):
 def read_SN_whitney(DATA_DIRECTORY, file_toplot):
     method = 'Whitney'
     filepath = os.path.join(DATA_DIRECTORY, method, file_toplot)
-    whitney = pd.read_fwf(filepath, widths = [17, 12, 12])
+    whitney = pd.read_fwf(filepath, widths = [17, 12, 12], header = None)
     whitney.columns = ['Col1', 'N_cycles', 'stress_param']
     whitney = whitney.fillna('')
     return whitney
