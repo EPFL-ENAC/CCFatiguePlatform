@@ -338,7 +338,7 @@ def main():
 
     print(TDE)
     print(strain_fail)
-    return
+    return TDE, strain_fail
 
 
 if __name__ == "__main__":
