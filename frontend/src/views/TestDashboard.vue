@@ -145,8 +145,6 @@ export default {
       'experience',
     ]),
     ...mapGetters([
-      'titles',
-      'dois',
       'dataIsFetched',
     ]),
   },
