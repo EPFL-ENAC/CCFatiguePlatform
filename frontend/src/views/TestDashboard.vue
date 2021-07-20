@@ -31,25 +31,23 @@
               <h4>GENERAL INFORMATIONS</h4>
               <ul>
                 <li>
-                  <span class="subject">Specimen number:</span> &nbsp;
-                  <span class="value">
-                    {{ experience.Experiment['Specimen number'] }}
-                  </span>
+                  <experiment-s-v
+                    subject="Specimen number"
+                    :values="[experience.Experiment['Specimen number']]"
+                  />
                 </li>
                 <li>
-                  <span class="subject">Publications:</span> &nbsp;
-                  <span class="value">
-                    <span v-for="(pub, index) in experience.Publications" :key="index">
-                      <a :href="pub.DOI" target="_blank">{{ pub.Title }}</a>
-                      <span v-if="index != experience.Publications.length - 1">, </span>
-                    </span>
-                  </span>
+                  <experiment-s-v
+                    subject="Publications"
+                    :values="[experience.Publications]"
+                    valueType="PublicationsLinks"
+                  />
                 </li>
                 <li>
-                  <span class="subject">Author:</span> &nbsp;
-                  <span class="value">
-                    {{ experience.Researcher }}
-                  </span>
+                  <experiment-s-v
+                    subject="Author"
+                    :values="[experience.Researcher]"
+                  />
                 </li>
               </ul>
             </v-col>
@@ -57,29 +55,31 @@
               <h4>TEST CONDITIONS</h4>
               <ul>
                 <li>
-                  <span class="subject">Temperature:</span> &nbsp;
-                  <span class="value">
-                    {{ experience.Experiment['Test Conditions'].Temperature }}
-                    <template v-if="! isNaN(experience.Experiment['Test Conditions'].Temperature)" >{{ experience['Experiment Units'].Temperature }}</template>
-                  </span>
+                  <experiment-s-v
+                    subject="Temperature"
+                    :values="[experience.Experiment['Test Conditions'].Temperature]"
+                    :unit="experience['Experiment Units'].Temperature"
+                  />
                 </li>
                 <li>
-                  <span class="subject">Relative humidity:</span> &nbsp;
-                  <span class="value">
-                    {{ experience.Experiment['Test Conditions']['Relative Humidity'] }}
-                    <template v-if="! isNaN(experience.Experiment['Test Conditions']['Relative Humidity'])">%</template>
-                  </span>
+                  <experiment-s-v
+                    subject="Relative humidity"
+                    :values="[experience.Experiment['Test Conditions']['Relative Humidity']]"
+                    unit="%"
+                  />
                 </li>
                 <li>
-                  <span class="subject">Grip pressure:</span> &nbsp;
-                  <span class="value">
-                    {{ experience.Experiment['Test Conditions']['Grip Pressure'] }}
-                    <template v-if="! isNaN(experience.Experiment['Test Conditions']['Grip Pressure'])">{{ experience['Experiment Units'].Pressure }}</template>
-                  </span>
+                  <experiment-s-v
+                    subject="Grip pressure"
+                    :values="[experience.Experiment['Test Conditions']['Grip Pressure']]"
+                    :unit="experience['Experiment Units'].Pressure"
+                  />
                 </li>
                 <li>
-                  <span class="subject">Measuring equipment:</span> &nbsp;
-                  <span class="value">{{ experience['Measuring Equipment'] }}</span>
+                  <experiment-s-v
+                    subject="Measuring equipment"
+                    :values="[experience['Measuring Equipment']]"
+                  />
                 </li>
               </ul>
             </v-col>
@@ -87,37 +87,37 @@
               <h4>LAMINATE AND ASSEMBLIES</h4>
               <ul>
                 <li>
-                  <span class="subject">Curing time:</span> &nbsp;
-                  <span class="value">
-                    {{ experience.Experiment['Laminates and Assemblies']['Curing Time'] }}
-                    <template v-if="! isNaN(experience.Experiment['Laminates and Assemblies']['Curing Time'])">{{ experience['Experiment Units'].Time }}</template>
-                  </span>
+                  <experiment-s-v
+                    subject="Curing time"
+                    :values="[experience.Experiment['Laminates and Assemblies']['Curing Time']]"
+                    :unit="experience['Experiment Units'].Time"
+                  />
                 </li>
                 <li>
-                  <span class="subject">Curing temperature:</span> &nbsp;
-                  <span class="value">
-                    {{ experience.Experiment['Laminates and Assemblies']['Curing Temperature'] }}
-                    <template v-if="! isNaN(experience.Experiment['Laminates and Assemblies']['Curing Temperature'])">{{ experience['Experiment Units'].Temperature }}</template>
-                  </span>
+                  <experiment-s-v
+                    subject="Curing temperature"
+                    :values="[experience.Experiment['Laminates and Assemblies']['Curing Temperature']]"
+                    :unit="experience['Experiment Units'].Temperature"
+                  />
                 </li>
                 <li>
-                  <span class="subject">Curing Pressure:</span> &nbsp;
-                  <span class="value">
-                    {{ experience.Experiment['Laminates and Assemblies']['Curing Pressure'] }}
-                    <template v-if="! isNaN(experience.Experiment['Laminates and Assemblies']['Curing Pressure'])">{{ experience['Experiment Units'].Pressure }}</template>
-                  </span>
+                  <experiment-s-v
+                    subject="Curing Pressure"
+                    :values="[experience.Experiment['Laminates and Assemblies']['Curing Pressure']]"
+                    :unit="experience['Experiment Units'].Pressure"
+                  />
                 </li>
                 <li>
-                  <span class="subject">Stacking sequence:</span> &nbsp;
-                  <span class="value">
-                    {{ experience.Experiment['Laminates and Assemblies']['Stacking Sequence'] }}
-                  </span>
+                  <experiment-s-v
+                    subject="Stacking sequence"
+                    :values="[experience.Experiment['Laminates and Assemblies']['Stacking Sequence']]"
+                  />
                 </li>
                 <li>
-                  <span class="subject">Fiber content:</span> &nbsp;
-                  <span class="value">
-                    {{ experience.Experiment['Laminates and Assemblies']['Fiber Content'] }}
-                  </span>
+                  <experiment-s-v
+                    subject="Fiber content"
+                    :values="[experience.Experiment['Laminates and Assemblies']['Fiber Content']]"
+                  />
                 </li>
               </ul>
             </v-col>
@@ -125,40 +125,40 @@
               <h4>MATERIALS</h4>
               <ul>
                 <li>
-                  <span class="subject">Resin:</span> &nbsp;
-                  <span class="value">
-                    {{ experience.Experiment['Material Type']['Resin'] }}
-                  </span>
+                  <experiment-s-v
+                    subject="Resin"
+                    :values="[experience.Experiment['Material Type']['Resin']]"
+                  />
                 </li>
                 <li>
-                  <span class="subject">Hardener:</span> &nbsp;
-                  <span class="value">
-                    {{ experience.Experiment['Material Type']['Hardener'] }}
-                  </span>
+                  <experiment-s-v
+                    subject="Hardener"
+                    :values="[experience.Experiment['Material Type']['Hardener']]"
+                  />
                 </li>
                 <li>
-                  <span class="subject">Mixing ration:</span> &nbsp;
-                  <span class="value">
-                    {{ experience.Experiment['Material Type']['Mixing ratio'] }}
-                  </span>
+                  <experiment-s-v
+                    subject="Mixing ration"
+                    :values="[experience.Experiment['Material Type']['Mixing ratio']]"
+                  />
                 </li>
                 <li>
-                  <span class="subject">Fiber Material:</span> &nbsp;
-                  <span class="value">
-                    {{ experience.Experiment['Constituent Materials']['Fiber Material'] }}
-                  </span>
+                  <experiment-s-v
+                    subject="Fiber Material"
+                    :values="[experience.Experiment['Constituent Materials']['Fiber Material']]"
+                  />
                 </li>
                 <li>
-                  <span class="subject">Fiber Geometry:</span> &nbsp;
-                  <span class="value">
-                    {{ experience.Experiment['Constituent Materials']['Fiber Geometry'] }}
-                  </span>
+                  <experiment-s-v
+                    subject="Fiber Geometry"
+                    :values="[experience.Experiment['Constituent Materials']['Fiber Geometry']]"
+                  />
                 </li>
                 <li>
-                  <span class="subject">Area Density:</span> &nbsp;
-                  <span class="value">
-                    {{ experience.Experiment['Constituent Materials']['Area Density'] }}
-                  </span>
+                  <experiment-s-v
+                    subject="Area Density"
+                    :values="[experience.Experiment['Constituent Materials']['Area Density']]"
+                  />
                 </li>
               </ul>
             </v-col>
@@ -232,34 +232,38 @@
               <v-card-text>
                 <ul>
                   <li>
-                    <span class="subject">Stress at failure:</span> &nbsp;
-                    <span class="value">
-                      {{ experience.Experiment['Standard Fatigue']['Stress at Failure'] }} {{ experience['Experiment Units'].Stress }}
-                    </span>
+                    <experiment-s-v
+                      subject="Stress at failure"
+                      :values="[experience.Experiment['Standard Fatigue']['Stress at Failure']]"
+                      :unit="experience['Experiment Units'].Stress"
+                    />
                   </li>
                   <li>
-                    <span class="subject">Strain at failure:</span> &nbsp;
-                    <span class="value">
-                      {{ experience.Experiment['Standard Fatigue']['Strain at Failure'] }}%
-                    </span>
+                    <experiment-s-v
+                      subject="Strain at failure"
+                      :values="[experience.Experiment['Standard Fatigue']['Strain at Failure']]"
+                      unit="%"
+                    />
                   </li>
                   <li>
-                    <span class="subject">N_cycles:</span> &nbsp;
-                    <span class="value">
-                      {{ experience.Experiment['Standard Fatigue']['Number of Cycles to Failure'] | numFormat('0,0') }}
-                    </span>
+                    <experiment-s-v
+                      subject="N_cycles"
+                      :values="[experience.Experiment['Standard Fatigue']['Number of Cycles to Failure']]"
+                      valueType="bigNumber"
+                    />
                   </li>
                   <li>
-                    <span class="subject">R:</span> &nbsp;
-                    <span class="value">
-                      {{ experience.Experiment['Standard Fatigue']['Stress Ratio'] }}
-                    </span>
+                    <experiment-s-v
+                      subject="R"
+                      :values="[experience.Experiment['Standard Fatigue']['Stress Ratio']]"
+                    />
                   </li>
                   <li>
-                    <span class="subject">Total dissipated energy (TDE):</span> &nbsp;
-                    <span class="value">
-                      {{ experience.Experiment['Standard Fatigue']['Total Dissipated Energy'] | numFormat('0,0') }}
-                    </span>
+                    <experiment-s-v
+                      subject="Total dissipated energy (TDE)"
+                      :values="[experience.Experiment['Standard Fatigue']['Total Dissipated Energy']]"
+                      valueType="bigNumber"
+                    />
                   </li>
                 </ul>
               </v-card-text>
@@ -273,12 +277,16 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import InfoButton from '@/components/InfoButton.vue'
+import InfoButton from '@/components/InfoButton'
+import ExperimentSV from '@/components/ExperimentSV'
 import * as Bokeh from 'bokeh'
 
 export default {
   name: 'TestDashboard',
-  components: { InfoButton },
+  components: {
+    InfoButton,
+    ExperimentSV,
+  },
   computed: {
     ...mapState([
       'experience',
@@ -312,10 +320,5 @@ export default {
 <style scoped>
 iframe {
   height: 600px;
-}
-span.subject {
-  font-weight: bold;
-  font-style: italic;
-  color: rgb(143, 143, 143);
 }
 </style>
