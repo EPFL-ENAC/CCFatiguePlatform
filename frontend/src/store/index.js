@@ -9,20 +9,6 @@ export default new Vuex.Store({
     experience: {},
   },
   getters: {
-    titles(state) {
-      try {
-        return state.experience.Publications.map(pub => pub.Title)
-      } catch (e) {
-        return ['']
-      }
-    },
-    dois(state) {
-      try {
-        return state.experience.Publications.map(pub => pub.DOI)
-      } catch (e) {
-        return ['']
-      }
-    },
     dataIsFetched(state) {
       return ('Laboratory' in state.experience)
     }
