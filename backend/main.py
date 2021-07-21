@@ -1,6 +1,12 @@
 import json
-from fastapi import FastAPI
+from datetime import date
+from typing import Any
+
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+import dashboarder
 
 app = FastAPI()
 
@@ -17,8 +23,27 @@ app.add_middleware(
 )
 
 
-@app.get('/experience')
-async def get_experience():
+class Plot(BaseModel):
+    stress_strain: Any
+    creep: Any
+    hysteresis_area: Any
+    stiffness: Any
+
+
+class Test(BaseModel):
+    experience: Any
+    total_dissipated_energy: int
+    strain_at_failure: float
+    plot: Plot
+
+
+@app.get('/experience/test', response_model=Test)
+async def get_experience(
+        laboratory: str,
+        researcher: str,
+        experience_type: str = Query(..., alias='experienceType'),
+        date: date = Query(...),
+        test_number: int = Query(..., alias='testNumber', ge=0, lt=1000)):
     experience_source_file = '../Preprocessing/vahid_CA_skel.json'
     with open(experience_source_file) as f:
         experience_data = json.load(f)
@@ -32,13 +57,17 @@ async def get_experience():
         ['Standard Fatigue']
         ['Strain at Failure']) = strain_at_failure
 
-    # TODO
-    # Add Total Dissipated Energy on the fly
-    # Scott prepares this in Fatigue_test_dashboard/test_dashboard.py
-    # calculate_tde()
-    total_dissipated_energy = 23987
-    (experience_data['Experiment']
-        ['Standard Fatigue']
-        ['Total Dissipated Energy']) = total_dissipated_energy
+    dashboard = dashboarder.generate_dashboard(
+        laboratory, researcher, experience_type, date, test_number)
 
-    return experience_data
+    return Test(
+        experience=experience_data,
+        total_dissipated_energy=dashboard.total_dissipated_energy,
+        strain_at_failure=strain_at_failure,
+        plot=Plot(
+            stress_strain=dashboard.stress_strain,
+            creep=dashboard.creep,
+            hysteresis_area=dashboard.hysteresis_area,
+            stiffness=dashboard.stiffness,
+        ),
+    )

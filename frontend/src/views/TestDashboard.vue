@@ -7,14 +7,14 @@
     <template v-else>
       <v-card elevation="0">
         <v-card-title>
-          Experiment : {{ experience['Experiment Type'] }} test, by {{ experience.Researcher }}, {{ experience.Laboratory }}, {{ experience.Experiment.Date }}
+          Experiment : {{ test.experience['Experiment Type'] }} test, by {{ test.experience.Researcher }}, {{ test.experience.Laboratory }}, {{ test.experience.Experiment.Date }}
           <v-spacer />
           <v-btn>Add test(s)</v-btn>
         </v-card-title>
       </v-card>
 
       <experiment-specifications
-        :experience="experience"
+        :experience="test.experience"
       />
 
       <v-container fluid>
@@ -64,16 +64,16 @@
 
               <v-row no-gutters>
                 <v-col cols="6">
-                  <div id="bokeh-stress-strain"></div>
+                  <div v-bind:id="bokeh.stressStrain"></div>
                 </v-col>
                 <v-col cols="6">
-                  <div id="bokeh-creep"></div>
+                  <div v-bind:id="bokeh.creep"></div>
                 </v-col>
                 <v-col cols="6">
-                  <div id="bokeh-hystarea"></div>
+                  <div v-bind:id="bokeh.hysteresisArea"></div>
                 </v-col>
                 <v-col cols="6">
-                  <div id="bokeh-stiffness"></div>
+                  <div v-bind:id="bokeh.stiffness"></div>
                 </v-col>
               </v-row>
             </v-card>
@@ -85,34 +85,34 @@
                   <li>
                     <experiment-s-v
                       subject="Stress at failure"
-                      :values="[experience.Experiment['Standard Fatigue']['Stress at Failure']]"
-                      :unit="experience['Experiment Units'].Stress"
+                      :values="[test.experience.Experiment['Standard Fatigue']['Stress at Failure']]"
+                      :unit="test.experience['Experiment Units'].Stress"
                     />
                   </li>
                   <li>
                     <experiment-s-v
                       subject="Strain at failure"
-                      :values="[experience.Experiment['Standard Fatigue']['Strain at Failure']]"
+                      :values="[test.experience.Experiment['Standard Fatigue']['Strain at Failure']]"
                       unit="%"
                     />
                   </li>
                   <li>
                     <experiment-s-v
                       subject="N_cycles"
-                      :values="[experience.Experiment['Standard Fatigue']['Number of Cycles to Failure']]"
+                      :values="[test.experience.Experiment['Standard Fatigue']['Number of Cycles to Failure']]"
                       valueType="bigNumber"
                     />
                   </li>
                   <li>
                     <experiment-s-v
                       subject="R"
-                      :values="[experience.Experiment['Standard Fatigue']['Stress Ratio']]"
+                      :values="[test.experience.Experiment['Standard Fatigue']['Stress Ratio']]"
                     />
                   </li>
                   <li>
                     <experiment-s-v
                       subject="Total dissipated energy (TDE)"
-                      :values="[experience.Experiment['Standard Fatigue']['Total Dissipated Energy']]"
+                      :values="[test.experience.Experiment['Standard Fatigue']['Total Dissipated Energy']]"
                       valueType="bigNumber"
                     />
                   </li>
@@ -142,28 +142,38 @@ export default {
   },
   computed: {
     ...mapState([
-      'experience',
+      'test',
     ]),
     ...mapGetters([
       'dataIsFetched',
     ]),
   },
-  created() {
-    this.$store.dispatch('fetchExperience')
+  data() {
+    return {
+      bokeh: {
+        stressStrain: 'bokeh-stress-strain',
+        creep: 'bokeh-creep',
+        hysteresisArea: 'bokeh-hysteresis-area',
+        stiffness: 'bokeh-stiffness'
+      }
+    }
   },
-  mounted() {
-    fetch('/bokeh/creep.json')
-      .then(response => response.json())
-      .then(item => Bokeh.embed.embed_item(item, 'bokeh-creep'));
-    fetch('/bokeh/hyst_area.json')
-      .then(response => response.json())
-      .then(item => Bokeh.embed.embed_item(item, 'bokeh-hystarea'));
-    fetch('/bokeh/select_stress_strain.json')
-      .then(response => response.json())
-      .then(item => Bokeh.embed.embed_item(item, 'bokeh-stress-strain'));
-    fetch('/bokeh/stiffness.json')
-      .then(response => response.json())
-      .then(item => Bokeh.embed.embed_item(item, 'bokeh-stiffness'));
+  created() {
+    this.$store.dispatch('fetchExperience', {
+      laboratory: 'CCLAB',
+      researcher: 'Vahid',
+      experienceType: 'FA',
+      date: '2021-04-20',
+      testNumber: 2,
+    })
+  },
+  updated() {
+    if (this.dataIsFetched) {
+      Bokeh.embed.embed_item(this.test.plot.stress_strain, this.bokeh.stressStrain)
+      Bokeh.embed.embed_item(this.test.plot.creep, this.bokeh.creep)
+      Bokeh.embed.embed_item(this.test.plot.hysteresis_area, this.bokeh.hysteresisArea)
+      Bokeh.embed.embed_item(this.test.plot.stiffness, this.bokeh.stiffness)
+    }
   },
 }
 </script>
