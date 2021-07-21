@@ -6,23 +6,30 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    experience: {},
+    test: {},
   },
   getters: {
     dataIsFetched(state) {
-      return ('Laboratory' in state.experience)
+      return Object.keys(state.test).length > 0
     }
   },
   mutations: {
-    saveExperience(state, experience) {
-      state.experience = { ...experience }
+    saveTest(state, test) {
+      state.test = { ...test }
     }
   },
   actions: {
-    fetchExperience(context) {
-      Axios.get('experience')
+    fetchExperience(context, payload) {
+      const params = {
+        laboratory: payload.laboratory,
+        researcher: payload.researcher,
+        experienceType: payload.experienceType,
+        date: payload.date,
+        testNumber: payload.testNumber,
+      }
+      Axios.get('experience/test', { params: params })
       .then((res) => {
-        context.commit('saveExperience', res.data)
+        context.commit('saveTest', res.data)
       })
       .catch(err => console.log(err))
     }

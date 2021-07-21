@@ -1,8 +1,9 @@
 import json
 import os
+from datetime import date
 from enum import Enum
 from sys import path
-from typing import Dict, List
+from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd
@@ -12,16 +13,10 @@ from bokeh.models.sources import ColumnDataSource
 from bokeh.models.tools import HoverTool
 from bokeh.plotting import figure
 from pandas.core.frame import DataFrame
-
-OUTPUT_DIRECTORY: str = "./output"
+from pydantic import BaseModel
 
 DATA_DIRECTORY: str = "../data/"
-LAB: str = "CCLAB"
-RESEARCHER: str = "Vahid"
-
-DATE: str = "2021-04-20"
-TEST_TYPE: str = "FA"
-TEST_NUMBER: str = "002"
+OUTPUT_DIRECTORY: str = "./output"
 
 INTERVAL: int = 10
 LOOP_SPACING: int = 1000
@@ -56,21 +51,34 @@ class LinePlot:
         self.data = data
 
 
-def get_dataframe(data_in: str) -> DataFrame:
-    filename: str = "{}_{}_{}_{}.csv".format(
-        data_in, DATE, TEST_TYPE, TEST_NUMBER)
+class Dashboard(BaseModel):
+    total_dissipated_energy: int
+    stress_strain: Any
+    creep: Any
+    hysteresis_area: Any
+    stiffness: Any
+
+
+def get_dataframe(data_in: str,
+                  laboratory: str,
+                  researcher: str,
+                  experience_type: str,
+                  date: date,
+                  test_number: int) -> DataFrame:
+    formatted_date = date.isoformat()
+    filename = f"{data_in}_{formatted_date}_{experience_type}_{test_number:03d}.csv"
     filepath: path = os.path.join(
-        DATA_DIRECTORY, LAB, RESEARCHER, TEST_TYPE, DATE, data_in, filename)
+        DATA_DIRECTORY, laboratory, researcher, experience_type, formatted_date, data_in, filename)
     return pd.read_csv(os.path.abspath(filepath))
 
 
-def save_json(filename: str, json_data: Dict) -> None:
+def save_json(json_data: Dict, filename: str) -> None:
     os.makedirs(OUTPUT_DIRECTORY, exist_ok=True)
     with open(os.path.join(OUTPUT_DIRECTORY, filename), "w") as file:
         json.dump(json_data, file)
 
 
-def save_plot(plot: LinePlot, filename: str, display=False) -> None:
+def export_plot(plot: LinePlot, display=False) -> Dict:
     fig = figure(title=plot.title,
                  x_axis_label=plot.x_axis.label,
                  y_axis_label=plot.y_axis.label,
@@ -81,10 +89,9 @@ def save_plot(plot: LinePlot, filename: str, display=False) -> None:
     for line in plot.data:
         source = ColumnDataSource(data={k.key: v for k, v in line.items()})
         fig.line(x=plot.x_axis.key, y=plot.y_axis.key, source=source)
-    json_data = json_item(fig)
-    save_json(filename, json_data)
     if display:
         show(fig)
+    return json_item(fig)
 
 
 def compute_sub_indexes(df: DataFrame) -> List[int]:
@@ -177,22 +184,39 @@ def generate_stiffness(hyst_df: DataFrame) -> LinePlot:
     )
 
 
-def generate_all():
-    std_df = get_dataframe("STD")
-    hyst_df = get_dataframe("HYS")
+def get_total_dissipated_energy(hyst_df: DataFrame) -> int:
+    return np.sum(hyst_df["hysteresis_area"])
 
-    save_plot(generate_select_stress_strain(std_df, hyst_df),
-              "select_stress_strain.json")
-    save_plot(generate_creep(hyst_df),
-              "creep.json")
-    save_plot(generate_hyst_area(hyst_df),
-              "hyst_area.json")
-    save_plot(generate_stiffness(hyst_df),
-              "stiffness.json")
+
+def generate_dashboard(laboratory: str,
+                       researcher: str,
+                       experience_type: str,
+                       date: date,
+                       test_number: int) -> Dashboard:
+    std_df = get_dataframe("STD", laboratory, researcher,
+                           experience_type, date, test_number)
+    hyst_df = get_dataframe("HYS", laboratory, researcher,
+                            experience_type, date, test_number)
+    return Dashboard(
+        total_dissipated_energy=get_total_dissipated_energy(hyst_df),
+        stress_strain=export_plot(
+            generate_select_stress_strain(std_df, hyst_df)),
+        creep=export_plot(generate_creep(hyst_df)),
+        hysteresis_area=export_plot(generate_hyst_area(hyst_df)),
+        stiffness=export_plot(generate_stiffness(hyst_df)),
+    )
 
 
 def main():
-    generate_all()
+    dashboard = generate_dashboard(laboratory="CCLAB",
+                                   researcher="Vahid",
+                                   experience_type="FA",
+                                   date=date("2021-04-20"),
+                                   test_number=2)
+    save_json(dashboard.stress_strain, "stress_strain.json")
+    save_json(dashboard.creep, "creep.json")
+    save_json(dashboard.hysteresis_area, "hyst_area.json")
+    save_json(dashboard.stiffness, "stiffness.json")
 
 
 if __name__ == "__main__":
