@@ -1,5 +1,17 @@
-data/
+## Python
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+## IDE
+
 .vscode/
+
+## Project
+
+data/
 Icon[\r]
 Icon\r\r
 Icon

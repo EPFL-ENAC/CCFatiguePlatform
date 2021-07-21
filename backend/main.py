@@ -2,6 +2,7 @@ import json
 from datetime import date
 from typing import Any
 
+import uvicorn
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -71,3 +72,7 @@ async def get_experience(
             stiffness=dashboard.stiffness,
         ),
     )
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
