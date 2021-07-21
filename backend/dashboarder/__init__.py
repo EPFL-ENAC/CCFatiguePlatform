@@ -2,7 +2,6 @@ import json
 import os
 from datetime import date
 from enum import Enum
-from sys import path
 from typing import Any, Dict, List
 
 import numpy as np
@@ -42,7 +41,7 @@ class LinePlot:
                  x_axis: DataKey,
                  y_axis: DataKey,
                  tooltips: List[DataKey],
-                 data: List[Dict[DataKey, List]],
+                 data: List[Dict[DataKey, List[Any]]],
                  ) -> None:
         self.title = title
         self.x_axis = x_axis
@@ -67,18 +66,23 @@ def get_dataframe(data_in: str,
                   test_number: int) -> DataFrame:
     formatted_date = date.isoformat()
     filename = f"{data_in}_{formatted_date}_{experience_type}_{test_number:03d}.csv"
-    filepath: path = os.path.join(
-        DATA_DIRECTORY, laboratory, researcher, experience_type, formatted_date, data_in, filename)
+    filepath = os.path.join(DATA_DIRECTORY,
+                            laboratory,
+                            researcher,
+                            experience_type,
+                            formatted_date,
+                            data_in,
+                            filename)
     return pd.read_csv(os.path.abspath(filepath))
 
 
-def save_json(json_data: Dict, filename: str) -> None:
+def save_json(json_data: Any, filename: str) -> None:
     os.makedirs(OUTPUT_DIRECTORY, exist_ok=True)
     with open(os.path.join(OUTPUT_DIRECTORY, filename), "w") as file:
         json.dump(json_data, file)
 
 
-def export_plot(plot: LinePlot, display=False) -> Dict:
+def export_plot(plot: LinePlot, display=False) -> Any:
     fig = figure(title=plot.title,
                  x_axis_label=plot.x_axis.label,
                  y_axis_label=plot.y_axis.label,
@@ -106,7 +110,8 @@ def compute_sub_indexes(df: DataFrame) -> List[int]:
     return sub_index
 
 
-def create_sub_hystloops(df: DataFrame, sub_index: List[int]) -> List[Dict[DataKey, List]]:
+def create_sub_hystloops(df: DataFrame,
+                         sub_index: List[int]) -> List[Dict[DataKey, List]]:
     # Conditional plotting of hysteresis loops - we only plot the loops specified by sub_index
     sub_hystloops = []
     for j in range(len(sub_index)):
@@ -129,7 +134,8 @@ def create_sub_hystloops(df: DataFrame, sub_index: List[int]) -> List[Dict[DataK
     return sub_hystloops
 
 
-def generate_select_stress_strain(std_df: DataFrame, hyst_df: DataFrame) -> LinePlot:
+def generate_select_stress_strain(std_df: DataFrame,
+                                  hyst_df: DataFrame) -> LinePlot:
     sub_indexes = compute_sub_indexes(hyst_df)
     sub_hystloops = create_sub_hystloops(std_df, sub_indexes)
 
@@ -211,7 +217,7 @@ def main():
     dashboard = generate_dashboard(laboratory="CCLAB",
                                    researcher="Vahid",
                                    experience_type="FA",
-                                   date=date("2021-04-20"),
+                                   date=date(year=2021, month=4, day=20),
                                    test_number=2)
     save_json(dashboard.stress_strain, "stress_strain.json")
     save_json(dashboard.creep, "creep.json")
