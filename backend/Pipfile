@@ -8,6 +8,7 @@ fastapi = "*"
 pandas = "*"
 bokeh = "*"
 uvicorn = "*"
+pydantic = "*"
 
 [dev-packages]
 
