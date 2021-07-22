@@ -3,7 +3,7 @@
     <span class="subject">{{ subject }}:</span> &nbsp;
 
     <span v-for="(value, valueIndex) in values" :key="valueIndex">
-      <span :class="classIter(valueIndex)">
+      <span :style="getStyle(valueIndex)">
         <span v-if="valueType==='string'" class="value">
           {{ value }}<template v-if="! isNaN(value) && unit !== ''" >{{ unit }}</template>
         </span>
@@ -35,16 +35,18 @@ export default {
     unit: {
       type: String,
       default: '',
-    }
+    },
+    colors: Array,
   },
   methods: {
-    classIter(i) {
-      const classes = ['one', 'two', 'three']
-      i = i % classes.length
-      if (this.values.length < 2) {
-        return ''
+    getStyle(i) {
+      if (this.colors) {
+        return {
+          color: this.colors[i]
+        }
+      } else {
+        return {}
       }
-      return classes[i]
     }
   }
 }
@@ -55,14 +57,5 @@ span.subject {
   font-weight: bold;
   font-style: italic;
   color: rgb(143, 143, 143);
-}
-.one {
-  color: blue;
-}
-.two {
-  color: red;
-}
-.three {
-  color: green;
 }
 </style>
