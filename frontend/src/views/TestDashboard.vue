@@ -112,8 +112,9 @@
                   <li>
                     <experiment-s-v
                       subject="Total dissipated energy (TDE)"
-                      :values="[test.experience.Experiment['Standard Fatigue']['Total Dissipated Energy']]"
+                      :values="test.tests.map(t => t.total_dissipated_energy)"
                       valueType="bigNumber"
+                      :colors="test.tests.map(t => t.color)"
                     />
                   </li>
                 </ul>
