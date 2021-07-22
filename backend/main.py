@@ -32,6 +32,13 @@ class Experience(BaseModel):
     date: date
 
 
+class Test(BaseModel):
+    number: int
+    color: str
+    total_dissipated_energy: int
+    strain_at_failure: float
+
+
 class Plot(BaseModel):
     stress_strain: Any
     creep: Any
@@ -39,10 +46,9 @@ class Plot(BaseModel):
     stiffness: Any
 
 
-class Test(BaseModel):
+class Dashboard(BaseModel):
     experience: Any
-    total_dissipated_energy: int
-    strain_at_failure: float
+    tests: List[Test]
     plot: Plot
 
 
@@ -51,14 +57,15 @@ async def get_experiences() -> List[Experience]:
     return []
 
 
-@app.get('/experience/test', response_model=Test)
-async def get_test(
+@app.get('/dashboard', response_model=Dashboard)
+async def get_dashboard(
         laboratory: str,
         researcher: str,
         experience_type: str = Query(..., alias='experienceType'),
         date: date = Query(...),
-        test_number: int = Query(..., alias='testNumber', ge=0, lt=1000)
-) -> Test:
+        test_numbers: List[int] = Query(...,
+                                        alias='testNumbers', ge=0, lt=1000)
+) -> Dashboard:
     experience_source_file = '../Preprocessing/vahid_CA_skel.json'
     with open(experience_source_file) as f:
         experience_data = json.load(f)
@@ -73,12 +80,19 @@ async def get_test(
         ['Strain at Failure']) = strain_at_failure
 
     dashboard = dashboarder.generate_dashboard(
-        laboratory, researcher, experience_type, date, test_number)
+        laboratory, researcher, experience_type, date, test_numbers)
 
-    return Test(
+    return Dashboard(
         experience=experience_data,
-        total_dissipated_energy=dashboard.total_dissipated_energy,
-        strain_at_failure=strain_at_failure,
+        tests=[
+            Test(
+                number=test.number,
+                color=test.color,
+                total_dissipated_energy=test.total_dissipated_energy,
+                strain_at_failure=strain_at_failure
+            )
+            for test in dashboard.tests
+        ],
         plot=Plot(
             stress_strain=dashboard.stress_strain,
             creep=dashboard.creep,

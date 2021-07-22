@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import Axios from 'axios'
+import qs from 'qs'
 
 Vue.use(Vuex)
 
@@ -20,14 +21,10 @@ export default new Vuex.Store({
   },
   actions: {
     fetchExperience(context, payload) {
-      const params = {
-        laboratory: payload.laboratory,
-        researcher: payload.researcher,
-        experienceType: payload.experienceType,
-        date: payload.date,
-        testNumber: payload.testNumber,
-      }
-      Axios.get('experience/test', { params: params })
+      Axios.get('dashboard', {
+        params: payload,
+        paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' })
+      })
       .then((res) => {
         context.commit('saveTest', res.data)
       })
