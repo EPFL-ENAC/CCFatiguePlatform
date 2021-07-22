@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 pandas = "*"
 bokeh = "==2.3.3"
+pydantic = "*"
 
 [dev-packages]
 

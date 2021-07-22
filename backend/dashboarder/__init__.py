@@ -6,6 +6,7 @@ from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd
+from bokeh import palettes
 from bokeh.embed import json_item
 from bokeh.io import show
 from bokeh.models.sources import ColumnDataSource
@@ -35,23 +36,27 @@ class DataKey(Enum):
         self.label = label
 
 
-class LinePlot:
-    def __init__(self,
-                 title: str,
-                 x_axis: DataKey,
-                 y_axis: DataKey,
-                 tooltips: List[DataKey],
-                 data: List[Dict[DataKey, List[Any]]],
-                 ) -> None:
-        self.title = title
-        self.x_axis = x_axis
-        self.y_axis = y_axis
-        self.tooltips = tooltips
-        self.data = data
+class Line(BaseModel):
+    color: str
+    data: Dict[DataKey, List[Any]]
+
+
+class LinePlot(BaseModel):
+    title: str
+    x_axis: DataKey
+    y_axis: DataKey
+    tooltips: List[DataKey]
+    lines: List[Line]
+
+
+class Test(BaseModel):
+    number: int
+    color: str
+    total_dissipated_energy: int
 
 
 class Dashboard(BaseModel):
-    total_dissipated_energy: int
+    tests: List[Test]
     stress_strain: Any
     creep: Any
     hysteresis_area: Any
@@ -90,9 +95,11 @@ def export_plot(plot: LinePlot, display=False) -> Any:
     fig.add_tools(HoverTool(
         tooltips=[(key.label, "@" + key.key) for key in plot.tooltips]
     ))
-    for line in plot.data:
-        source = ColumnDataSource(data={k.key: v for k, v in line.items()})
-        fig.line(x=plot.x_axis.key, y=plot.y_axis.key, source=source)
+    for line in plot.lines:
+        data = {k.key: v for k, v in line.data.items()}
+        source = ColumnDataSource(data=data)
+        fig.line(x=plot.x_axis.key, y=plot.y_axis.key,
+                 source=source, color=line.color)
     if display:
         show(fig)
     return json_item(fig)
@@ -134,59 +141,79 @@ def create_sub_hystloops(df: DataFrame,
     return sub_hystloops
 
 
-def generate_select_stress_strain(std_df: DataFrame,
-                                  hyst_df: DataFrame) -> LinePlot:
-    sub_indexes = compute_sub_indexes(hyst_df)
-    sub_hystloops = create_sub_hystloops(std_df, sub_indexes)
-
+def generate_stress_strain(colors: List[str],
+                           std_dfs: List[DataFrame],
+                           hyst_dfs: List[DataFrame]) -> LinePlot:
+    sub_hystloops = [create_sub_hystloops(std_df, compute_sub_indexes(hyst_df))
+                     for std_df, hyst_df in zip(std_dfs, hyst_dfs)]
+    lines = [
+        Line(
+            color=color,
+            data=loop
+        )
+        for color, loops in zip(colors, sub_hystloops)
+        for loop in loops
+    ]
     return LinePlot(
         title="Stress - Strain",
         x_axis=DataKey.STRAIN,
         y_axis=DataKey.STRESS,
         tooltips=[DataKey.STRESS, DataKey.STRAIN, DataKey.N_CYCLES],
-        data=sub_hystloops
+        lines=lines
     )
 
 
-def generate_creep(hyst_df: DataFrame) -> LinePlot:
-    line = {
-        DataKey.N_CYCLES: hyst_df["n_cycles"].to_list(),
-        DataKey.CREEP: hyst_df["creep"].to_list(),
-    }
+def generate_creep(colors: List[str],
+                   hyst_dfs: List[DataFrame]) -> LinePlot:
+    lines = [Line(
+        color=color,
+        data={
+            DataKey.N_CYCLES: hyst_df["n_cycles"].to_list(),
+            DataKey.CREEP: hyst_df["creep"].to_list(),
+        },
+    ) for color, hyst_df in zip(colors, hyst_dfs)]
     return LinePlot(
         title="Creep evolution",
         x_axis=DataKey.N_CYCLES,
         y_axis=DataKey.CREEP,
         tooltips=[DataKey.CREEP, DataKey.N_CYCLES],
-        data=[line],
+        lines=lines,
     )
 
 
-def generate_hyst_area(hyst_df: DataFrame) -> LinePlot:
-    line = {
-        DataKey.N_CYCLES: hyst_df["n_cycles"].to_list(),
-        DataKey.HYST_AREA: hyst_df["hysteresis_area"].to_list(),
-    }
+def generate_hyst_area(colors: List[str],
+                       hyst_dfs: List[DataFrame]) -> LinePlot:
+    lines = [Line(
+        color=color,
+        data={
+            DataKey.N_CYCLES: hyst_df["n_cycles"].to_list(),
+            DataKey.HYST_AREA: hyst_df["hysteresis_area"].to_list(),
+        },
+    ) for color, hyst_df in zip(colors, hyst_dfs)]
     return LinePlot(
         title="Hysteresis loop area evolution",
         x_axis=DataKey.N_CYCLES,
         y_axis=DataKey.HYST_AREA,
         tooltips=[DataKey.HYST_AREA, DataKey.N_CYCLES],
-        data=[line],
+        lines=lines,
     )
 
 
-def generate_stiffness(hyst_df: DataFrame) -> LinePlot:
-    line = {
-        DataKey.N_CYCLES: hyst_df["n_cycles"].to_list(),
-        DataKey.STIFNESS: hyst_df["stiffness"].to_list(),
-    }
+def generate_stiffness(colors: List[str],
+                       hyst_dfs: List[DataFrame]) -> LinePlot:
+    lines = [Line(
+        color=color,
+        data={
+            DataKey.N_CYCLES: hyst_df["n_cycles"].to_list(),
+            DataKey.STIFNESS: hyst_df["stiffness"].to_list(),
+        },
+    ) for color, hyst_df in zip(colors, hyst_dfs)]
     return LinePlot(
         title="Stiffness evolution under cyclic loading",
         x_axis=DataKey.N_CYCLES,
         y_axis=DataKey.STIFNESS,
         tooltips=[DataKey.STIFNESS, DataKey.N_CYCLES],
-        data=[line],
+        lines=lines,
     )
 
 
@@ -198,18 +225,29 @@ def generate_dashboard(laboratory: str,
                        researcher: str,
                        experience_type: str,
                        date: date,
-                       test_number: int) -> Dashboard:
-    std_df = get_dataframe("STD", laboratory, researcher,
-                           experience_type, date, test_number)
-    hyst_df = get_dataframe("HYS", laboratory, researcher,
-                            experience_type, date, test_number)
+                       test_numbers: List[int]) -> Dashboard:
+    colors = list(palettes.Category10_10)[:len(test_numbers)]
+    std_dfs = [get_dataframe("STD", laboratory, researcher, experience_type,
+                             date, test_number)
+               for test_number in test_numbers]
+    hyst_dfs = [get_dataframe("HYS", laboratory, researcher, experience_type,
+                              date, test_number)
+                for test_number in test_numbers]
+    tests = [
+        Test(
+            number=test_number,
+            color=color,
+            total_dissipated_energy=get_total_dissipated_energy(hyst_df)
+        )
+        for test_number, color, hyst_df in zip(test_numbers, colors, hyst_dfs)
+    ]
     return Dashboard(
-        total_dissipated_energy=get_total_dissipated_energy(hyst_df),
+        tests=tests,
         stress_strain=export_plot(
-            generate_select_stress_strain(std_df, hyst_df)),
-        creep=export_plot(generate_creep(hyst_df)),
-        hysteresis_area=export_plot(generate_hyst_area(hyst_df)),
-        stiffness=export_plot(generate_stiffness(hyst_df)),
+            generate_stress_strain(colors, std_dfs, hyst_dfs)),
+        creep=export_plot(generate_creep(colors, hyst_dfs)),
+        hysteresis_area=export_plot(generate_hyst_area(colors, hyst_dfs)),
+        stiffness=export_plot(generate_stiffness(colors, hyst_dfs)),
     )
 
 
@@ -218,7 +256,7 @@ def main():
                                    researcher="Vahid",
                                    experience_type="FA",
                                    date=date(year=2021, month=4, day=20),
-                                   test_number=2)
+                                   test_numbers=[2, 5])
     save_json(dashboard.stress_strain, "stress_strain.json")
     save_json(dashboard.creep, "creep.json")
     save_json(dashboard.hysteresis_area, "hyst_area.json")
