@@ -164,7 +164,7 @@ export default {
       researcher: 'Vahid',
       experienceType: 'FA',
       date: '2021-04-20',
-      testNumber: 2,
+      testNumbers: [2, 5],
     })
   },
   updated() {
