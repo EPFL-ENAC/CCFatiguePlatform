@@ -84,6 +84,14 @@
                 <ul>
                   <li>
                     <experiment-s-v
+                      subject="Specimen number"
+                      :values="test.tests.map(t => t.number)"
+                      valueType="bigNumber"
+                      :colors="test.tests.map(t => t.color)"
+                    />
+                  </li>
+                  <li>
+                    <experiment-s-v
                       subject="Stress at failure"
                       :values="[test.experience.Experiment['Standard Fatigue']['Stress at Failure']]"
                       :unit="test.experience['Experiment Units'].Stress"
