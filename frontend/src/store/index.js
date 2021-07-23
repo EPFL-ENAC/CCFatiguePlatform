@@ -1,42 +1,32 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import Axios from 'axios'
+import qs from 'qs'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    experience: {},
+    test: {},
   },
   getters: {
-    titles(state) {
-      try {
-        return state.experience.Publications.map(pub => pub.Title)
-      } catch (e) {
-        return ['']
-      }
-    },
-    dois(state) {
-      try {
-        return state.experience.Publications.map(pub => pub.DOI)
-      } catch (e) {
-        return ['']
-      }
-    },
     dataIsFetched(state) {
-      return ('Laboratory' in state.experience)
+      return Object.keys(state.test).length > 0
     }
   },
   mutations: {
-    saveExperience(state, experience) {
-      state.experience = { ...experience }
+    saveTest(state, test) {
+      state.test = { ...test }
     }
   },
   actions: {
-    fetchExperience(context) {
-      Axios.get('experience')
+    fetchExperience(context, payload) {
+      Axios.get('dashboard', {
+        params: payload,
+        paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' })
+      })
       .then((res) => {
-        context.commit('saveExperience', res.data)
+        context.commit('saveTest', res.data)
       })
       .catch(err => console.log(err))
     }
