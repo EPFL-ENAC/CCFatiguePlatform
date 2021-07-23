@@ -9,7 +9,7 @@ import numFormat from 'vue-filter-number-format';
 
 Vue.config.productionTip = false
 
-Axios.defaults.baseURL = 'http://localhost:8000/'
+Axios.defaults.baseURL = process.env.VUE_APP_API_URL
 Vue.prototype.$http = Axios
 
 numeral.register('locale', 'fr-CH', {
