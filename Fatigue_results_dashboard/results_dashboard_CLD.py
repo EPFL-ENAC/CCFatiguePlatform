@@ -157,13 +157,16 @@ def plot_CLD(sub_linear, sub_piecewise_linear, sub_piecewise_nonlinear, sub_boer
 
     plotCLD = figure(title = 'Constant Life Diagram (CLD)', plot_width=1200, plot_height=800,
                   x_axis_label = "Mean Stress", y_axis_label = "Stress Amplitude")
+    plotCLD.title.text_font_size = '20pt'
+    plotCLD.xaxis.axis_label_text_font_size = "18pt"
+    plotCLD.yaxis.axis_label_text_font_size = "18pt"
     plotCLD.add_tools(HoverTool(tooltips=[("N", "@n_cycles"), ("Stress range", "@stress_range"), ("Stress mean", "@stress_mean")]))
-    for curve in sub_linear:
-        plotCLD.line(x = 'stress_mean', y = 'stress_range', source = ColumnDataSource(data = curve), line_color = 'blue')
+    #for curve in sub_linear:
+    #    plotCLD.line(x = 'stress_mean', y = 'stress_range', source = ColumnDataSource(data = curve), line_color = 'blue')
     for curve in sub_piecewise_linear:
         plotCLD.line(x = 'stress_mean', y = 'stress_range', source = ColumnDataSource(data = curve), line_color = 'red')
-    for curve in sub_piecewise_nonlinear:
-        plotCLD.line(x = 'stress_mean', y = 'stress_range', source = ColumnDataSource(data = curve), line_color = 'green')
+    #for curve in sub_piecewise_nonlinear:
+    #    plotCLD.line(x = 'stress_mean', y = 'stress_range', source = ColumnDataSource(data = curve), line_color = 'green')
     #for curve in sub_boerstra:
         #plotCLD.line(x = 'stress_mean', y = 'stress_range', source = ColumnDataSource(data = curve))
     #for curve in sub_kawai:
