@@ -9,6 +9,7 @@ pandas = "*"
 bokeh = "*"
 uvicorn = "*"
 pydantic = "*"
+gunicorn = "*"
 
 [dev-packages]
 
