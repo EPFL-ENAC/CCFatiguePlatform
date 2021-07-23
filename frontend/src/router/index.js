@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 // route level code-splitting
 // this generates a separate chunk (name.[hash].js) for each route
 // which is lazy-loaded when the route is visited.
+const SearchDatabase = () => import(/* webpackChunkName: "search" */ '../views/SearchDatabase.vue')
 const TestDashboard = () => import(/* webpackChunkName: "test-dashboard" */ '../views/TestDashboard.vue')
 const DataUpload = () => import(/* webpackChunkName: "data-upload" */ '../views/DataUpload.vue')
 const CCFatigueAnalysis = () => import(/* webpackChunkName: "ccfatigue-analysis" */ '../views/CCFatigueAnalysis.vue')
@@ -28,9 +29,9 @@ const routes = [
     redirect: {name: 'SearchDatabase'},
   },
   {
-    path: '/fatigue_database/test-dashboard',
+    path: '/fatigue_database/search',
     name: 'SearchDatabase',
-    redirect: {name: 'TestDashboard'},
+    component: SearchDatabase,
   },
   {
     path: '/fatigue_database/test-dashboard',
