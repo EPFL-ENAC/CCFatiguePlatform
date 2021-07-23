@@ -1,6 +1,13 @@
 import json
-from fastapi import FastAPI
+from datetime import date
+from typing import Any, List
+
+import uvicorn
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+import dashboarder
 
 app = FastAPI()
 
@@ -17,9 +24,83 @@ app.add_middleware(
 )
 
 
-@app.get('/experience')
-async def get_experience():
+class Experience(BaseModel):
+    id: str
+    laboratory: str
+    researcher: str
+    type: str
+    date: date
+
+
+class Test(BaseModel):
+    number: int
+    color: str
+    total_dissipated_energy: int
+    strain_at_failure: float
+
+
+class Plot(BaseModel):
+    stress_strain: Any
+    creep: Any
+    hysteresis_area: Any
+    stiffness: Any
+
+
+class Dashboard(BaseModel):
+    experience: Any
+    tests: List[Test]
+    plot: Plot
+
+
+@app.get('/experiences', response_model=List[Experience])
+async def get_experiences() -> List[Experience]:
+    return []
+
+
+@app.get('/dashboard', response_model=Dashboard)
+async def get_dashboard(
+        laboratory: str,
+        researcher: str,
+        experience_type: str = Query(..., alias='experienceType'),
+        date: date = Query(...),
+        test_numbers: List[int] = Query(...,
+                                        alias='testNumbers', ge=0, lt=1000)
+) -> Dashboard:
     experience_source_file = '../Preprocessing/vahid_CA_skel.json'
     with open(experience_source_file) as f:
         experience_data = json.load(f)
-    return experience_data
+
+    # TODO
+    # Add Strain at failure from HYS*.csv on the fly
+    # Scott prepares this in Fatigue_test_dashboard/Hysteresis_loops.py
+    # strain_at_failure()
+    strain_at_failure = 1.17
+    (experience_data['Experiment']
+        ['Standard Fatigue']
+        ['Strain at Failure']) = strain_at_failure
+
+    dashboard = dashboarder.generate_dashboard(
+        laboratory, researcher, experience_type, date, test_numbers)
+
+    return Dashboard(
+        experience=experience_data,
+        tests=[
+            Test(
+                number=test.number,
+                color=test.color,
+                total_dissipated_energy=test.total_dissipated_energy,
+                strain_at_failure=strain_at_failure
+            )
+            for test in dashboard.tests
+        ],
+        plot=Plot(
+            stress_strain=dashboard.stress_strain,
+            creep=dashboard.creep,
+            hysteresis_area=dashboard.hysteresis_area,
+            stiffness=dashboard.stiffness,
+        ),
+    )
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

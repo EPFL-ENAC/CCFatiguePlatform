@@ -1,12 +1,71 @@
 <template>
   <v-app>
     <v-app-bar app color="primary" dense dark>
-      <v-tabs align-with-title fixed-tabs>
+      <v-tabs
+        align-with-title
+        fixed-tabs
+      >
+        
         <v-tab
-          v-for="(route, i) in routerMenu" :key="i"
-          :to="route.to"
-          exact
-        ><v-icon>{{ route.icon }}</v-icon><template v-if="!route.iconOnly">&nbsp;{{ route.label}} </template></v-tab>
+          :to="{name: 'Home'}" exact
+        >
+          <v-icon>mdi-home</v-icon>
+        </v-tab>
+        
+        <v-tab
+          :to="{name: 'FatigueDatabase'}"
+        >
+          <v-menu offset-y open-on-hover>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                color="primary"
+                v-on="on"
+                elevation="0"
+              >
+                Fatigue database
+              </v-btn>
+            </template>
+            <v-list
+              color="primary"
+            >
+              <v-list-item>
+                <v-list-item-title>
+                  <v-btn
+                    color="primary"
+                    elevation="0"
+                    :to="{name: 'SearchDatabase'}"
+                  >
+                    Search database
+                  </v-btn>
+                </v-list-item-title>
+              </v-list-item>
+              <v-list-item>
+                <v-list-item-title>
+                  <v-btn
+                    color="primary"
+                    elevation="0"
+                    :to="{name: 'DataUpload'}"
+                  >
+                    Data upload
+                  </v-btn>
+                </v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </v-tab>
+
+
+        <v-tab
+          :to="{name: 'CCFatigueAnalysis'}" exact
+        >
+          CCFatigue analysis
+        </v-tab>
+        
+        <v-tab
+          :to="{name: 'About'}" exact
+        >
+          <v-icon>mdi-information</v-icon>
+        </v-tab>
       </v-tabs>
     </v-app-bar>
 
@@ -19,17 +78,6 @@
 <script>
 export default {
   name: 'App',
-
-  data () {
-    return {
-      routerMenu: [
-        {label: 'Home', icon: 'mdi-home', to: '/home', iconOnly: true},
-        {label: 'Test dashboard', icon: 'mdi-chart-line', to: '/test-dashboard', iconOnly: false},
-        {label: 'Data upload ', icon: 'mdi-upload', to: '/data-upload', iconOnly: false},
-        {label: 'About', icon: 'mdi-information', to: '/about', iconOnly: true},
-      ]
-    }
-  },
 }
 </script>
 
