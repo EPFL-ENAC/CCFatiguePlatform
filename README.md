@@ -4,10 +4,14 @@ CCFatiguePlatform is an initiative from CCLab that aims to develop a web applica
 
 
 # Web app: Usage
-## Setup & run locally
+## Setup & run locally (without CCFatigue modules)
 
 1. run backend according to [backend/README.md](backend/README.md)
 2. run frontend according to [frontend/README.md](frontend/README.md)
+
+## Run on server
+See https://github.com/EPFL-ENAC/SB_Sysadmin/tree/enacvm0056
+
 
 
 # Data
