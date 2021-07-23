@@ -18,12 +18,6 @@
           <ul>
             <li>
               <experiment-s-v
-                subject="Specimen number"
-                :values="[experience.Experiment['Specimen number']]"
-              />
-            </li>
-            <li>
-              <experiment-s-v
                 subject="Publications"
                 :values="[experience.Publications]"
                 valueType="PublicationsLinks"
