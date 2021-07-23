@@ -10,7 +10,7 @@
     <v-container>
       <v-row justify="center">
         <v-btn class="ma-2">Download raw files</v-btn>
-        <v-btn class="ma-2" :to="{name: 'TestDashboard'}">View tests results</v-btn>
+        <v-btn class="ma-2" :to="{name: 'TestSelection'}">View tests results</v-btn>
         <v-btn class="ma-2" :to="{name: 'CCFatigueAnalysis'}">Analyse experiment</v-btn>
       </v-row>
     </v-container>

@@ -5,6 +5,7 @@ import Home from '../views/Home.vue'
 // this generates a separate chunk (name.[hash].js) for each route
 // which is lazy-loaded when the route is visited.
 const SearchDatabase = () => import(/* webpackChunkName: "search" */ '../views/SearchDatabase.vue')
+const TestSelection = () => import(/* webpackChunkName: "test-selection" */ '../views/TestSelection.vue')
 const TestDashboard = () => import(/* webpackChunkName: "test-dashboard" */ '../views/TestDashboard.vue')
 const DataUpload = () => import(/* webpackChunkName: "data-upload" */ '../views/DataUpload.vue')
 const CCFatigueAnalysis = () => import(/* webpackChunkName: "ccfatigue-analysis" */ '../views/CCFatigueAnalysis.vue')
@@ -32,6 +33,11 @@ const routes = [
     path: '/fatigue_database/search',
     name: 'SearchDatabase',
     component: SearchDatabase,
+  },
+  {
+    path: '/fatigue_database/test-selection',
+    name: 'TestSelection',
+    component: TestSelection,
   },
   {
     path: '/fatigue_database/test-dashboard',
