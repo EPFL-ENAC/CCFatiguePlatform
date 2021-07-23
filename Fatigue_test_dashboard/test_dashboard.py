@@ -125,14 +125,15 @@ def create_sub_hystloops(df, sub_index):
                                  'strain': sub_hystloops_strain,
                                  'stress': sub_hystloops_stress})
 
-
     return sub_hystloops
 
 def plot_select_stress_strain(sub_hystloops):
     stressStrain = figure(title = 'Stress - Strain', plot_width=1200, plot_height=800,
                           x_axis_label = "Strain", y_axis_label = "Stress")
 
-
+    stressStrain.title.text_font_size = '20pt'
+    stressStrain.xaxis.axis_label_text_font_size = "18pt"
+    stressStrain.yaxis.axis_label_text_font_size = "18pt"
     stressStrain.add_tools(HoverTool(tooltips=[("Stress", "@stress"), ("Strain", "@strain"),
                                                ("Nb. cycles", "@n_cycles")]))
     for curve in sub_hystloops:
@@ -210,6 +211,9 @@ sub_creep = {'n_cycles': creep_n_cycles,
 def plot_creep(hyst_df):
     creep = figure(title = 'Creep evolution', plot_width=1200, plot_height=800,
                    x_axis_label = "N_cycles", y_axis_label = "Creep")
+    creep.title.text_font_size = '20pt'
+    creep.xaxis.axis_label_text_font_size = "18pt"
+    creep.yaxis.axis_label_text_font_size = "18pt"
     creep.add_tools(HoverTool(tooltips=[("Creep", "@creep"), ("Nb. cycles", "@n_cycles")]))
     creep.line(x = 'n_cycles', y = 'creep', source = ColumnDataSource(data = sub_creep))
     #creep.line(x = 'n_cycles', y = 'creep', source = ColumnDataSource(data = sub_creep2), line_color = 'red')
@@ -234,9 +238,15 @@ sub_hyst = {'n_cycles': hyst_n_cycles,
 #             'area': hyst_area2}
 
 def calculate_tde(hyst_area):
+
     tde = np.sum(hyst_area)
     #tde2 = np.sum(hyst_area2)
-    return tde, tde2
+    return tde #, tde2
+
+def strain_failure(hyst_df):
+    strain_fail = max(hyst_df.creep)
+    strain_fail = hyst_df["creep"].max()
+    return strain_fail
 
 def plot_hystarea(hyst_df):
 
@@ -244,9 +254,15 @@ def plot_hystarea(hyst_df):
 
     area = figure(title = 'Hysteresis loop area evolution', plot_width=1200, plot_height=800,
                   x_axis_label = "N_cycles", y_axis_label = "Hysteresis area")
+    area.title.text_font_size = '20pt'
+    area.xaxis.axis_label_text_font_size = "18pt"
+    area.yaxis.axis_label_text_font_size = "18pt"
     area.add_tools(HoverTool(tooltips=[("area", "@area"), ("Nb. cycles", "@n_cycles")]))
     area.line(x = 'n_cycles', y = 'area', source = ColumnDataSource(data = sub_hyst))
     #area.line(x = 'n_cycles', y = 'area', source = ColumnDataSource(data = sub_hyst2), line_color = 'red')
+
+
+
 
     show(area)
 
@@ -277,6 +293,9 @@ def plot_stiffness(hyst_df):
 
     stiff = figure(title = 'Stiffness evolution under cyclic loading', plot_width=1200, plot_height=800,
                    x_axis_label = "N_cycles", y_axis_label = "Stiffness")
+    stiff.title.text_font_size = '20pt'
+    stiff.xaxis.axis_label_text_font_size = "18pt"
+    stiff.yaxis.axis_label_text_font_size = "18pt"
     stiff.add_tools(HoverTool(tooltips=[("stiffness", "@stiffness"), ("Nb. cycles", "@n_cycles")]))
     stiff.line(x = 'n_cycles', y = 'stiffness', source = ColumnDataSource(data = sub_hyst))
     #stiff.line(x = 'n_cycles', y = 'stiffness', source = ColumnDataSource(data = sub_hyst2), line_color = 'red')
@@ -312,10 +331,13 @@ def main():
     plot_stiffness(hyst_df)
     #plot_stiffness(hyst_df, hyst_df2)
 
+    strain_fail = strain_failure(hyst_df)
+
     TDE = calculate_tde(hyst_area)
     #TDE = calculate_tde(hyst_area, hyst_area2)
 
     print(TDE)
+    print(strain_fail)
     return
 
 
