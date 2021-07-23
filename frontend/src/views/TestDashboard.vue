@@ -9,7 +9,7 @@
         <v-card-title>
           Experiment : {{ test.experience['Experiment Type'] }} test, by {{ test.experience.Researcher }}, {{ test.experience.Laboratory }}, {{ test.experience.Experiment.Date }}
           <v-spacer />
-          <v-btn>Add test(s)</v-btn>
+          <v-btn :to="{name: 'TestSelection'}">Add test(s)</v-btn>
         </v-card-title>
       </v-card>
 
