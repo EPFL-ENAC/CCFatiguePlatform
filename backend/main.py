@@ -1,13 +1,14 @@
 import json
 from datetime import date
-from typing import Any, List
+from typing import List
 
 import uvicorn
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, File, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 
+import analyzer
 import dashboarder
+from model import Dashboard, Experience, Plot, SnCurveResult, Test
 
 app = FastAPI()
 
@@ -22,34 +23,6 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
-
-
-class Experience(BaseModel):
-    id: str
-    laboratory: str
-    researcher: str
-    type: str
-    date: date
-
-
-class Test(BaseModel):
-    number: int
-    color: str
-    total_dissipated_energy: int
-    strain_at_failure: float
-
-
-class Plot(BaseModel):
-    stress_strain: Any
-    creep: Any
-    hysteresis_area: Any
-    stiffness: Any
-
-
-class Dashboard(BaseModel):
-    experience: Any
-    tests: List[Test]
-    plot: Plot
 
 
 @app.get('/experiences', response_model=List[Experience])
@@ -100,6 +73,11 @@ async def get_dashboard(
             stiffness=dashboard.stiffness,
         ),
     )
+
+
+@app.post("/snCurve/file")
+async def run_sn_curve_file(file: UploadFile = File(...)) -> SnCurveResult:
+    return analyzer.run_sn_curve(file.file)
 
 
 if __name__ == "__main__":

@@ -19,9 +19,9 @@
               </info-button>
             </v-card-title>
             <v-container fluid>
-              <v-row class="mx-2">
-                <v-img src="/img/results_dashboard1.png"></v-img>
-                <v-spacer />
+              <v-row class="mx-2" align="center">
+                <v-file-input show-size label="Upload file" @change="uploadSnCurve"></v-file-input>
+                <!-- <v-img src="/img/results_dashboard1.png"></v-img> -->
                 <info-button>
                   <template v-slot:title>
                     S-N Curve
@@ -39,9 +39,13 @@
                       If a sample doesn’t break under loading, we call it a test run off and the value for residual strength is obtained by means of a quasi static loading up to breaking. If the sample doesn’t  break, residual strength takes the same value as the stress parameter.
                     </p>
                 </info-button>
+                <v-spacer />
+              </v-row>
+              <v-row class="mx-2">
+                <v-btn disabled>Browse from Fatigue DB</v-btn>
               </v-row>
               <v-row justify="end">
-                <v-btn class="ma-5">Run</v-btn>
+                <v-btn class="ma-5" v-on:click="runSnCurve" :disabled="!isSnCurveRunnable">Run</v-btn>
               </v-row>
             </v-container>
           </v-card>
@@ -216,6 +220,8 @@
 
 <script>
 import InfoButton from '@/components/InfoButton'
+import Axios from 'axios'
+import download from 'downloadjs'
 
 export default {
   name: 'CCFatigueAnalysis',
@@ -246,8 +252,33 @@ export default {
         'Linear',
         'Piecewise-Linear'
       ],
+      snCurve: {
+        file: null,
+      },
     }
   },
+  computed: {
+    isSnCurveRunnable: function() {
+      return this.snCurve.file;
+    },
+  },
+  methods: {
+    uploadSnCurve(file) {
+      this.snCurve.file = file
+    },
+    runSnCurve() {
+      if (this.snCurve.file) {
+        const formData = new FormData();
+        formData.append('file', this.snCurve.file);
+        Axios
+          .post('snCurve/file', formData, {
+            headers: {'Content-Type': 'multipart/form-data'}
+          })
+          .then(res => res.data)
+          .then(result => download(result.content, 'sn-curve-output.txt', 'text/plain'))
+      }
+    }
+  }
 }
 </script>
 

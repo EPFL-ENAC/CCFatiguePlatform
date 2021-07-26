@@ -10,6 +10,7 @@ bokeh = "*"
 uvicorn = "*"
 pydantic = "*"
 gunicorn = "*"
+python-multipart = "*"
 
 [dev-packages]
 
