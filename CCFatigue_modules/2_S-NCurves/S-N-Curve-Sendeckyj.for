@@ -13,10 +13,14 @@
 	CHARACTER*40 NAME, NAM
 
 	! Enter the input file name and open it for reading
-        
-	OPEN (10, FILE = 'input.txt') 
-	OPEN (20, FILE = 'output.txt')     
- 
+	CHARACTER(len = 1024) inputFile
+	call get_command_argument(1, inputFile)
+	if (inputFile == '') inputFile = 'input.txt'
+
+	OPEN (10, FILE = inputFile)
+	OPEN (20, FILE = '/dev/stdout') 
+
+
 	! Read maximum stress, cycles and residual stress
 	! Calculate number of test data and number of censored points 
 	! ##########################################################################

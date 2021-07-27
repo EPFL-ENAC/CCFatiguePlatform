@@ -14,11 +14,15 @@
      
 	CHARACTER*40 NAME, NAM
 
-      ! Enter the input file name and open it for reading
- 
-   	OPEN (10, FILE = 'input.txt') 
-	OPEN (20, FILE = 'output.txt')     
-      
+	! Enter the input file name and open it for reading
+	CHARACTER(len = 1024) inputFile
+	call get_command_argument(1, inputFile)
+	if (inputFile == '') inputFile = 'input.txt'
+
+	OPEN (10, FILE = inputFile)
+	OPEN (20, FILE = '/dev/stdout') 
+
+
       ! number of cycles for run out 
 	rrout=5e7
       

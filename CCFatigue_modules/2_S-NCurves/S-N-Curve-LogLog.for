@@ -1,4 +1,4 @@
-	Program LinLog
+	Program LogLog
       
 	integer k,i,j,m,NOR,NOD(100),kk,ii,f,Replicate(100,100)
 	integer level(100),checknumber,Confidence,NN
@@ -8,32 +8,31 @@
 	real noc(1000,1000),rnos(1000),rfail(1000),S(1000)
 	real sumnoc,rmean(1000),rout(1000),rno(1000),rn(1000),Noi(1000)
 	real Band, SPNu,SPNl,Fp,PP,termI,termII,termIII
-        real fTABLE(1000,1000,100)
+	real fTABLE(1000,1000,100)
 	real averagesigma(100,100),FN,FD,SumN,averageN(100,100)
-	real averagelogN(100,100),ttable(30,100)
-	real SigmaRL(10,100,100),CycleRL(10,100,100),Linearcheck
-	real SSE,SST, RMSE,RSQ,Nb,LSSE,LSST,LRSQ,LNb,SSEL,PESS,EPL,RSQL
+	real averagelogN(100,100),ttable(30,100),SSE,SST,RMSE,RSQ,Nb
+	real SigmaRL(10,100,100),CycleRL(10,100,100),Linearcheck,A95,B95
+	real LSSE,LSST,LRSQ,LNb
 
-        CHARACTER*40 NAME, NAM
+	CHARACTER*40 NAME, NAM
 
-      ! Enter the input file name and open it for reading
+	! Enter the input file name and open it for reading
 	CHARACTER(len = 1024) inputFile
 	call get_command_argument(1, inputFile)
 	if (inputFile == '') inputFile = 'input.txt'
 
 	OPEN (10, FILE = inputFile)
-	OPEN (20, FILE = '/dev/stdout')
-      
-       
-      
+	OPEN (20, FILE = '/dev/stdout') 
+
+
       ! Read maximum stress, cycles and residual stress
-      ! Calculate number of test data and number of censored points 
+	! Calculate number of test data and number of censored points 
       ! ##########################################################################
 	m=0
 	k=0
 	NOR=1
 	Confidence=95
-	RROUT=1e9
+	RROUT=1e7
 	
 	
 	!Data from ASTM E739-91
@@ -112,7 +111,7 @@
      &	4.0293,3.8325,3.6897,3.5814,3.4966,3.4284,3.3725,3.3257,3.286,
      &	3.252,3.2225,3.1966,3.1737,3.1534,3.1352,3.1188,3.104,3.0905,
      &	3.0782,3.0669,3.0565,3.0469/)
-
+	
 
 	do
 	    m=m+1
@@ -142,9 +141,9 @@
 20	end do 
 	NOD(NOR)=m
 	
-	do j=1,NOR				!Log(N)=A+B*Sigma....Y=A+B*X
+	do j=1,NOR
 		do m=1,NOD(j)
-		X(j,m)=asigma(j,m)
+		X(j,m)=log10(asigma(j,m))
 		Y(j,m)=log10(N(j,m))
 		end do
 	end do
@@ -162,7 +161,7 @@
 		CycleRL(f,1,1)=N(f,1)
 		
 		checknumber=1
-	        level(f)=0
+	    level(f)=0
 		kk=1
 		do i=2,NOD(f)
 			if (slevel(f,i).eq.slevel(f,i-1)) then
@@ -204,6 +203,9 @@
 		averageN(f,level(f))=SumN/checknumber
 		averagelogN(f,level(f))=SumlogN/checknumber
 
+
+
+
 		do j=i-checknumber, i-1
 			write(30,*) averagesigma(f,level(f)),N(f,j),averageN(f,level(f))
 		end do
@@ -238,7 +240,7 @@
 		!	checkmark=0
 		!	do p=1,i-1,1
 		!		if (asigma(f,i).eq.asigma(f,p)) then
-					checkmark=1
+		!			checkmark=1
 		!		end if
 		!	end do
 		!	if (checkmark.NE.1) then
@@ -299,77 +301,75 @@
 		end do
 		Xb=Xb/NOD(f)
 		Yb=Yb/NOD(f)
-		Nb=Nb/NOD(f)	!average of all N
+		Nb=Nb/NOD(f)
 		LNb=LNb/NOD(f)	!average of all Log(N)
-		
+			
 		do i=1,NOD(f),1
 			P=P+((X(f,i)-Xb)*(Y(f,i)-Yb))
 			Q=Q+(X(f,i)-Xb)**2
 		end do
 
-		B=P/Q			!Log(N)=A+B*Sigma....Y=A+B*X
+		B=P/Q			!Log(N)=A+B*Log(S)
 		A=Yb-B*Xb
 		
 
 		do i=1,NOD(f)
 			Ycar(f,i)=A+B*X(f,i)
-			VS=VS+(Y(f,i)-Ycar(f,i))**2
-			SSE=SSE+(10**Y(f,i)-10**Ycar(f,i))**2 !Sum of squares due to error
+			VS=VS+(Y(f,i)-Ycar(f,i))**2 !Sum of squares due to error
+			SSE=SSE+(10**Y(f,i)-10**Ycar(f,i))**2
 			LSSE=LSSE+(Y(f,i)-Ycar(f,i))**2
-			
-			SST=SST+(10**Y(f,i)-Nb)**2
-			LSST=LSST+(Y(f,i)-LNb)**2			
-			!WRITE(20,*) 10**Y(f,i),10**Ycar(f,i)
+
+			SST=SST+(10**Y(f,i)-Nb)**2 !squares about mean
+			LSST=LSST+(Y(f,i)-LNb)**2
+			!WRITE(20,*) X(f,i),Ycar(f,i),Y(f,i),VS
 		end do
 		
-		do i=1,level(f)
-			do j=1,Replicate(f,i)	
-				SSEL=SSEL+(CycleRL(f,i,j)-10**(A+B*SigmaRL(f,i,j)))**2
-				PESS=PESS+(CycleRL(f,i,j)-averageN(f,i))**2
-			end do
-			EPL=EPL+(SSEL-PESS)/PESS
-			!WRITE(20,*) SSEL,PESS,(SSEL-PESS),EPL
-		end do		
-
 		Variance=sqrt(VS/(NOD(f)-2))
 		RMSE=sqrt(SSE/NOD(f))		!Root mean square error
-		
-
+		RSQ=1-SSE/SST
+		LRSQ=1-LSSE/LSST
+						
 		Fp=Ftable((NOD(f)-level(f)),(level(f)-2),Confidence)
 		PP=2*Fp*Variance**2
-		!WRITE(20,*) Variance,LNb
 		
+		!CIA=Variance*(1/NOD(f)+Xb**2/Q)**(0.5)
+		!CIB=Variance*Q**(-0.5)
+		
+		!A95P=A+ttable(NOD(f)-2,99.5)*CIA
+		!B95P=B+ttable(NOD(f)-2,99.5)*CIB
+		!A95M=A-ttable(NOD(f)-2,99.5)*CIA
+		!B95M=B-ttable(NOD(f)-2,99.5)*CIB
+
+
 		FN=0
 		FD=0
 		!Testing the adequacy of the Linear model
 		!***************************************************************
 		do i=1,level(f)
-			FN=FN+(Replicate(f,i)*((A+B*averagesigma(f,i))
+			FN=FN+(Replicate(f,i)*((A+B*log10(averagesigma(f,i)))
      &			-averagelogN(f,i))**2)
 			do ii=1,Replicate(f,i)
 				FD=FD+(log10(CycleRL(f,i,ii))-averagelogN(f,i))**2
-				
-				!WRITE(20,*) CycleRL(f,i,ii),averageN(f,i)
+				!WRITE(20,*) FN,FD
 				!WRITE(20,*) ((A+B*log10(averagesigma(f,i)))-averagelogN(f,i))**2
 				!WRITE(20,*)	(log10(CycleRL(f,i,ii))-averagelogN(f,i))**2
-
 			end do
 			
 		end do
-		RSQ=1-SSE/SST
-		LRSQ=1-LSSE/LSST
-		RSQL=EPL
+		
 		!WRITE(20,*)	(level(f)-2),(NOD(f)-level(f))
 		Linearcheck=(FN/(level(f)-2))/(FD/(NOD(f)-level(f)))
 		
 		!***************************************************************
+		!if (R(f).Eq.99.5) then
+		!	A=A95
+		!end if
 
-
-		AA=(-A/B)
-		BB=1/B
+		AA=10**(-A/B)
+		BB=-1/B
 		
 		!do i=1, level(f)
-		!	WRITE(20,*) Replicate(f,i)
+		!	WRITE(20,*) level(f),Replicate(f,i)
 		!end do	
 	
 		!do i=1, 15
@@ -377,13 +377,13 @@
 		!end do	
 
 		
-	! Calculating and writing the fitted S-N curve based on the found parameters
+	! Calculating and writing the fitted S-N curve based on found parameters
 	! ##########################################################################
-		WRITE(20,*) '0'				!Seperator
+		WRITE(20,*) '0' !Seperator
 		WRITE(20,*) R(f)
-		WRITE(20,*) RSQL
-		WRITE(20,*) A
-		WRITE(20,*) B
+		WRITE(20,*) 50
+		WRITE(20,*) AA
+		WRITE(20,*) BB
 		WRITE(20,*) LRSQ
 		WRITE(20,*) Fp				!Linearity criterion
 		WRITE(20,*) Linearcheck		!Linearity index
@@ -393,88 +393,88 @@
 		WRITE(20,*) RSQ				!R-square
 
 
-!		"Data for 50% Reliability level"
+		!"Data for 50% Reliability level"
 		do NN=1,1000,50
-		  SPN=(AA)+(log10(real(NN))*BB)
+		  SPN=(AA)*(NN**(-BB))
 	termI= (NOD(f)*Q*A*B)-(NOD(f)*Q*log10(real(NN))*B)+(PP*NOD(f)*Xb) 
             termII=sqrt(NOD(f)*PP*Q*(2*NOD(f)*A*B*Xb - 
      #	  2*NOD(f)*log10(real(NN))*B*Xb +  
      #      Q*B**2 + NOD(f)*B**2*Xb**2 + NOD(f)*log10(real(NN))**2 -  
      #      2*NOD(f)*log10(real(NN))*A - PP + NOD(f)*A**2))
             termIII=NOD(f)*(B ** 2 * Q - PP)
-    		  SPNu=-(termI+termII)/termIII
-		  SPNl=-(termI-termII)/termIII
+    		  SPNu=10**(-(termI+termII)/termIII)
+		  SPNl=10**(-(termI-termII)/termIII)
 		  WRITE(20,*) R(f),NN,SPN,SPNu,SPNl
 		end do
 
 		NN=1000
-		  SPN=(AA)+(log10(real(NN))*BB)
-	termI= (NOD(f)*Q*A*B)-(NOD(f)*Q*log10(real(NN))*B)+(PP*NOD(f)*Xb)
+		  SPN=(AA)*(NN**(-BB))
+	termI= (NOD(f)*Q*A*B)-(NOD(f)*Q*log10(real(NN))*B)+(PP*NOD(f)*Xb) 
             termII=sqrt(NOD(f)*PP*Q*(2*NOD(f)*A*B*Xb - 
      #	  2*NOD(f)*log10(real(NN))*B*Xb +  
      #      Q*B**2 + NOD(f)*B**2*Xb**2 + NOD(f)*log10(real(NN))**2 -  
      #      2*NOD(f)*log10(real(NN))*A - PP + NOD(f)*A**2))
             termIII=NOD(f)*(B ** 2 * Q - PP)
-    		  SPNu=-(termI+termII)/termIII
-		  SPNl=-(termI-termII)/termIII
+    		  SPNu=10**(-(termI+termII)/termIII)
+		  SPNl=10**(-(termI-termII)/termIII)
 		  WRITE(20,*) R(f),NN,SPN,SPNu,SPNl
 
 	
 		do NN=10000,2000000,10000
-		  SPN=(AA)+(log10(real(NN))*BB)
-	termI= (NOD(f)*Q*A*B)-(NOD(f)*Q*log10(real(NN))*B)+(PP*NOD(f)*Xb)
+		  SPN=(AA)*(NN**(-BB))
+	termI= (NOD(f)*Q*A*B)-(NOD(f)*Q*log10(real(NN))*B)+(PP*NOD(f)*Xb) 
             termII=sqrt(NOD(f)*PP*Q*(2*NOD(f)*A*B*Xb - 
      #	  2*NOD(f)*log10(real(NN))*B*Xb +  
      #      Q*B**2 + NOD(f)*B**2*Xb**2 + NOD(f)*log10(real(NN))**2 -  
      #      2*NOD(f)*log10(real(NN))*A - PP + NOD(f)*A**2))
             termIII=NOD(f)*(B ** 2 * Q - PP)
-    		  SPNu=-(termI+termII)/termIII
-		  SPNl=-(termI-termII)/termIII
+    		  SPNu=10**(-(termI+termII)/termIII)
+		  SPNl=10**(-(termI-termII)/termIII)
 		  WRITE(20,*) R(f),NN,SPN,SPNu,SPNl
 		end do
 	
 		do NN=2000000,20000000,1000000
-		  SPN=(AA)+(log10(real(NN))*BB)
-	termI= (NOD(f)*Q*A*B)-(NOD(f)*Q*log10(real(NN))*B)+(PP*NOD(f)*Xb)
+		  SPN=(AA)*(NN**(-BB))
+	termI= (NOD(f)*Q*A*B)-(NOD(f)*Q*log10(real(NN))*B)+(PP*NOD(f)*Xb) 
             termII=sqrt(NOD(f)*PP*Q*(2*NOD(f)*A*B*Xb - 
      #	  2*NOD(f)*log10(real(NN))*B*Xb +  
      #      Q*B**2 + NOD(f)*B**2*Xb**2 + NOD(f)*log10(real(NN))**2 -  
      #      2*NOD(f)*log10(real(NN))*A - PP + NOD(f)*A**2))
             termIII=NOD(f)*(B ** 2 * Q - PP)
-    		  SPNu=-(termI+termII)/termIII
-		  SPNl=-(termI-termII)/termIII
+    		  SPNu=10**(-(termI+termII)/termIII)
+		  SPNl=10**(-(termI-termII)/termIII)
 		  WRITE(20,*) R(f),NN,SPN,SPNu,SPNl
 		end do    
-	
+
 		do NN=30000000,1400000000,100000000
-		  SPN=(AA)+(log10(real(NN))*BB)
-	termI= (NOD(f)*Q*A*B)-(NOD(f)*Q*log10(real(NN))*B)+(PP*NOD(f)*Xb)
+		  SPN=(AA)*(NN**(-BB))
+	termI= (NOD(f)*Q*A*B)-(NOD(f)*Q*log10(real(NN))*B)+(PP*NOD(f)*Xb) 
             termII=sqrt(NOD(f)*PP*Q*(2*NOD(f)*A*B*Xb - 
      #	  2*NOD(f)*log10(real(NN))*B*Xb +  
      #      Q*B**2 + NOD(f)*B**2*Xb**2 + NOD(f)*log10(real(NN))**2 -  
      #      2*NOD(f)*log10(real(NN))*A - PP + NOD(f)*A**2))
             termIII=NOD(f)*(B ** 2 * Q - PP)
-    		  SPNu=-(termI+termII)/termIII
-		  SPNl=-(termI-termII)/termIII
+    		  SPNu=10**(-(termI+termII)/termIII)
+		  SPNl=10**(-(termI-termII)/termIII)
 		  WRITE(20,*) R(f),NN,SPN,SPNu,SPNl
 		end do
 		
-	!	NN=1924
-	!	  SPN=(AA)+(log10(real(NN))*BB)
-	!	  termI= (NOD(f)*Q*A*B)-(NOD(f)*Q*log10(real(NN))*B)+(PP*NOD(f)*Xb) 
-      !      termII=sqrt(NOD(f)*PP*Q*(2*NOD(f)*A*B*Xb - 
-      !#	  2*NOD(f)*log10(real(NN))*B*Xb +  
-      !#      Q*B**2 + NOD(f)*B**2*Xb**2 + NOD(f)*log10(real(NN))**2 -  
-      !#      2*NOD(f)*log10(real(NN))*A - PP + NOD(f)*A**2))
-      !      termIII=NOD(f)*(B ** 2 * Q - PP)
-    	!	  SPNu=-(termI+termII)/termIII
-	!	  SPNl=-(termI-termII)/termIII
-	!	  WRITE(20,*) R(f),NN,SPN,SPNu,SPNl
-		    
+!		NN=1273000
+!		  SPN=(AA)*(NN**(-BB))
+!	termI= (NOD(f)*Q*A*B)-(NOD(f)*Q*log10(real(NN))*B)+(PP*NOD(f)*Xb) 
+!            termII=sqrt(NOD(f)*PP*Q*(2*NOD(f)*A*B*Xb - 
+!     #	  2*NOD(f)*log10(real(NN))*B*Xb +  
+!     #      Q*B**2 + NOD(f)*B**2*Xb**2 + NOD(f)*log10(real(NN))**2 -  
+!     #      2*NOD(f)*log10(real(NN))*A - PP + NOD(f)*A**2))
+!            termIII=NOD(f)*(B ** 2 * Q - PP)
+!    		  SPNu=10**(-(termI+termII)/termIII)
+!		  SPNl=10**(-(termI-termII)/termIII)
+!		  WRITE(20,*) R(f),NN,SPN,SPNu,SPNl		
+		    	
 	end do
 	
 	CLOSE(UNIT=10)  
-      CLOSE(UNIT=20)
+	CLOSE(UNIT=20)
 
 	end    
 
