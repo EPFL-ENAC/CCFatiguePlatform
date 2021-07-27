@@ -2,7 +2,7 @@ import os
 import subprocess
 from tempfile import NamedTemporaryFile, SpooledTemporaryFile
 
-from model import SnCurveResult
+from model import SnCurveMethod, SnCurveResult
 
 
 def run_fortran(exec_path: str, input_file: SpooledTemporaryFile) -> bytes:
@@ -18,9 +18,11 @@ def run_fortran(exec_path: str, input_file: SpooledTemporaryFile) -> bytes:
         return ouput
 
 
-def run_sn_curve(file: SpooledTemporaryFile) -> SnCurveResult:
+def run_sn_curve(file: SpooledTemporaryFile,
+                 method: SnCurveMethod
+                 ) -> SnCurveResult:
     content = run_fortran(
-        "../CCFatigue_modules/2_S-NCurves/LinLog/S-N-Curve-Lin-Log",
+        f"../CCFatigue_modules/2_S-NCurves/S-N-Curve-{method.value}",
         file)
     return SnCurveResult(
         content=content

@@ -1,4 +1,5 @@
 from datetime import date
+from enum import Enum
 from typing import Any, List
 
 from pydantic import BaseModel
@@ -34,3 +35,10 @@ class Dashboard(BaseModel):
 
 class SnCurveResult(BaseModel):
     content: bytes
+
+
+class SnCurveMethod(str, Enum):
+    LIN_LOG = "LinLog"
+    LOG_LOG = "LogLog"
+    SENDECKYJ = "Sendeckyj"
+    WHITNEY = "Whitney"
