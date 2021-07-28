@@ -8,7 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import analyzer
 import dashboarder
-from model import Dashboard, Experience, Plot, SnCurveMethod, SnCurveResult, Test
+from model import (Dashboard, Experience, Plot, SnCurveMethod, SnCurveResult,
+                   Test)
 
 app = FastAPI()
 
@@ -75,12 +76,13 @@ async def get_dashboard(
     )
 
 
-@app.post("/snCurve/file")
+@app.post('/snCurve/file')
 async def run_sn_curve_file(file: UploadFile = File(...),
                             method: SnCurveMethod = Query(...),
+                            r_ratio: float = Query(..., alias='rRatio')
                             ) -> SnCurveResult:
-    return analyzer.run_sn_curve(file.file, method)
+    return analyzer.run_sn_curve(file.file, method, r_ratio)
 
 
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+if __name__ == '__main__':
+    uvicorn.run('main:app', host='0.0.0.0', port=8000, reload=True)
