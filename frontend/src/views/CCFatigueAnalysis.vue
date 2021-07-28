@@ -13,13 +13,18 @@
           <v-card-subtitle>
             <v-container>
               <v-row align="center">
-                <v-file-input 
-                  show-size label="Upload file" 
-                  v-model="snCurve.file"
-                  @change="updateSnCurve"
-                  color="secondary"
-                ></v-file-input>
-                <info-tooltip>
+                <v-col>
+                  <v-file-input 
+                    show-size
+                    accept=".txt"
+                    label="Upload file"
+                    v-model="snCurve.file"
+                    :disabled="snCurve.loading"
+                    @change="updateSnCurve"
+                    color="secondary"
+                  >
+                    <template v-slot:append>
+                  <info-tooltip>
                     The data required as input for this module takes the form of a csv file containing 6 columns and as many rows as there were testings in the experiment. The columns are populated as follows:
                     <ul>
                       <li>Stress ratio (R) [-]</li>
@@ -32,24 +37,47 @@
                     <p>
                       If a sample doesn’t break under loading, we call it a test run off and the value for residual strength is obtained by means of a quasi static loading up to breaking. If the sample doesn’t  break, residual strength takes the same value as the stress parameter.
                     </p>
-                </info-tooltip>
-                <v-btn disabled>Browse from Fatigue DB</v-btn>
-                <v-spacer />
+                  </info-tooltip>
+                    </template>
+                  </v-file-input>
+                </v-col>
+                <v-col>
+                  <v-btn disabled>Browse from Fatigue DB</v-btn>
+                </v-col>
               </v-row>
             </v-container>
           </v-card-subtitle>
-          <v-card-text>
-            <v-select
-              label="select S-N curve method(s)"
-              :items="snCurve.methods"
-              v-model="snCurve.method"
-              @change="updateSnCurve"
-              color="secondary"
-            ></v-select>
-
+          <v-card-text v-if="snCurveHasInput">
+            <v-container>
+              <v-row>
+                <v-col>
+                  <v-select
+                    label="select S-N curve method(s)"
+                    :items="snCurve.methods"
+                    v-model="snCurve.method"
+                    :disabled="snCurve.loading"
+                    @change="updateSnCurve"
+                    color="secondary"
+                  ></v-select>
+                </v-col>
+                <v-col>
+                  <v-select
+                    label="select R ratio"
+                    :items="snCurve.rRatios"
+                    v-model="snCurve.rRatio"
+                    :disabled="snCurve.loading"
+                    @change="updateSnCurve"
+                    color="secondary"
+                  ></v-select>
+                </v-col>
+              </v-row>
+              <v-row>
+                <div :id="id.bokeh.snCurve" class="bokeh"></div>
+              </v-row>
+            </v-container>
           </v-card-text>
-          <v-card-actions>
-            <v-btn v-on:click="downloadSnCurve" :disabled="!isSnCurveDownloadable">Download</v-btn>
+          <v-card-actions v-if="snCurveHasInput" class="justify-end">
+            <v-btn v-on:click="downloadSnCurve" :disabled="snCurve.loading && snCurve.output">Download</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -223,6 +251,7 @@ import InfoButton from '@/components/InfoButton'
 import InfoTooltip from '@/components/InfoTooltip'
 import Axios from 'axios'
 import download from 'downloadjs'
+import * as Bokeh from 'bokeh'
 
 export default {
   name: 'CCFatigueAnalysis',
@@ -248,8 +277,14 @@ export default {
         'Linear',
         'Piecewise-Linear'
       ],
+      id: {
+        bokeh: {
+          snCurve: 'bokeh-sn-curve',
+        },
+      },
       snCurve: {
         file: null,
+        loading: false,
         method: 'LinLog',
         methods: [
           'LinLog',
@@ -257,14 +292,21 @@ export default {
           'Sendeckyj',
           'Whitney',
         ],
+        rRatio: -1,
+        rRatios: [
+          -1.00000000,
+          0.100000001,
+          10.0000000,
+          0.500000000,
+        ],
         output: null,
-        loading: false
+        views: [],
       },
     }
   },
   computed: {
-    isSnCurveDownloadable: function() {
-      return !this.snCurve.loading && this.snCurve.output;
+    snCurveHasInput: function() {
+      return this.snCurve.file;
     },
   },
   methods: {
@@ -273,16 +315,22 @@ export default {
         const formData = new FormData();
         formData.append('file', this.snCurve.file);
         this.snCurve.loading = true;
+        this.snCurve.views.forEach(view => view.remove());
         Axios
           .post('snCurve/file', formData, {
             params: {
               method: this.snCurve.method,
+              rRatio: this.snCurve.rRatio,
             },
             headers: {'Content-Type': 'multipart/form-data'},
           })
           .then(res => res.data)
-          .then(result => this.snCurve.output = result.content)
-          .then(() => this.snCurve.loading = false);
+          .then(result => {
+            this.snCurve.output = result.output;
+            return Bokeh.embed.embed_item(result.plot, this.id.bokeh.snCurve)
+          })
+          .then(views => this.snCurve.views = views)
+          .finally(() => this.snCurve.loading = false);
       }
     },
     downloadSnCurve() {
@@ -293,4 +341,7 @@ export default {
 </script>
 
 <style scoped>
+div.bokeh {
+  min-height: 250px;
+}
 </style>

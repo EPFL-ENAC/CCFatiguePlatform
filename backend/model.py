@@ -34,11 +34,12 @@ class Dashboard(BaseModel):
 
 
 class SnCurveResult(BaseModel):
-    content: bytes
+    output: bytes
+    plot: Any
 
 
 class SnCurveMethod(str, Enum):
-    LIN_LOG = "LinLog"
-    LOG_LOG = "LogLog"
-    SENDECKYJ = "Sendeckyj"
-    WHITNEY = "Whitney"
+    LIN_LOG = 'LinLog'
+    LOG_LOG = 'LogLog'
+    SENDECKYJ = 'Sendeckyj'
+    WHITNEY = 'Whitney'
