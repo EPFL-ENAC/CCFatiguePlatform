@@ -45,13 +45,13 @@ export default {
     ]),
   },
   created() {
-    this.$store.dispatch('fetchExperience', {
-      laboratory: 'CCLAB',
-      researcher: 'Vahid',
-      experienceType: 'FA',
-      date: '2021-04-20',
-      testNumbers: [2, 5],  // This doesn't make sense ! TODO
-    })
+    // this.$store.dispatch('fetchExperience', {
+    //   laboratory: 'CCLAB',
+    //   researcher: 'Vahid',
+    //   experienceType: 'FA',
+    //   date: '2021-04-20',
+    //   testNumbers: [2, 5],  // This doesn't make sense ! TODO
+    // })
   },
 }
 </script>

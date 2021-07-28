@@ -1,7 +1,5 @@
 <template>
-  <v-card header="Experiment specifications"
-    fluid
-  >
+  <v-card header="Experiment specifications">
     <v-card-title>
       Experiment specifications (metadata)
       <info-button>
@@ -12,7 +10,7 @@
       </info-button>
     </v-card-title>
     <v-card-text>
-      <v-row no-gutters>
+      <v-row>
         <v-col>
           <h4>GENERAL INFORMATIONS</h4>
           <ul>
