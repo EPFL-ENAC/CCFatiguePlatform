@@ -1,10 +1,10 @@
 <template>
   <div>
-    <v-skeleton-loader v-if="!dataIsFetched"
+    <!-- <v-skeleton-loader v-if="!dataIsFetched"
       max-width="100%" height="10rem"
       type="paragraph" />
 
-    <template v-else>
+    <template v-else> -->
       <experiment-specifications
         :experience="test.experience"
       />
@@ -23,7 +23,7 @@
           </v-container>
         </v-card>
       </v-container>
-    </template>
+    <!-- </template> -->
   </div>
 </template>
 
