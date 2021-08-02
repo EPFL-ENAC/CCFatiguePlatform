@@ -8,10 +8,9 @@ import numpy as np
 import pandas as pd
 from bokeh import palettes
 from bokeh.embed import json_item
-from bokeh.io import show
 from bokeh.models.sources import ColumnDataSource
 from bokeh.models.tools import HoverTool
-from bokeh.plotting import figure
+from bokeh.plotting import figure, output_file, save
 from pandas.core.frame import DataFrame
 from pydantic import BaseModel
 
@@ -93,7 +92,7 @@ def save_json(json_data: Any, filename: str) -> None:
         json.dump(json_data, file)
 
 
-def export_plot(plot: LinePlot, display=False) -> Any:
+def export_plot(plot: LinePlot, save_html=False) -> Any:
     fig = figure(title=plot.title,
                  x_axis_label=plot.x_axis.label,
                  y_axis_label=plot.y_axis.label,
@@ -108,8 +107,11 @@ def export_plot(plot: LinePlot, display=False) -> Any:
         source = ColumnDataSource(data=data)
         fig.line(x=plot.x_axis.key, y=plot.y_axis.key,
                  source=source, color=line.color)
-    if display:
-        show(fig)
+    if save_html:
+        os.makedirs(OUTPUT_DIRECTORY, exist_ok=True)
+        output_file(filename=os.path.join(OUTPUT_DIRECTORY,
+                                          plot.title.lower() + '.html'))
+        save(fig)
     return json_item(fig)
 
 
