@@ -12,6 +12,9 @@ from dashboarder import DataKey, Line, LinePlot
 from model import SnCurveMethod, SnCurveResult
 
 
+ROUND_DECIMAL = 8
+
+
 def run_fortran(exec_path: str, input_file: SpooledTemporaryFile) -> bytes:
     with NamedTemporaryFile() as tmp_file:
         tmp_file.write(input_file.read())
@@ -45,7 +48,10 @@ def create_dataframe(method: SnCurveMethod, output: bytes) -> DataFrame:
 
 def create_plot(method: SnCurveMethod, output: bytes, r_ratio: float) -> Any:
     df = create_dataframe(method, output)
-    selected_df = df[df[DataKey.R_RATIO.key] == r_ratio]
+    round_df = df.round({DataKey.R_RATIO.key: ROUND_DECIMAL})
+    selected_df = round_df[round_df[DataKey.R_RATIO.key] == r_ratio]
+    n_cycles = selected_df[DataKey.N_CYCLES.key].to_list()
+    stress_param = selected_df[DataKey.STRESS_PARAM.key].to_list()
     plot = LinePlot(
         title='S-N Curves',
         x_axis=DataKey.N_CYCLES,
@@ -53,10 +59,8 @@ def create_plot(method: SnCurveMethod, output: bytes, r_ratio: float) -> Any:
         tooltips=[DataKey.N_CYCLES, DataKey.STRESS_PARAM],
         lines=[Line(
             data={
-                DataKey.N_CYCLES: selected_df[DataKey.N_CYCLES.key]
-                .to_list(),
-                DataKey.STRESS_PARAM: selected_df[DataKey.STRESS_PARAM.key]
-                .to_list()
+                DataKey.N_CYCLES: n_cycles,
+                DataKey.STRESS_PARAM: stress_param,
             },
         )],
         x_axis_type='log',
