@@ -19,11 +19,14 @@
       </span>
       <span v-if="valueIndex != values.length - 1">, </span>
     </span>
+    <info-tooltip v-if="tooltip">{{ tooltip }}</info-tooltip>
   </span>
 </template>
 
 <script>
+import InfoTooltip from './InfoTooltip.vue'
 export default {
+  components: { InfoTooltip },
   name: 'ExperimentSV',
   props: {
     subject: String,
@@ -37,6 +40,7 @@ export default {
       default: '',
     },
     colors: Array,
+    tooltip: String,
   },
   methods: {
     getStyle(i) {

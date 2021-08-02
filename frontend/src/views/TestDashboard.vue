@@ -9,116 +9,111 @@
         <experiment-specifications :experience="test.experience"></experiment-specifications>
       </v-card-subtitle>
       <v-card-text>
-        <v-container fluid>
-          <v-row align="center">
-            <h1>Test results</h1>
-            <info-tooltip>
-              <p>
-                In the test results sections, we show information that can be derived from the testings using 4 graphs and 5 key values.
-              </p>
-              <p>
-                Graph 1: Stress-Strain (x: strain, y: stress)
-                This graph shows a selection of loading/unloading loops. These loops, also known as hysteresis loops are important because they provide a visual representation of what is being plotted in the next three graphs.
-              </p>
-              <p>
-                Graph 2: Hysteresis loop area (x: number of cycles, y: hysteresis area)
-                On this graph, we show the evolution of the hysteresis area. This value is defined as the area contained within a hysteresis loop. For visual representation, it represents the area defined by each closed loop on the (stress-strain) plane in graph 1. 
-              </p>
-              <p>
-                Graph 3: Creep evolution (x: number of cycles, y: creep)
-                Creep is defined as the average deformation during each loading/unloading cycle. It gives an understanding of how much deformation occurs at each cycle.
-              </p>
-              <p>
-                Graph 4: Stiffness evolution (x: number of cycles, y: stiffness)
-                Stiffness is representative of the resistance an object opposes to an applied force. On this graph, we show how this capacity evolves over a fatigue life cycle.
-              </p>
-              <p>
-                Stress at failure: σ_fail is defined as the stress level that induced failure from the tested specimen and is measured in [MPa]
-              </p>
-              <p>
-                Strain at failure: ε_fail is defined as the deformation at the time of failure and is measured in [%]
-              </p>
-              <p>
-                N_cycles: is defined as the number of cycles to failure [-]
-              </p>
-              <p>
-                R: is defined as the stress ratio (σ_min/σ_max) [-] and has relevance in the context of constant amplitude experiments.
-                Total dissipated energy (TDE): defined as the sum of all the hysteresis areas over the course of an experiment. It gives a good measure of the amount of energy that has been dissipated in deformation and heat over the course of an experiment.
-              </p>
-            </info-tooltip>
+        <v-card>
+          <v-card-title>
+            Test results
             <v-spacer></v-spacer>
             <v-btn :to="{name: 'TestSelection'}">Add test(s)</v-btn>
-          </v-row>
-          <v-row>
-            <v-col cols="10">
+          </v-card-title>
+          <v-card-text>
+            <v-container fluid>
               <v-row>
-                <v-col cols="6">
-                  <div :id="id.bokeh.stressStrain" class="bokeh"></div>
+                <v-col cols="10">
+                  <v-row>
+                    <v-col cols="6">
+                      <v-row>
+                        <info-tooltip>
+                          This graph shows a selection of loading/unloading loops. These loops, also known as hysteresis loops are important because they provide a visual representation of what is being plotted in the next three graphs.
+                        </info-tooltip>
+                        <div :id="id.bokeh.stressStrain" class="bokeh"></div>
+                      </v-row>
+                    </v-col>
+                    <v-col cols="6">
+                      <v-row>
+                        <info-tooltip>
+                          On this graph, we show the evolution of the hysteresis area. This value is defined as the area contained within a hysteresis loop. For visual representation, it represents the area defined by each closed loop on the (stress-strain) plane in graph 1. 
+                        </info-tooltip>
+                        <div :id="id.bokeh.hysteresisArea" class="bokeh"></div>
+                      </v-row>
+                    </v-col>
+                    <v-col cols="6">
+                      <v-row>
+                        <info-tooltip>
+                          Creep is defined as the average deformation during each loading/unloading cycle. It gives an understanding of how much deformation occurs at each cycle.
+                        </info-tooltip>
+                        <div :id="id.bokeh.creep" class="bokeh"></div>
+                      </v-row>
+                    </v-col>
+                    <v-col cols="6">
+                      <v-row>
+                        <info-tooltip>
+                          Stiffness is representative of the resistance an object opposes to an applied force. On this graph, we show how this capacity evolves over a fatigue life cycle.
+                        </info-tooltip>
+                        <div :id="id.bokeh.stiffness" class="bokeh"></div>
+                      </v-row>
+                    </v-col>
+                  </v-row>
                 </v-col>
-                <v-col cols="6">
-                  <div :id="id.bokeh.creep" class="bokeh"></div>
-                </v-col>
-                <v-col cols="6">
-                  <div :id="id.bokeh.hysteresisArea" class="bokeh"></div>
-                </v-col>
-                <v-col cols="6">
-                  <div :id="id.bokeh.stiffness" class="bokeh"></div>
+                <v-col cols="2">
+                  <v-card>
+                    <v-card-text>
+                      <ul>
+                        <li>
+                          <experiment-s-v
+                            subject="Specimen number"
+                            :values="test.tests.map(t => t.number)"
+                            valueType="bigNumber"
+                            :colors="test.tests.map(t => t.color)"
+                          />
+                        </li>
+                        <li>
+                          <experiment-s-v
+                            subject="Stress at failure"
+                            :values="[test.experience.Experiment['Standard Fatigue']['Stress at Failure']]"
+                            :unit="test.experience['Experiment Units'].Stress"
+                            tooltip="σ_fail is defined as the stress level that induced failure from the tested specimen and is measured in [MPa]"
+                          />
+                        </li>
+                        <li>
+                          <experiment-s-v
+                            subject="Strain at failure"
+                            :values="[test.experience.Experiment['Standard Fatigue']['Strain at Failure']]"
+                            unit="%"
+                            tooltip="ε_fail is defined as the deformation at the time of failure and is measured in [%]"
+                          />
+                        </li>
+                        <li>
+                          <experiment-s-v
+                            subject="N_cycles"
+                            :values="[test.experience.Experiment['Standard Fatigue']['Number of Cycles to Failure']]"
+                            valueType="bigNumber"
+                            tooltip="defined as the number of cycles to failure [-]"
+                          />
+                        </li>
+                        <li>
+                          <experiment-s-v
+                            subject="R"
+                            :values="[test.experience.Experiment['Standard Fatigue']['Stress Ratio']]"
+                            tooltip="defined as the stress ratio (σ_min/σ_max) [-] and has relevance in the context of constant amplitude experiments."
+                          />
+                        </li>
+                        <li>
+                          <experiment-s-v
+                            subject="Total dissipated energy (TDE)"
+                            :values="test.tests.map(t => t.total_dissipated_energy)"
+                            valueType="bigNumber"
+                            :colors="test.tests.map(t => t.color)"
+                            tooltip="defined as the sum of all the hysteresis areas over the course of an experiment. It gives a good measure of the amount of energy that has been dissipated in deformation and heat over the course of an experiment."
+                          />
+                        </li>
+                      </ul>
+                    </v-card-text>
+                  </v-card>
                 </v-col>
               </v-row>
-            </v-col>
-            <v-col cols="2">
-              <v-card>
-                <v-card-text>
-                  <ul>
-                    <li>
-                      <experiment-s-v
-                        subject="Specimen number"
-                        :values="test.tests.map(t => t.number)"
-                        valueType="bigNumber"
-                        :colors="test.tests.map(t => t.color)"
-                      />
-                    </li>
-                    <li>
-                      <experiment-s-v
-                        subject="Stress at failure"
-                        :values="[test.experience.Experiment['Standard Fatigue']['Stress at Failure']]"
-                        :unit="test.experience['Experiment Units'].Stress"
-                      />
-                    </li>
-                    <li>
-                      <experiment-s-v
-                        subject="Strain at failure"
-                        :values="[test.experience.Experiment['Standard Fatigue']['Strain at Failure']]"
-                        unit="%"
-                      />
-                    </li>
-                    <li>
-                      <experiment-s-v
-                        subject="N_cycles"
-                        :values="[test.experience.Experiment['Standard Fatigue']['Number of Cycles to Failure']]"
-                        valueType="bigNumber"
-                      />
-                    </li>
-                    <li>
-                      <experiment-s-v
-                        subject="R"
-                        :values="[test.experience.Experiment['Standard Fatigue']['Stress Ratio']]"
-                      />
-                    </li>
-                    <li>
-                      <experiment-s-v
-                        subject="Total dissipated energy (TDE)"
-                        :values="test.tests.map(t => t.total_dissipated_energy)"
-                        valueType="bigNumber"
-                        :colors="test.tests.map(t => t.color)"
-                      />
-                    </li>
-                  </ul>
-                </v-card-text>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-container>
+            </v-container>
+          </v-card-text>
+        </v-card>
       </v-card-text>
     </v-card>
   </div>
@@ -183,6 +178,7 @@ export default {
 
 <style scoped>
 div.bokeh {
-  height: 400px;
+  min-height: 250px;
+  height: 25vh;
 }
 </style>
