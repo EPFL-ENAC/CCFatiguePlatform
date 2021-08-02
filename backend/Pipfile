@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 fastapi = "*"
 pandas = "*"
-bokeh = "*"
+bokeh = "==2.3.3"
 uvicorn = "*"
 pydantic = "*"
 gunicorn = "*"
