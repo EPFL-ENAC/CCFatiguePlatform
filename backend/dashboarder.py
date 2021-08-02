@@ -1,57 +1,21 @@
-import json
 import os
 from datetime import date
-from enum import Enum
 from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd
 from bokeh import palettes
-from bokeh.embed import json_item
-from bokeh.models.sources import ColumnDataSource
-from bokeh.models.tools import HoverTool
-from bokeh.plotting import figure, output_file, save
 from pandas.core.frame import DataFrame
 from pydantic import BaseModel
 
+import plotter
+from plotter import DataKey, Line, Plot
+
 DATA_DIRECTORY: str = '../data/'
-OUTPUT_DIRECTORY: str = './output'
 
 INTERVAL: int = 10
 LOOP_SPACING: int = 1000
 MAGNITUDE: int = -3
-
-
-class DataKey(Enum):
-    CREEP = ('creep', 'Creep')
-    HIGH = ('high', 'High')
-    HYST_AREA = ('hyst_area', 'Hysteresis area')
-    LOW = ('low', 'Low')
-    N_CYCLES = ('n_cycles', 'Number of cycles')
-    R_RATIO = ('r_ratio', 'R ratio')
-    STIFNESS = ('stiffness', 'Stiffness')
-    STRAIN = ('strain', 'Strain')
-    STRESS = ('stress', 'Stress')
-    STRESS_PARAM = ('stress_parameter', 'Maximum Cyclic Stress')
-
-    def __init__(self, key: str, label: str):
-        self.key = key
-        self.label = label
-
-
-class Line(BaseModel):
-    data: Dict[DataKey, List[Any]]
-    color: str = palettes.Category10_10[0]
-
-
-class LinePlot(BaseModel):
-    title: str
-    x_axis: DataKey
-    y_axis: DataKey
-    tooltips: List[DataKey]
-    lines: List[Line]
-    x_axis_type: str = 'auto'
-    y_axis_type: str = 'auto'
 
 
 class Test(BaseModel):
@@ -84,35 +48,6 @@ def get_dataframe(data_in: str,
                             data_in,
                             filename)
     return pd.read_csv(os.path.abspath(filepath))
-
-
-def save_json(json_data: Any, filename: str) -> None:
-    os.makedirs(OUTPUT_DIRECTORY, exist_ok=True)
-    with open(os.path.join(OUTPUT_DIRECTORY, filename), 'w') as file:
-        json.dump(json_data, file)
-
-
-def export_plot(plot: LinePlot, save_html=False) -> Any:
-    fig = figure(title=plot.title,
-                 x_axis_label=plot.x_axis.label,
-                 y_axis_label=plot.y_axis.label,
-                 x_axis_type=plot.x_axis_type,
-                 y_axis_type=plot.y_axis_type,
-                 sizing_mode='stretch_both')
-    fig.add_tools(HoverTool(
-        tooltips=[(key.label, '@' + key.key) for key in plot.tooltips]
-    ))
-    for line in plot.lines:
-        data = {k.key: v for k, v in line.data.items()}
-        source = ColumnDataSource(data=data)
-        fig.line(x=plot.x_axis.key, y=plot.y_axis.key,
-                 source=source, color=line.color)
-    if save_html:
-        os.makedirs(OUTPUT_DIRECTORY, exist_ok=True)
-        output_file(filename=os.path.join(OUTPUT_DIRECTORY,
-                                          plot.title.lower() + '.html'))
-        save(fig)
-    return json_item(fig)
 
 
 def compute_sub_indexes(df: DataFrame) -> List[int]:
@@ -151,20 +86,21 @@ def create_sub_hystloops(df: DataFrame,
     return sub_hystloops
 
 
-def generate_stress_strain(colors: List[str],
+def generate_stress_strain(tests: List[Test],
                            std_dfs: List[DataFrame],
-                           hyst_dfs: List[DataFrame]) -> LinePlot:
+                           hyst_dfs: List[DataFrame]) -> Plot:
     sub_hystloops = [create_sub_hystloops(std_df, compute_sub_indexes(hyst_df))
                      for std_df, hyst_df in zip(std_dfs, hyst_dfs)]
     lines = [
         Line(
-            color=color,
-            data=loop
+            data=loop,
+            legend_label=test.number,
+            color=test.color,
         )
-        for color, loops in zip(colors, sub_hystloops)
+        for test, loops in zip(tests, sub_hystloops)
         for loop in loops
     ]
-    return LinePlot(
+    return Plot(
         title='Stress - Strain',
         x_axis=DataKey.STRAIN,
         y_axis=DataKey.STRESS,
@@ -173,16 +109,17 @@ def generate_stress_strain(colors: List[str],
     )
 
 
-def generate_creep(colors: List[str],
-                   hyst_dfs: List[DataFrame]) -> LinePlot:
+def generate_creep(tests: List[Test],
+                   hyst_dfs: List[DataFrame]) -> Plot:
     lines = [Line(
-        color=color,
         data={
             DataKey.N_CYCLES: hyst_df['n_cycles'].to_list(),
             DataKey.CREEP: hyst_df['creep'].to_list(),
         },
-    ) for color, hyst_df in zip(colors, hyst_dfs)]
-    return LinePlot(
+        legend_label=test.number,
+        color=test.color,
+    ) for test, hyst_df in zip(tests, hyst_dfs)]
+    return Plot(
         title='Creep evolution',
         x_axis=DataKey.N_CYCLES,
         y_axis=DataKey.CREEP,
@@ -191,16 +128,17 @@ def generate_creep(colors: List[str],
     )
 
 
-def generate_hyst_area(colors: List[str],
-                       hyst_dfs: List[DataFrame]) -> LinePlot:
+def generate_hyst_area(tests: List[Test],
+                       hyst_dfs: List[DataFrame]) -> Plot:
     lines = [Line(
-        color=color,
         data={
             DataKey.N_CYCLES: hyst_df['n_cycles'].to_list(),
             DataKey.HYST_AREA: hyst_df['hysteresis_area'].to_list(),
         },
-    ) for color, hyst_df in zip(colors, hyst_dfs)]
-    return LinePlot(
+        legend_label=test.number,
+        color=test.color,
+    ) for test, hyst_df in zip(tests, hyst_dfs)]
+    return Plot(
         title='Hysteresis loop area evolution',
         x_axis=DataKey.N_CYCLES,
         y_axis=DataKey.HYST_AREA,
@@ -209,16 +147,17 @@ def generate_hyst_area(colors: List[str],
     )
 
 
-def generate_stiffness(colors: List[str],
-                       hyst_dfs: List[DataFrame]) -> LinePlot:
+def generate_stiffness(tests: List[Test],
+                       hyst_dfs: List[DataFrame]) -> Plot:
     lines = [Line(
-        color=color,
         data={
             DataKey.N_CYCLES: hyst_df['n_cycles'].to_list(),
             DataKey.STIFNESS: hyst_df['stiffness'].to_list(),
         },
-    ) for color, hyst_df in zip(colors, hyst_dfs)]
-    return LinePlot(
+        legend_label=test.number,
+        color=test.color,
+    ) for test, hyst_df in zip(tests, hyst_dfs)]
+    return Plot(
         title='Stiffness evolution under cyclic loading',
         x_axis=DataKey.N_CYCLES,
         y_axis=DataKey.STIFNESS,
@@ -253,11 +192,12 @@ def generate_dashboard(laboratory: str,
     ]
     return Dashboard(
         tests=tests,
-        stress_strain=export_plot(
-            generate_stress_strain(colors, std_dfs, hyst_dfs)),
-        creep=export_plot(generate_creep(colors, hyst_dfs)),
-        hysteresis_area=export_plot(generate_hyst_area(colors, hyst_dfs)),
-        stiffness=export_plot(generate_stiffness(colors, hyst_dfs)),
+        stress_strain=plotter.export_plot(
+            generate_stress_strain(tests, std_dfs, hyst_dfs)),
+        creep=plotter.export_plot(generate_creep(tests, hyst_dfs)),
+        hysteresis_area=plotter.export_plot(
+            generate_hyst_area(tests, hyst_dfs)),
+        stiffness=plotter.export_plot(generate_stiffness(tests, hyst_dfs)),
     )
 
 
@@ -267,10 +207,10 @@ def main():
                                    experience_type='FA',
                                    date=date(year=2021, month=4, day=20),
                                    test_numbers=[2, 5])
-    save_json(dashboard.stress_strain, 'stress_strain.json')
-    save_json(dashboard.creep, 'creep.json')
-    save_json(dashboard.hysteresis_area, 'hyst_area.json')
-    save_json(dashboard.stiffness, 'stiffness.json')
+    plotter.save_json(dashboard.stress_strain, 'stress_strain.json')
+    plotter.save_json(dashboard.creep, 'creep.json')
+    plotter.save_json(dashboard.hysteresis_area, 'hyst_area.json')
+    plotter.save_json(dashboard.stiffness, 'stiffness.json')
 
 
 if __name__ == '__main__':

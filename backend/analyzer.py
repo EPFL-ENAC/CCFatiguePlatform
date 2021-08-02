@@ -2,25 +2,26 @@ import io
 import os
 import subprocess
 from tempfile import NamedTemporaryFile, SpooledTemporaryFile
-from typing import Any
+from typing import Any, Dict, List
 
 import pandas as pd
 from pandas.core.frame import DataFrame
 
-import dashboarder
-from dashboarder import DataKey, Line, LinePlot
+import plotter
 from model import SnCurveMethod, SnCurveResult
-
+from plotter import DataKey, Line, Plot
 
 ROUND_DECIMAL = 8
 
 
 def run_fortran(exec_path: str, input_file: SpooledTemporaryFile) -> bytes:
     with NamedTemporaryFile() as tmp_file:
+        input_file.seek(0)
         tmp_file.write(input_file.read())
         tmp_file.flush()
         split_path = os.path.split(exec_path)
         directory = os.path.abspath(split_path[0])
+        print(f'executing {os.path.abspath(exec_path)} {tmp_file.name}')
         ouput = subprocess.check_output([
             f'./{split_path[1]}',
             tmp_file.name,
@@ -28,7 +29,7 @@ def run_fortran(exec_path: str, input_file: SpooledTemporaryFile) -> bytes:
         return ouput
 
 
-def create_dataframe(method: SnCurveMethod, output: bytes) -> DataFrame:
+def create_dataframe(output: bytes, method: SnCurveMethod) -> DataFrame:
     if method in [SnCurveMethod.LIN_LOG, SnCurveMethod.LOG_LOG]:
         widths = [17, 12, 12, 12, 12]
         columns = [DataKey.R_RATIO,
@@ -46,37 +47,41 @@ def create_dataframe(method: SnCurveMethod, output: bytes) -> DataFrame:
     return df.fillna('')
 
 
-def create_plot(method: SnCurveMethod, output: bytes, r_ratio: float) -> Any:
-    df = create_dataframe(method, output)
+def create_line(output: bytes, method: SnCurveMethod, r_ratio: float) -> Any:
+    df = create_dataframe(output, method)
     round_df = df.round({DataKey.R_RATIO.key: ROUND_DECIMAL})
     selected_df = round_df[round_df[DataKey.R_RATIO.key] == r_ratio]
     n_cycles = selected_df[DataKey.N_CYCLES.key].to_list()
     stress_param = selected_df[DataKey.STRESS_PARAM.key].to_list()
-    plot = LinePlot(
+    return Line(
+        data={
+            DataKey.N_CYCLES: n_cycles,
+            DataKey.STRESS_PARAM: stress_param,
+        },
+        legend_label=f'{method.value} {r_ratio}',
+    )
+
+
+def run_sn_curve(file: SpooledTemporaryFile,
+                 methods: List[SnCurveMethod],
+                 r_ratios: List[float],
+                 ) -> SnCurveResult:
+    plot = Plot(
         title='S-N Curves',
         x_axis=DataKey.N_CYCLES,
         y_axis=DataKey.STRESS_PARAM,
         tooltips=[DataKey.N_CYCLES, DataKey.STRESS_PARAM],
-        lines=[Line(
-            data={
-                DataKey.N_CYCLES: n_cycles,
-                DataKey.STRESS_PARAM: stress_param,
-            },
-        )],
         x_axis_type='log',
     )
-    return dashboarder.export_plot(plot)
-
-
-def run_sn_curve(file: SpooledTemporaryFile,
-                 method: SnCurveMethod,
-                 r_ratio: float,
-                 ) -> SnCurveResult:
-    output = run_fortran(
-        f'../CCFatigue_modules/2_S-NCurves/S-N-Curve-{method.value}',
-        file)
-    plot = create_plot(method, output, r_ratio)
+    outputs: Dict[SnCurveMethod, bytes] = {}
+    for method in methods:
+        output = run_fortran(
+            f'../CCFatigue_modules/2_S-NCurves/S-N-Curve-{method.value}',
+            file)
+        outputs[method] = output
+        for r_ratio in r_ratios:
+            plot.lines.append(create_line(output, method, r_ratio))
     return SnCurveResult(
-        output=output,
-        plot=plot
+        outputs=outputs,
+        plot=plotter.export_plot(plot)
     )

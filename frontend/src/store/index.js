@@ -23,7 +23,7 @@ export default new Vuex.Store({
     fetchExperience(context, payload) {
       Axios.get('dashboard', {
         params: payload,
-        paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' })
+        paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' }),
       })
       .then((res) => {
         context.commit('saveTest', res.data)

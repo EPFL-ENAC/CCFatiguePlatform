@@ -153,7 +153,7 @@
 
 	do f=1,NOR
 
-		OPEN (30, FILE = 'Temp-input.txt')
+		OPEN (30, STATUS='SCRATCH')
 		Ssigma=asigma(f,1)
 		SumN=N(f,1)
 		SumlogN=log10(N(f,1))
@@ -227,7 +227,7 @@
 
 
 		!m=0
-		!OPEN (30, FILE = 'Temp-input.txt')
+		!OPEN (30, STATUS='SCRATCH')
 		!do while (.NOT.EOF (10)) 
 	    !    m=m+1
 		!	read(30,*) asigma(f,m), N(f,m)

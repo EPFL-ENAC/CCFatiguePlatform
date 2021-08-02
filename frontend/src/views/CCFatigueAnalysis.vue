@@ -14,7 +14,8 @@
             <v-container>
               <v-row align="center">
                 <v-col>
-                  <v-file-input 
+                  <v-file-input
+                    chips
                     show-size
                     accept=".txt"
                     label="Upload file"
@@ -54,7 +55,9 @@
                   <v-select
                     label="select S-N curve method(s)"
                     :items="snCurve.methods"
-                    v-model="snCurve.method"
+                    v-model="snCurve.selectedMethods"
+                    chips
+                    multiple
                     :disabled="snCurve.loading"
                     @change="updateSnCurve"
                     color="secondary"
@@ -64,7 +67,9 @@
                   <v-select
                     label="select R ratio"
                     :items="snCurve.rRatios"
-                    v-model="snCurve.rRatio"
+                    v-model="snCurve.selectedRRatios"
+                    chips
+                    multiple
                     :disabled="snCurve.loading"
                     @change="updateSnCurve"
                     color="secondary"
@@ -251,6 +256,7 @@ import InfoButton from '@/components/InfoButton'
 import InfoTooltip from '@/components/InfoTooltip'
 import Axios from 'axios'
 import download from 'downloadjs'
+import qs from 'qs'
 import * as Bokeh from 'bokeh'
 
 export default {
@@ -285,21 +291,21 @@ export default {
       snCurve: {
         file: null,
         loading: false,
-        method: 'LinLog',
+        selectedMethods: [],
         methods: [
           'LinLog',
           'LogLog',
           'Sendeckyj',
           'Whitney',
         ],
-        rRatio: -1,
+        selectedRRatios: [],
         rRatios: [
           -1,
           0.1,
           10,
           0.5,
         ],
-        output: null,
+        outputs: {},
         views: [],
       },
     }
@@ -311,22 +317,23 @@ export default {
   },
   methods: {
     updateSnCurve() {
-      if (this.snCurve.method && this.snCurve.file) {
+      this.snCurve.views.forEach(view => view.remove());
+      if (this.snCurve.selectedMethods.length > 0 && this.snCurve.selectedRRatios.length > 0 && this.snCurve.file) {
         const formData = new FormData();
         formData.append('file', this.snCurve.file);
         this.snCurve.loading = true;
-        this.snCurve.views.forEach(view => view.remove());
         Axios
           .post('snCurve/file', formData, {
             params: {
-              method: this.snCurve.method,
-              rRatio: this.snCurve.rRatio,
+              methods: this.snCurve.selectedMethods,
+              rRatios: this.snCurve.selectedRRatios,
             },
+            paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' }),
             headers: {'Content-Type': 'multipart/form-data'},
           })
           .then(res => res.data)
           .then(result => {
-            this.snCurve.output = result.output;
+            this.snCurve.outputs = result.outputs;
             return Bokeh.embed.embed_item(result.plot, this.id.bokeh.snCurve)
           })
           .then(views => this.snCurve.views = views)
@@ -334,7 +341,9 @@ export default {
       }
     },
     downloadSnCurve() {
-      download(this.snCurve.output, `sn-curve-${this.snCurve.method.toLowerCase()}-output.txt`, 'text/plain')
+      for (const [key, value] of Object.entries(this.snCurve.outputs)) {
+        download(value, `sn-curve-${key.toLowerCase()}-output.txt`, 'text/plain')
+      }      
     }
   }
 }

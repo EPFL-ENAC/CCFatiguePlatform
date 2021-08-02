@@ -78,10 +78,10 @@ async def get_dashboard(
 
 @app.post('/snCurve/file')
 async def run_sn_curve_file(file: UploadFile = File(...),
-                            method: SnCurveMethod = Query(...),
-                            r_ratio: float = Query(..., alias='rRatio')
+                            methods: List[SnCurveMethod] = Query(...),
+                            r_ratios: List[float] = Query(..., alias='rRatios')
                             ) -> SnCurveResult:
-    return analyzer.run_sn_curve(file.file, method, r_ratio)
+    return analyzer.run_sn_curve(file.file, methods, r_ratios)
 
 
 if __name__ == '__main__':
