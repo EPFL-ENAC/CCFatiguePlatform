@@ -59,7 +59,7 @@
 	CLOSE(UNIT=10)
 	
 	do f=1,NOR
-		OPEN (10, FILE = 'Temp-input.txt')
+		OPEN (10, STATUS='SCRATCH')
 		Ssigma=asigma(f,1)
 		checknumber=1
 		do i=2,NOD(f)
@@ -84,11 +84,10 @@
 		do j=i-checknumber, i-1
 			write(10,*) averagesigma,N(f,j)
 		end do
-		CLOSE(UNIT=10)
-	
-		
+
+		call fseek(10, 0, 0)
+
 		m=0
-		OPEN (10, FILE = 'Temp-input.txt')
 		do
 	          m=m+1
 		  read(10,*,iostat=ierr) asigma(f,m), N(f,m)
@@ -96,7 +95,9 @@
              	     m=m-1
                      exit
         	  end if
-		end do 
+		end do
+
+		CLOSE(UNIT=10)
 
 		strlev=0
 
