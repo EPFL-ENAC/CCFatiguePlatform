@@ -42,7 +42,7 @@
 			NOD(NOR)=m-1
 			m=0
 			NOR=NOR+1
-			do i=1,11
+			do i=1,9
 			read(10,*)
 			end do
 		go to 20

@@ -41,7 +41,7 @@
             end if
 		
 		if (Rtest(i).eq.0) then
-			do j=1,11
+			do j=1,9
 				read(10,*)
 			end do
 			Rtest(i)=PreR
