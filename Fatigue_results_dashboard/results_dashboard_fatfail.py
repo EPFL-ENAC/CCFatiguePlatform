@@ -63,6 +63,9 @@ def sub_r_ratio_kawai(kawai, R_RATIO):
 def plot_FF(sub_ST, sub_kawai):
     plotFF = figure(title = 'Fatigue Failure', plot_width=1200, plot_height=800,
                   x_axis_label = "Number of cycles", y_axis_label = "Stress Amplitude", x_axis_type = "log")
+    plotFF.title.text_font_size = '20pt'
+    plotFF.xaxis.axis_label_text_font_size = "18pt"
+    plotFF.yaxis.axis_label_text_font_size = "18pt"
     plotFF.add_tools(HoverTool(tooltips=[("R", "@r_ratio"), ("Number of cycles", "@n_cycles"), ("Stress", "@stress_param")]))
     plotFF.line(x = 'n_cycles', y = 'stress_param', source = ColumnDataSource(data = sub_ST), line_color = 'blue')
     plotFF.line(x = 'n_cycles', y = 'stress_param', source = ColumnDataSource(data = sub_kawai), line_color = 'red')
