@@ -47,7 +47,7 @@
         "Area Density": 0
       },
       "Loading information": {
-        "Fatigue Type": "Constant Amplitude",
+        "Fatigue Test Type": "Constant Amplitude",
         "Stress Ratio": 0.1,
         "Number of Cycles to Failure": 1198627,
         "Stress at Failure": 47.4,
