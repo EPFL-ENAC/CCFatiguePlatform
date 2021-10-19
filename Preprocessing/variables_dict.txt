@@ -1,0 +1,2 @@
+R : stress ratio
+: strain
