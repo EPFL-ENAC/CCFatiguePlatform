@@ -42,9 +42,8 @@ MONGODB_INFOS = {
 
 
 if __name__ == '__main__':
-
-    # Connect to DB Engine
     try:
+        # Connect to DB Engine
         client = MongoClient(
             username=MONGODB_INFOS['USER'],
             password=MONGODB_INFOS['PASS'],
@@ -63,6 +62,8 @@ if __name__ == '__main__':
         collection = db.get_collection(COLL_NAME)
         if COLL_NAME not in list_of_coll:
             print(f'Created Collection { COLL_NAME }')
+
+        # TODO : Set validation
 
         # Loop all JSON and inject them into DB if not already present
         for json_file in FILES_TO_INJECT:
