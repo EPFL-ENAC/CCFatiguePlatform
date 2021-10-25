@@ -14,12 +14,12 @@ For each test, the user should provide 2 files, named
 | Machine\_N_cycles     | Number of cycles counted by the machine            | [-]   | int       |   |
 | Machine_Load         | Load measured by the machine                       | [MPa] | double    |   |
 | Machine_Displacement | Displacement measured by the machine               | [-]   | double    |   |
-| DIC_index            | Image number                                       | [-]   | int       |   |
-| DIC\_N_cycles         | Number of cycles counted by the camera             | [-]   | int       |   |
-| DIC_exx              | Displacement measured along main axis              | [mm]  | double    |   |
-| DIC_eyy              | Displacement measured along secondary axis         | [mm]  | double    |   |
-| DIC_exy              | Displacement measured along a specified axis       | [mm]  | double    |   |
-| DIC_crack_length     | Crack length measurement (for fracture testings)   | [mm]  | double    |   |
+| index            | Image number                                       | [-]   | int       |   |
+| N_cycles         | Number of cycles counted by the camera             | [-]   | int       |   |
+| exx              | Displacement measured along main axis              | [mm]  | double    |   |
+| eyy              | Displacement measured along secondary axis         | [mm]  | double    |   |
+| exy              | Displacement measured along a specified axis       | [mm]  | double    |   |
+| crack_length     | Crack length measurement (for fracture testings)   | [mm]  | double    |   |
 | Th\_N_cycles          | Number of cycles counted by temperature monitoring | [-]   | int       |   |
 | Th_time              | Time as counted by temperature monitoring          | [sec] | int       |   |
 | Th\_specimen_max      | Maximum temperature monitored                      | [°C]  | single    |   |
@@ -27,6 +27,7 @@ For each test, the user should provide 2 files, named
 | Th_chamber           | Temperature of the test environment                | [°C]  | single    |   |
 | Th_uppergrips        | Temperature of the upper grips                     | [°C]  | single    |   |
 | Th_lowergrips        | Temperature of the lower grips                     | [°C]  | single    |   |
+| Image_filepath        | Filepath of images                    |  | string    |   |
 
 
 
