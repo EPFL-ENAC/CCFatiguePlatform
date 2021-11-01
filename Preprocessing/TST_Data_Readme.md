@@ -9,13 +9,13 @@ For each test, the user should provide 2 files, named
 ### (1) The CSV file should contain the following variables (and exact column names) :
 
 
-| Column name          | Description                                        | Unit  | Data type |   |
+| Column name          | Description                                        | Unit  | Data type | Mandatory  |
 |----------------------|----------------------------------------------------|-------|-----------|---|
-| Machine\_N_cycles     | Number of cycles counted by the machine            | [-]   | int       |   |
-| Machine_Load         | Load measured by the machine                       | [MPa] | double    |   |
-| Machine_Displacement | Displacement measured by the machine               | [-]   | double    |   |
+| Machine\_N_cycles     | Number of cycles counted by the machine            | [-]   | int       | y  |
+| Machine_Load         | Load measured by the machine                       | [MPa] | double    |  y |
+| Machine_Displacement | Displacement measured by the machine               | [-]   | double    |  y |
 | index            | Image number                                       | [-]   | int       |   |
-| N_cycles         | Number of cycles counted by the camera             | [-]   | int       |   |
+| N_cycles         | Number of cycles counted by the camera             | [-]   | int       |  y |
 | exx              | Displacement measured along main axis              | [mm]  | double    |   |
 | eyy              | Displacement measured along secondary axis         | [mm]  | double    |   |
 | exy              | Displacement measured along a specified axis       | [mm]  | double    |   |
