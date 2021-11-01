@@ -27,7 +27,6 @@ For each test, the user should provide 2 files, named
 | Th_chamber           | Temperature of the test environment                | [°C]  | single    |   |
 | Th_uppergrips        | Temperature of the upper grips                     | [°C]  | single    |   |
 | Th_lowergrips        | Temperature of the lower grips                     | [°C]  | single    |   |
-| Image_filepath        | Filepath of images                    |  | string    |   |
 
 
 
