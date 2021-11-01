@@ -22,7 +22,12 @@
       "Material Type": {
         "Resin": "Biresin CR83",
         "Hardener": "Sika CH83-2",
-        "Mixing ratio": "3:1"
+        "Mixing ratio": "3:1",
+        "Constituent Materials": {
+          "Fiber Material": "",
+          "Fiber Geometry": "",
+          "Area Density": 0
+        },
       },
       "Test Conditions": {
         "Temperature": 0,
@@ -41,22 +46,22 @@
         "Fiber Content": 0,
         "Stacking Sequence": "(±45)_2s"
       },
-      "Constituent Materials": {
-        "Fiber Material": "",
-        "Fiber Geometry": "",
-        "Area Density": 0
-      },
+      
       "Loading information": {
-        "Fatigue Test Type": "Constant Amplitude",
         "Stress Ratio": 0.1,
-        "Number of Cycles to Failure": 1198627,
-        "Stress at Failure": 47.4,
-        "Strain at Failure": 1.17
+        "Maximum Stress": 47.4,
+        "Number of Cycles to Failure": 1198627 ,
+        "Loading rate": 0,
+        "Frequency": 0
       },
       "Fracture information": {
         "Fracture analysis": 0,
         "Fracture mode": "",
         "Initial crack length": 0
+      },
+      "DIC information": {
+        "Subset size": 0,
+        "Step size": ""
       }
     },
     "Experiment Units": {
