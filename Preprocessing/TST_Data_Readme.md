@@ -20,8 +20,8 @@ For each test, the user should provide 2 files, named
 | eyy              | Displacement measured along secondary axis         | [mm]  | double    |   |
 | exy              | Displacement measured along a specified axis       | [mm]  | double    |   |
 | crack_length     | Crack length measurement (for fracture testings)   | [mm]  | double    |   |
-| Th\_N_cycles          | Number of cycles counted by temperature monitoring | [-]   | int       |   |
 | Th_time              | Time as counted by temperature monitoring          | [sec] | int       |   |
+| Th\_N_cycles          | Number of cycles counted by temperature monitoring | [-]   | int       |   |
 | Th\_specimen_max      | Maximum temperature monitored                      | [°C]  | single    |   |
 | Th\_specimen_mean     | Mean temperature                                   | [°C]  | single    |   |
 | Th_chamber           | Temperature of the test environment                | [°C]  | single    |   |
