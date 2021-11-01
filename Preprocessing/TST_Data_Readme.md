@@ -69,6 +69,7 @@ For each test, the user should provide 2 files, named
         "Thickness": 0
       },
       "Laminates and Assemblies": {
+        "Fabrication Method": "Vacuum Infusion",
         "Curing Time": 0,
         "Curing Temperature": 0,
         "Curing Pressure": 0,
@@ -83,9 +84,15 @@ For each test, the user should provide 2 files, named
       "Loading information": {
         "Fatigue Test Type": "Constant Amplitude",
         "Stress Ratio": 0.1,
+        "Maximum Stress": 90,
+        "Loading Rate": 10,
         "Number of Cycles to Failure": 1198627,
         "Stress at Failure": 47.4,
         "Strain at Failure": 1.17
+      },
+      "DIC Analysis information": {
+        "Step Size": 7,
+        "Subset Size": 29,
       },
       "Fracture information": {
         "Fracture analysis": 0,
@@ -95,6 +102,7 @@ For each test, the user should provide 2 files, named
     },
     "Experiment Units": {
       "Stress": "MPa",
+      "Loading Rate": "kN/sec",
       "Temperature": "°C",
       "Dimension": "mm",
       "Pressure": "Pa",
