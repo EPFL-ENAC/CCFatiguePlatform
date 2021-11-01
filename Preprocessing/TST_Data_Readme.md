@@ -15,7 +15,7 @@ For each test, the user should provide 2 files, named
 | Machine_Load         | Load measured by the machine                       | [MPa] | double    |  y |
 | Machine_Displacement | Displacement measured by the machine               | [-]   | double    |  y |
 | index            | Image number                                       | [-]   | int       |   |
-| N_cycles         | Number of cycles counted by the camera             | [-]   | int       |  y |
+| Camera\_N_cycles         | Number of cycles counted by the camera             | [-]   | int       |   |
 | exx              | Displacement measured along main axis              | [mm]  | double    |   |
 | eyy              | Displacement measured along secondary axis         | [mm]  | double    |   |
 | exy              | Displacement measured along a specified axis       | [mm]  | double    |   |
