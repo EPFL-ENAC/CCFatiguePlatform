@@ -52,7 +52,7 @@
         "Load spectrum Filepath": "",
       },
       "Fracture information": {
-        "Fracture analysis": 0,
+        "Fracture analysis": true,
         "Fracture mode": "",
         "Initial crack length": 0
       }
