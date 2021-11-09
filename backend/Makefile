@@ -2,4 +2,4 @@ install:
 	pipenv install
 
 run:
-	pipenv run python main.py
+	pipenv run uvicorn ccfatigue.main:app --reload
