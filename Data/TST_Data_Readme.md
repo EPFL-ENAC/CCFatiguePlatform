@@ -7,19 +7,21 @@ Each experiment is composed of several tests.
 └───Experiment folder
 	   │   Metadata file .xls
 	   │   Test data 01 .csv
-	   │   Test data 01 .csv
+	   │   Test data 02 .csv
+	   │   ...
+
 ```
 
 
 ### Directory/file naming conventions
 
 * Experiment folder:  **TST _ {Researcher's lastname}_{Date} _ {Test type}** 
-* Metadata file: **TST_{Date} _ {Test type}.xls** 
+* Metadata file: **TST_{Date} _ {Test type}_metadata.xls** 
 * Test data: **TST _ {Date} _ {Test type} _ {###}.csv** 
 
 with:
 
-* date: YYYY-MM-DD
+* date: YYYY-MM
 * Test type: {FA} = standard fatigue or {QS} = standard quasi-static.
 * \###: Specimen number
 
