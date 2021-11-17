@@ -11,8 +11,12 @@ uvicorn = "*"
 pydantic = "*"
 gunicorn = "*"
 python-multipart = "*"
-pymongo = "*"
 dynaconf = "*"
+databases = "*"
+psycopg2 = "*"
+asyncpg = "*"
+sqlalchemy-utils = "*"
+alembic = "*"
 
 [dev-packages]
 
