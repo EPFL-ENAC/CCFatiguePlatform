@@ -33,13 +33,13 @@ with:
 | Column name          | Description                                        | Unit  | Data type | Mandatory  |
 |----------------------|----------------------------------------------------|-------|-----------|---|
 | Machine\_N_cycles     | Number of cycles counted by the machine            | [-]   | int       | y  |
-| Machine_Load         | Load measured by the machine                       | [MPa] | double    |  y |
-| Machine_Displacement | Displacement measured by the machine               | [-]   | double    |  y |
+| Machine_Load         | Load measured by the machine                       | [kN] | double    |  y |
+| Machine_Displacement | Displacement measured by the machine               | [mm]   | double    |  y |
 | index            | Image number                                       | [-]   | int       |   |
 | Camera\_N_cycles         | Number of cycles counted by the camera             | [-]   | int       |   |
-| exx              | Displacement measured along main axis              | [mm]  | double    |   |
-| eyy              | Displacement measured along secondary axis         | [mm]  | double    |   |
-| exy              | Displacement measured along a specified axis       | [mm]  | double    |   |
+| exx              | Strain measured along main axis              | [-]  | double    |   |
+| eyy              | Strain measured along secondary axis         | [-]  | double    |   |
+| exy              | Strain measured along a specified axis       | [-]  | double    |   |
 | crack_length     | Crack length measurement (for fracture testings)   | [mm]  | double    |   |
 | Th_time              | Time as counted by temperature monitoring          | [sec] | int       |   |
 | Th\_N_cycles          | Number of cycles counted by temperature monitoring | [-]   | int       |   |
