@@ -10,6 +10,7 @@ from ccfatigue import dashboarder
 from ccfatigue.model import (
     Dashboard, Experience, Plot, SnCurveMethod, SnCurveResult, Test)
 from ccfatigue.config import settings
+from ccfatigue.services.database import Base, database, engine
 
 
 app = FastAPI()
@@ -25,6 +26,18 @@ else:
         allow_methods=['*'],
         allow_headers=['*'],
     )
+
+
+Base.metadata.create_all(engine)
+
+@app.on_event("startup")
+async def startup():
+    await database.connect()
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    await database.disconnect()
 
 
 @app.get('/experiences', response_model=List[Experience])

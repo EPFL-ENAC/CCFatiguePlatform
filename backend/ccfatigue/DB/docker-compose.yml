@@ -1,19 +1,12 @@
 version: "3.8"
 services:
-  mongo:
-    image: mongo:5
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/mongo-root
+  database:
+    image: postgres:14-alpine
     ports:
-      - 27017:27017
-    secrets:
-      - mongo-root
+      - "5432:5432"
+    env_file:
+      - ./secrets/database.env
     volumes:
-      - ccfatigue-mongo:/data/db
-secrets:
-  mongo-root:
-    file: ./secrets/mongo-root.txt
+      - database:/var/lib/postgresql/data
 volumes:
-  ccfatigue-mongo:
+  database: {}
