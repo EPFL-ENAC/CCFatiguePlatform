@@ -1,13 +1,4 @@
-# Copy data to localhost
-
-Do it only once
-
-Copy to /data/CCLAB :
-GDrive -> CCLAB - Fatigue Data Platform > FatigueDataPlatform files & data > Data Description > File directory example > CCLAB
-
-
-
-# DB backend (MongoDB)
+# A) DB backend (PostgreSQL)
 
 ## Install
 
@@ -17,21 +8,20 @@ Do it only once
 sudo snap install docker
 ```
 
-## Serve
+## Serve DB
 
 ```bash
-cd DB
+cd ccfatigue/DB
 docker-compose up
 ```
 
 ## Initialize
 
-```bash
-pipenv run python3 ./DB/db_initialize.py
-```
+TODO
 
 
-# Web backend
+
+# B) Web backend
 
 ## Env install
 
@@ -52,12 +42,5 @@ pipenv run python
 Do it each time you open the terminal that will serve
 
 ```bash
-pipenv shell
-export PYTHONPATH=../Fatigue_test_dashboard/:$PYTHONPATH
-```
-
-then simply
-
-```bash
-uvicorn main:app --reload
+make run
 ```
