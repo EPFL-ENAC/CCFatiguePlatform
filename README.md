@@ -20,11 +20,12 @@ See https://github.com/EPFL-ENAC/SB_Sysadmin/tree/enacvm0056
 
 
 # Web app structure
-<img src="flowchart_CCFATIGUE.jpg" style="width: 650px; max-width: 100%; height: auto" title="Click to enlarge picture" />
+<img src="images/flowchart_CCFATIGUE.jpg" style="width: 650px; max-width: 100%; height: auto" title="Click to enlarge picture" />
 
 
 # License
 TBD.
 
-# Authors
-Charlotte Weil, Scott M. Salmon, Samuel Bancal.
+
+# Contributors
+Charlotte Weil, Samuel Bancal, David Tang, Scott M. Salmon, Anastasios Vassilopoulos, Shayan Khalooei
