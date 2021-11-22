@@ -6,8 +6,8 @@ Each experiment is composed of several tests.
 ```
 └───Experiment folder
 	   │   Metadata file .xls
-	   │   Test data 01 .csv
-	   │   Test data 02 .csv
+	   │   Test data 001 .csv
+	   │   Test data 002 .csv
 	   │   ...
 
 ```
@@ -21,7 +21,7 @@ Each experiment is composed of several tests.
 
 with:
 
-* date: YYYY-MM
+* date: YYYY-MM (starting month of the experiment)
 * Test type: {FA} = standard fatigue or {QS} = standard quasi-static.
 * \###: Specimen number
 
@@ -48,4 +48,4 @@ with:
 | Th_chamber           | Temperature of the test environment                | [°C]  | single    |   |
 | Th_uppergrips        | Temperature of the upper grips                     | [°C]  | single    |   |
 | Th_lowergrips        | Temperature of the lower grips                     | [°C]  | single    |   |
-
+| Specimen Name        | Specimen Name                    | [-]  | string    |   |
