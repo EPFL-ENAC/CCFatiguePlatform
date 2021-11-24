@@ -7,9 +7,9 @@ from typing import Any, Dict, List
 import pandas as pd
 from pandas.core.frame import DataFrame
 
-import plotter
-from model import SnCurveMethod, SnCurveResult
-from plotter import DataKey, Line, Plot
+from ccfatigue import plotter
+from ccfatigue.model import SnCurveMethod, SnCurveResult
+from ccfatigue.plotter import DataKey, Line, Plot
 
 ROUND_DECIMAL = 8
 

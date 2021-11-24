@@ -8,8 +8,8 @@ from bokeh import palettes
 from pandas.core.frame import DataFrame
 from pydantic import BaseModel
 
-import plotter
-from plotter import DataKey, Line, Plot
+from ccfatigue import plotter
+from ccfatigue.plotter import DataKey, Line, Plot
 
 DATA_DIRECTORY: str = '../data/'
 
