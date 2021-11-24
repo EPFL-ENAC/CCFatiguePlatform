@@ -12,6 +12,7 @@ pydantic = "*"
 gunicorn = "*"
 python-multipart = "*"
 pymongo = "*"
+dynaconf = "*"
 
 [dev-packages]
 
