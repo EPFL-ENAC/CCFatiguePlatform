@@ -7,22 +7,24 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from ccfatigue import analyzer
 from ccfatigue import dashboarder
-from ccfatigue.model import (Dashboard, Experience, Plot, SnCurveMethod, SnCurveResult,
-                   Test)
+from ccfatigue.model import (
+    Dashboard, Experience, Plot, SnCurveMethod, SnCurveResult, Test)
+from ccfatigue.config import settings
+
 
 app = FastAPI()
 
-allowed_origins = [
-    '*',
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=['*'],
-    allow_headers=['*'],
-)
+if settings.cors_enabled:
+    print('cors enabled')
+else:
+    print('cors disabled')
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=['*'],
+        allow_credentials=True,
+        allow_methods=['*'],
+        allow_headers=['*'],
+    )
 
 
 @app.get('/experiences', response_model=List[Experience])
