@@ -2,13 +2,12 @@ import json
 from datetime import date
 from typing import List
 
-import uvicorn
 from fastapi import FastAPI, File, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
-import analyzer
-import dashboarder
-from model import (Dashboard, Experience, Plot, SnCurveMethod, SnCurveResult,
+from ccfatigue import analyzer
+from ccfatigue import dashboarder
+from ccfatigue.model import (Dashboard, Experience, Plot, SnCurveMethod, SnCurveResult,
                    Test)
 
 app = FastAPI()
@@ -82,7 +81,3 @@ async def run_sn_curve_file(file: UploadFile = File(...),
                             r_ratios: List[float] = Query(..., alias='rRatios')
                             ) -> SnCurveResult:
     return analyzer.run_sn_curve(file.file, methods, r_ratios)
-
-
-if __name__ == '__main__':
-    uvicorn.run('main:app', host='0.0.0.0', port=8000, reload=True)
