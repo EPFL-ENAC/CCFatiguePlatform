@@ -6,7 +6,7 @@
 
     <template v-else> -->
       <experiment-specifications
-        :experience="test.experience"
+        :experiment="test.experiment"
       />
       <v-container>
 
@@ -45,10 +45,10 @@ export default {
     ]),
   },
   created() {
-    // this.$store.dispatch('fetchExperience', {
+    // this.$store.dispatch('fetchExperiment', {
     //   laboratory: 'CCLAB',
     //   researcher: 'Vahid',
-    //   experienceType: 'FA',
+    //   experimentType: 'FA',
     //   date: '2021-04-20',
     //   testNumbers: [2, 5],  // This doesn't make sense ! TODO
     // })

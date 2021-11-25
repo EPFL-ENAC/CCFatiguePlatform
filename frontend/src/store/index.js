@@ -20,7 +20,7 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    fetchExperience(context, payload) {
+    fetchExperiment(context, payload) {
       Axios.get('dashboard', {
         params: payload,
         paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' }),

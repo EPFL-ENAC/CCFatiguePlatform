@@ -35,15 +35,15 @@ class Dashboard(BaseModel):
 def get_dataframe(data_in: str,
                   laboratory: str,
                   researcher: str,
-                  experience_type: str,
+                  experiment_type: str,
                   date: date,
                   test_number: int) -> DataFrame:
     formatted_date = date.isoformat()
-    filename = f'{data_in}_{formatted_date}_{experience_type}_{test_number:03d}.csv'
+    filename = f'{data_in}_{formatted_date}_{experiment_type}_{test_number:03d}.csv'
     filepath = os.path.join(DATA_DIRECTORY,
                             laboratory,
                             researcher,
-                            experience_type,
+                            experiment_type,
                             formatted_date,
                             data_in,
                             filename)
@@ -172,14 +172,14 @@ def get_total_dissipated_energy(hyst_df: DataFrame) -> int:
 
 def generate_dashboard(laboratory: str,
                        researcher: str,
-                       experience_type: str,
+                       experiment_type: str,
                        date: date,
                        test_numbers: List[int]) -> Dashboard:
     colors = list(palettes.Category10_10)[:len(test_numbers)]
-    std_dfs = [get_dataframe('STD', laboratory, researcher, experience_type,
+    std_dfs = [get_dataframe('STD', laboratory, researcher, experiment_type,
                              date, test_number)
                for test_number in test_numbers]
-    hyst_dfs = [get_dataframe('HYS', laboratory, researcher, experience_type,
+    hyst_dfs = [get_dataframe('HYS', laboratory, researcher, experiment_type,
                               date, test_number)
                 for test_number in test_numbers]
     tests = [
@@ -204,7 +204,7 @@ def generate_dashboard(laboratory: str,
 def main():
     dashboard = generate_dashboard(laboratory='CCLAB',
                                    researcher='Vahid',
-                                   experience_type='FA',
+                                   experiment_type='FA',
                                    date=date(year=2021, month=4, day=20),
                                    test_numbers=[2, 5])
     plotter.save_json(dashboard.stress_strain, 'stress_strain.json')

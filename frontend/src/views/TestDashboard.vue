@@ -3,10 +3,10 @@
     <v-skeleton-loader v-if="!dataIsFetched" type="article" />
     <v-card v-else flat>
       <v-card-title>
-        Experiment : {{ test.experience['Experiment Type'] }} test, by {{ test.experience.Researcher }}, {{ test.experience.Laboratory }}, {{ test.experience.Experiment.Date }}
+        Experiment : {{ test.experiment['Experiment Type'] }} test, by {{ test.experiment.Researcher }}, {{ test.experiment.Laboratory }}, {{ test.experiment.Experiment.Date }}
       </v-card-title>
       <v-card-subtitle>
-        <experiment-specifications :experience="test.experience"></experiment-specifications>
+        <experiment-specifications :experiment="test.experiment"></experiment-specifications>
       </v-card-subtitle>
       <v-card-text>
         <v-card>
@@ -31,7 +31,7 @@
                     <v-col cols="6">
                       <v-row>
                         <info-tooltip>
-                          On this graph, we show the evolution of the hysteresis area. This value is defined as the area contained within a hysteresis loop. For visual representation, it represents the area defined by each closed loop on the (stress-strain) plane in graph 1. 
+                          On this graph, we show the evolution of the hysteresis area. This value is defined as the area contained within a hysteresis loop. For visual representation, it represents the area defined by each closed loop on the (stress-strain) plane in graph 1.
                         </info-tooltip>
                         <div :id="id.bokeh.hysteresisArea" class="bokeh"></div>
                       </v-row>
@@ -69,15 +69,15 @@
                         <li>
                           <experiment-s-v
                             subject="Stress at failure"
-                            :values="[test.experience.Experiment['Standard Fatigue']['Stress at Failure']]"
-                            :unit="test.experience['Experiment Units'].Stress"
+                            :values="[test.experiment.Experiment['Standard Fatigue']['Stress at Failure']]"
+                            :unit="test.experiment['Experiment Units'].Stress"
                             tooltip="σ_fail is defined as the stress level that induced failure from the tested specimen and is measured in [MPa]"
                           />
                         </li>
                         <li>
                           <experiment-s-v
                             subject="Strain at failure"
-                            :values="[test.experience.Experiment['Standard Fatigue']['Strain at Failure']]"
+                            :values="[test.experiment.Experiment['Standard Fatigue']['Strain at Failure']]"
                             unit="%"
                             tooltip="ε_fail is defined as the deformation at the time of failure and is measured in [%]"
                           />
@@ -85,7 +85,7 @@
                         <li>
                           <experiment-s-v
                             subject="N_cycles"
-                            :values="[test.experience.Experiment['Standard Fatigue']['Number of Cycles to Failure']]"
+                            :values="[test.experiment.Experiment['Standard Fatigue']['Number of Cycles to Failure']]"
                             valueType="bigNumber"
                             tooltip="defined as the number of cycles to failure [-]"
                           />
@@ -93,7 +93,7 @@
                         <li>
                           <experiment-s-v
                             subject="R"
-                            :values="[test.experience.Experiment['Standard Fatigue']['Stress Ratio']]"
+                            :values="[test.experiment.Experiment['Standard Fatigue']['Stress Ratio']]"
                             tooltip="defined as the stress ratio (σ_min/σ_max) [-] and has relevance in the context of constant amplitude experiments."
                           />
                         </li>
@@ -154,10 +154,10 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('fetchExperience', {
+    this.$store.dispatch('fetchExperiment', {
       laboratory: 'CCLAB',
       researcher: 'Vahid',
-      experienceType: 'FA',
+      experimentType: 'FA',
       date: '2021-04-20',
       testNumbers: [2, 5],
     });
