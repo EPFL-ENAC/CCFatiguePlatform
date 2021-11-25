@@ -2,13 +2,13 @@
     "Experiment": {
         "General": {
             "Laboratory": "CCLAB",
-            "Researcher": "Shayan Khalooei",
-            "Date": "2021-06",
-            "Experiment Type": "FA",
+            "Researcher": "AAA FakeResearcher",
+            "Date": "2019-09",
+            "Experiment Type": "QS",
             "Fracture": false,
             "Fracture Mode": null,
             "Initial Crack length": null,
-            "Fatigue Test Type": "CA",
+            "Fatigue Test Type": null,
             "Measuring Equipment": "Instron Machine",
             "Reliability Level": null,
             "Control mode": "Load Controlled"
