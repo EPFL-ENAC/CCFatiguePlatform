@@ -1,8 +1,8 @@
 """initial inject data to DB
 
-Revision ID: e8da76ec51b8
-Revises: 14c4bbf64e6c
-Create Date: 2021-11-12 15:54:13.438864
+Revision ID: ea8898a5d8e7
+Revises: c88178579df5
+Create Date: 2021-11-25 15:20:50.589997
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ from sqlalchemy import MetaData, Table
 
 
 # revision identifiers, used by Alembic.
-revision = 'e8da76ec51b8'
-down_revision = '14c4bbf64e6c'
+revision = 'ea8898a5d8e7'
+down_revision = 'c88178579df5'
 branch_labels = None
 depends_on = None
 
@@ -22,12 +22,12 @@ def upgrade():
 
     # pass in tuple with tables we want to reflect,
     # otherwise whole database will get reflected
-    meta.reflect(only=('experience', 'test',))
+    meta.reflect(only=('experiment', 'test',))
 
-    # inject into experience table
-    experience = Table('experience', meta)
+    # inject into experiment table
+    experiment = Table('experiment', meta)
     op.bulk_insert(
-        experience,
+        experiment,
         [
             {
                 'laboratory': 'CCLAB',
@@ -38,6 +38,7 @@ def upgrade():
                 'geometry_length': 250,
                 'geometry_width': 25,
                 'geometry_thickness': 2.25,
+                'images_repository': None,
                 'laminates_and_assemblies_curing_time': 8,
                 'laminates_and_assemblies_curing_temperature': 70,
                 'laminates_and_assemblies_curing_pressure': None,
@@ -47,13 +48,14 @@ def upgrade():
         ]
     )
 
+
     # inject into test table
     test = Table('test', meta)
     op.bulk_insert(
         test,
         [
             {
-                'experience_id': 1,
+                'experiment_id': 1,
                 'specimen_number': '002',
                 'number_of_cycles_to_failure': 1198627,
             },

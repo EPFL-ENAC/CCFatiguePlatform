@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from ccfatigue import analyzer
 from ccfatigue import dashboarder
 from ccfatigue.model import (
-    Dashboard, Experience, Plot, SnCurveMethod, SnCurveResult, Test)
+    Dashboard, Experiment, Plot, SnCurveMethod, SnCurveResult, Test)
 from ccfatigue.config import settings
 from ccfatigue.services.database import Base, database, engine
 
@@ -40,8 +40,8 @@ async def shutdown():
     await database.disconnect()
 
 
-@app.get('/experiences', response_model=List[Experience])
-async def get_experiences() -> List[Experience]:
+@app.get('/experiments', response_model=List[Experiment])
+async def get_experiments() -> List[Experiment]:
     return []
 
 
@@ -49,29 +49,29 @@ async def get_experiences() -> List[Experience]:
 async def get_dashboard(
         laboratory: str,
         researcher: str,
-        experience_type: str = Query(..., alias='experienceType'),
+        experiment_type: str = Query(..., alias='experimentType'),
         date: date = Query(...),
         test_numbers: List[int] = Query(...,
                                         alias='testNumbers', ge=0, lt=1000)
 ) -> Dashboard:
-    experience_source_file = '../Preprocessing/vahid_CA_skel.json'
-    with open(experience_source_file) as f:
-        experience_data = json.load(f)
+    experiment_source_file = '../Preprocessing/vahid_CA_skel.json'
+    with open(experiment_source_file) as f:
+        experiment_data = json.load(f)
 
     # TODO
     # Add Strain at failure from HYS*.csv on the fly
     # Scott prepares this in Fatigue_test_dashboard/Hysteresis_loops.py
     # strain_at_failure()
     strain_at_failure = 1.17
-    (experience_data['Experiment']
+    (experiment_data['Experiment']
         ['Standard Fatigue']
         ['Strain at Failure']) = strain_at_failure
 
     dashboard = dashboarder.generate_dashboard(
-        laboratory, researcher, experience_type, date, test_numbers)
+        laboratory, researcher, experiment_type, date, test_numbers)
 
     return Dashboard(
-        experience=experience_data,
+        experiment=experiment_data,
         tests=[
             Test(
                 number=test.number,

@@ -5,7 +5,7 @@ from typing import Any, Dict, List
 from pydantic import BaseModel
 
 
-class Experience(BaseModel):
+class Experiment(BaseModel):
     id: str
     laboratory: str
     researcher: str
@@ -28,7 +28,7 @@ class Plot(BaseModel):
 
 
 class Dashboard(BaseModel):
-    experience: Any
+    experiment: Any
     tests: List[Test]
     plot: Plot
 

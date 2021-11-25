@@ -2,7 +2,7 @@
 
 import os
 import json
-from ccfatigue.models.database import Experience, Test
+from ccfatigue.models.database import Experiment, Test
 from ccfatigue.services.database import engine
 from sqlalchemy.orm import sessionmaker
 
@@ -30,7 +30,7 @@ if __name__ == '__main__':
         number_of_cycles_to_failure=data['Test']['Number of Cycles to Failure']
     )
 
-    experiment = Experience(
+    experiment = Experiment(
         laboratory=data['Experiment']['Laboratory'],
         researcher=data['Experiment']['Researcher'],
         experiment_type=data['Experiment']['Experiment Type'],
