@@ -15,10 +15,11 @@ cd ccfatigue/DB
 docker-compose up
 ```
 
-## Initialize
+## Create schema + initialize DB
 
-TODO
-
+```bash
+pipenv run alembic upgrade head
+```
 
 
 # B) Web backend
