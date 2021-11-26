@@ -1,21 +1,128 @@
 <template>
   <v-container>
-    <v-card elevation="0">
-      <v-card-title> Search Experiments Database </v-card-title>
-      <v-data-table :headers="headers" :items="experiments"> </v-data-table>
-    </v-card>
-
-    <v-container>
-      <v-row justify="center">
-        <v-btn class="ma-2">Download raw files</v-btn>
-        <v-btn class="ma-2" :to="{ name: 'TestSelection' }">
-          View tests results
-        </v-btn>
-        <v-btn class="ma-2" :to="{ name: 'CCFatigueAnalysis' }">
-          Analyse experiment
-        </v-btn>
+    <v-card flat>
+      <v-card-title>Search Experiments Database</v-card-title>
+      <v-row>
+        <v-col>
+          <v-card flat>
+            <v-card-title>Experiment type</v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col>
+                  <v-checkbox
+                    v-model="filters.typeFA"
+                    label="FA"
+                    hide-details
+                  />
+                </v-col>
+                <v-col>
+                  <v-checkbox
+                    v-model="filters.typeQS"
+                    label="QS"
+                    hide-details
+                  />
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col>
+                  <v-checkbox
+                    v-model="filters.withFracture"
+                    label="with fracture"
+                    hide-details
+                  />
+                </v-col>
+                <v-col>
+                  <v-checkbox
+                    v-model="filters.withoutFracture"
+                    label="without fracture"
+                    hide-details
+                  />
+                </v-col>
+              </v-row>
+              <v-row v-if="filters.withFracture">
+                <v-col>
+                  <v-overflow-btn
+                    v-model="filters.fractureMode"
+                    :items="possibleValues.fractureModes"
+                    label="fracture mode"
+                    hide-details
+                    dense
+                  >
+                  </v-overflow-btn>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+          <v-card flat>
+            <v-card-title>Material type</v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col>
+                  <v-overflow-btn
+                    v-model="filters.resin"
+                    :items="possibleValues.resins"
+                    hide-details
+                    dense
+                  >
+                  </v-overflow-btn>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col>
+                  <v-overflow-btn
+                    v-model="filters.fiberMaterial"
+                    :items="possibleValues.fiberMaterials"
+                    hide-details
+                    dense
+                  >
+                  </v-overflow-btn>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+          <v-card flat>
+            <v-card-title>Laminates &amp; Assemblies</v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col>
+                  <v-overflow-btn
+                    v-model="filters.stackingSequence"
+                    :items="possibleValues.stackingSequences"
+                    hide-details
+                    dense
+                  >
+                  </v-overflow-btn>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+          <v-card flat>
+            <v-card-title>Loading information</v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col>
+                  todo
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <v-col cols="8">
+          <v-data-table :headers="headers" :items="experiments"> </v-data-table>
+          <v-container>
+            <v-row justify="center">
+              <v-btn class="ma-2">Download raw files</v-btn>
+              <v-btn class="ma-2" :to="{ name: 'TestSelection' }"
+                >View tests results</v-btn
+              >
+              <v-btn class="ma-2" :to="{ name: 'CCFatigueAnalysis' }"
+                >Analyse experiment</v-btn
+              >
+            </v-row>
+          </v-container>
+        </v-col>
       </v-row>
-    </v-container>
+    </v-card>
   </v-container>
 </template>
 
@@ -24,6 +131,28 @@ export default {
   name: "SearchDatabase",
   data() {
     return {
+      filters: {
+        typeFA: true,
+        typeQS: true,
+        withFracture: true,
+        withoutFracture: true,
+        fractureMode: "All modes",
+        resin: "All resins",
+        fiberMaterial: "All materials",
+        stackingSequence: "All stacking sequences",
+      },
+      possibleValues: {
+        fractureModes: [
+          "All modes",
+          "Mode I",
+          "Mode II",
+          "Mode III",
+          "Combined",
+        ],
+        resins: ["All resins", "Biresin\u00ae CR83"],
+        fiberMaterials: ["All materials", "E-glass fiber fabrics (EC 9-68)"],
+        stackingSequences: ["All stacking sequences", "[+-45]2s"],
+      },
       headers: [
         { text: "Laboratory", value: "General.Laboratory" },
         { text: "Experiment Type", value: "General.Experiment Type" },
