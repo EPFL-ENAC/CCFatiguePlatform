@@ -5,44 +5,40 @@
       type="paragraph" />
 
     <template v-else> -->
-      <experiment-specifications
-        :experiment="test.experiment"
-      />
-      <v-container>
+    <experiment-specifications :experiment="test.experiment" />
+    <v-container>
+      <v-card elevation="0">
+        <v-card-title> Test selection </v-card-title>
+        <v-img
+          src="/img/test_selection_capture1.png"
+          alt="Test selection section"
+        />
 
-        <v-card elevation="0">
-          <v-card-title>
-            Test selection
-          </v-card-title>
-          <v-img src="/img/test_selection_capture1.png" alt="Test selection section" />
-
-          <v-container>
-            <v-row justify="end">
-              <v-btn class="ma-2" :to="{name: 'TestDashboard'}">View tests</v-btn>
-            </v-row>
-          </v-container>
-        </v-card>
-      </v-container>
+        <v-container>
+          <v-row justify="end">
+            <v-btn class="ma-2" :to="{ name: 'TestDashboard' }"
+              >View tests</v-btn
+            >
+          </v-row>
+        </v-container>
+      </v-card>
+    </v-container>
     <!-- </template> -->
   </div>
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
-import ExperimentSpecifications from '@/components/ExperimentSpecifications.vue'
+import { mapState, mapGetters } from "vuex";
+import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
 
 export default {
-  name: 'TestSelection',
+  name: "TestSelection",
   components: {
     ExperimentSpecifications,
   },
   computed: {
-    ...mapState([
-      'test',
-    ]),
-    ...mapGetters([
-      'dataIsFetched',
-    ]),
+    ...mapState(["test"]),
+    ...mapGetters(["dataIsFetched"]),
   },
   created() {
     // this.$store.dispatch('fetchExperiment', {
@@ -53,8 +49,7 @@ export default {
     //   testNumbers: [2, 5],  // This doesn't make sense ! TODO
     // })
   },
-}
+};
 </script>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>

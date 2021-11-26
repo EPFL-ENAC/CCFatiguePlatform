@@ -4,15 +4,21 @@
 
     <span v-for="(value, valueIndex) in values" :key="valueIndex">
       <span :style="getStyle(valueIndex)">
-        <span v-if="valueType==='string'" class="value">
-          {{ value }}<template v-if="! isNaN(value) && unit !== ''" >{{ unit }}</template>
+        <span v-if="valueType === 'string'" class="value">
+          {{ value }}
+          <template v-if="!isNaN(value) && unit !== ''"> {{ unit }} </template>
         </span>
 
-        <span v-else-if="valueType==='bigNumber'" class="value">
-          {{ value | numFormat('0,0') }}<template v-if="! isNaN(value) && unit !== ''" >{{ unit }}</template>
+        <span v-else-if="valueType === 'bigNumber'" class="value">
+          {{ value | numFormat("0,0") }}
+          <template v-if="!isNaN(value) && unit !== ''"> {{ unit }} </template>
         </span>
 
-        <span v-else-if="valueType==='PublicationsLinks'" v-for="(pub, index) in value" :key="index">
+        <span
+          v-else-if="valueType === 'PublicationsLinks'"
+          v-for="(pub, index) in value"
+          :key="index"
+        >
           <a :href="pub.DOI" target="_blank">{{ pub.Title }}</a>
           <span v-if="index != value.length - 1">, </span>
         </span>
@@ -24,20 +30,20 @@
 </template>
 
 <script>
-import InfoTooltip from './InfoTooltip.vue'
+import InfoTooltip from "./InfoTooltip.vue";
 export default {
   components: { InfoTooltip },
-  name: 'ExperimentSV',
+  name: "ExperimentSV",
   props: {
     subject: String,
     values: Array,
     valueType: {
       type: String,
-      default: 'string',
+      default: "string",
     },
     unit: {
       type: String,
-      default: '',
+      default: "",
     },
     colors: Array,
     tooltip: String,
@@ -46,14 +52,14 @@ export default {
     getStyle(i) {
       if (this.colors) {
         return {
-          color: this.colors[i]
-        }
+          color: this.colors[i],
+        };
       } else {
-        return {}
+        return {};
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped lang="scss">

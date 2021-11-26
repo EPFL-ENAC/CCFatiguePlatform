@@ -6,9 +6,8 @@
 
 <script>
 export default {
-  name: 'DataUpload',
-}
+  name: "DataUpload",
+};
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

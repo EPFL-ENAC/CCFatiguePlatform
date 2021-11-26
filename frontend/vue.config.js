@@ -1,10 +1,8 @@
 module.exports = {
   configureWebpack: {
     externals: {
-      bokeh: 'Bokeh'
-    }
+      bokeh: "Bokeh",
+    },
   },
-  transpileDependencies: [
-    'vuetify'
-  ]
-}
+  transpileDependencies: ["vuetify"],
+};

@@ -1,39 +1,25 @@
 <template>
   <v-app>
     <v-app-bar app color="primary" dense dark>
-      <v-tabs
-        align-with-title
-        fixed-tabs
-      >
-        
-        <v-tab
-          :to="{name: 'Home'}" exact
-        >
+      <v-tabs align-with-title fixed-tabs>
+        <v-tab :to="{ name: 'Home' }" exact>
           <v-icon>mdi-home</v-icon>
         </v-tab>
-        
-        <v-tab
-          :to="{name: 'FatigueDatabase'}"
-        >
+
+        <v-tab :to="{ name: 'FatigueDatabase' }">
           <v-menu offset-y open-on-hover>
             <template v-slot:activator="{ on }">
-              <v-btn
-                color="primary"
-                v-on="on"
-                elevation="0"
-              >
+              <v-btn color="primary" v-on="on" elevation="0">
                 Fatigue database
               </v-btn>
             </template>
-            <v-list
-              color="primary"
-            >
+            <v-list color="primary">
               <v-list-item>
                 <v-list-item-title>
                   <v-btn
                     color="primary"
                     elevation="0"
-                    :to="{name: 'SearchDatabase'}"
+                    :to="{ name: 'SearchDatabase' }"
                   >
                     Search database
                   </v-btn>
@@ -44,7 +30,7 @@
                   <v-btn
                     color="primary"
                     elevation="0"
-                    :to="{name: 'DataUpload'}"
+                    :to="{ name: 'DataUpload' }"
                   >
                     Data upload
                   </v-btn>
@@ -54,32 +40,26 @@
           </v-menu>
         </v-tab>
 
-
-        <v-tab
-          :to="{name: 'CCFatigueAnalysis'}" exact
-        >
+        <v-tab :to="{ name: 'CCFatigueAnalysis' }" exact>
           CCFatigue analysis
         </v-tab>
-        
-        <v-tab
-          :to="{name: 'About'}" exact
-        >
+
+        <v-tab :to="{ name: 'About' }" exact>
           <v-icon>mdi-information</v-icon>
         </v-tab>
       </v-tabs>
     </v-app-bar>
 
     <v-main>
-      <router-view/>
+      <router-view />
     </v-main>
   </v-app>
 </template>
 
 <script>
 export default {
-  name: 'App',
-}
+  name: "App",
+};
 </script>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>
