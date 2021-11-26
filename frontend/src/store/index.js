@@ -1,9 +1,9 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import Axios from 'axios'
-import qs from 'qs'
+import Vue from "vue";
+import Vuex from "vuex";
+import Axios from "axios";
+import qs from "qs";
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
@@ -11,26 +11,26 @@ export default new Vuex.Store({
   },
   getters: {
     dataIsFetched(state) {
-      return Object.keys(state.test).length > 0
-    }
+      return Object.keys(state.test).length > 0;
+    },
   },
   mutations: {
     saveTest(state, test) {
-      state.test = { ...test }
-    }
+      state.test = { ...test };
+    },
   },
   actions: {
     fetchExperiment(context, payload) {
-      Axios.get('dashboard', {
+      Axios.get("dashboard", {
         params: payload,
-        paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' }),
+        paramsSerializer: (params) =>
+          qs.stringify(params, { arrayFormat: "repeat" }),
       })
-      .then((res) => {
-        context.commit('saveTest', res.data)
-      })
-      .catch(err => console.log(err))
-    }
+        .then((res) => {
+          context.commit("saveTest", res.data);
+        })
+        .catch((err) => console.log(err));
+    },
   },
-  modules: {
-  }
-})
+  modules: {},
+});

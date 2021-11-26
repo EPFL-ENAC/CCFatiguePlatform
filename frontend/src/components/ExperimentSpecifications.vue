@@ -6,7 +6,8 @@
         <template v-slot:title>
           Experiment specifications metadata info
         </template>
-        The metadata are the set of information that define all the test parameters, they also allow us to uniquely define each test.
+        The metadata are the set of information that define all the test
+        parameters, they also allow us to uniquely define each test.
       </info-button>
     </v-card-title>
     <v-card-text>
@@ -42,14 +43,18 @@
             <li>
               <experiment-s-v
                 subject="Relative humidity"
-                :values="[experiment.Experiment['Test Conditions']['Relative Humidity']]"
+                :values="[
+                  experiment.Experiment['Test Conditions']['Relative Humidity'],
+                ]"
                 unit="%"
               />
             </li>
             <li>
               <experiment-s-v
                 subject="Grip pressure"
-                :values="[experiment.Experiment['Test Conditions']['Grip Pressure']]"
+                :values="[
+                  experiment.Experiment['Test Conditions']['Grip Pressure'],
+                ]"
                 :unit="experiment['Experiment Units'].Pressure"
               />
             </li>
@@ -67,34 +72,54 @@
             <li>
               <experiment-s-v
                 subject="Curing time"
-                :values="[experiment.Experiment['Laminates and Assemblies']['Curing Time']]"
+                :values="[
+                  experiment.Experiment['Laminates and Assemblies'][
+                    'Curing Time'
+                  ],
+                ]"
                 :unit="experiment['Experiment Units'].Time"
               />
             </li>
             <li>
               <experiment-s-v
                 subject="Curing temperature"
-                :values="[experiment.Experiment['Laminates and Assemblies']['Curing Temperature']]"
+                :values="[
+                  experiment.Experiment['Laminates and Assemblies'][
+                    'Curing Temperature'
+                  ],
+                ]"
                 :unit="experiment['Experiment Units'].Temperature"
               />
             </li>
             <li>
               <experiment-s-v
                 subject="Curing Pressure"
-                :values="[experiment.Experiment['Laminates and Assemblies']['Curing Pressure']]"
+                :values="[
+                  experiment.Experiment['Laminates and Assemblies'][
+                    'Curing Pressure'
+                  ],
+                ]"
                 :unit="experiment['Experiment Units'].Pressure"
               />
             </li>
             <li>
               <experiment-s-v
                 subject="Stacking sequence"
-                :values="[experiment.Experiment['Laminates and Assemblies']['Stacking Sequence']]"
+                :values="[
+                  experiment.Experiment['Laminates and Assemblies'][
+                    'Stacking Sequence'
+                  ],
+                ]"
               />
             </li>
             <li>
               <experiment-s-v
                 subject="Fiber content"
-                :values="[experiment.Experiment['Laminates and Assemblies']['Fiber Content']]"
+                :values="[
+                  experiment.Experiment['Laminates and Assemblies'][
+                    'Fiber Content'
+                  ],
+                ]"
               />
             </li>
           </ul>
@@ -117,25 +142,39 @@
             <li>
               <experiment-s-v
                 subject="Mixing ration"
-                :values="[experiment.Experiment['Material Type']['Mixing ratio']]"
+                :values="[
+                  experiment.Experiment['Material Type']['Mixing ratio'],
+                ]"
               />
             </li>
             <li>
               <experiment-s-v
                 subject="Fiber Material"
-                :values="[experiment.Experiment['Constituent Materials']['Fiber Material']]"
+                :values="[
+                  experiment.Experiment['Constituent Materials'][
+                    'Fiber Material'
+                  ],
+                ]"
               />
             </li>
             <li>
               <experiment-s-v
                 subject="Fiber Geometry"
-                :values="[experiment.Experiment['Constituent Materials']['Fiber Geometry']]"
+                :values="[
+                  experiment.Experiment['Constituent Materials'][
+                    'Fiber Geometry'
+                  ],
+                ]"
               />
             </li>
             <li>
               <experiment-s-v
                 subject="Area Density"
-                :values="[experiment.Experiment['Constituent Materials']['Area Density']]"
+                :values="[
+                  experiment.Experiment['Constituent Materials'][
+                    'Area Density'
+                  ],
+                ]"
               />
             </li>
           </ul>
@@ -146,20 +185,19 @@
 </template>
 
 <script>
-import InfoButton from '@/components/InfoButton'
-import ExperimentSV from '@/components/ExperimentSV'
+import InfoButton from "@/components/InfoButton";
+import ExperimentSV from "@/components/ExperimentSV";
 
 export default {
-  name: 'ExperimentSpecifications',
+  name: "ExperimentSpecifications",
   props: {
     experiment: Object,
   },
   components: {
     InfoButton,
     ExperimentSV,
-  }
-}
+  },
+};
 </script>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>
