@@ -6,7 +6,7 @@
       </v-btn>
     </template>
     <span>
-      <slot></slot>
+      <slot> </slot>
     </span>
   </v-tooltip>
 </template>
