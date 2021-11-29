@@ -109,7 +109,7 @@
           <v-data-table
             v-model="experimentSelected"
             :headers="headers"
-            :items="experiments"
+            :items="visibleExperiments"
             item-key="id"
             show-select
             single-select
@@ -146,18 +146,6 @@ export default {
         resin: "All resins",
         fiberMaterial: "All materials",
         stackingSequence: "All stacking sequences",
-      },
-      possibleValues: {
-        fractureModes: [
-          "All modes",
-          "Mode I",
-          "Mode II",
-          "Mode III",
-          "Combined",
-        ],
-        resins: ["All resins", "Biresin\u00ae CR83"],
-        fiberMaterials: ["All materials", "E-glass fiber fabrics (EC 9-68)"],
-        stackingSequences: ["All stacking sequences", "[+-45]2s"],
       },
       headers: [
         { text: "Laboratory", value: "General.Laboratory" },
@@ -263,7 +251,7 @@ export default {
             "Fiber Material": "E-glass fiber fabrics (EC 9-68)",
             "Fiber Geometry": null,
             "Area Density": 425,
-            Resin: "Biresin\u00ae CR83",
+            Resin: "Tripleresin\u00ae CR58",
             Hardener: "Sika CH83-2",
             "Mixing ratio": "10:3",
           },
@@ -314,7 +302,7 @@ export default {
             "Fiber Material": "E-glass fiber fabrics (EC 9-68)",
             "Fiber Geometry": null,
             "Area Density": 425,
-            Resin: "Biresin\u00ae CR83",
+            Resin: "Tripleresin\u00ae CR58",
             Hardener: "Sika CH83-2",
             "Mixing ratio": "10:3",
           },
@@ -325,7 +313,7 @@ export default {
           },
           "Laminates and Assemblies": {
             "Curing Time": 8,
-            "Curing Temperature": 22,
+            "Curing Temperature": 26,
             "Curing Pressure": 0.95,
             "Fiber Content": 0.65,
             "Stacking Sequence": "[+-45]2s",
@@ -379,7 +367,7 @@ export default {
             "Curing Temperature": 22,
             "Curing Pressure": 0.95,
             "Fiber Content": 0.65,
-            "Stacking Sequence": "[+-45]2s",
+            "Stacking Sequence": "[+-90]2s",
           },
           "Test condtions": {
             Temperature: 22,
@@ -393,6 +381,79 @@ export default {
       ],
       experimentSelected: [],
     };
+  },
+  computed: {
+    possibleValues() {
+      let fractureModes = [
+        "All modes",
+        "Mode I",
+        "Mode II",
+        "Mode III",
+        "Combined",
+      ];
+      let resins = ["All resins"];
+      let fiberMaterials = ["All materials"];
+      let stackingSequences = ["All stacking sequences"];
+      this.experiments.forEach((exp) => {
+        let addIfNotExist = (array, item) => {
+          if (array.indexOf(item) === -1) {
+            array.push(item);
+          }
+        };
+        addIfNotExist(resins, exp["Material Type"].Resin);
+        addIfNotExist(fiberMaterials, exp["Material Type"]["Fiber Material"]);
+        addIfNotExist(
+          stackingSequences,
+          exp["Laminates and Assemblies"]["Stacking Sequence"]
+        );
+      });
+      return {
+        fractureModes,
+        resins,
+        fiberMaterials,
+        stackingSequences,
+      };
+    },
+    visibleExperiments() {
+      return this.experiments
+        .filter((exp) => {
+          return (
+            (this.filters.typeFA && exp.General["Experiment Type"] == "FA") ||
+            (this.filters.typeQS && exp.General["Experiment Type"] == "QS")
+          );
+        })
+        .filter((exp) => {
+          return (
+            (this.filters.withFracture && exp.General.Fracture) ||
+            (this.filters.withoutFracture && !exp.General.Fracture)
+          );
+        })
+        .filter((exp) => {
+          return (
+            this.filters.fractureMode == "All modes" ||
+            exp.General["Fracture Mode"] == this.filters.fractureMode
+          );
+        })
+        .filter((exp) => {
+          return (
+            this.filters.resin == "All resins" ||
+            exp["Material Type"].Resin == this.filters.resin
+          );
+        })
+        .filter((exp) => {
+          return (
+            this.filters.fiberMaterial == "All materials" ||
+            exp["Material Type"]["Fiber Material"] == this.filters.fiberMaterial
+          );
+        })
+        .filter((exp) => {
+          return (
+            this.filters.stackingSequence == "All stacking sequences" ||
+            exp["Laminates and Assemblies"]["Stacking Sequence"] ==
+              this.filters.stackingSequence
+          );
+        });
+    },
   },
 };
 </script>
