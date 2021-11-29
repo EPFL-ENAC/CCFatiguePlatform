@@ -8,15 +8,14 @@
         {{ test.experiment.Experiment.Date }}
       </v-card-title>
       <v-card-subtitle>
-        <experiment-specifications
-          :experiment="test.experiment"
-        ></experiment-specifications>
+        <experiment-specifications :experiment="test.experiment">
+        </experiment-specifications>
       </v-card-subtitle>
       <v-card-text>
         <v-card>
           <v-card-title>
             Test results
-            <v-spacer></v-spacer>
+            <v-spacer> </v-spacer>
             <v-btn :to="{ name: 'TestSelection' }">Add test(s)</v-btn>
           </v-card-title>
           <v-card-text>
