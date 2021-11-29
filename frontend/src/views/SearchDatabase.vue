@@ -100,15 +100,21 @@
             <v-card-title>Loading information</v-card-title>
             <v-card-text>
               <v-row>
-                <v-col>
-                  todo
-                </v-col>
+                <v-col> todo </v-col>
               </v-row>
             </v-card-text>
           </v-card>
         </v-col>
         <v-col cols="8">
-          <v-data-table :headers="headers" :items="experiments"> </v-data-table>
+          <v-data-table
+            v-model="experimentSelected"
+            :headers="headers"
+            :items="experiments"
+            item-key="id"
+            show-select
+            single-select
+          >
+          </v-data-table>
           <v-container>
             <v-row justify="center">
               <v-btn class="ma-2">Download raw files</v-btn>
@@ -181,6 +187,7 @@ export default {
       ],
       experiments: [
         {
+          id: 0,
           General: {
             Laboratory: "CCLAB",
             Researcher: "AAA FakeResearcher",
@@ -231,6 +238,7 @@ export default {
           },
         },
         {
+          id: 1,
           General: {
             Laboratory: "CCLAB",
             Researcher: "Shayan Khalooei",
@@ -281,6 +289,7 @@ export default {
           },
         },
         {
+          id: 2,
           General: {
             Laboratory: "CCLAB",
             Researcher: "Shayan Khalooei",
@@ -331,6 +340,7 @@ export default {
           },
         },
         {
+          id: 3,
           General: {
             Laboratory: "CCLAB",
             Researcher: "Shayan Khalooei",
@@ -381,6 +391,7 @@ export default {
           },
         },
       ],
+      experimentSelected: [],
     };
   },
 };
