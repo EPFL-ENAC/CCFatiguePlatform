@@ -97,10 +97,17 @@
             </v-card-text>
           </v-card>
           <v-card flat>
-            <v-card-title>Loading information</v-card-title>
+            <v-card-title>Filter by text</v-card-title>
             <v-card-text>
               <v-row>
-                <v-col> todo </v-col>
+                <v-col>
+                  <v-text-field
+                    v-model="filters.textSearch"
+                    placeholder="search"
+                    dense
+                  >
+                  </v-text-field>
+                </v-col>
               </v-row>
             </v-card-text>
           </v-card>
@@ -146,6 +153,7 @@ export default {
         resin: "All resins",
         fiberMaterial: "All materials",
         stackingSequence: "All stacking sequences",
+        textSearch: "",
       },
       headers: [
         { text: "Laboratory", value: "General.Laboratory" },
@@ -256,7 +264,7 @@ export default {
             "Mixing ratio": "10:3",
           },
           Geometry: {
-            Length: 160,
+            Length: 200,
             Width: 25.1,
             Thickness: 2.85,
           },
@@ -363,7 +371,7 @@ export default {
             Thickness: 2.85,
           },
           "Laminates and Assemblies": {
-            "Curing Time": 8,
+            "Curing Time": 10,
             "Curing Temperature": 22,
             "Curing Pressure": 0.95,
             "Fiber Content": 0.65,
@@ -451,6 +459,42 @@ export default {
             this.filters.stackingSequence == "All stacking sequences" ||
             exp["Laminates and Assemblies"]["Stacking Sequence"] ==
               this.filters.stackingSequence
+          );
+        })
+        .filter((exp) => {
+          let textSearch = this.filters.textSearch.toUpperCase();
+          return (
+            this.filters.textSearch == "" ||
+            exp.General.Laboratory.toUpperCase().includes(textSearch) ||
+            exp.General["Experiment Type"].toUpperCase().includes(textSearch) ||
+            exp.Geometry.Length.toString().toUpperCase().includes(textSearch) ||
+            exp.Geometry.Width.toString().toUpperCase().includes(textSearch) ||
+            exp.Geometry.Thickness.toString()
+              .toUpperCase()
+              .includes(textSearch) ||
+            exp["Laminates and Assemblies"]["Curing Time"]
+              .toString()
+              .toUpperCase()
+              .includes(textSearch) ||
+            exp["Laminates and Assemblies"]["Curing Temperature"]
+              .toString()
+              .toUpperCase()
+              .includes(textSearch) ||
+            exp["Laminates and Assemblies"]["Curing Pressure"]
+              .toString()
+              .toUpperCase()
+              .includes(textSearch) ||
+            exp["Laminates and Assemblies"]["Fiber Content"]
+              .toString()
+              .toUpperCase()
+              .includes(textSearch) ||
+            exp["Laminates and Assemblies"]["Stacking Sequence"]
+              .toUpperCase()
+              .includes(textSearch) ||
+            exp["Laminates and Assemblies"]["Curing Time"]
+              .toString()
+              .toUpperCase()
+              .includes(textSearch)
           );
         });
     },
