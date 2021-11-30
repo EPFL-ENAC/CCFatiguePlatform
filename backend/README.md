@@ -32,6 +32,12 @@ docker-compose up
 ## Create schema + initialize DB with alembic
 
 ```bash
+make init-db
+```
+
+or only create/update schema in DB :
+
+```bash
 make alembic-upgrade
 ```
 
