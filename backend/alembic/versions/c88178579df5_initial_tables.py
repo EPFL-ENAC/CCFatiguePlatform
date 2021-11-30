@@ -30,11 +30,16 @@ def upgrade():
         sa.Column('geometry_width', sa.Integer(), nullable=True),
         sa.Column('geometry_thickness', sa.Integer(), nullable=True),
         sa.Column('images_repository', sa.String(), nullable=True),
-        sa.Column('laminates_and_assemblies_curing_time', sa.Integer(), nullable=True),
-        sa.Column('laminates_and_assemblies_curing_temperature', sa.Integer(), nullable=True),
-        sa.Column('laminates_and_assemblies_curing_pressure', sa.Integer(), nullable=True),
-        sa.Column('laminates_and_assemblies_fiber_content', sa.Integer(), nullable=True),
-        sa.Column('laminates_and_assemblies_stacking_sequence', sa.String(), nullable=True),
+        sa.Column('laminates_and_assemblies_curing_time',
+                  sa.Integer(), nullable=True),
+        sa.Column('laminates_and_assemblies_curing_temperature',
+                  sa.Integer(), nullable=True),
+        sa.Column('laminates_and_assemblies_curing_pressure',
+                  sa.Integer(), nullable=True),
+        sa.Column('laminates_and_assemblies_fiber_content',
+                  sa.Integer(), nullable=True),
+        sa.Column('laminates_and_assemblies_stacking_sequence',
+                  sa.String(), nullable=True),
         sa.PrimaryKeyConstraint('id')
     )
     op.create_table(
