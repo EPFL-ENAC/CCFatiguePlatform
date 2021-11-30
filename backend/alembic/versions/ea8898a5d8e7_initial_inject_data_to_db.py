@@ -33,8 +33,12 @@ def upgrade():
                 'laboratory': 'CCLAB',
                 'researcher': 'Abdolvahid Movahedirad',
                 'experiment_type': 'Standard Fatigue',
-                'publication_title': 'Fatigue damage in angle-ply GFRP laminates under tension-tension fatigue',
-                'publication_doi': 'https://doi.org/10.1016/j.ijfatigue.2017.12.015',
+                'publication_title':
+                    ('Fatigue damage in angle-ply GFRP'
+                     ' laminates under tension-tension fatigue'),
+                'publication_doi':
+                    ('https://doi.org/10.1016/'
+                     'j.ijfatigue.2017.12.015'),
                 'geometry_length': 250,
                 'geometry_width': 25,
                 'geometry_thickness': 2.25,
@@ -47,7 +51,6 @@ def upgrade():
             },
         ]
     )
-
 
     # inject into test table
     test = Table('test', meta)

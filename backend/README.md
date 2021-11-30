@@ -1,4 +1,4 @@
-# A) DB backend (PostgreSQL)
+# DB backend
 
 ## Install
 
@@ -8,23 +8,7 @@ Do it only once
 sudo snap install docker
 ```
 
-## Serve DB
-
-```bash
-cd ccfatigue/DB
-docker-compose up
-```
-
-## Create schema + initialize DB
-
-```bash
-pipenv run alembic upgrade head
-```
-
-
-# B) Web backend
-
-## Env install
+## venv setup
 
 Do it only once
 
@@ -38,9 +22,20 @@ pipenv run python
 'UTF-8'
 ```
 
-## Serve on localhost
+## Serve DB
 
-Do it each time you open the terminal that will serve
+```bash
+cd ccfatigue/DB
+docker-compose up
+```
+
+## Create schema + initialize DB with alembic
+
+```bash
+make alembic-upgrade
+```
+
+## Serve web backend on localhost
 
 ```bash
 make run
