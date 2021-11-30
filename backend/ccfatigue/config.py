@@ -11,6 +11,7 @@ settings = Dynaconf(
     ],
     validators=[
         Validator('cors_enabled', default=False),
+        Validator('root_path', default=''),
         Validator('postgres_host', default='localhost'),
         Validator('postgres_port', default=5432),
         Validator('postgres_user', default='ccfatigue'),
