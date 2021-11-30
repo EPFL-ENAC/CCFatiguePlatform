@@ -34,11 +34,11 @@
             "Thickness": 2.85
         },
         "Laminates and Assemblies": {
-            "Curing Time": 8,
+            "Curing Time": 10,
             "Curing Temperature": 22,
             "Curing Pressure": 0.95,
             "Fiber Content": 0.65,
-            "Stacking Sequence": "[+-45]2s"
+            "Stacking Sequence": "[+-90]2s"
         },
         "Test condtions": {
             "Temperature": 22,

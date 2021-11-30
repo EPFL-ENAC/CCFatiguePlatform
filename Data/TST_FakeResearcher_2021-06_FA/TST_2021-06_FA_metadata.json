@@ -24,7 +24,7 @@
             "Fiber Material": "E-glass fiber fabrics (EC 9-68)",
             "Fiber Geometry": null,
             "Area Density": 425,
-            "Resin": "Biresin\u00ae CR83",
+            "Resin": "Tripleresin\u00ae CR58",
             "Hardener": "Sika CH83-2",
             "Mixing ratio": "10:3"
         },
@@ -35,7 +35,7 @@
         },
         "Laminates and Assemblies": {
             "Curing Time": 8,
-            "Curing Temperature": 22,
+            "Curing Temperature": 26,
             "Curing Pressure": 0.95,
             "Fiber Content": 0.65,
             "Stacking Sequence": "[+-45]2s"
