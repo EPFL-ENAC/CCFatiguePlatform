@@ -1,5 +1,7 @@
 import numpy
 import os
+
+import numpy as np
 import pandas
 
 from psycopg2.extensions import register_adapter, AsIs
@@ -29,7 +31,7 @@ tests_local_len = int()
 
 # Take the Excel XLS metadata file, extract the experiment/test data, and put it in the above array
 # As input, the id of experiment exp_id
-def preprocess_metadata(metadata_file, exp_id):
+def preprocess_metadata(metadata_file, exp_id, file):
     # Reinitiate the local test list
     tests_local.clear()
 
@@ -74,16 +76,18 @@ def preprocess_metadata(metadata_file, exp_id):
                                                  'Step Size': str,
                                              })
     # Flag the missing value that appear as NaN on Enum types and Int
-    experiment_meta_data['Experiment Type'] = experiment_meta_data['Experiment Type'].fillna('NO_VALUE')
-    experiment_meta_data['Fracture Mode'] = experiment_meta_data['Fracture Mode'].fillna('NO_VALUE')
-    experiment_meta_data['Fatigue Test Type'] = experiment_meta_data['Fatigue Test Type'].fillna('NO_VALUE')
-    experiment_meta_data['Control mode'] = experiment_meta_data['Control mode'].fillna('NO_VALUE')
-    experiment_meta_data['Subset Size'] = experiment_meta_data['Subset Size'].fillna(0)
-    experiment_meta_data['Step Size'] = experiment_meta_data['Step Size'].fillna(0)
+    #experiment_meta_data['Experiment Type'] = experiment_meta_data['Experiment Type'].fillna('NO_VALUE')
+    #experiment_meta_data['Fracture Mode'] = experiment_meta_data['Fracture Mode'].fillna('NO_VALUE')
+    #experiment_meta_data['Fatigue Test Type'] = experiment_meta_data['Fatigue Test Type'].fillna('NO_VALUE')
+    #experiment_meta_data['Control mode'] = experiment_meta_data['Control mode'].fillna('NO_VALUE')
+    #experiment_meta_data['Subset Size'] = experiment_meta_data['Subset Size'].fillna(np.nan).replace([np.nan], [None])
+    experiment_meta_data = experiment_meta_data.fillna(np.nan).replace([np.nan], [None])
+    #experiment_meta_data['Step Size'] = experiment_meta_data['Step Size'].fillna('')
     # Flag remaining missing value with 0
-    experiment_meta_data = experiment_meta_data.fillna(0)
+    #experiment_meta_data = experiment_meta_data.fillna(0)
     # Build experiment table objects
     experiment = Experiment()
+    experiment.__name__ = file
     # Fill the table object columns from the Dframes
     experiment.id = exp_id # Come from the function input
     experiment.Laboratory = experiment_meta_data.iloc[0, 0]
@@ -130,16 +134,16 @@ def preprocess_metadata(metadata_file, exp_id):
     test_meta_data['Run-out '] = test_meta_data['Run-out '].map(dict(Yes=True, No=False))
     # Management of the missing data
     test_meta_data['Specimen number'] = test_meta_data['Specimen number'].fillna('')
-    # Iterate over the length of test, which correspond to the number of tests
+    # Iterate over the length of test, which correspond to the number of tests in the folder
     for i in range(len(test_meta_data)):
         # Build test objects
         test = Test()
         # Increment the test id
-        if (i == 0 and exp_id == 1):
-            test.id = 1
+        if i == 0 and exp_id == 1:
+            test.id = 1 # First test object ever
         else:
-            test.id = len(tests) + 1
-        test.parent_id = experiment.id
+            test.id = len(tests) + 1 # We assume the specimen order match the row order in the file
+        test.parent_id = experiment.id # We link to the corresponding parent experiment
         test.Specimen_number = test_meta_data.iloc[i, 0]
         test.Stress_Ratio = test_meta_data.iloc[i, 1]
         test.Maximum_Stress = test_meta_data.iloc[i, 2]
@@ -188,10 +192,11 @@ def preprocess_file(data_file, file):
     test_results_data = test_results_data.fillna('0')
     # Getting the test number from the file name
     test_number = int(file.split('_')[-1].split('.')[0])
-    # Look for matching test number in test_local given the history of tests
+    # Look for matching folder number given the specimen number
     for test in tests_local:
-        if (test.id - tests_local_len) == test_number:
+        if test.Specimen_number == test_number:
             test_parent = test
+            break
     # Iterate over the length of the file
     for i in range(len(test_results_data)):
         # Building object
@@ -242,7 +247,7 @@ def preprocess_data(folder_name):
                             expnumber = expnumber + 1
                             meta_data_file = folder_name + "/" + folder + "/" + file
                             print('Meta_data_file :  ' + meta_data_file)
-                            preprocess_metadata(meta_data_file, expnumber)
+                            preprocess_metadata(meta_data_file, expnumber, file)
                         # Then its CSV file
                         else:
                             # File is the test name
@@ -255,7 +260,7 @@ def preprocess_data(folder_name):
                             if not file.split('_')[3].split('.')[0] == 'metadata':
                                 preprocess_file(result_file, file)
                                 tests_local_len = len(tests_local)
-                                # For debug purpose, to process only 1 file
+                                #break # For debug purpose, to process only 1 file
                             else:
                                 print('File skipped')
 
