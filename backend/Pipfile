@@ -17,6 +17,8 @@ psycopg2 = "*"
 asyncpg = "*"
 sqlalchemy-utils = "*"
 alembic = "*"
+xlrd = "*"
+matplotlib = "*"
 
 [dev-packages]
 
