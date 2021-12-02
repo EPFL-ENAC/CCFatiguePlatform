@@ -1,5 +1,6 @@
 
 # This pipeline will remove the entries for which the mandatory data is absent
+import logging
 from math import isnan
 
 
@@ -54,7 +55,7 @@ def verify_test(tests):
 def verify_test_results(test_results_list):
     # Iteration on the list of test results
     missing_values_test_results = []
-    print("PRE test_results length :  " + str(len(test_results_list)))
+    logging.info("PRE test_results length :  " + str(len(test_results_list)))
     for tstdata in test_results_list:
         # Iteration on the columns
         for c in tstdata.__table__.c:
