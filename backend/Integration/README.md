@@ -15,14 +15,14 @@ Do once (the pip file from /backend has been modified)
 
 ## Executing program
 ### Main program
-Launch the main.py with as argument the database connection
+Launch the [main.py](main.py) with as argument the database connection
 string and replace the fields with your own connection parameters ([More info](https://docs.sqlalchemy.org/en/14/core/engines.html)):
 
 * dialect+driver://username:password@host:port/database
 
 Example:
 ```bash
-python main.py postgresql://username:password@localhost:5432/ENAC_Exo
+python main.py "postgresql://username:password@localhost:5432/ENAC_Exo"
 ```
 
 Time for the whole execution: 10min.
@@ -37,18 +37,18 @@ Execution actions:</br>
 
 ### Unit test
 
-Launch unittests:
+This is a test for the [data_quality.py](data_quality.py) functions
+Located in : [/test](test/test_data_quality.py)
 
-```bash
-python test_data_quality.py
-```
 ## Result
 
-This image should be built in [/figures](figures/)
-<img src="StressRatio_MaxMachload_distribution.png" style="width: 650px; max-width: 100%; height: auto" title="Click to enlarge picture" />
+This image should be built in [/figures](figures/) </br>
+<img src="StressRatio_MaxMachload_distribution_example.png" style="width: 650px; max-width: 100%; height: auto" title="Click to enlarge picture" />
 
 ## Remarks
 
+* The policy for missing data handling is to remove data rows if
+there is a missing value in a mandatory field. 
 * As initial_crack_length is a mandatory field and is missing on
 all given data, I purposely make it 0 so that the exercise can go on.
 (Otherwise all data is removed by hierarchy == not inserted in the DB)
@@ -57,6 +57,8 @@ is defined using ORM classes. So columns are hard-coded into /model/
 * Using other DB design like NoSQL would allow changing dynamically columns
 * Units are specified in the table class definition. Inserting a non-correct
 unit in the DB would throw an error
+* In the [data_quality.py](data_quality.py), we can specify to return the list 
+of missing value and write it into a file for example.
 
 ## Future work
 

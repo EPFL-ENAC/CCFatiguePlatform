@@ -1,3 +1,5 @@
+import logging
+
 import numpy
 import os
 
@@ -14,17 +16,28 @@ def addapt_numpy_float64(numpy_float64):
 def addapt_numpy_int64(numpy_int64):
     return AsIs(numpy_int64)
 
-from model.test import Test
-from model.experiment import Experiment
-from model.test_results import Test_results
+from model.init_db import Experiment,Test,Test_results
 
 register_adapter(numpy.float64, addapt_numpy_float64)
 register_adapter(numpy.int64, addapt_numpy_int64)
 
 # Take the Excel XLS metadata file, extract the experiment/test data, and put it in the above array
 # As input, the id of experiment exp_id
-def preprocess_metadata(metadata_file, exp_id, file):
+def preprocess_metadata(metadata_file, exp_id, file,testlength):
+    """
+    From a EXCEL data file, read each sheet with Pandas and populate a list of Test and Experiment object
 
+            Parameters:
+                    metadata_file (str): the file name with full path
+                    exp_id (int): the id number of the experiment, coming from the folder iteration
+                    file (str): the file name
+                    testlength (int): the total length of the Test list, used to attributes id
+
+            Returns:
+                    tests (list of Test_results): A list of object Test extracted from the file.
+                    tests_local (list of Test): A list of object Test for indexing the file regarding the folder's hierarchy.
+                    experiment (Experiment): A list of object Experiment extracted from the file.
+    """
     ## SHEET 1 ##
     # Read the excel with pandas first sheet and defining data types
     experiment_meta_data = pandas.read_excel(metadata_file, 'Experiment', header=1,
@@ -86,22 +99,23 @@ def preprocess_metadata(metadata_file, exp_id, file):
     test_meta_data = test_meta_data.fillna(np.nan).replace([np.nan], [None])
     tests = []
     # Iterate over the length of test, which correspond to the number of tests in the folder
+    tests_local = []
     for i in range(len(test_meta_data)):
         # Build test objects
         test = Test()
-        tests_local = []
         # Increment the test id
         if i == 0 and exp_id == 1:
             test.id = 1 # First test object ever
         else:
-            test.id = len(tests) + 1 # We assume the specimen order match the row order in the file
+            test.id = testlength + len(tests) + 1 # We assume the specimen order match the row order in the file
 
         test.parent_id = experiment.id # We link to the corresponding parent experiment
         for c in test.__table__.c:
             name = c.name
             if not (name == 'id' or name == 'parent_id' or name == 'Run_out'):
                 setattr(test, name, test_meta_data.loc[i, name.replace('_', ' ')])
-        setattr(test, 'Run_out', test_meta_data.loc[i, 'Run-out'])
+            if name == 'Run_out':
+                setattr(test,'Run_out', test_meta_data.loc[i, 'Run-out '])
 
         # Add to test list above
         tests.append(test)
@@ -111,6 +125,17 @@ def preprocess_metadata(metadata_file, exp_id, file):
 
 # Extract data from CSV data file
 def preprocess_file(data_file, file, tests_local):
+    """
+    From a CSV data file, read with Pandas and populate a list of Test_results object
+
+            Parameters:
+                    data_file (str): the file name with full path
+                    file (str): the file name
+                    tests_local (list of Test): A list of object Test for indexing the file regarding the folder's hierarchy.
+
+            Returns:
+                    test_results_list (list of Test_results): A list of object Test_results extracted from the file.
+    """
     # Initialisation of a variable
     test_parent = Test_results()
     test_results_list = []
@@ -152,13 +177,24 @@ def preprocess_file(data_file, file, tests_local):
         for c in test_results.__table__.c:
             name = c.name
             if not (name == 'id' or name == 'parent_id'):
-                setattr(test_results, name, test_results_data.loc[0, name.replace('_', ' ')])
+                setattr(test_results, name, test_results_data.loc[0, name])
         # Add to list above
         test_results_list.append(test_results)
-    return [test_results_list]
+    return test_results_list
 
 # Go through folder hierarchy and analyse files
 def preprocess_data(folder_name):
+    """
+    Crawl into the folder hierarchy to extract data
+
+            Parameters:
+                    folder_name (str): name of the folder to look into
+
+            Returns:
+                    experiments (list of Experiment): list of Experiment objects
+                    tests (list of Test): list of Test objects
+                    test_results_list (list of Test_results): list of Test_results objects
+    """
     # Initialize the experiment counter
     expnumber = int(0)
     experiments = []
@@ -168,7 +204,7 @@ def preprocess_data(folder_name):
     for root, sub_folders, files in os.walk(folder_name):
         for folder in sub_folders:
 
-            print('Folder :  ' + folder)
+            logging.info('Folder :  ' + folder)
 
             # Getting the folder as experiment name
             experiment_name = folder
@@ -183,28 +219,25 @@ def preprocess_data(folder_name):
                         if '.xls' in file:
                             expnumber = expnumber + 1
                             meta_data_file = folder_name + "/" + folder + "/" + file
-                            print('Meta_data_file :  ' + meta_data_file)
-                            preprocessed_metadata = preprocess_metadata(meta_data_file, expnumber, file)
+                            logging.info('Meta_data_file :  ' + meta_data_file)
+                            preprocessed_metadata = preprocess_metadata(meta_data_file, expnumber, file,len(tests))
                             experiments.append(preprocessed_metadata[2])
-                            tests.append(preprocessed_metadata[0])
+                            tests.extend(preprocessed_metadata[0])
                         # Then its CSV file
                         else:
                             # File is the test name
                             test_name = file
                             # Result file
 
-                            print('File :  ' + file)
+                            logging.info('File :  ' + file)
                             result_file = folder_name + "/" + folder + "/" + file
                             # To avoid other files suffix
                             if not file.split('_')[3].split('.')[0] == 'metadata':
-                                preprocess_data = preprocess_file(result_file, file)
-                                #tests_local_len = len(preprocessed_metadata[1])
-                                test_results_list.append([preprocess_data])
-                                #break # For debug purpose, to process only 1 file
+                                preprocess_data = preprocess_file(result_file, file,preprocessed_metadata[1])
+                                test_results_list.extend(preprocess_data)
+                                break # For debug purpose, to process only 1 file
                             else:
-                                print('File skipped')
+                                logging.info('File skipped')
 
     return [experiments, tests, test_results_list]
 
-#folder = "../../Data"
-#preprocess_data(folder)

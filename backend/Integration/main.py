@@ -1,51 +1,51 @@
-#from Integration.data_quality import control_quality
+import logging
+
+import visualisation
+from data_quality import verify_test,verify_test_results,verify_experiment
 import time
-#from init_db import init#, bulkInsertExperiment, bulkInsertTest, bulkInsertTestResult
+from model.init_db import init, bulkInsertExperiment, bulkInsertTest, bulkInsertTestResult
 from read_data import preprocess_data
-from sqlalchemy import Column, Integer, String, create_engine, ForeignKey
-from sqlalchemy import Float, Date, Enum, Boolean
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import scoped_session, sessionmaker, relationship, validates
-
-import base
-
-import model.test
-import model.experiment
-import model.test_results
-
-from init_db import init
-
-#Base = declarative_base()
-DBSession = scoped_session(sessionmaker())
-engine = None
-
+from sqlalchemy.orm import scoped_session, sessionmaker
+import sys
+from model import init_db
+"""
+This script launches the different steps of the homework:
+    - DB creation
+    - Data extraction
+    - Data processing
+    - Data insertion in DB
+    - Data retrieving from the DB
+    - Visualisation of statistics
+"""
+# Retrieve the DB connection string passed as argument
+DB_Name = sys.argv[1]
+logging.info(DB_Name)
+#DB_Name = "postgresql://postgres:197355cC?@localhost:5432/ENAC_Exo"
+start_time = time.time()
 # Initialize the DB, create class (create table in SQL DB).
-# Please replace the name and password corresponding to the DB to connect to.
-DB_Name = "postgresql://postgres:197355cC?@localhost:5432/ENAC_Exo"
+init(DB_Name)
+logging.info("init phase : " + "--- %s seconds ---" % (time.time() - start_time))
 start_time = time.time()
-init(DB_Name,DBSession)
-
-
-print("init phase : " + "--- %s seconds ---" % (time.time() - start_time))
-start_time = time.time()
-# Read the data based on a specific folder. returns the extracted data from files
+# Read the data based on a specific folder.
 folder = "../../Data"
-preprocessed = preprocess_data(folder)
-print("read_data phase : " + "--- %s seconds ---" % (time.time() - start_time))
+# Return extracted data
+[experiments, tests, test_results_list] = preprocess_data(folder)
+logging.info("read_data phase : " + "--- %s seconds ---" % (time.time() - start_time))
 start_time = time.time()
-# Process and insert data in the DB
-#processed = control_quality(preprocessed)
-print("quality_control phase : " + "--- %s seconds ---" % (time.time() - start_time))
+# Process data for missing values
+experiments = verify_experiment(experiments)
+tests = verify_test(tests)
+test_results_list = verify_test_results(test_results_list)
+logging.info("quality_control phase : " + "--- %s seconds ---" % (time.time() - start_time))
+# Insert data in the DB
 start_time = time.time()
-#bulkInsertExperiment(processed[0])
-print("Experiment insertion phase : " + "--- %s seconds ---" % (time.time() - start_time))
+bulkInsertExperiment(experiments)
+logging.info("Experiment insertion phase : " + "--- %s seconds ---" % (time.time() - start_time))
 start_time = time.time()
-#bulkInsertTest(processed[1])
-print("Test phase : " + "--- %s seconds ---" % (time.time() - start_time))
+bulkInsertTest(tests)
+logging.info("Test phase : " + "--- %s seconds ---" % (time.time() - start_time))
 start_time = time.time()
-#bulkInsertTestResult(processed[2])
-print("Test_results phase : " + "--- %s seconds ---" % (time.time() - start_time))
-
-
-# Pull & Visualize data separately by launching the visualisation.py
-#visualisation.Graphs()
+bulkInsertTestResult(test_results_list)
+logging.info("Test_results phase : " + "--- %s seconds ---" % (time.time() - start_time))
+# Pull data and save the statistics in a file
+visualisation.graphs()

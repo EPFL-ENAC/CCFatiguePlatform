@@ -4,32 +4,29 @@ from sqlalchemy import create_engine, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-from init_db import Test, Test_results, Experiment
+from model.init_db import Test, Test_results, Experiment
+import model.init_db
 
-Base = declarative_base()
-DBSession = scoped_session(sessionmaker())
-engine = None
-
-# Initialisation of the interface with the DB
-def init(dbname="postgresql://postgres:197355cC?@localhost:5432/ENAC_Exo"):
-    global engine
-    engine = create_engine(dbname, echo=True)
-    DBSession.remove()
-    DBSession.configure(bind=engine, autoflush=False, expire_on_commit=False)
-    Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)
-
-def Graphs():
-    init()
-    Session = sessionmaker(bind=engine)
+def graphs():
+    """
+    Pull the data from the DB using a query:
+        - Stress Ratio for each test per experiment
+        - Maximum machine load for each test per experiment
+    Display the results in a graph
+    Save the graph to /figures
+    """
+    Session = sessionmaker(bind=model.init_db.engine)
     session = Session()
 
+    # Configure the figure to be 2 subfigures
     fig = plt.figure(constrained_layout=True)
     subfigs = fig.subfigures(nrows=2, ncols=1)
 
+    # Pulling the data
     records = session.query(Test.Stress_Ratio, Experiment.id).join(Experiment).all()
     df = pandas.DataFrame(records)
 
+    ## Visualizing the Stress Ratio distribution
     axs = subfigs[0].subplots(nrows=1, ncols=4)
     subfigs[0].suptitle('Stress Ratio')
     for x in range(1,5):
@@ -42,7 +39,6 @@ def Graphs():
     ## Visualizing the Maximum machine load distribution
 
     # Pulling the data by filtering per experiment
-    # Iteration per experiment
     records2 = session.query(func.max(Test_results.Machine_Load), Test.id, Experiment.id)\
                 .select_from(Test_results)\
                 .join(Test)\
@@ -62,6 +58,3 @@ def Graphs():
 
     fig.savefig('figures/StressRatio_MaxMachload_distribution.png')
     plt.show()
-
-
-Graphs()
