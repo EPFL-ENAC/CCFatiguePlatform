@@ -12,13 +12,15 @@ pydantic = "*"
 gunicorn = "*"
 python-multipart = "*"
 dynaconf = "*"
-databases = "*"
 psycopg2 = "*"
 asyncpg = "*"
-sqlalchemy-utils = "*"
+SQLAlchemy-Utils = "*"
 alembic = "*"
 
 [dev-packages]
 
 [requires]
 python_version = "3.8"
+
+[packages.SQLAlchemy]
+extras = [ "asyncio",]

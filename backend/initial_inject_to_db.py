@@ -6,7 +6,8 @@ import glob
 import json
 import random
 from ccfatigue.models.database import Experiment, Test
-from ccfatigue.services.database import engine
+from ccfatigue.services.database import __sync_url
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 
@@ -35,7 +36,8 @@ def generate_random_test(experiment, specimen_number):
 
 
 if __name__ == '__main__':
-    Session = sessionmaker(bind=engine)
+    sync_engine = create_engine(__sync_url, echo=True)
+    Session = sessionmaker(bind=sync_engine)
     session = Session()
 
     for exp_fold in EXPERIMENTS_TO_INJECT:
