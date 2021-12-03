@@ -14,15 +14,15 @@ app = FastAPI(
 
 
 if settings.cors_enabled:
-    print('cors enabled')
+    print("cors enabled")
 else:
-    print('cors disabled')
+    print("cors disabled")
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=['*'],
+        allow_origins=["*"],
         allow_credentials=True,
-        allow_methods=['*'],
-        allow_headers=['*'],
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
 app.include_router(root.router)

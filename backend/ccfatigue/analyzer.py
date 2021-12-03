@@ -21,30 +21,35 @@ def run_fortran(exec_path: str, input_file: SpooledTemporaryFile) -> bytes:
         tmp_file.flush()
         split_path = os.path.split(exec_path)
         directory = os.path.abspath(split_path[0])
-        print(f'executing {os.path.abspath(exec_path)} {tmp_file.name}')
-        ouput = subprocess.check_output([
-            f'./{split_path[1]}',
-            tmp_file.name,
-        ], cwd=directory)
+        print(f"executing {os.path.abspath(exec_path)} {tmp_file.name}")
+        ouput = subprocess.check_output(
+            [
+                f"./{split_path[1]}",
+                tmp_file.name,
+            ],
+            cwd=directory,
+        )
         return ouput
 
 
 def create_dataframe(output: bytes, method: SnCurveMethod) -> DataFrame:
     if method in [SnCurveMethod.LIN_LOG, SnCurveMethod.LOG_LOG]:
         widths = [17, 12, 12, 12, 12]
-        columns = [DataKey.R_RATIO,
-                   DataKey.N_CYCLES,
-                   DataKey.STRESS_PARAM,
-                   DataKey.LOW,
-                   DataKey.HIGH]
+        columns = [
+            DataKey.R_RATIO,
+            DataKey.N_CYCLES,
+            DataKey.STRESS_PARAM,
+            DataKey.LOW,
+            DataKey.HIGH,
+        ]
     elif method in [SnCurveMethod.SENDECKYJ, SnCurveMethod.WHITNEY]:
         widths = [17, 12, 12]
         columns = [DataKey.R_RATIO, DataKey.N_CYCLES, DataKey.STRESS_PARAM]
     else:
-        raise ValueError(f'unknown {method.name}')
+        raise ValueError(f"unknown {method.name}")
     df: DataFrame = pd.read_fwf(io.BytesIO(output), widths=widths, header=None)
     df.columns = [column.key for column in columns]
-    return df.fillna('')
+    return df.fillna("")
 
 
 def create_line(output: bytes, method: SnCurveMethod, r_ratio: float) -> Any:
@@ -58,30 +63,28 @@ def create_line(output: bytes, method: SnCurveMethod, r_ratio: float) -> Any:
             DataKey.N_CYCLES: n_cycles,
             DataKey.STRESS_PARAM: stress_param,
         },
-        legend_label=f'{method.value} {r_ratio}',
+        legend_label=f"{method.value} {r_ratio}",
     )
 
 
-def run_sn_curve(file: SpooledTemporaryFile,
-                 methods: List[SnCurveMethod],
-                 r_ratios: List[float],
-                 ) -> SnCurveResult:
+def run_sn_curve(
+    file: SpooledTemporaryFile,
+    methods: List[SnCurveMethod],
+    r_ratios: List[float],
+) -> SnCurveResult:
     plot = Plot(
-        title='S-N Curves',
+        title="S-N Curves",
         x_axis=DataKey.N_CYCLES,
         y_axis=DataKey.STRESS_PARAM,
         tooltips=[DataKey.N_CYCLES, DataKey.STRESS_PARAM],
-        x_axis_type='log',
+        x_axis_type="log",
     )
     outputs: Dict[SnCurveMethod, bytes] = {}
     for method in methods:
         output = run_fortran(
-            f'../CCFatigue_modules/2_S-NCurves/S-N-Curve-{method.value}',
-            file)
+            f"../CCFatigue_modules/2_S-NCurves/S-N-Curve-{method.value}", file
+        )
         outputs[method] = output
         for r_ratio in r_ratios:
             plot.lines.append(create_line(output, method, r_ratio))
-    return SnCurveResult(
-        outputs=outputs,
-        plot=plotter.export_plot(plot)
-    )
+    return SnCurveResult(outputs=outputs, plot=plotter.export_plot(plot))
