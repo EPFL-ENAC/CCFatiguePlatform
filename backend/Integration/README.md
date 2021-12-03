@@ -1,66 +1,70 @@
-# Project Title
+# Homework
 
-Simple overview of use/purpose.
+## Dependencies
 
-## Description
+xlrd : manipulating excel files </br>
+matplotlib : plotting the results
 
-An in-depth paragraph about your project and overview of use.
+## Installing
 
-## Getting Started
-
-### Dependencies
-
-* Describe any prerequisites, libraries, OS version, etc., needed before installing program.
-* ex. Windows 10
-
-### Installing
-
-* How/where to download your program
-* Any modifications needed to be made to files/folders
-
-### Executing program
-
-* How to run the program
-* Step-by-step bullets
-```
-code blocks for commands
-```
-
-## Help
-
-Any advise for common problems or issues.
-```
-command to run if program contains helper info
-```
-
-## Authors
-
-Contributors names and contact info
-
-ex. Dominique Pizzie  
-ex. [@DomPizzie](https://twitter.com/dompizzie)
-
-## Version History
-
-* 0.2
-    * Various bug fixes and optimizations
-    * See [commit change]() or See [release history]()
-* 0.1
-    * Initial Release
-
-## License
-
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
-
-## Acknowledgments
-
-Inspiration, code snippets, etc.
-* [awesome-readme](https://github.com/matiassingers/awesome-readme)
-* [PurpleBooth](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2)
-* [dbader](https://github.com/dbader/readme-template)
-* [zenorocha](https://gist.github.com/zenorocha/4526327)
-* [fvcproductions](https://gist.github.com/fvcproductions/1bfc2d4aecb01a834b46)
+Do once (the pip file from /backend has been modified)
 
 ```bash
-make run
+../backend/pipenv install
 ```
+
+## Executing program
+### Main program
+Launch the main.py with as argument the database connection
+string and replace the fields with your own connection parameters ([More info](https://docs.sqlalchemy.org/en/14/core/engines.html)):
+
+* dialect+driver://username:password@host:port/database
+
+Example:
+```bash
+python main.py postgresql://username:password@localhost:5432/ENAC_Exo
+```
+
+Time for the whole execution: 10min.
+
+Execution actions:</br>
+* Connection to the database
+* Creation of tables from ORM classes specified in [model.py](/Integration/model/init_db.py)
+* Extraction of data with Pandas ([read_data.py](/Integration/read_data.py))
+* Deletion of the entries having a missing mandatory data field ([data_quality.py](/Integration/data_quality.py))
+* Query data corresponding to the homework question
+* Plot the statistic and save it into png file in [/figures](/Integration/figures/)
+
+### Unit test
+
+Launch unittests:
+
+```bash
+python test_data_quality.py
+```
+## Result
+
+This image should be built in [/figures](/Integration/figures/)
+<img src="Integration/StressRatio_MaxMachload_distribution.png" style="width: 650px; max-width: 100%; height: auto" title="Click to enlarge picture" />
+
+## Remarks
+
+* As initial_crack_length is a mandatory field and is missing on
+all given data, I purposely make it 0 so that the exercise can go on.
+(Otherwise all data is removed by hierarchy == not inserted in the DB)
+* By design (the exercise specify to use SQLAlchemy) the table structure
+is defined using ORM classes. So columns are hard-coded into /model/
+* Using other DB design like NoSQL would allow changing dynamically columns
+* Units are specified in the table class definition. Inserting a non-correct
+unit in the DB would throw an error
+
+## Future work
+
+* Optimize Pandas file reading time with different strategies:
+  * Loading by chunk
+  * Specify precise data type (int8 if possible, etc..) 
+* Implement a date format conversion in data_quality.py
+* Separate table definition (ORM classes in init_db.py) into different files
+* Column names are checked in read_data.py (line 75,101,154) in order
+to populate the ORM class. A modularity to the name can be implemented here.
+* In the table ORM class, define the column "Run-out" with the "-" (not possible so far)
