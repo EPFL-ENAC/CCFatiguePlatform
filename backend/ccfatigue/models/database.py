@@ -1,18 +1,18 @@
-'''
+"""
 Define the model as it is in the DB
-'''
+"""
 
 from ccfatigue.services.database import Base
-from sqlalchemy import (Column, ForeignKey, Integer,
-                        Float, String, Boolean, Enum)
+from sqlalchemy import Column, ForeignKey, Integer, Float, String, Boolean, Enum
 from sqlalchemy.orm import relationship
 
 
 class Experiment(Base):
-    '''
+    """
     Defines how experiment data is structured in DB
-    '''
-    __tablename__ = 'experiment'
+    """
+
+    __tablename__ = "experiment"
     id = Column(Integer, primary_key=True)
 
     laboratory = Column(String)
@@ -22,25 +22,22 @@ class Experiment(Base):
 
     fracture = Column(Boolean)
     fracture_mode = Column(
-        Enum('Mode I', 'Mode II', 'Mode III', 'Combined', '',
-             name='fracture_mode'),
-        default='',
+        Enum("Mode I", "Mode II", "Mode III", "Combined", "", name="fracture_mode"),
+        default="",
     )
     initial_crack_length = Column(Float)
 
     fatigue_test_type = Column(
-        Enum('CA', 'VA', 'BL', 'Combined', '',
-             name='fatigue_test_type'),
-        default='',
+        Enum("CA", "VA", "BL", "Combined", "", name="fatigue_test_type"),
+        default="",
     )
 
     measuring_equipment = Column(String)
     reliability_level = Column(Float)
 
     control_mode = Column(
-        Enum('Load Controlled', 'Displacement Controlled', '',
-             name='control_mode'),
-        default='',
+        Enum("Load Controlled", "Displacement Controlled", "", name="control_mode"),
+        default="",
     )
 
     publication_title = Column(String)
@@ -72,18 +69,19 @@ class Experiment(Base):
     dic_analysis_subset_size = Column(Integer)
     dic_analysis_step_size = Column(Integer)
 
-    tests = relationship('Test', cascade='all, delete')
+    tests = relationship("Test", cascade="all, delete")
 
 
 class Test(Base):
-    '''
+    """
     Defines how test part of experiment is structured in DB
-    '''
-    __tablename__ = 'test'
+    """
+
+    __tablename__ = "test"
     id = Column(Integer, primary_key=True)
 
-    experiment_id = Column(Integer, ForeignKey('experiment.id'))
-    experiment = relationship('Experiment', back_populates='tests')
+    experiment_id = Column(Integer, ForeignKey("experiment.id"))
+    experiment = relationship("Experiment", back_populates="tests")
 
     specimen_number = Column(String)
     stress_ratio = Column(Float)

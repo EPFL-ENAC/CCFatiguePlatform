@@ -1,23 +1,24 @@
-'''
+"""
 API Models
-'''
+"""
 
 from pydantic import BaseModel
 from typing import Optional
 
 
 class OrmModel(BaseModel):
-    '''
+    """
     Parent class for all API models
-    '''
+    """
+
     class Config:
         orm_mode = True
 
 
 class ExperimentModel(OrmModel):
-    '''
+    """
     Defines how experiment is seen on the API
-    '''
+    """
 
     id: int
     laboratory: str

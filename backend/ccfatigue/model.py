@@ -34,10 +34,10 @@ class Dashboard(BaseModel):
 
 
 class SnCurveMethod(str, Enum):
-    LIN_LOG = 'LinLog'
-    LOG_LOG = 'LogLog'
-    SENDECKYJ = 'Sendeckyj'
-    WHITNEY = 'Whitney'
+    LIN_LOG = "LinLog"
+    LOG_LOG = "LogLog"
+    SENDECKYJ = "Sendeckyj"
+    WHITNEY = "Whitney"
 
 
 class SnCurveResult(BaseModel):

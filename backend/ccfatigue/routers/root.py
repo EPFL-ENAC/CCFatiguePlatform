@@ -9,12 +9,9 @@ from ccfatigue.models import AppInfo
 router = APIRouter()
 
 
-@router.get('/', response_model=AppInfo)
+@router.get("/", response_model=AppInfo)
 async def root():
     """
     Get AppInfo
     """
-    return AppInfo(
-        name=__name__,
-        version=__version__
-    )
+    return AppInfo(name=__name__, version=__version__)
