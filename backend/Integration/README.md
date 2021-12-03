@@ -29,11 +29,11 @@ Time for the whole execution: 10min.
 
 Execution actions:</br>
 * Connection to the database
-* Creation of tables from ORM classes specified in [model.py](/Integration/model/init_db.py)
-* Extraction of data with Pandas ([read_data.py](/Integration/read_data.py))
-* Deletion of the entries having a missing mandatory data field ([data_quality.py](/Integration/data_quality.py))
+* Creation of tables from ORM classes specified in [model.py](model/init_db.py)
+* Extraction of data with Pandas ([read_data.py](read_data.py))
+* Deletion of the entries having a missing mandatory data field ([data_quality.py](data_quality.py))
 * Query data corresponding to the homework question
-* Plot the statistic and save it into png file in [/figures](/Integration/figures/)
+* Plot the statistic and save it into png file in [/figures](figures)
 
 ### Unit test
 
@@ -44,8 +44,8 @@ python test_data_quality.py
 ```
 ## Result
 
-This image should be built in [/figures](/Integration/figures/)
-<img src="Integration/StressRatio_MaxMachload_distribution.png" style="width: 650px; max-width: 100%; height: auto" title="Click to enlarge picture" />
+This image should be built in [/figures](figures/)
+<img src="StressRatio_MaxMachload_distribution.png" style="width: 650px; max-width: 100%; height: auto" title="Click to enlarge picture" />
 
 ## Remarks
 
