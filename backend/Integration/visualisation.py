@@ -60,7 +60,7 @@ def Graphs():
         axs2[x - 1].set_xlabel('Value')
         axs2[x - 1].set_ylabel('Frequency')
 
-    fig.savefig('StressRatio_MaxMachload_distribution.png')
+    fig.savefig('figures/StressRatio_MaxMachload_distribution.png')
     plt.show()
 
 

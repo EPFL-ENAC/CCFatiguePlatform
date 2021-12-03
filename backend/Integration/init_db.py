@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Integer, String, create_engine, ForeignKey
 from sqlalchemy import Float, Date, Enum, Boolean
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import scoped_session, sessionmaker, relationship
+from sqlalchemy.orm import scoped_session, sessionmaker, relationship, validates
 
-Base = declarative_base()
+'''Base = declarative_base()
 DBSession = scoped_session(sessionmaker())
 engine = None
 
@@ -15,15 +15,15 @@ class Experiment(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     Laboratory = Column(String, nullable=False)
     Researcher = Column(String, nullable=False)
-    Date = Column(Date)
-    Experiment_Type = Column(Enum('FA', 'QS', 'NO_VALUE', name='Experiment_Types'), default='NO_VALUE', nullable=False)
-    Fracture = Column(Boolean, nullable=False, default=False)
-    Fracture_Mode = Column(Enum('Mode I', 'Mode II', 'Mode III', 'Combined', 'NO_VALUE', name='Fracture_Mode'), default='NO_VALUE')
-    Initial_Crack_length = Column(Float, default=0)#, nullable=False) # Modified for the sake of the exercise
-    Fatigue_Test_Type = Column(Enum('CA', 'VA', 'BL', 'Combined', 'NO_VALUE', name='Fatigue_Test_Type'), default='NO_VALUE')
+    Date = Column(Date),
+    Experiment_Type = Column(Enum('FA', 'QS', name='Experiment_Types'), nullable=False)
+    Fracture = Column(Boolean, nullable=False)
+    Fracture_Mode = Column(Enum('Mode I', 'Mode II', 'Mode III', 'Combined', name='Fracture_Mode'))
+    Initial_Crack_length = Column(Float, nullable=False)
+    Fatigue_Test_Type = Column(Enum('CA', 'VA', 'BL', 'Combined', name='Fatigue_Test_Type'))
     Measuring_Equipment = Column(String)
     Reliability_Level = Column(String)
-    Control_mode = Column(Enum('Load Controlled', 'Displacement Controlled', 'NO_VALUE', name='Control_Mode'), default='NO_VALUE', nullable=False)
+    Control_mode = Column(Enum('Load Controlled', 'Displacement Controlled', name='Control_Mode'), nullable=False)
     Title = Column(String)
     Author = Column(String)
     Year = Column(String)
@@ -48,6 +48,20 @@ class Experiment(Base):
     Subset_Size = Column(Integer)
     Step_Size = Column(Integer)
     children = relationship("Test", back_populates="parent")
+
+    @validates('Subset_Size')
+    def empty_Subset_Size_to_null(self, key, value):
+        if value == 'nan':
+            return None
+        else:
+            return value
+
+    @validates('Step_Size')
+    def empty_string_to_null(self, key, value):
+        if value == 'nan':
+            return None
+        else:
+            return value
 
 ## Test class ##
 class Test(Base):
@@ -84,8 +98,10 @@ class Test_results(Base):
     Th_uppergrips = Column(Integer)
     Th_lowergrips = Column(Integer)
     parent = relationship("Test", back_populates="children")
+'''
+from base import Base
 
-def init(dbname):
+def init(dbname,DBSession):
     global engine
     print("Connection to the DB :  " + dbname)
     engine = create_engine(dbname, echo=True)
@@ -95,7 +111,7 @@ def init(dbname):
     Base.metadata.create_all(engine)
     print("Tables created in the DB")
 
-
+'''
 def insertExperiment(experiment):
     DBSession.add(experiment)
     DBSession.commit()
@@ -121,5 +137,5 @@ def insertTestResult(test_result):
 
 def bulkInsertTestResult(test_results):
     DBSession.bulk_save_objects(test_results)
-    DBSession.commit()
+    DBSession.commit()'''
 
