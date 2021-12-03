@@ -235,7 +235,7 @@ def preprocess_data(folder_name):
                             if not file.split('_')[3].split('.')[0] == 'metadata':
                                 preprocess_data = preprocess_file(result_file, file,preprocessed_metadata[1])
                                 test_results_list.extend(preprocess_data)
-                                break # For debug purpose, to process only 1 file
+                                #break # For debug purpose, to process only 1 file
                             else:
                                 logging.info('File skipped')
 

@@ -1,0 +1,412 @@
+INFO:sqlalchemy.engine.Engine:select pg_catalog.version()
+INFO:sqlalchemy.engine.Engine:[raw sql] {}
+INFO:sqlalchemy.engine.Engine:select current_schema()
+INFO:sqlalchemy.engine.Engine:[raw sql] {}
+INFO:sqlalchemy.engine.Engine:show standard_conforming_strings
+INFO:sqlalchemy.engine.Engine:[raw sql] {}
+2021-12-03 15:18:20,061 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2021-12-03 15:18:20,061 INFO sqlalchemy.engine.Engine [raw sql] {}
+2021-12-03 15:18:20,062 INFO sqlalchemy.engine.Engine select current_schema()
+2021-12-03 15:18:20,062 INFO sqlalchemy.engine.Engine [raw sql] {}
+2021-12-03 15:18:20,063 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2021-12-03 15:18:20,063 INFO sqlalchemy.engine.Engine [raw sql] {}
+2021-12-03 15:18:20,064 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2021-12-03 15:18:20,064 INFO sqlalchemy.engine.Engine select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where pg_catalog.pg_table_is_visible(c.oid) and relname=%(name)s
+2021-12-03 15:18:20,064 INFO sqlalchemy.engine.Engine [generated in 0.00014s] {'name': 'experiment'}
+INFO:sqlalchemy.engine.Engine:BEGIN (implicit)
+INFO:sqlalchemy.engine.Engine:select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where pg_catalog.pg_table_is_visible(c.oid) and relname=%(name)s
+INFO:sqlalchemy.engine.Engine:[generated in 0.00014s] {'name': 'experiment'}
+2021-12-03 15:18:20,066 INFO sqlalchemy.engine.Engine select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where pg_catalog.pg_table_is_visible(c.oid) and relname=%(name)s
+2021-12-03 15:18:20,066 INFO sqlalchemy.engine.Engine [cached since 0.002254s ago] {'name': 'test'}
+2021-12-03 15:18:20,067 INFO sqlalchemy.engine.Engine select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where pg_catalog.pg_table_is_visible(c.oid) and relname=%(name)s
+2021-12-03 15:18:20,067 INFO sqlalchemy.engine.Engine [cached since 0.002869s ago] {'name': 'test_results'}
+2021-12-03 15:18:20,068 INFO sqlalchemy.engine.Engine 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+INFO:sqlalchemy.engine.Engine:select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where pg_catalog.pg_table_is_visible(c.oid) and relname=%(name)s
+INFO:sqlalchemy.engine.Engine:[cached since 0.002254s ago] {'name': 'test'}
+INFO:sqlalchemy.engine.Engine:select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where pg_catalog.pg_table_is_visible(c.oid) and relname=%(name)s
+INFO:sqlalchemy.engine.Engine:[cached since 0.002869s ago] {'name': 'test_results'}
+INFO:sqlalchemy.engine.Engine:
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+2021-12-03 15:18:20,068 INFO sqlalchemy.engine.Engine [generated in 0.00012s] {'typname': 'Experiment_Types'}
+2021-12-03 15:18:20,068 INFO sqlalchemy.engine.Engine DROP TYPE "Experiment_Types"
+2021-12-03 15:18:20,069 INFO sqlalchemy.engine.Engine [no key 0.00010s] {}
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+INFO:sqlalchemy.engine.Engine:[generated in 0.00012s] {'typname': 'Experiment_Types'}
+INFO:sqlalchemy.engine.Engine:DROP TYPE "Experiment_Types"
+INFO:sqlalchemy.engine.Engine:[no key 0.00010s] {}
+INFO:sqlalchemy.engine.Engine:
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+2021-12-03 15:18:20,072 INFO sqlalchemy.engine.Engine 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+2021-12-03 15:18:20,072 INFO sqlalchemy.engine.Engine [cached since 0.004374s ago] {'typname': 'Fracture_Mode'}
+2021-12-03 15:18:20,073 INFO sqlalchemy.engine.Engine DROP TYPE "Fracture_Mode"
+2021-12-03 15:18:20,073 INFO sqlalchemy.engine.Engine [no key 0.00009s] {}
+2021-12-03 15:18:20,074 INFO sqlalchemy.engine.Engine 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+2021-12-03 15:18:20,074 INFO sqlalchemy.engine.Engine [cached since 0.005804s ago] {'typname': 'Fatigue_Test_Type'}
+2021-12-03 15:18:20,074 INFO sqlalchemy.engine.Engine DROP TYPE "Fatigue_Test_Type"
+2021-12-03 15:18:20,074 INFO sqlalchemy.engine.Engine [no key 0.00009s] {}
+2021-12-03 15:18:20,075 INFO sqlalchemy.engine.Engine 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+INFO:sqlalchemy.engine.Engine:[cached since 0.004374s ago] {'typname': 'Fracture_Mode'}
+INFO:sqlalchemy.engine.Engine:DROP TYPE "Fracture_Mode"
+INFO:sqlalchemy.engine.Engine:[no key 0.00009s] {}
+INFO:sqlalchemy.engine.Engine:
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+2021-12-03 15:18:20,075 INFO sqlalchemy.engine.Engine [cached since 0.006977s ago] {'typname': 'Control_Mode'}
+2021-12-03 15:18:20,075 INFO sqlalchemy.engine.Engine DROP TYPE "Control_Mode"
+2021-12-03 15:18:20,075 INFO sqlalchemy.engine.Engine [no key 0.00010s] {}
+2021-12-03 15:18:20,076 INFO sqlalchemy.engine.Engine COMMIT
+                
+INFO:sqlalchemy.engine.Engine:[cached since 0.005804s ago] {'typname': 'Fatigue_Test_Type'}
+INFO:sqlalchemy.engine.Engine:DROP TYPE "Fatigue_Test_Type"
+INFO:sqlalchemy.engine.Engine:[no key 0.00009s] {}
+INFO:sqlalchemy.engine.Engine:
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+INFO:sqlalchemy.engine.Engine:[cached since 0.006977s ago] {'typname': 'Control_Mode'}
+INFO:sqlalchemy.engine.Engine:DROP TYPE "Control_Mode"
+INFO:sqlalchemy.engine.Engine:[no key 0.00010s] {}
+INFO:sqlalchemy.engine.Engine:COMMIT
+INFO:sqlalchemy.engine.Engine:BEGIN (implicit)
+2021-12-03 15:18:20,088 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2021-12-03 15:18:20,088 INFO sqlalchemy.engine.Engine select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where pg_catalog.pg_table_is_visible(c.oid) and relname=%(name)s
+INFO:sqlalchemy.engine.Engine:select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where pg_catalog.pg_table_is_visible(c.oid) and relname=%(name)s
+INFO:sqlalchemy.engine.Engine:[cached since 0.02392s ago] {'name': 'experiment'}
+2021-12-03 15:18:20,088 INFO sqlalchemy.engine.Engine [cached since 0.02392s ago] {'name': 'experiment'}
+2021-12-03 15:18:20,089 INFO sqlalchemy.engine.Engine select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where pg_catalog.pg_table_is_visible(c.oid) and relname=%(name)s
+2021-12-03 15:18:20,089 INFO sqlalchemy.engine.Engine [cached since 0.02488s ago] {'name': 'test'}
+INFO:sqlalchemy.engine.Engine:select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where pg_catalog.pg_table_is_visible(c.oid) and relname=%(name)s
+INFO:sqlalchemy.engine.Engine:[cached since 0.02488s ago] {'name': 'test'}
+2021-12-03 15:18:20,090 INFO sqlalchemy.engine.Engine select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where pg_catalog.pg_table_is_visible(c.oid) and relname=%(name)s
+2021-12-03 15:18:20,090 INFO sqlalchemy.engine.Engine [cached since 0.02558s ago] {'name': 'test_results'}
+2021-12-03 15:18:20,091 INFO sqlalchemy.engine.Engine 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+INFO:sqlalchemy.engine.Engine:select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where pg_catalog.pg_table_is_visible(c.oid) and relname=%(name)s
+INFO:sqlalchemy.engine.Engine:[cached since 0.02558s ago] {'name': 'test_results'}
+INFO:sqlalchemy.engine.Engine:
+            SELECT EXISTS (
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+2021-12-03 15:18:20,091 INFO sqlalchemy.engine.Engine [cached since 0.02276s ago] {'typname': 'Experiment_Types'}
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+2021-12-03 15:18:20,091 INFO sqlalchemy.engine.Engine CREATE TYPE "Experiment_Types" AS ENUM ('FA', 'QS')
+2021-12-03 15:18:20,091 INFO sqlalchemy.engine.Engine [no key 0.00009s] {}
+2021-12-03 15:18:20,093 INFO sqlalchemy.engine.Engine 
+INFO:sqlalchemy.engine.Engine:[cached since 0.02276s ago] {'typname': 'Experiment_Types'}
+INFO:sqlalchemy.engine.Engine:CREATE TYPE "Experiment_Types" AS ENUM ('FA', 'QS')
+INFO:sqlalchemy.engine.Engine:[no key 0.00009s] {}
+INFO:sqlalchemy.engine.Engine:
+            SELECT EXISTS (
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+INFO:sqlalchemy.engine.Engine:[cached since 0.0257s ago] {'typname': 'Fracture_Mode'}
+INFO:sqlalchemy.engine.Engine:CREATE TYPE "Fracture_Mode" AS ENUM ('Mode I', 'Mode II', 'Mode III', 'Combined')
+INFO:sqlalchemy.engine.Engine:[no key 0.00009s] {}
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+INFO:sqlalchemy.engine.Engine:
+            SELECT EXISTS (
+2021-12-03 15:18:20,094 INFO sqlalchemy.engine.Engine [cached since 0.0257s ago] {'typname': 'Fracture_Mode'}
+2021-12-03 15:18:20,094 INFO sqlalchemy.engine.Engine CREATE TYPE "Fracture_Mode" AS ENUM ('Mode I', 'Mode II', 'Mode III', 'Combined')
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+2021-12-03 15:18:20,094 INFO sqlalchemy.engine.Engine [no key 0.00009s] {}
+2021-12-03 15:18:20,095 INFO sqlalchemy.engine.Engine 
+                )
+                
+INFO:sqlalchemy.engine.Engine:[cached since 0.0269s ago] {'typname': 'Fatigue_Test_Type'}
+INFO:sqlalchemy.engine.Engine:CREATE TYPE "Fatigue_Test_Type" AS ENUM ('CA', 'VA', 'BL', 'Combined')
+INFO:sqlalchemy.engine.Engine:[no key 0.00009s] {}
+INFO:sqlalchemy.engine.Engine:
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+INFO:sqlalchemy.engine.Engine:[cached since 0.02802s ago] {'typname': 'Control_Mode'}
+                
+2021-12-03 15:18:20,095 INFO sqlalchemy.engine.Engine [cached since 0.0269s ago] {'typname': 'Fatigue_Test_Type'}
+2021-12-03 15:18:20,095 INFO sqlalchemy.engine.Engine CREATE TYPE "Fatigue_Test_Type" AS ENUM ('CA', 'VA', 'BL', 'Combined')
+2021-12-03 15:18:20,095 INFO sqlalchemy.engine.Engine [no key 0.00009s] {}
+2021-12-03 15:18:20,096 INFO sqlalchemy.engine.Engine 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+INFO:sqlalchemy.engine.Engine:CREATE TYPE "Control_Mode" AS ENUM ('Load Controlled', 'Displacement Controlled')
+INFO:sqlalchemy.engine.Engine:[no key 0.00010s] {}
+                
+2021-12-03 15:18:20,096 INFO sqlalchemy.engine.Engine [cached since 0.02802s ago] {'typname': 'Control_Mode'}
+2021-12-03 15:18:20,096 INFO sqlalchemy.engine.Engine CREATE TYPE "Control_Mode" AS ENUM ('Load Controlled', 'Displacement Controlled')
+2021-12-03 15:18:20,096 INFO sqlalchemy.engine.Engine [no key 0.00010s] {}
+2021-12-03 15:18:20,098 INFO sqlalchemy.engine.Engine 
+CREATE TABLE experiment (
+	id SERIAL NOT NULL, 
+INFO:sqlalchemy.engine.Engine:
+CREATE TABLE experiment (
+	id SERIAL NOT NULL, 
+	"Laboratory" VARCHAR NOT NULL, 
+	"Researcher" VARCHAR NOT NULL, 
+	"Date" DATE, 
+	"Laboratory" VARCHAR NOT NULL, 
+	"Researcher" VARCHAR NOT NULL, 
+	"Date" DATE, 
+	"Experiment_Type" "Experiment_Types" NOT NULL, 
+	"Fracture" BOOLEAN NOT NULL, 
+	"Fracture_Mode" "Fracture_Mode", 
+	"Initial_Crack_length" FLOAT, 
+	"Experiment_Type" "Experiment_Types" NOT NULL, 
+	"Fracture" BOOLEAN NOT NULL, 
+	"Fatigue_Test_Type" "Fatigue_Test_Type", 
+	"Measuring_Equipment" VARCHAR, 
+	"Fracture_Mode" "Fracture_Mode", 
+	"Initial_Crack_length" FLOAT, 
+	"Fatigue_Test_Type" "Fatigue_Test_Type", 
+	"Measuring_Equipment" VARCHAR, 
+	"Reliability_Level" VARCHAR, 
+	"Control_mode" "Control_Mode" NOT NULL, 
+	"Reliability_Level" VARCHAR, 
+	"Control_mode" "Control_Mode" NOT NULL, 
+	"Title" VARCHAR, 
+	"Author" VARCHAR, 
+	"Year" VARCHAR, 
+	"DOI" VARCHAR, 
+	"Images_Repository" VARCHAR, 
+	"Fiber_Material" VARCHAR NOT NULL, 
+	"Fiber_Geometry" VARCHAR, 
+	"Area_Density" FLOAT, 
+	"Resin" VARCHAR NOT NULL, 
+	"Hardener" VARCHAR, 
+	"Mixing_ratio" VARCHAR, 
+	"Length" FLOAT NOT NULL, 
+	"Width" FLOAT NOT NULL, 
+	"Thickness" FLOAT NOT NULL, 
+	"Curing_Time" FLOAT, 
+	"Curing_Temperature" FLOAT, 
+	"Curing_Pressure" FLOAT, 
+	"Fiber_Content" FLOAT, 
+	"Stacking_Sequence" VARCHAR NOT NULL, 
+	"Temperature" FLOAT NOT NULL, 
+	"Humidity" FLOAT NOT NULL, 
+	"Subset_Size" INTEGER, 
+	"Step_Size" INTEGER, 
+	PRIMARY KEY (id)
+)
+
+
+INFO:sqlalchemy.engine.Engine:[no key 0.00234s] {}
+	"Title" VARCHAR, 
+	"Author" VARCHAR, 
+	"Year" VARCHAR, 
+	"DOI" VARCHAR, 
+	"Images_Repository" VARCHAR, 
+	"Fiber_Material" VARCHAR NOT NULL, 
+	"Fiber_Geometry" VARCHAR, 
+	"Area_Density" FLOAT, 
+	"Resin" VARCHAR NOT NULL, 
+	"Hardener" VARCHAR, 
+	"Mixing_ratio" VARCHAR, 
+	"Length" FLOAT NOT NULL, 
+	"Width" FLOAT NOT NULL, 
+	"Thickness" FLOAT NOT NULL, 
+	"Curing_Time" FLOAT, 
+	"Curing_Temperature" FLOAT, 
+	"Curing_Pressure" FLOAT, 
+	"Fiber_Content" FLOAT, 
+	"Stacking_Sequence" VARCHAR NOT NULL, 
+	"Temperature" FLOAT NOT NULL, 
+	"Humidity" FLOAT NOT NULL, 
+	"Subset_Size" INTEGER, 
+	"Step_Size" INTEGER, 
+	PRIMARY KEY (id)
+)
+
+
+2021-12-03 15:18:20,101 INFO sqlalchemy.engine.Engine [no key 0.00234s] {}
+INFO:sqlalchemy.engine.Engine:
+2021-12-03 15:18:20,116 INFO sqlalchemy.engine.Engine 
+CREATE TABLE test (
+CREATE TABLE test (
+	id SERIAL NOT NULL, 
+	parent_id INTEGER, 
+	"Specimen_number" INTEGER NOT NULL, 
+	"Stress_Ratio" FLOAT NOT NULL, 
+	"Maximum_Stress" FLOAT NOT NULL, 
+	"Loading_rate" FLOAT NOT NULL, 
+	"Run_out" BOOLEAN NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(parent_id) REFERENCES experiment (id)
+)
+
+
+INFO:sqlalchemy.engine.Engine:[no key 0.00018s] {}
+	id SERIAL NOT NULL, 
+	parent_id INTEGER, 
+	"Specimen_number" INTEGER NOT NULL, 
+	"Stress_Ratio" FLOAT NOT NULL, 
+	"Maximum_Stress" FLOAT NOT NULL, 
+	"Loading_rate" FLOAT NOT NULL, 
+	"Run_out" BOOLEAN NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(parent_id) REFERENCES experiment (id)
+)
+
+
+2021-12-03 15:18:20,116 INFO sqlalchemy.engine.Engine [no key 0.00018s] {}
+INFO:sqlalchemy.engine.Engine:
+2021-12-03 15:18:20,124 INFO sqlalchemy.engine.Engine 
+CREATE TABLE test_results (
+CREATE TABLE test_results (
+	id SERIAL NOT NULL, 
+	id SERIAL NOT NULL, 
+	parent_id INTEGER, 
+	parent_id INTEGER, 
+	"Machine_N_cycles" INTEGER NOT NULL, 
+	"Machine_Load" FLOAT NOT NULL, 
+	"Machine_Displacement" FLOAT NOT NULL, 
+	index INTEGER, 
+	"Camera_N_cycles" INTEGER, 
+	exx FLOAT, 
+	eyy FLOAT, 
+	exy FLOAT, 
+	crack_length FLOAT, 
+	"Th_time" INTEGER, 
+	"Th_N_cycles" INTEGER, 
+	"Th_specimen_max" INTEGER, 
+	"Machine_N_cycles" INTEGER NOT NULL, 
+	"Machine_Load" FLOAT NOT NULL, 
+	"Machine_Displacement" FLOAT NOT NULL, 
+	index INTEGER, 
+	"Camera_N_cycles" INTEGER, 
+	"Th_specimen_mean" INTEGER, 
+	"Th_chamber" INTEGER, 
+	"Th_uppergrips" INTEGER, 
+	exx FLOAT, 
+	eyy FLOAT, 
+	exy FLOAT, 
+	crack_length FLOAT, 
+	"Th_lowergrips" INTEGER, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(parent_id) REFERENCES test (id)
+)
+
+
+2021-12-03 15:18:20,124 INFO sqlalchemy.engine.Engine [no key 0.00018s] {}
+2021-12-03 15:18:20,130 INFO sqlalchemy.engine.Engine COMMIT
+	"Th_time" INTEGER, 
+	"Th_N_cycles" INTEGER, 
+	"Th_specimen_max" INTEGER, 
+	"Th_specimen_mean" INTEGER, 
+	"Th_chamber" INTEGER, 
+	"Th_uppergrips" INTEGER, 
+	"Th_lowergrips" INTEGER, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(parent_id) REFERENCES test (id)
+)
+
+
+INFO:sqlalchemy.engine.Engine:[no key 0.00018s] {}
+INFO:sqlalchemy.engine.Engine:COMMIT
+INFO:sqlalchemy.engine.Engine:BEGIN (implicit)
+2021-12-03 15:18:55,909 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+INFO:sqlalchemy.engine.Engine:INSERT INTO experiment (id, "Laboratory", "Researcher", "Date", "Experiment_Type", "Fracture", "Initial_Crack_length", "Measuring_Equipment", "Control_mode", "Fiber_Material", "Area_Density", "Resin", "Hardener", "Mixing_ratio", "Length", "Width", "Thickness", "Curing_Time", "Curing_Temperature", "Curing_Pressure", "Fiber_Content", "Stacking_Sequence", "Temperature", "Humidity") VALUES (%(id)s, %(Laboratory)s, %(Researcher)s, %(Date)s, %(Experiment_Type)s, %(Fracture)s, %(Initial_Crack_length)s, %(Measuring_Equipment)s, %(Control_mode)s, %(Fiber_Material)s, %(Area_Density)s, %(Resin)s, %(Hardener)s, %(Mixing_ratio)s, %(Length)s, %(Width)s, %(Thickness)s, %(Curing_Time)s, %(Curing_Temperature)s, %(Curing_Pressure)s, %(Fiber_Content)s, %(Stacking_Sequence)s, %(Temperature)s, %(Humidity)s)
+2021-12-03 15:18:55,911 INFO sqlalchemy.engine.Engine INSERT INTO experiment (id, "Laboratory", "Researcher", "Date", "Experiment_Type", "Fracture", "Initial_Crack_length", "Measuring_Equipment", "Control_mode", "Fiber_Material", "Area_Density", "Resin", "Hardener", "Mixing_ratio", "Length", "Width", "Thickness", "Curing_Time", "Curing_Temperature", "Curing_Pressure", "Fiber_Content", "Stacking_Sequence", "Temperature", "Humidity") VALUES (%(id)s, %(Laboratory)s, %(Researcher)s, %(Date)s, %(Experiment_Type)s, %(Fracture)s, %(Initial_Crack_length)s, %(Measuring_Equipment)s, %(Control_mode)s, %(Fiber_Material)s, %(Area_Density)s, %(Resin)s, %(Hardener)s, %(Mixing_ratio)s, %(Length)s, %(Width)s, %(Thickness)s, %(Curing_Time)s, %(Curing_Temperature)s, %(Curing_Pressure)s, %(Fiber_Content)s, %(Stacking_Sequence)s, %(Temperature)s, %(Humidity)s)
+INFO:sqlalchemy.engine.Engine:[generated in 0.00038s] {'id': 1, 'Laboratory': 'CCLAB', 'Researcher': 'AAA FakeResearcher', 'Date': Timestamp('2019-09-01 00:00:00'), 'Experiment_Type': 'QS', 'Fracture': False, 'Initial_Crack_length': 0, 'Measuring_Equipment': 'Instron Machine', 'Control_mode': 'Load Controlled', 'Fiber_Material': 'E-glass fiber fabrics (EC 9-68)', 'Area_Density': 425.0, 'Resin': 'Biresin® CR83', 'Hardener': 'Sika CH83-2', 'Mixing_ratio': '10:3', 'Length': 160.0, 'Width': 25.1, 'Thickness': 2.85, 'Curing_Time': 8.0, 'Curing_Temperature': 22.0, 'Curing_Pressure': 0.95, 'Fiber_Content': 0.65, 'Stacking_Sequence': '[+-45]2s', 'Temperature': 22.0, 'Humidity': 40.0}
+2021-12-03 15:18:55,911 INFO sqlalchemy.engine.Engine [generated in 0.00038s] {'id': 1, 'Laboratory': 'CCLAB', 'Researcher': 'AAA FakeResearcher', 'Date': Timestamp('2019-09-01 00:00:00'), 'Experiment_Type': 'QS', 'Fracture': False, 'Initial_Crack_length': 0, 'Measuring_Equipment': 'Instron Machine', 'Control_mode': 'Load Controlled', 'Fiber_Material': 'E-glass fiber fabrics (EC 9-68)', 'Area_Density': 425.0, 'Resin': 'Biresin® CR83', 'Hardener': 'Sika CH83-2', 'Mixing_ratio': '10:3', 'Length': 160.0, 'Width': 25.1, 'Thickness': 2.85, 'Curing_Time': 8.0, 'Curing_Temperature': 22.0, 'Curing_Pressure': 0.95, 'Fiber_Content': 0.65, 'Stacking_Sequence': '[+-45]2s', 'Temperature': 22.0, 'Humidity': 40.0}
+INFO:sqlalchemy.engine.Engine:INSERT INTO experiment (id, "Laboratory", "Researcher", "Date", "Experiment_Type", "Fracture", "Initial_Crack_length", "Fatigue_Test_Type", "Measuring_Equipment", "Control_mode", "Fiber_Material", "Area_Density", "Resin", "Hardener", "Mixing_ratio", "Length", "Width", "Thickness", "Curing_Time", "Curing_Temperature", "Curing_Pressure", "Fiber_Content", "Stacking_Sequence", "Temperature", "Humidity") VALUES (%(id)s, %(Laboratory)s, %(Researcher)s, %(Date)s, %(Experiment_Type)s, %(Fracture)s, %(Initial_Crack_length)s, %(Fatigue_Test_Type)s, %(Measuring_Equipment)s, %(Control_mode)s, %(Fiber_Material)s, %(Area_Density)s, %(Resin)s, %(Hardener)s, %(Mixing_ratio)s, %(Length)s, %(Width)s, %(Thickness)s, %(Curing_Time)s, %(Curing_Temperature)s, %(Curing_Pressure)s, %(Fiber_Content)s, %(Stacking_Sequence)s, %(Temperature)s, %(Humidity)s)
+2021-12-03 15:18:55,918 INFO sqlalchemy.engine.Engine INSERT INTO experiment (id, "Laboratory", "Researcher", "Date", "Experiment_Type", "Fracture", "Initial_Crack_length", "Fatigue_Test_Type", "Measuring_Equipment", "Control_mode", "Fiber_Material", "Area_Density", "Resin", "Hardener", "Mixing_ratio", "Length", "Width", "Thickness", "Curing_Time", "Curing_Temperature", "Curing_Pressure", "Fiber_Content", "Stacking_Sequence", "Temperature", "Humidity") VALUES (%(id)s, %(Laboratory)s, %(Researcher)s, %(Date)s, %(Experiment_Type)s, %(Fracture)s, %(Initial_Crack_length)s, %(Fatigue_Test_Type)s, %(Measuring_Equipment)s, %(Control_mode)s, %(Fiber_Material)s, %(Area_Density)s, %(Resin)s, %(Hardener)s, %(Mixing_ratio)s, %(Length)s, %(Width)s, %(Thickness)s, %(Curing_Time)s, %(Curing_Temperature)s, %(Curing_Pressure)s, %(Fiber_Content)s, %(Stacking_Sequence)s, %(Temperature)s, %(Humidity)s)
+2021-12-03 15:18:55,918 INFO sqlalchemy.engine.Engine [generated in 0.00041s] ({'id': 2, 'Laboratory': 'CCLAB', 'Researcher': 'Shayan Khalooei', 'Date': Timestamp('2021-06-01 00:00:00'), 'Experiment_Type': 'FA', 'Fracture': False, 'Initial_Crack_length': 0, 'Fatigue_Test_Type': 'CA', 'Measuring_Equipment': 'Instron Machine', 'Control_mode': 'Load Controlled', 'Fiber_Material': 'E-glass fiber fabrics (EC 9-68)', 'Area_Density': 425.0, 'Resin': 'Biresin® CR83', 'Hardener': 'Sika CH83-2', 'Mixing_ratio': '10:3', 'Length': 160.0, 'Width': 25.1, 'Thickness': 2.85, 'Curing_Time': 8.0, 'Curing_Temperature': 22.0, 'Curing_Pressure': 0.95, 'Fiber_Content': 0.65, 'Stacking_Sequence': '[+-45]2s', 'Temperature': 22.0, 'Humidity': 40.0}, {'id': 4, 'Laboratory': 'CCLAB', 'Researcher': 'Shayan Khalooei', 'Date': Timestamp('2021-06-01 00:00:00'), 'Experiment_Type': 'FA', 'Fracture': False, 'Initial_Crack_length': 0, 'Fatigue_Test_Type': 'CA', 'Measuring_Equipment': 'Instron Machine', 'Control_mode': 'Load Controlled', 'Fiber_Material': 'E-glass fiber fabrics (EC 9-68)', 'Area_Density': 425.0, 'Resin': 'Biresin® CR83', 'Hardener': 'Sika CH83-2', 'Mixing_ratio': '10:3', 'Length': 160.0, 'Width': 25.1, 'Thickness': 2.85, 'Curing_Time': 8.0, 'Curing_Temperature': 22.0, 'Curing_Pressure': 0.95, 'Fiber_Content': 0.65, 'Stacking_Sequence': '[+-45]2s', 'Temperature': 22.0, 'Humidity': 40.0}, {'id': 3, 'Laboratory': 'CCLAB', 'Researcher': 'Shayan Khalooei', 'Date': Timestamp('2021-06-01 00:00:00'), 'Experiment_Type': 'FA', 'Fracture': False, 'Initial_Crack_length': 0, 'Fatigue_Test_Type': 'CA', 'Measuring_Equipment': 'Instron Machine', 'Control_mode': 'Load Controlled', 'Fiber_Material': 'E-glass fiber fabrics (EC 9-68)', 'Area_Density': 425.0, 'Resin': 'Biresin® CR83', 'Hardener': 'Sika CH83-2', 'Mixing_ratio': '10:3', 'Length': 160.0, 'Width': 25.1, 'Thickness': 2.85, 'Curing_Time': 8.0, 'Curing_Temperature': 22.0, 'Curing_Pressure': 0.95, 'Fiber_Content': 0.65, 'Stacking_Sequence': '[+-45]2s', 'Temperature': 22.0, 'Humidity': 40.0})
+2021-12-03 15:18:55,927 INFO sqlalchemy.engine.Engine COMMIT
+INFO:sqlalchemy.engine.Engine:[generated in 0.00041s] ({'id': 2, 'Laboratory': 'CCLAB', 'Researcher': 'Shayan Khalooei', 'Date': Timestamp('2021-06-01 00:00:00'), 'Experiment_Type': 'FA', 'Fracture': False, 'Initial_Crack_length': 0, 'Fatigue_Test_Type': 'CA', 'Measuring_Equipment': 'Instron Machine', 'Control_mode': 'Load Controlled', 'Fiber_Material': 'E-glass fiber fabrics (EC 9-68)', 'Area_Density': 425.0, 'Resin': 'Biresin® CR83', 'Hardener': 'Sika CH83-2', 'Mixing_ratio': '10:3', 'Length': 160.0, 'Width': 25.1, 'Thickness': 2.85, 'Curing_Time': 8.0, 'Curing_Temperature': 22.0, 'Curing_Pressure': 0.95, 'Fiber_Content': 0.65, 'Stacking_Sequence': '[+-45]2s', 'Temperature': 22.0, 'Humidity': 40.0}, {'id': 4, 'Laboratory': 'CCLAB', 'Researcher': 'Shayan Khalooei', 'Date': Timestamp('2021-06-01 00:00:00'), 'Experiment_Type': 'FA', 'Fracture': False, 'Initial_Crack_length': 0, 'Fatigue_Test_Type': 'CA', 'Measuring_Equipment': 'Instron Machine', 'Control_mode': 'Load Controlled', 'Fiber_Material': 'E-glass fiber fabrics (EC 9-68)', 'Area_Density': 425.0, 'Resin': 'Biresin® CR83', 'Hardener': 'Sika CH83-2', 'Mixing_ratio': '10:3', 'Length': 160.0, 'Width': 25.1, 'Thickness': 2.85, 'Curing_Time': 8.0, 'Curing_Temperature': 22.0, 'Curing_Pressure': 0.95, 'Fiber_Content': 0.65, 'Stacking_Sequence': '[+-45]2s', 'Temperature': 22.0, 'Humidity': 40.0}, {'id': 3, 'Laboratory': 'CCLAB', 'Researcher': 'Shayan Khalooei', 'Date': Timestamp('2021-06-01 00:00:00'), 'Experiment_Type': 'FA', 'Fracture': False, 'Initial_Crack_length': 0, 'Fatigue_Test_Type': 'CA', 'Measuring_Equipment': 'Instron Machine', 'Control_mode': 'Load Controlled', 'Fiber_Material': 'E-glass fiber fabrics (EC 9-68)', 'Area_Density': 425.0, 'Resin': 'Biresin® CR83', 'Hardener': 'Sika CH83-2', 'Mixing_ratio': '10:3', 'Length': 160.0, 'Width': 25.1, 'Thickness': 2.85, 'Curing_Time': 8.0, 'Curing_Temperature': 22.0, 'Curing_Pressure': 0.95, 'Fiber_Content': 0.65, 'Stacking_Sequence': '[+-45]2s', 'Temperature': 22.0, 'Humidity': 40.0})
+2021-12-03 15:18:55,939 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+INFO:sqlalchemy.engine.Engine:COMMIT
+INFO:sqlalchemy.engine.Engine:BEGIN (implicit)
+INFO:sqlalchemy.engine.Engine:INSERT INTO test (id, parent_id, "Specimen_number", "Stress_Ratio", "Maximum_Stress", "Loading_rate", "Run_out") VALUES (%(id)s, %(parent_id)s, %(Specimen_number)s, %(Stress_Ratio)s, %(Maximum_Stress)s, %(Loading_rate)s, %(Run_out)s)
+2021-12-03 15:18:55,940 INFO sqlalchemy.engine.Engine INSERT INTO test (id, parent_id, "Specimen_number", "Stress_Ratio", "Maximum_Stress", "Loading_rate", "Run_out") VALUES (%(id)s, %(parent_id)s, %(Specimen_number)s, %(Stress_Ratio)s, %(Maximum_Stress)s, %(Loading_rate)s, %(Run_out)s)
+INFO:sqlalchemy.engine.Engine:[generated in 0.00073s] ({'id': 9, 'parent_id': 2, 'Specimen_number': 4, 'Stress_Ratio': 0.2, 'Maximum_Stress': 80, 'Loading_rate': 100, 'Run_out': False}, {'id': 3, 'parent_id': 1, 'Specimen_number': 3, 'Stress_Ratio': 0.9, 'Maximum_Stress': 70, 'Loading_rate': 10, 'Run_out': False}, {'id': 10, 'parent_id': 2, 'Specimen_number': 5, 'Stress_Ratio': 0.1, 'Maximum_Stress': 80, 'Loading_rate': 100, 'Run_out': False}, {'id': 7, 'parent_id': 2, 'Specimen_number': 2, 'Stress_Ratio': 0.2, 'Maximum_Stress': 70, 'Loading_rate': 100, 'Run_out': False}, {'id': 29, 'parent_id': 4, 'Specimen_number': 13, 'Stress_Ratio': 0.5, 'Maximum_Stress': 90, 'Loading_rate': 10, 'Run_out': False}, {'id': 30, 'parent_id': 4, 'Specimen_number': 14, 'Stress_Ratio': 0.5, 'Maximum_Stress': 100, 'Loading_rate': 10, 'Run_out': False}, {'id': 4, 'parent_id': 1, 'Specimen_number': 4, 'Stress_Ratio': 0.9, 'Maximum_Stress': 80, 'Loading_rate': 10, 'Run_out': False}, {'id': 18, 'parent_id': 4, 'Specimen_number': 2, 'Stress_Ratio': 0.1, 'Maximum_Stress': 70, 'Loading_rate': 10, 'Run_out': False}  ... displaying 10 of 39 total bound parameter sets ...  {'id': 13, 'parent_id': 3, 'Specimen_number': 3, 'Stress_Ratio': 0.8, 'Maximum_Stress': 70, 'Loading_rate': 10, 'Run_out': False}, {'id': 6, 'parent_id': 2, 'Specimen_number': 1, 'Stress_Ratio': 0.1, 'Maximum_Stress': 60, 'Loading_rate': 100, 'Run_out': False})
+INFO:sqlalchemy.engine.Engine:COMMIT
+2021-12-03 15:18:55,940 INFO sqlalchemy.engine.Engine [generated in 0.00073s] ({'id': 9, 'parent_id': 2, 'Specimen_number': 4, 'Stress_Ratio': 0.2, 'Maximum_Stress': 80, 'Loading_rate': 100, 'Run_out': False}, {'id': 3, 'parent_id': 1, 'Specimen_number': 3, 'Stress_Ratio': 0.9, 'Maximum_Stress': 70, 'Loading_rate': 10, 'Run_out': False}, {'id': 10, 'parent_id': 2, 'Specimen_number': 5, 'Stress_Ratio': 0.1, 'Maximum_Stress': 80, 'Loading_rate': 100, 'Run_out': False}, {'id': 7, 'parent_id': 2, 'Specimen_number': 2, 'Stress_Ratio': 0.2, 'Maximum_Stress': 70, 'Loading_rate': 100, 'Run_out': False}, {'id': 29, 'parent_id': 4, 'Specimen_number': 13, 'Stress_Ratio': 0.5, 'Maximum_Stress': 90, 'Loading_rate': 10, 'Run_out': False}, {'id': 30, 'parent_id': 4, 'Specimen_number': 14, 'Stress_Ratio': 0.5, 'Maximum_Stress': 100, 'Loading_rate': 10, 'Run_out': False}, {'id': 4, 'parent_id': 1, 'Specimen_number': 4, 'Stress_Ratio': 0.9, 'Maximum_Stress': 80, 'Loading_rate': 10, 'Run_out': False}, {'id': 18, 'parent_id': 4, 'Specimen_number': 2, 'Stress_Ratio': 0.1, 'Maximum_Stress': 70, 'Loading_rate': 10, 'Run_out': False}  ... displaying 10 of 39 total bound parameter sets ...  {'id': 13, 'parent_id': 3, 'Specimen_number': 3, 'Stress_Ratio': 0.8, 'Maximum_Stress': 70, 'Loading_rate': 10, 'Run_out': False}, {'id': 6, 'parent_id': 2, 'Specimen_number': 1, 'Stress_Ratio': 0.1, 'Maximum_Stress': 60, 'Loading_rate': 100, 'Run_out': False})
+2021-12-03 15:18:55,945 INFO sqlalchemy.engine.Engine COMMIT
+2021-12-03 15:18:56,150 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+INFO:sqlalchemy.engine.Engine:BEGIN (implicit)
+INFO:sqlalchemy.engine.Engine:INSERT INTO test_results (parent_id, "Machine_N_cycles", "Machine_Load", "Machine_Displacement") VALUES (%(parent_id)s, %(Machine_N_cycles)s, %(Machine_Load)s, %(Machine_Displacement)s)
+2021-12-03 15:18:57,772 INFO sqlalchemy.engine.Engine INSERT INTO test_results (parent_id, "Machine_N_cycles", "Machine_Load", "Machine_Displacement") VALUES (%(parent_id)s, %(Machine_N_cycles)s, %(Machine_Load)s, %(Machine_Displacement)s)
+INFO:sqlalchemy.engine.Engine:[generated in 0.35832s] ({'parent_id': 5, 'Machine_N_cycles': '1', 'Machine_Load': 3.116748291, 'Machine_Displacement': 0.676286232}, {'parent_id': 5, 'Machine_N_cycles': '1', 'Machine_Load': 3.116748291, 'Machine_Displacement': 0.676286232}, {'parent_id': 10, 'Machine_N_cycles': '1', 'Machine_Load': 32.116748291, 'Machine_Displacement': 0.676286232}, {'parent_id': 16, 'Machine_N_cycles': '1', 'Machine_Load': 3.434443359, 'Machine_Displacement': 0.789721322}, {'parent_id': 5, 'Machine_N_cycles': '1', 'Machine_Load': 3.116748291, 'Machine_Displacement': 0.676286232}, {'parent_id': 39, 'Machine_N_cycles': '1', 'Machine_Load': 6.14663916, 'Machine_Displacement': 2.761971671}, {'parent_id': 39, 'Machine_N_cycles': '1', 'Machine_Load': 6.14663916, 'Machine_Displacement': 2.761971671}, {'parent_id': 5, 'Machine_N_cycles': '1', 'Machine_Load': 3.116748291, 'Machine_Displacement': 0.676286232}  ... displaying 10 of 119278 total bound parameter sets ...  {'parent_id': 16, 'Machine_N_cycles': '1', 'Machine_Load': 3.434443359, 'Machine_Displacement': 0.789721322}, {'parent_id': 16, 'Machine_N_cycles': '1', 'Machine_Load': 3.434443359, 'Machine_Displacement': 0.789721322})
+2021-12-03 15:18:57,772 INFO sqlalchemy.engine.Engine [generated in 0.35832s] ({'parent_id': 5, 'Machine_N_cycles': '1', 'Machine_Load': 3.116748291, 'Machine_Displacement': 0.676286232}, {'parent_id': 5, 'Machine_N_cycles': '1', 'Machine_Load': 3.116748291, 'Machine_Displacement': 0.676286232}, {'parent_id': 10, 'Machine_N_cycles': '1', 'Machine_Load': 32.116748291, 'Machine_Displacement': 0.676286232}, {'parent_id': 16, 'Machine_N_cycles': '1', 'Machine_Load': 3.434443359, 'Machine_Displacement': 0.789721322}, {'parent_id': 5, 'Machine_N_cycles': '1', 'Machine_Load': 3.116748291, 'Machine_Displacement': 0.676286232}, {'parent_id': 39, 'Machine_N_cycles': '1', 'Machine_Load': 6.14663916, 'Machine_Displacement': 2.761971671}, {'parent_id': 39, 'Machine_N_cycles': '1', 'Machine_Load': 6.14663916, 'Machine_Displacement': 2.761971671}, {'parent_id': 5, 'Machine_N_cycles': '1', 'Machine_Load': 3.116748291, 'Machine_Displacement': 0.676286232}  ... displaying 10 of 119278 total bound parameter sets ...  {'parent_id': 16, 'Machine_N_cycles': '1', 'Machine_Load': 3.434443359, 'Machine_Displacement': 0.789721322}, {'parent_id': 16, 'Machine_N_cycles': '1', 'Machine_Load': 3.434443359, 'Machine_Displacement': 0.789721322})
+2021-12-03 15:19:01,775 INFO sqlalchemy.engine.Engine COMMIT
+INFO:sqlalchemy.engine.Engine:COMMIT
+INFO:sqlalchemy.engine.Engine:BEGIN (implicit)
+2021-12-03 15:19:01,958 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+INFO:sqlalchemy.engine.Engine:SELECT test."Stress_Ratio" AS "test_Stress_Ratio", experiment.id AS experiment_id 
+FROM test JOIN experiment ON experiment.id = test.parent_id
+INFO:sqlalchemy.engine.Engine:[generated in 0.00015s] {}
+2021-12-03 15:19:01,960 INFO sqlalchemy.engine.Engine SELECT test."Stress_Ratio" AS "test_Stress_Ratio", experiment.id AS experiment_id 
+FROM test JOIN experiment ON experiment.id = test.parent_id
+2021-12-03 15:19:01,960 INFO sqlalchemy.engine.Engine [generated in 0.00015s] {}
+2021-12-03 15:19:02,087 INFO sqlalchemy.engine.Engine SELECT max(test_results."Machine_Load") AS max_1, test.id AS test_id, experiment.id AS experiment_id 
+INFO:sqlalchemy.engine.Engine:SELECT max(test_results."Machine_Load") AS max_1, test.id AS test_id, experiment.id AS experiment_id 
+FROM test_results JOIN test ON test.id = test_results.parent_id JOIN experiment ON experiment.id = test.parent_id GROUP BY test.id, experiment.id
+INFO:sqlalchemy.engine.Engine:[generated in 0.00025s] {}
+FROM test_results JOIN test ON test.id = test_results.parent_id JOIN experiment ON experiment.id = test.parent_id GROUP BY test.id, experiment.id
+2021-12-03 15:19:02,087 INFO sqlalchemy.engine.Engine [generated in 0.00025s] {}
