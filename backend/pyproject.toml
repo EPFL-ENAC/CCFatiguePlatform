@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "ccfatigue"
+version = "0.1.0"
+description = ""
+authors = ["Samuel Bancal <Samuel.Bancal@epfl.ch>"]
+license = "to be defined"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+fastapi = "^0.70.0"
+uvicorn = "^0.15.0"
+pydantic = "^1.8.2"
+gunicorn = "^20.1.0"
+dynaconf = "^3.1.7"
+psycopg2 = "^2.9.2"
+asyncpg = "^0.25.0"
+SQLAlchemy = {extras = ["asyncio"], version = "^1.4.27"}
+alembic = "^1.7.5"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

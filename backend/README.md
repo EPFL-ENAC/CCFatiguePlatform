@@ -13,10 +13,10 @@ sudo snap install docker
 Do it only once
 
 ```bash
-pipenv install
+make install
 
 # Check default encoding is UTF-8
-pipenv run python
+poetry run python
 >>> import locale
 >>> locale.getpreferredencoding()
 'UTF-8'

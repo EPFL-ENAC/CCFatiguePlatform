@@ -1,5 +1,5 @@
 install:
-	pipenv install
+	poetry install
 
 run:
-	pipenv run python3 TST_metadata_excel_to_json.py
+	poetry run python3 TST_metadata_excel_to_json.py
