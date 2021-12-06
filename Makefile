@@ -15,3 +15,7 @@ compile_sncurve:
 
 build_frontend:
 	$(MAKE) -C frontend build
+
+generate-api:
+	$(MAKE) -C backend generate-api
+	$(MAKE) -C frontend generate-api

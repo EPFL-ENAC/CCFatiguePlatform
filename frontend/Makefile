@@ -6,3 +6,6 @@ run:
 
 build:
 	npm run build
+
+generate-api:
+	npm run generate:backend

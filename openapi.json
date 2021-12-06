@@ -23,6 +23,32 @@
           }
         }
       }
+    },
+    "/experiments": {
+      "get": {
+        "tags": [
+          "experiments"
+        ],
+        "summary": "Get Experiments",
+        "description": "Get all experiments",
+        "operationId": "get_experiments_experiments_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Get Experiments Experiments Get",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExperimentModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -45,6 +71,163 @@
           }
         },
         "description": "App Info"
+      },
+      "ExperimentModel": {
+        "title": "ExperimentModel",
+        "required": [
+          "id",
+          "laboratory",
+          "researcher",
+          "experiment_type",
+          "fracture",
+          "geometry_length",
+          "geometry_width",
+          "geometry_thickness"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "laboratory": {
+            "title": "Laboratory",
+            "type": "string"
+          },
+          "researcher": {
+            "title": "Researcher",
+            "type": "string"
+          },
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "experiment_type": {
+            "title": "Experiment Type",
+            "type": "string"
+          },
+          "fracture": {
+            "title": "Fracture",
+            "type": "boolean"
+          },
+          "fracture_mode": {
+            "title": "Fracture Mode",
+            "type": "string"
+          },
+          "initial_crack_length": {
+            "title": "Initial Crack Length",
+            "type": "number"
+          },
+          "fatigue_test_type": {
+            "title": "Fatigue Test Type",
+            "type": "string"
+          },
+          "measuring_equipment": {
+            "title": "Measuring Equipment",
+            "type": "string"
+          },
+          "reliability_level": {
+            "title": "Reliability Level",
+            "type": "number"
+          },
+          "control_mode": {
+            "title": "Control Mode",
+            "type": "string"
+          },
+          "publication_title": {
+            "title": "Publication Title",
+            "type": "string"
+          },
+          "publication_author": {
+            "title": "Publication Author",
+            "type": "string"
+          },
+          "publication_year": {
+            "title": "Publication Year",
+            "type": "string"
+          },
+          "publication_doi": {
+            "title": "Publication Doi",
+            "type": "string"
+          },
+          "publication_images_repository": {
+            "title": "Publication Images Repository",
+            "type": "string"
+          },
+          "material_type_fiber_material": {
+            "title": "Material Type Fiber Material",
+            "type": "string"
+          },
+          "material_type_fiber_geometry": {
+            "title": "Material Type Fiber Geometry",
+            "type": "string"
+          },
+          "material_type_area_density": {
+            "title": "Material Type Area Density",
+            "type": "number"
+          },
+          "material_type_resin": {
+            "title": "Material Type Resin",
+            "type": "string"
+          },
+          "material_type_hardener": {
+            "title": "Material Type Hardener",
+            "type": "string"
+          },
+          "material_type_mixing_ratio": {
+            "title": "Material Type Mixing Ratio",
+            "type": "string"
+          },
+          "geometry_length": {
+            "title": "Geometry Length",
+            "type": "number"
+          },
+          "geometry_width": {
+            "title": "Geometry Width",
+            "type": "number"
+          },
+          "geometry_thickness": {
+            "title": "Geometry Thickness",
+            "type": "number"
+          },
+          "laminates_and_assemblies_curing_time": {
+            "title": "Laminates And Assemblies Curing Time",
+            "type": "number"
+          },
+          "laminates_and_assemblies_curing_temperature": {
+            "title": "Laminates And Assemblies Curing Temperature",
+            "type": "number"
+          },
+          "laminates_and_assemblies_curing_pressure": {
+            "title": "Laminates And Assemblies Curing Pressure",
+            "type": "number"
+          },
+          "laminates_and_assemblies_fiber_content": {
+            "title": "Laminates And Assemblies Fiber Content",
+            "type": "number"
+          },
+          "laminates_and_assemblies_stacking_sequence": {
+            "title": "Laminates And Assemblies Stacking Sequence",
+            "type": "string"
+          },
+          "test_condtions_temperature": {
+            "title": "Test Condtions Temperature",
+            "type": "number"
+          },
+          "test_condtions_humidity": {
+            "title": "Test Condtions Humidity",
+            "type": "number"
+          },
+          "dic_analysis_subset_size": {
+            "title": "Dic Analysis Subset Size",
+            "type": "integer"
+          },
+          "dic_analysis_step_size": {
+            "title": "Dic Analysis Step Size",
+            "type": "integer"
+          }
+        },
+        "description": "Defines how experiment is seen on the API"
       }
     }
   }

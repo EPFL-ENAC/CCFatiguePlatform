@@ -12,7 +12,7 @@ init-db:
 	${MAKE} alembic-upgrade
 	poetry run python3 initial_inject_to_db.py
 
-generate-openapi:
+generate-api:
 	poetry run python api.py ../openapi.json
 
 run:
