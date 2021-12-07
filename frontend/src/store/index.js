@@ -1,36 +1,17 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import Axios from "axios";
-import qs from "qs";
+
+import { ExperimentsApi } from "@/backend/src/index";
+import ApiClient from "@/backend/src/ApiClient";
+import experiments from "./experiments";
 
 Vue.use(Vuex);
 
+const apiClient = new ApiClient(process.env.VUE_APP_API_URL);
+Vue.prototype.$experimentsApi = new ExperimentsApi(apiClient);
+
 export default new Vuex.Store({
-  state: {
-    test: {},
+  modules: {
+    experiments,
   },
-  getters: {
-    dataIsFetched(state) {
-      return Object.keys(state.test).length > 0;
-    },
-  },
-  mutations: {
-    saveTest(state, test) {
-      state.test = { ...test };
-    },
-  },
-  actions: {
-    fetchExperiment(context, payload) {
-      Axios.get("dashboard", {
-        params: payload,
-        paramsSerializer: (params) =>
-          qs.stringify(params, { arrayFormat: "repeat" }),
-      })
-        .then((res) => {
-          context.commit("saveTest", res.data);
-        })
-        .catch((err) => console.log(err));
-    },
-  },
-  modules: {},
 });

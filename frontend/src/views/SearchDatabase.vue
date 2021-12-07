@@ -140,6 +140,8 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
   name: "SearchDatabase",
   data() {
@@ -156,241 +158,36 @@ export default {
         textSearch: "",
       },
       headers: [
-        { text: "Laboratory", value: "General.Laboratory" },
-        { text: "Experiment Type", value: "General.Experiment Type" },
-        { text: "Publication", value: "Publication.DOI" },
-        { text: "Images", value: "Publication.Images Repository" },
-        { text: "Length", value: "Geometry.Length" },
-        { text: "width", value: "Geometry.Width" },
-        { text: "Thickness", value: "Geometry.Thickness" },
-        { text: "Curing Time", value: "Laminates and Assemblies.Curing Time" },
+        { text: "Laboratory", value: "laboratory" },
+        { text: "Experiment Type", value: "experiment_type" },
+        { text: "Publication", value: "publication_doi" },
+        { text: "Images", value: "publication_images_repository" },
+        { text: "Length", value: "geometry_length" },
+        { text: "width", value: "geometry_width" },
+        { text: "Thickness", value: "geometry_thickness" },
+        { text: "Curing Time", value: "laminates_and_assemblies_curing_time" },
         {
           text: "Curing Temperature",
-          value: "Laminates and Assemblies.Curing Temperature",
+          value: "laminates_and_assemblies_curing_temperature",
         },
         {
           text: "Curing Pressure",
-          value: "Laminates and Assemblies.Curing Pressure",
+          value: "laminates_and_assemblies_curing_pressure",
         },
         {
           text: "Fiber Content",
-          value: "Laminates and Assemblies.Fiber Content",
+          value: "laminates_and_assemblies_fiber_content",
         },
         {
           text: "Stacking Sequence",
-          value: "Laminates and Assemblies.Stacking Sequence",
-        },
-      ],
-      experiments: [
-        {
-          id: 0,
-          General: {
-            Laboratory: "CCLAB",
-            Researcher: "AAA FakeResearcher",
-            "Experiment Type": "QS",
-            Date: "2019-09",
-            Fracture: false,
-            "Fracture Mode": null,
-            "Initial Crack length": null,
-            "Fatigue Test Type": null,
-            "Measuring Equipment": "Instron Machine",
-            "Reliability Level": null,
-            "Control mode": "Load Controlled",
-          },
-          Publication: {
-            Title: null,
-            Author: null,
-            Year: null,
-            DOI: null,
-            "Images Repository": null,
-          },
-          "Material Type": {
-            "Fiber Material": "E-glass fiber fabrics (EC 9-68)",
-            "Fiber Geometry": null,
-            "Area Density": 425,
-            Resin: "Biresin\u00ae CR83",
-            Hardener: "Sika CH83-2",
-            "Mixing ratio": "10:3",
-          },
-          Geometry: {
-            Length: 160,
-            Width: 25.1,
-            Thickness: 2.85,
-          },
-          "Laminates and Assemblies": {
-            "Curing Time": 8,
-            "Curing Temperature": 22,
-            "Curing Pressure": 0.95,
-            "Fiber Content": 0.65,
-            "Stacking Sequence": "[+-45]2s",
-          },
-          "Test condtions": {
-            Temperature: 22,
-            Humidity: 40,
-          },
-          "DIC Analysis ": {
-            "Subset Size": null,
-            "Step Size": null,
-          },
-        },
-        {
-          id: 1,
-          General: {
-            Laboratory: "CCLAB",
-            Researcher: "Shayan Khalooei",
-            "Experiment Type": "FA",
-            Date: "2021-06",
-            Fracture: false,
-            "Fracture Mode": null,
-            "Initial Crack length": null,
-            "Fatigue Test Type": "CA",
-            "Measuring Equipment": "Instron Machine",
-            "Reliability Level": null,
-            "Control mode": "Load Controlled",
-          },
-          Publication: {
-            Title: null,
-            Author: null,
-            Year: null,
-            DOI: null,
-            "Images Repository": null,
-          },
-          "Material Type": {
-            "Fiber Material": "E-glass fiber fabrics (EC 9-68)",
-            "Fiber Geometry": null,
-            "Area Density": 425,
-            Resin: "Tripleresin\u00ae CR58",
-            Hardener: "Sika CH83-2",
-            "Mixing ratio": "10:3",
-          },
-          Geometry: {
-            Length: 200,
-            Width: 25.1,
-            Thickness: 2.85,
-          },
-          "Laminates and Assemblies": {
-            "Curing Time": 8,
-            "Curing Temperature": 22,
-            "Curing Pressure": 0.95,
-            "Fiber Content": 0.65,
-            "Stacking Sequence": "[+-45]2s",
-          },
-          "Test condtions": {
-            Temperature: 22,
-            Humidity: 40,
-          },
-          "DIC Analysis ": {
-            "Subset Size": null,
-            "Step Size": null,
-          },
-        },
-        {
-          id: 2,
-          General: {
-            Laboratory: "CCLAB",
-            Researcher: "Shayan Khalooei",
-            "Experiment Type": "FA",
-            Date: "2021-06",
-            Fracture: false,
-            "Fracture Mode": null,
-            "Initial Crack length": null,
-            "Fatigue Test Type": "CA",
-            "Measuring Equipment": "Instron Machine",
-            "Reliability Level": null,
-            "Control mode": "Load Controlled",
-          },
-          Publication: {
-            Title: null,
-            Author: null,
-            Year: null,
-            DOI: null,
-            "Images Repository": null,
-          },
-          "Material Type": {
-            "Fiber Material": "E-glass fiber fabrics (EC 9-68)",
-            "Fiber Geometry": null,
-            "Area Density": 425,
-            Resin: "Tripleresin\u00ae CR58",
-            Hardener: "Sika CH83-2",
-            "Mixing ratio": "10:3",
-          },
-          Geometry: {
-            Length: 160,
-            Width: 25.1,
-            Thickness: 2.85,
-          },
-          "Laminates and Assemblies": {
-            "Curing Time": 8,
-            "Curing Temperature": 26,
-            "Curing Pressure": 0.95,
-            "Fiber Content": 0.65,
-            "Stacking Sequence": "[+-45]2s",
-          },
-          "Test condtions": {
-            Temperature: 22,
-            Humidity: 40,
-          },
-          "DIC Analysis ": {
-            "Subset Size": null,
-            "Step Size": null,
-          },
-        },
-        {
-          id: 3,
-          General: {
-            Laboratory: "CCLAB",
-            Researcher: "Shayan Khalooei",
-            Date: "2021-06",
-            "Experiment Type": "FA",
-            Fracture: false,
-            "Fracture Mode": null,
-            "Initial Crack length": null,
-            "Fatigue Test Type": "CA",
-            "Measuring Equipment": "Instron Machine",
-            "Reliability Level": null,
-            "Control mode": "Load Controlled",
-          },
-          Publication: {
-            Title: null,
-            Author: null,
-            Year: null,
-            DOI: null,
-            "Images Repository": null,
-          },
-          "Material Type": {
-            "Fiber Material": "E-glass fiber fabrics (EC 9-68)",
-            "Fiber Geometry": null,
-            "Area Density": 425,
-            Resin: "Biresin\u00ae CR83",
-            Hardener: "Sika CH83-2",
-            "Mixing ratio": "10:3",
-          },
-          Geometry: {
-            Length: 160,
-            Width: 25.1,
-            Thickness: 2.85,
-          },
-          "Laminates and Assemblies": {
-            "Curing Time": 10,
-            "Curing Temperature": 22,
-            "Curing Pressure": 0.95,
-            "Fiber Content": 0.65,
-            "Stacking Sequence": "[+-90]2s",
-          },
-          "Test condtions": {
-            Temperature: 22,
-            Humidity: 40,
-          },
-          "DIC Analysis ": {
-            "Subset Size": null,
-            "Step Size": null,
-          },
+          value: "laminates_and_assemblies_stacking_sequence",
         },
       ],
       experimentSelected: [],
     };
   },
   computed: {
+    ...mapState("experiments", { experiments: "experiments" }),
     possibleValues() {
       let fractureModes = [
         "All modes",
@@ -408,11 +205,11 @@ export default {
             array.push(item);
           }
         };
-        addIfNotExist(resins, exp["Material Type"].Resin);
-        addIfNotExist(fiberMaterials, exp["Material Type"]["Fiber Material"]);
+        addIfNotExist(resins, exp.material_type_resin);
+        addIfNotExist(fiberMaterials, exp.material_type_fiber_material);
         addIfNotExist(
           stackingSequences,
-          exp["Laminates and Assemblies"]["Stacking Sequence"]
+          exp.laminates_and_assemblies_stacking_sequence
         );
       });
       return {
@@ -426,38 +223,38 @@ export default {
       return this.experiments
         .filter((exp) => {
           return (
-            (this.filters.typeFA && exp.General["Experiment Type"] == "FA") ||
-            (this.filters.typeQS && exp.General["Experiment Type"] == "QS")
+            (this.filters.typeFA && exp.experiment_type == "FA") ||
+            (this.filters.typeQS && exp.experiment_type == "QS")
           );
         })
         .filter((exp) => {
           return (
-            (this.filters.withFracture && exp.General.Fracture) ||
-            (this.filters.withoutFracture && !exp.General.Fracture)
+            (this.filters.withFracture && exp.fracture) ||
+            (this.filters.withoutFracture && !exp.fracture)
           );
         })
         .filter((exp) => {
           return (
             this.filters.fractureMode == "All modes" ||
-            exp.General["Fracture Mode"] == this.filters.fractureMode
+            exp.fracture_mode == this.filters.fractureMode
           );
         })
         .filter((exp) => {
           return (
             this.filters.resin == "All resins" ||
-            exp["Material Type"].Resin == this.filters.resin
+            exp.material_type_resin == this.filters.resin
           );
         })
         .filter((exp) => {
           return (
             this.filters.fiberMaterial == "All materials" ||
-            exp["Material Type"]["Fiber Material"] == this.filters.fiberMaterial
+            exp.material_type_fiber_material == this.filters.fiberMaterial
           );
         })
         .filter((exp) => {
           return (
             this.filters.stackingSequence == "All stacking sequences" ||
-            exp["Laminates and Assemblies"]["Stacking Sequence"] ==
+            exp.laminates_and_assemblies_stacking_sequence ==
               this.filters.stackingSequence
           );
         })
@@ -465,39 +262,43 @@ export default {
           let textSearch = this.filters.textSearch.toUpperCase();
           return (
             this.filters.textSearch == "" ||
-            exp.General.Laboratory.toUpperCase().includes(textSearch) ||
-            exp.General["Experiment Type"].toUpperCase().includes(textSearch) ||
-            exp.Geometry.Length.toString().toUpperCase().includes(textSearch) ||
-            exp.Geometry.Width.toString().toUpperCase().includes(textSearch) ||
-            exp.Geometry.Thickness.toString()
-              .toUpperCase()
-              .includes(textSearch) ||
-            exp["Laminates and Assemblies"]["Curing Time"]
+            exp.laboratory.toUpperCase().includes(textSearch) ||
+            exp.experiment_type.toUpperCase().includes(textSearch) ||
+            exp.geometry_length.toString().toUpperCase().includes(textSearch) ||
+            exp.geometry_width.toString().toUpperCase().includes(textSearch) ||
+            exp.geometry_thickness
               .toString()
               .toUpperCase()
               .includes(textSearch) ||
-            exp["Laminates and Assemblies"]["Curing Temperature"]
+            exp.laminates_and_assemblies_curing_time
               .toString()
               .toUpperCase()
               .includes(textSearch) ||
-            exp["Laminates and Assemblies"]["Curing Pressure"]
+            exp.laminates_and_assemblies_curing_temperature
               .toString()
               .toUpperCase()
               .includes(textSearch) ||
-            exp["Laminates and Assemblies"]["Fiber Content"]
+            exp.laminates_and_assemblies_curing_pressure
               .toString()
               .toUpperCase()
               .includes(textSearch) ||
-            exp["Laminates and Assemblies"]["Stacking Sequence"]
+            exp.laminates_and_assemblies_fiber_content
+              .toString()
               .toUpperCase()
               .includes(textSearch) ||
-            exp["Laminates and Assemblies"]["Curing Time"]
+            exp.laminates_and_assemblies_stacking_sequence
+              .toUpperCase()
+              .includes(textSearch) ||
+            exp.laminates_and_assemblies_curing_time
               .toString()
               .toUpperCase()
               .includes(textSearch)
           );
         });
     },
+  },
+  created() {
+    this.$store.dispatch("experiments/fetchAll");
   },
 };
 </script>
