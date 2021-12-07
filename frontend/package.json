@@ -6,19 +6,19 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "generate:backend": "rm -rf src/backend && openapi-generator-cli generate -i ../openapi.json -g typescript-axios -o src/backend"
+    "generate:backend": "rm -rf src/backend && openapi-generator-cli generate -i ../openapi.json -g javascript -o src/backend && prettier --write src/backend"
   },
   "dependencies": {
     "@openapitools/openapi-generator-cli": "^2.4.18",
-    "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "downloadjs": "^1.4.7",
     "numeral": "^2.0.6",
+    "superagent": "^6.1.0",
     "vue": "^2.6.11",
     "vue-filter-number-format": "^3.0.1",
     "vue-router": "^3.2.0",
     "vuetify": "^2.4.0",
-    "vuex": "^3.4.0"
+    "vuex": "^3.6.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
@@ -32,7 +32,7 @@
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-vue": "^6.2.2",
     "lint-staged": "^9.5.0",
-    "prettier": "^2.2.1",
+    "prettier": "^2.5.1",
     "sass": "~1.32.0",
     "sass-loader": "^10.0.0",
     "vue-cli-plugin-vuetify": "~2.4.1",
