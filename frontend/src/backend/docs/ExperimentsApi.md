@@ -8,7 +8,7 @@ All URIs are relative to _http://localhost_
 
 ## getExperimentsExperimentsGet
 
-> [ExperimentModel] getExperimentsExperimentsGet()
+> PageExperimentModel getExperimentsExperimentsGet(opts)
 
 Get Experiments
 
@@ -20,7 +20,11 @@ Get all experiments
 import Ccfatigue from "ccfatigue";
 
 let apiInstance = new Ccfatigue.ExperimentsApi();
-apiInstance.getExperimentsExperimentsGet((error, data, response) => {
+let opts = {
+  page: 1, // Number |
+  size: 50, // Number |
+};
+apiInstance.getExperimentsExperimentsGet(opts, (error, data, response) => {
   if (error) {
     console.error(error);
   } else {
@@ -31,11 +35,14 @@ apiInstance.getExperimentsExperimentsGet((error, data, response) => {
 
 ### Parameters
 
-This endpoint does not need any parameter.
+| Name     | Type       | Description | Notes                      |
+| -------- | ---------- | ----------- | -------------------------- |
+| **page** | **Number** |             | [optional] [default to 1]  |
+| **size** | **Number** |             | [optional] [default to 50] |
 
 ### Return type
 
-[**[ExperimentModel]**](ExperimentModel.md)
+[**PageExperimentModel**](PageExperimentModel.md)
 
 ### Authorization
 

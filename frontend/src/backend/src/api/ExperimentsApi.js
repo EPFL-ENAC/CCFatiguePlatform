@@ -12,7 +12,8 @@
  */
 
 import ApiClient from "../ApiClient";
-import ExperimentModel from "../model/ExperimentModel";
+import HTTPValidationError from "../model/HTTPValidationError";
+import PageExperimentModel from "../model/PageExperimentModel";
 
 /**
  * Experiments service.
@@ -35,28 +36,35 @@ export default class ExperimentsApi {
    * Callback function to receive the result of the getExperimentsExperimentsGet operation.
    * @callback module:api/ExperimentsApi~getExperimentsExperimentsGetCallback
    * @param {String} error Error message, if any.
-   * @param {Array.<module:model/ExperimentModel>} data The data returned by the service call.
+   * @param {module:model/PageExperimentModel} data The data returned by the service call.
    * @param {String} response The complete HTTP response.
    */
 
   /**
    * Get Experiments
    * Get all experiments
+   * @param {Object} opts Optional parameters
+   * @param {Number} opts.page  (default to 1)
+   * @param {Number} opts.size  (default to 50)
    * @param {module:api/ExperimentsApi~getExperimentsExperimentsGetCallback} callback The callback function, accepting three arguments: error, data, response
-   * data is of type: {@link Array.<module:model/ExperimentModel>}
+   * data is of type: {@link module:model/PageExperimentModel}
    */
-  getExperimentsExperimentsGet(callback) {
+  getExperimentsExperimentsGet(opts, callback) {
+    opts = opts || {};
     let postBody = null;
 
     let pathParams = {};
-    let queryParams = {};
+    let queryParams = {
+      page: opts["page"],
+      size: opts["size"],
+    };
     let headerParams = {};
     let formParams = {};
 
     let authNames = [];
     let contentTypes = [];
     let accepts = ["application/json"];
-    let returnType = [ExperimentModel];
+    let returnType = PageExperimentModel;
     return this.apiClient.callApi(
       "/experiments",
       "GET",

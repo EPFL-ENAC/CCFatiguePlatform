@@ -16,6 +16,7 @@ psycopg2 = "^2.9.2"
 asyncpg = "^0.25.0"
 SQLAlchemy = {extras = ["asyncio"], version = "^1.4.27"}
 alembic = "^1.7.5"
+fastapi-pagination = {extras = ["async_sqlalchemy"], version = "^0.9.1"}
 
 [tool.poetry.dev-dependencies]
 flake8 = "^4.0.1"
