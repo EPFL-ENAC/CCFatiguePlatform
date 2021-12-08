@@ -14,6 +14,9 @@
 import ApiClient from "./ApiClient";
 import AppInfo from "./model/AppInfo";
 import ExperimentModel from "./model/ExperimentModel";
+import HTTPValidationError from "./model/HTTPValidationError";
+import PageExperimentModel from "./model/PageExperimentModel";
+import ValidationError from "./model/ValidationError";
 import DefaultApi from "./api/DefaultApi";
 import ExperimentsApi from "./api/ExperimentsApi";
 
@@ -64,6 +67,21 @@ export {
    * @property {module:model/ExperimentModel}
    */
   ExperimentModel,
+  /**
+   * The HTTPValidationError model constructor.
+   * @property {module:model/HTTPValidationError}
+   */
+  HTTPValidationError,
+  /**
+   * The PageExperimentModel model constructor.
+   * @property {module:model/PageExperimentModel}
+   */
+  PageExperimentModel,
+  /**
+   * The ValidationError model constructor.
+   * @property {module:model/ValidationError}
+   */
+  ValidationError,
   /**
    * The DefaultApi service constructor.
    * @property {module:api/DefaultApi}

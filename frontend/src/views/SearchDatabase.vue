@@ -117,6 +117,12 @@
             v-model="experimentSelected"
             :headers="headers"
             :items="visibleExperiments"
+            :options.sync="pageOptions"
+            :server-items-length="nbExperiments"
+            :loading="loading"
+            :footer-props="{
+              'items-per-page-options': [5, 10, 15, 20, 40],
+            }"
             item-key="id"
             show-select
             single-select
@@ -184,10 +190,17 @@ export default {
         },
       ],
       experimentSelected: [],
+      pageOptions: {},
     };
   },
   computed: {
-    ...mapState("experiments", { experiments: "experiments" }),
+    ...mapState("experiments", {
+      loading: "loading",
+      experiments: "experiments",
+      page: "page",
+      itemsPerPage: "itemsPerPage",
+      nbExperiments: "nbExperiments",
+    }),
     possibleValues() {
       let fractureModes = [
         "All modes",
@@ -298,7 +311,15 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch("experiments/fetchAll");
+    this.$store.dispatch("experiments/fetch");
+  },
+  watch: {
+    pageOptions: {
+      handler() {
+        this.$store.dispatch("experiments/fetch", this.pageOptions);
+      },
+      deep: true,
+    },
   },
 };
 </script>

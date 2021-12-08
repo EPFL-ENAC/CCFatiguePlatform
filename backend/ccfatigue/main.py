@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_pagination import add_pagination
 
 from ccfatigue import __name__, __version__
 
@@ -27,3 +28,4 @@ else:
 
 app.include_router(root.router)
 app.include_router(experiments.router)
+add_pagination(app)

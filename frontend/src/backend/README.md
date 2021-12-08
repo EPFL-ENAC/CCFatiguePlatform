@@ -124,6 +124,9 @@ All URIs are relative to _http://localhost_
 
 - [Ccfatigue.AppInfo](docs/AppInfo.md)
 - [Ccfatigue.ExperimentModel](docs/ExperimentModel.md)
+- [Ccfatigue.HTTPValidationError](docs/HTTPValidationError.md)
+- [Ccfatigue.PageExperimentModel](docs/PageExperimentModel.md)
+- [Ccfatigue.ValidationError](docs/ValidationError.md)
 
 ## Documentation for Authorization
 

@@ -7,6 +7,9 @@ docs/AppInfo.md
 docs/DefaultApi.md
 docs/ExperimentModel.md
 docs/ExperimentsApi.md
+docs/HTTPValidationError.md
+docs/PageExperimentModel.md
+docs/ValidationError.md
 git_push.sh
 mocha.opts
 package.json
@@ -16,7 +19,13 @@ src/api/ExperimentsApi.js
 src/index.js
 src/model/AppInfo.js
 src/model/ExperimentModel.js
+src/model/HTTPValidationError.js
+src/model/PageExperimentModel.js
+src/model/ValidationError.js
 test/api/DefaultApi.spec.js
 test/api/ExperimentsApi.spec.js
 test/model/AppInfo.spec.js
 test/model/ExperimentModel.spec.js
+test/model/HTTPValidationError.spec.js
+test/model/PageExperimentModel.spec.js
+test/model/ValidationError.spec.js
