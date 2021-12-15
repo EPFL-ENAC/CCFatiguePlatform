@@ -36,6 +36,24 @@
           {
             "required": false,
             "schema": {
+              "title": "Query",
+              "type": "string"
+            },
+            "name": "query",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Text Search",
+              "type": "string"
+            },
+            "name": "text_search",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
               "title": "Page",
               "minimum": 1.0,
               "type": "integer",

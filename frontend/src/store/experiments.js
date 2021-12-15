@@ -22,19 +22,36 @@ export default {
       state.nbExperiments = data.total;
       state.loading = false;
     },
+    emptyExperiments(state) {
+      state.experiments = [];
+      state.nbExperiments = 0;
+      state.loading = false;
+    },
   },
   actions: {
-    fetch({ commit, state }, options = {}) {
-      commit("nowWeLoad");
-      if (options.page && options.page != state.page) {
-        commit("storePage", options.page);
+    fetch({ commit, state }, payload) {
+      if (payload.filterToEmpty) {
+        commit("emptyExperiments");
+        return;
       }
-      if (options.itemsPerPage && options.itemsPerPage != state.itemsPerPage) {
-        commit("storeItemsPerPage", options.itemsPerPage);
+      commit("nowWeLoad");
+      if (
+        payload.paginationOptions.page &&
+        payload.paginationOptions.page != state.page
+      ) {
+        commit("storePage", payload.paginationOptions.page);
+      }
+      if (
+        payload.paginationOptions.itemsPerPage &&
+        payload.paginationOptions.itemsPerPage != state.itemsPerPage
+      ) {
+        commit("storeItemsPerPage", payload.paginationOptions.itemsPerPage);
       }
       let opts = {
         page: state.page,
         size: state.itemsPerPage,
+        query: payload.query,
+        textSearch: payload.textSearch,
       };
       this._vm.$experimentsApi.getExperimentsExperimentsGet(
         opts,

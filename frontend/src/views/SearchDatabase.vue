@@ -13,6 +13,7 @@
                     v-model="filters.typeFA"
                     label="FA"
                     hide-details
+                    @change="fetchExperiments"
                   />
                 </v-col>
                 <v-col>
@@ -20,6 +21,7 @@
                     v-model="filters.typeQS"
                     label="QS"
                     hide-details
+                    @change="fetchExperiments"
                   />
                 </v-col>
               </v-row>
@@ -29,6 +31,7 @@
                     v-model="filters.withFracture"
                     label="with fracture"
                     hide-details
+                    @change="fetchExperiments"
                   />
                 </v-col>
                 <v-col>
@@ -36,10 +39,11 @@
                     v-model="filters.withoutFracture"
                     label="without fracture"
                     hide-details
+                    @change="fetchExperiments"
                   />
                 </v-col>
               </v-row>
-              <v-row v-if="filters.withFracture">
+              <v-row v-if="filters.withFracture && !filters.withoutFracture">
                 <v-col>
                   <v-overflow-btn
                     v-model="filters.fractureMode"
@@ -47,6 +51,7 @@
                     label="fracture mode"
                     hide-details
                     dense
+                    @change="fetchExperiments"
                   >
                   </v-overflow-btn>
                 </v-col>
@@ -63,6 +68,7 @@
                     :items="possibleValues.resins"
                     hide-details
                     dense
+                    @change="fetchExperiments"
                   >
                   </v-overflow-btn>
                 </v-col>
@@ -74,6 +80,7 @@
                     :items="possibleValues.fiberMaterials"
                     hide-details
                     dense
+                    @change="fetchExperiments"
                   >
                   </v-overflow-btn>
                 </v-col>
@@ -90,6 +97,7 @@
                     :items="possibleValues.stackingSequences"
                     hide-details
                     dense
+                    @change="fetchExperiments"
                   >
                   </v-overflow-btn>
                 </v-col>
@@ -105,6 +113,7 @@
                     v-model="filters.textSearch"
                     placeholder="search"
                     dense
+                    @change="fetchExperiments"
                   >
                   </v-text-field>
                 </v-col>
@@ -116,8 +125,8 @@
           <v-data-table
             v-model="experimentSelected"
             :headers="headers"
-            :items="visibleExperiments"
-            :options.sync="pageOptions"
+            :items="experiments"
+            :options.sync="paginationOptions"
             :server-items-length="nbExperiments"
             :loading="loading"
             :footer-props="{
@@ -190,7 +199,7 @@ export default {
         },
       ],
       experimentSelected: [],
-      pageOptions: {},
+      paginationOptions: {},
     };
   },
   computed: {
@@ -232,93 +241,71 @@ export default {
         stackingSequences,
       };
     },
-    visibleExperiments() {
-      return this.experiments
-        .filter((exp) => {
-          return (
-            (this.filters.typeFA && exp.experiment_type == "FA") ||
-            (this.filters.typeQS && exp.experiment_type == "QS")
-          );
-        })
-        .filter((exp) => {
-          return (
-            (this.filters.withFracture && exp.fracture) ||
-            (this.filters.withoutFracture && !exp.fracture)
-          );
-        })
-        .filter((exp) => {
-          return (
-            this.filters.fractureMode == "All modes" ||
-            exp.fracture_mode == this.filters.fractureMode
-          );
-        })
-        .filter((exp) => {
-          return (
-            this.filters.resin == "All resins" ||
-            exp.material_type_resin == this.filters.resin
-          );
-        })
-        .filter((exp) => {
-          return (
-            this.filters.fiberMaterial == "All materials" ||
-            exp.material_type_fiber_material == this.filters.fiberMaterial
-          );
-        })
-        .filter((exp) => {
-          return (
-            this.filters.stackingSequence == "All stacking sequences" ||
-            exp.laminates_and_assemblies_stacking_sequence ==
-              this.filters.stackingSequence
-          );
-        })
-        .filter((exp) => {
-          let textSearch = this.filters.textSearch.toUpperCase();
-          return (
-            this.filters.textSearch == "" ||
-            exp.laboratory.toUpperCase().includes(textSearch) ||
-            exp.experiment_type.toUpperCase().includes(textSearch) ||
-            exp.geometry_length.toString().toUpperCase().includes(textSearch) ||
-            exp.geometry_width.toString().toUpperCase().includes(textSearch) ||
-            exp.geometry_thickness
-              .toString()
-              .toUpperCase()
-              .includes(textSearch) ||
-            exp.laminates_and_assemblies_curing_time
-              .toString()
-              .toUpperCase()
-              .includes(textSearch) ||
-            exp.laminates_and_assemblies_curing_temperature
-              .toString()
-              .toUpperCase()
-              .includes(textSearch) ||
-            exp.laminates_and_assemblies_curing_pressure
-              .toString()
-              .toUpperCase()
-              .includes(textSearch) ||
-            exp.laminates_and_assemblies_fiber_content
-              .toString()
-              .toUpperCase()
-              .includes(textSearch) ||
-            exp.laminates_and_assemblies_stacking_sequence
-              .toUpperCase()
-              .includes(textSearch) ||
-            exp.laminates_and_assemblies_curing_time
-              .toString()
-              .toUpperCase()
-              .includes(textSearch)
-          );
-        });
-    },
   },
   created() {
-    this.$store.dispatch("experiments/fetch");
+    this.fetchExperiments();
   },
   watch: {
-    pageOptions: {
+    paginationOptions: {
       handler() {
-        this.$store.dispatch("experiments/fetch", this.pageOptions);
+        this.fetchExperiments();
       },
       deep: true,
+    },
+  },
+  methods: {
+    fetchExperiments() {
+      let queryElements = [];
+      let types = [];
+      let filterToEmpty = false;
+
+      // type (FA|QS)
+      if (this.filters.typeFA) {
+        types.push("FA");
+      }
+      if (this.filters.typeQS) {
+        types.push("QS");
+      }
+      queryElements.push("experiment_type:" + types.join(","));
+
+      // fracture (true|false)
+      // fracture_mode (All modes|Mode I|Mode II|Mode III|Combined)
+      if (this.filters.withFracture && !this.filters.withoutFracture) {
+        queryElements.push("fracture:1");
+        if (this.filters.fractureMode !== "All modes") {
+          queryElements.push(`fracture_mode:${this.filters.fractureMode}`);
+        }
+      } else if (!this.filters.withFracture && this.filters.withoutFracture) {
+        queryElements.push("fracture:0");
+      } else if (!this.filters.withFracture && !this.filters.withoutFracture) {
+        filterToEmpty = true;
+      }
+
+      // material_type_resin
+      if (this.filters.resin !== "All resins") {
+        queryElements.push(`material_type_resin:${this.filters.resin}`);
+      }
+
+      // material_type_fiber_material
+      if (this.filters.fiberMaterial !== "All materials") {
+        queryElements.push(
+          `material_type_fiber_material:${this.filters.fiberMaterial}`
+        );
+      }
+
+      // laminates_and_assemblies_stacking_sequence
+      if (this.filters.stackingSequence !== "All stacking sequences") {
+        queryElements.push(
+          `laminates_and_assemblies_stacking_sequence:${this.filters.stackingSequence}`
+        );
+      }
+
+      this.$store.dispatch("experiments/fetch", {
+        query: queryElements.join(";"),
+        textSearch: this.filters.textSearch,
+        paginationOptions: this.paginationOptions,
+        filterToEmpty,
+      });
     },
   },
 };
