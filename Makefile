@@ -19,3 +19,12 @@ build_frontend:
 generate-api:
 	$(MAKE) -C backend generate-api
 	$(MAKE) -C frontend generate-api
+
+run-db:
+	$(MAKE) -C backend run-db
+
+run-backend:
+	$(MAKE) -C backend run
+
+run-frontend:
+	$(MAKE) -C frontend run
