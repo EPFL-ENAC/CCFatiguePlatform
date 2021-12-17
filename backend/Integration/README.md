@@ -45,7 +45,7 @@ python -m unittest test\test_data_quality.py
 ## Results
 
 This image should be built in [/figures](figures/) </br>
-<img src="StressRatio_MaxMachload_distribution_example.png" style="width: 650px; max-width: 100%;align="center"; height: auto" title="Click to enlarge picture" />
+![plot](StressRatio_MaxMachload_distribution_example.png)
 
 ## Remarks
 
