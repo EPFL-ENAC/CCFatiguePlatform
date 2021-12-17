@@ -17,10 +17,10 @@ This script launches the different steps of the homework:
     - Data retrieving from the DB
     - Visualisation of statistics
 """
+logging.getLogger().setLevel(logging.INFO)
 # Retrieve the DB connection string passed as argument
 DB_Name = sys.argv[1]
 #DB_Name = "postgresql://postgres:197355cC?@localhost:5432/ENAC_Exo"
-logging.info(DB_Name)
 start_time = time.time()
 # Initialize the DB, create class (create table in SQL DB).
 init(DB_Name)
