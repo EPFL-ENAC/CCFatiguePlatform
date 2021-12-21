@@ -12,6 +12,10 @@ init-db:
 	${MAKE} alembic-upgrade
 	poetry run python3 initial_inject_to_db.py
 
+init-db-with-fake:
+	${MAKE} alembic-upgrade
+	poetry run python3 initial_inject_to_db.py --add-fake-data
+
 generate-api:
 	poetry run python api.py ../openapi.json
 
