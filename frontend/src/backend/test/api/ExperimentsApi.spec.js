@@ -54,5 +54,45 @@
         done();
       });
     });
+    describe("getFractureModeDistinctExperimentsFractureModeDistinctGet", function () {
+      it("should call getFractureModeDistinctExperimentsFractureModeDistinctGet successfully", function (done) {
+        //uncomment below and update the code to test getFractureModeDistinctExperimentsFractureModeDistinctGet
+        //instance.getFractureModeDistinctExperimentsFractureModeDistinctGet(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
+    describe("getLaminatesAndAssembliesStackingSequenceDistinctExperimentsLaminatesAndAssembliesStackingSequenceDistinctGet", function () {
+      it("should call getLaminatesAndAssembliesStackingSequenceDistinctExperimentsLaminatesAndAssembliesStackingSequenceDistinctGet successfully", function (done) {
+        //uncomment below and update the code to test getLaminatesAndAssembliesStackingSequenceDistinctExperimentsLaminatesAndAssembliesStackingSequenceDistinctGet
+        //instance.getLaminatesAndAssembliesStackingSequenceDistinctExperimentsLaminatesAndAssembliesStackingSequenceDistinctGet(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
+    describe("getMaterialTypeFiberMaterialDistinctExperimentsMaterialTypeFiberMaterialDistinctGet", function () {
+      it("should call getMaterialTypeFiberMaterialDistinctExperimentsMaterialTypeFiberMaterialDistinctGet successfully", function (done) {
+        //uncomment below and update the code to test getMaterialTypeFiberMaterialDistinctExperimentsMaterialTypeFiberMaterialDistinctGet
+        //instance.getMaterialTypeFiberMaterialDistinctExperimentsMaterialTypeFiberMaterialDistinctGet(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
+    describe("getMaterialTypeResinDistinctExperimentsMaterialTypeResinDistinctGet", function () {
+      it("should call getMaterialTypeResinDistinctExperimentsMaterialTypeResinDistinctGet successfully", function (done) {
+        //uncomment below and update the code to test getMaterialTypeResinDistinctExperimentsMaterialTypeResinDistinctGet
+        //instance.getMaterialTypeResinDistinctExperimentsMaterialTypeResinDistinctGet(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
   });
 });

@@ -47,7 +47,7 @@
                 <v-col>
                   <v-overflow-btn
                     v-model="filters.fractureMode"
-                    :items="possibleValues.fractureModes"
+                    :items="[fractureModeAll, ...allFractureMode]"
                     label="fracture mode"
                     hide-details
                     dense
@@ -65,7 +65,7 @@
                 <v-col>
                   <v-overflow-btn
                     v-model="filters.resin"
-                    :items="possibleValues.resins"
+                    :items="[resinsAll, ...allMaterialTypeResin]"
                     hide-details
                     dense
                     @change="fetchExperiments"
@@ -77,7 +77,10 @@
                 <v-col>
                   <v-overflow-btn
                     v-model="filters.fiberMaterial"
-                    :items="possibleValues.fiberMaterials"
+                    :items="[
+                      fiberMaterialsAll,
+                      ...allMaterialTypeFiberMaterial,
+                    ]"
                     hide-details
                     dense
                     @change="fetchExperiments"
@@ -94,7 +97,10 @@
                 <v-col>
                   <v-overflow-btn
                     v-model="filters.stackingSequence"
-                    :items="possibleValues.stackingSequences"
+                    :items="[
+                      stackingSequencesAll,
+                      ...allLaminatesAndAssembliesStackingSequence,
+                    ]"
                     hide-details
                     dense
                     @change="fetchExperiments"
@@ -161,17 +167,23 @@ export default {
   name: "SearchDatabase",
   data() {
     return {
+      fractureModeAll: "All modes",
+      fiberMaterialsAll: "All materials",
+      resinsAll: "All resins",
+      stackingSequencesAll: "All stacking sequences",
+
       filters: {
         typeFA: true,
         typeQS: true,
         withFracture: true,
         withoutFracture: true,
         fractureMode: "All modes",
-        resin: "All resins",
         fiberMaterial: "All materials",
+        resin: "All resins",
         stackingSequence: "All stacking sequences",
         textSearch: "",
       },
+
       headers: [
         { text: "Laboratory", value: "laboratory" },
         { text: "Experiment Type", value: "experiment_type" },
@@ -209,40 +221,15 @@ export default {
       page: "page",
       itemsPerPage: "itemsPerPage",
       nbExperiments: "nbExperiments",
+      allFractureMode: "allFractureMode",
+      allMaterialTypeFiberMaterial: "allMaterialTypeFiberMaterial",
+      allMaterialTypeResin: "allMaterialTypeResin",
+      allLaminatesAndAssembliesStackingSequence:
+        "allLaminatesAndAssembliesStackingSequence",
     }),
-    possibleValues() {
-      let fractureModes = [
-        "All modes",
-        "Mode I",
-        "Mode II",
-        "Mode III",
-        "Combined",
-      ];
-      let resins = ["All resins"];
-      let fiberMaterials = ["All materials"];
-      let stackingSequences = ["All stacking sequences"];
-      this.experiments.forEach((exp) => {
-        let addIfNotExist = (array, item) => {
-          if (array.indexOf(item) === -1) {
-            array.push(item);
-          }
-        };
-        addIfNotExist(resins, exp.material_type_resin);
-        addIfNotExist(fiberMaterials, exp.material_type_fiber_material);
-        addIfNotExist(
-          stackingSequences,
-          exp.laminates_and_assemblies_stacking_sequence
-        );
-      });
-      return {
-        fractureModes,
-        resins,
-        fiberMaterials,
-        stackingSequences,
-      };
-    },
   },
   created() {
+    this.$store.dispatch("experiments/fetchAllFiltersValues");
     this.fetchExperiments();
   },
   watch: {
@@ -272,7 +259,7 @@ export default {
       // fracture_mode (All modes|Mode I|Mode II|Mode III|Combined)
       if (this.filters.withFracture && !this.filters.withoutFracture) {
         queryElements.push("fracture:1");
-        if (this.filters.fractureMode !== "All modes") {
+        if (this.filters.fractureMode !== this.fractureModeAll) {
           queryElements.push(`fracture_mode:${this.filters.fractureMode}`);
         }
       } else if (!this.filters.withFracture && this.filters.withoutFracture) {
@@ -281,20 +268,20 @@ export default {
         filterToEmpty = true;
       }
 
-      // material_type_resin
-      if (this.filters.resin !== "All resins") {
-        queryElements.push(`material_type_resin:${this.filters.resin}`);
-      }
-
       // material_type_fiber_material
-      if (this.filters.fiberMaterial !== "All materials") {
+      if (this.filters.fiberMaterial !== this.fiberMaterialsAll) {
         queryElements.push(
           `material_type_fiber_material:${this.filters.fiberMaterial}`
         );
       }
 
+      // material_type_resin
+      if (this.filters.resin !== this.resinsAll) {
+        queryElements.push(`material_type_resin:${this.filters.resin}`);
+      }
+
       // laminates_and_assemblies_stacking_sequence
-      if (this.filters.stackingSequence !== "All stacking sequences") {
+      if (this.filters.stackingSequence !== this.stackingSequencesAll) {
         queryElements.push(
           `laminates_and_assemblies_stacking_sequence:${this.filters.stackingSequence}`
         );
