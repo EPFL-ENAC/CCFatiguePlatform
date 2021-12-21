@@ -306,8 +306,8 @@ import InfoButton from "@/components/InfoButton";
 import InfoTooltip from "@/components/InfoTooltip";
 // import Axios from "axios";  //  TODO !
 import download from "downloadjs";
-import qs from "qs";
-import * as Bokeh from "bokeh";
+// import qs from "qs";
+// import * as Bokeh from "bokeh";
 
 const CANCEL = "cancel";
 
