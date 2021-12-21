@@ -5,6 +5,7 @@ import re
 import glob
 import json
 import random
+import argparse
 from ccfatigue.models.database import Experiment, Test
 from ccfatigue.services.database import __sync_url
 from sqlalchemy import create_engine
@@ -12,11 +13,13 @@ from sqlalchemy.orm import sessionmaker
 
 
 DATA_DIR = os.path.abspath(f"{__file__}/../../Data")
-EXPERIMENTS_TO_INJECT = [
+REAL_EXPERIMENTS_TO_INJECT = [
+    f"{DATA_DIR}/TST_Khalooei_2021-10_FA",
+]
+FAKE_EXPERIMENTS_TO_INJECT = [
     f"{DATA_DIR}/TST_FakeResearcher_2019-09_QS",
     f"{DATA_DIR}/TST_FakeResearcher_2020-06_FA",
     f"{DATA_DIR}/TST_FakeResearcher_2021-06_FA",
-    f"{DATA_DIR}/TST_Khalooei_2021-10_FA",
 ]
 
 
@@ -183,78 +186,102 @@ def generate_random_experiment(rnd_gen):
     )
 
 
+def inject_exp_from_folder(exp_folder, add_fake_data, session):
+    """
+    Inject Experiment + Test described in a dedicated folder
+    Test is not yet implemented, but feeded with fake if add_fake_data
+    """
+    # Experiment loaded from JSON
+    json_file = glob.glob(f"{exp_folder}/*.json")[0]
+    with open(json_file, "r") as f:
+        exp = json.load(f)["Experiment"]
+
+    experiment = Experiment(
+        laboratory=exp["General"]["Laboratory"],
+        researcher=exp["General"]["Researcher"],
+        date=exp["General"]["Date"],
+        experiment_type=exp["General"]["Experiment Type"],
+        fracture=exp["General"].get("Fracture", False),
+        fracture_mode=exp["General"]["Fracture Mode"],
+        initial_crack_length=exp["General"]["Initial Crack length"],
+        fatigue_test_type=exp["General"]["Fatigue Test Type"],
+        measuring_equipment=exp["General"]["Measuring Equipment"],
+        reliability_level=exp["General"]["Reliability Level"],
+        control_mode=exp["General"]["Control mode"],
+        publication_title=exp["Publication"]["Title"],
+        publication_author=exp["Publication"]["Author"],
+        publication_year=exp["Publication"]["Year"],
+        publication_doi=exp["Publication"]["DOI"],
+        publication_images_repository=exp["Publication"]["Images Repository"],
+        material_type_fiber_material=exp["Material Type"]["Fiber Material"],
+        material_type_fiber_geometry=exp["Material Type"]["Fiber Geometry"],
+        material_type_area_density=exp["Material Type"]["Area Density"],
+        material_type_resin=exp["Material Type"]["Resin"],
+        material_type_hardener=exp["Material Type"]["Hardener"],
+        material_type_mixing_ratio=exp["Material Type"]["Mixing ratio"],
+        geometry_length=exp["Geometry"]["Length"],
+        geometry_width=exp["Geometry"]["Width"],
+        geometry_thickness=exp["Geometry"]["Thickness"],
+        laminates_and_assemblies_curing_time=exp["Laminates and Assemblies"][
+            "Curing Time"
+        ],
+        laminates_and_assemblies_curing_temperature=exp["Laminates and Assemblies"][
+            "Curing Temperature"
+        ],
+        laminates_and_assemblies_curing_pressure=exp["Laminates and Assemblies"][
+            "Curing Pressure"
+        ],
+        laminates_and_assemblies_fiber_content=exp["Laminates and Assemblies"][
+            "Fiber Content"
+        ],
+        laminates_and_assemblies_stacking_sequence=exp["Laminates and Assemblies"][
+            "Stacking Sequence"
+        ],
+        test_condtions_temperature=exp["Test condtions"]["Temperature"],
+        test_condtions_humidity=exp["Test condtions"]["Humidity"],
+        dic_analysis_subset_size=exp["DIC Analysis"]["Subset Size"],
+        dic_analysis_step_size=exp["DIC Analysis"]["Step Size"],
+    )
+    session.add(experiment)
+
+    # Test data from CSV
+    if add_fake_data:
+        for csv_file in glob.glob(f"{exp_folder}/*.csv"):
+            specimen_number = re.findall(r"\d+", csv_file)[-1]
+            test = generate_random_test(rnd_gen, experiment, specimen_number)
+            session.add(test)
+
+
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Inject initial data from researcher Data into DB"
+    )
+    parser.add_argument(
+        "--add-fake-data",
+        action="store_true",
+        help="Also inject fake data to have more things to observe",
+    )
+    args = parser.parse_args()
+    add_fake_data = args.add_fake_data
+
     rnd_gen = RandomGen()
     sync_engine = create_engine(__sync_url, echo=True)
     Session = sessionmaker(bind=sync_engine)
     session = Session()
 
-    for exp_fold in EXPERIMENTS_TO_INJECT:
-        # Experiment loaded from JSON
-        json_file = glob.glob(f"{exp_fold}/*.json")[0]
-        with open(json_file, "r") as f:
-            exp = json.load(f)["Experiment"]
+    for exp_folder in REAL_EXPERIMENTS_TO_INJECT:
+        inject_exp_from_folder(exp_folder, add_fake_data, session)
 
-        experiment = Experiment(
-            laboratory=exp["General"]["Laboratory"],
-            researcher=exp["General"]["Researcher"],
-            date=exp["General"]["Date"],
-            experiment_type=exp["General"]["Experiment Type"],
-            fracture=exp["General"].get("Fracture", False),
-            fracture_mode=exp["General"]["Fracture Mode"],
-            initial_crack_length=exp["General"]["Initial Crack length"],
-            fatigue_test_type=exp["General"]["Fatigue Test Type"],
-            measuring_equipment=exp["General"]["Measuring Equipment"],
-            reliability_level=exp["General"]["Reliability Level"],
-            control_mode=exp["General"]["Control mode"],
-            publication_title=exp["Publication"]["Title"],
-            publication_author=exp["Publication"]["Author"],
-            publication_year=exp["Publication"]["Year"],
-            publication_doi=exp["Publication"]["DOI"],
-            publication_images_repository=exp["Publication"]["Images Repository"],
-            material_type_fiber_material=exp["Material Type"]["Fiber Material"],
-            material_type_fiber_geometry=exp["Material Type"]["Fiber Geometry"],
-            material_type_area_density=exp["Material Type"]["Area Density"],
-            material_type_resin=exp["Material Type"]["Resin"],
-            material_type_hardener=exp["Material Type"]["Hardener"],
-            material_type_mixing_ratio=exp["Material Type"]["Mixing ratio"],
-            geometry_length=exp["Geometry"]["Length"],
-            geometry_width=exp["Geometry"]["Width"],
-            geometry_thickness=exp["Geometry"]["Thickness"],
-            laminates_and_assemblies_curing_time=exp["Laminates and Assemblies"][
-                "Curing Time"
-            ],
-            laminates_and_assemblies_curing_temperature=exp["Laminates and Assemblies"][
-                "Curing Temperature"
-            ],
-            laminates_and_assemblies_curing_pressure=exp["Laminates and Assemblies"][
-                "Curing Pressure"
-            ],
-            laminates_and_assemblies_fiber_content=exp["Laminates and Assemblies"][
-                "Fiber Content"
-            ],
-            laminates_and_assemblies_stacking_sequence=exp["Laminates and Assemblies"][
-                "Stacking Sequence"
-            ],
-            test_condtions_temperature=exp["Test condtions"]["Temperature"],
-            test_condtions_humidity=exp["Test condtions"]["Humidity"],
-            dic_analysis_subset_size=exp["DIC Analysis"]["Subset Size"],
-            dic_analysis_step_size=exp["DIC Analysis"]["Step Size"],
-        )
-        session.add(experiment)
+    if add_fake_data:
+        for exp_folder in FAKE_EXPERIMENTS_TO_INJECT:
+            inject_exp_from_folder(exp_folder, add_fake_data, session)
 
-        # Test data from CSV
-        for csv_file in glob.glob(f"{exp_fold}/*.csv"):
-            specimen_number = re.findall(r"\d+", csv_file)[-1]
-            test = generate_random_test(rnd_gen, experiment, specimen_number)
-            session.add(test)
-
-    # Generate 30 fake Experiments + test data
-    for _ in range(30):
-        experiment = generate_random_experiment(rnd_gen)
-        session.add(experiment)
-        for i in range(random.randint(5, 20)):
-            test = generate_random_test(rnd_gen, experiment, f"{i:02}")
-            session.add(test)
+        # Generate 30 fake Experiments + test data
+        for _ in range(30):
+            experiment = generate_random_experiment(rnd_gen)
+            session.add(experiment)
+            for i in range(random.randint(5, 20)):
+                test = generate_random_test(rnd_gen, experiment, f"{i:02}")
+                session.add(test)
 
     session.commit()
