@@ -202,6 +202,72 @@
           }
         }
       }
+    },
+    "/tests": {
+      "get": {
+        "tags": [
+          "tests"
+        ],
+        "summary": "Get Tests",
+        "description": "Get all tests for specific experiment",
+        "operationId": "get_tests_tests_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Experiment Id",
+              "type": "integer"
+            },
+            "name": "experiment_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Page",
+              "minimum": 1.0,
+              "type": "integer",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Size",
+              "maximum": 100.0,
+              "minimum": 1.0,
+              "type": "integer",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_TestModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -428,6 +494,79 @@
             "type": "integer"
           }
         }
+      },
+      "Page_TestModel_": {
+        "title": "Page[TestModel]",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "size"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "title": "Items",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestModel"
+            }
+          },
+          "total": {
+            "title": "Total",
+            "minimum": 0.0,
+            "type": "integer"
+          },
+          "page": {
+            "title": "Page",
+            "minimum": 1.0,
+            "type": "integer"
+          },
+          "size": {
+            "title": "Size",
+            "minimum": 1.0,
+            "type": "integer"
+          }
+        }
+      },
+      "TestModel": {
+        "title": "TestModel",
+        "required": [
+          "id",
+          "experiment_id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "experiment_id": {
+            "title": "Experiment Id",
+            "type": "integer"
+          },
+          "specimen_number": {
+            "title": "Specimen Number",
+            "type": "string"
+          },
+          "stress_ratio": {
+            "title": "Stress Ratio",
+            "type": "number"
+          },
+          "maximum_stress": {
+            "title": "Maximum Stress",
+            "type": "number"
+          },
+          "loading_rate": {
+            "title": "Loading Rate",
+            "type": "number"
+          },
+          "run_out": {
+            "title": "Run Out",
+            "type": "boolean"
+          }
+        },
+        "description": "Defines how test is seen on the API"
       },
       "ValidationError": {
         "title": "ValidationError",

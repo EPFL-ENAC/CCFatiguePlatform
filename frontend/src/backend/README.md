@@ -123,6 +123,7 @@ All URIs are relative to _http://localhost_
 | _Ccfatigue.ExperimentsApi_ | [**getLaminatesAndAssembliesStackingSequenceDistinctExperimentsLaminatesAndAssembliesStackingSequenceDistinctGet**](docs/ExperimentsApi.md#getLaminatesAndAssembliesStackingSequenceDistinctExperimentsLaminatesAndAssembliesStackingSequenceDistinctGet) | **GET** /experiments/laminates_and_assemblies_stacking_sequence/distinct | Get Laminates And Assemblies Stacking Sequence Distinct |
 | _Ccfatigue.ExperimentsApi_ | [**getMaterialTypeFiberMaterialDistinctExperimentsMaterialTypeFiberMaterialDistinctGet**](docs/ExperimentsApi.md#getMaterialTypeFiberMaterialDistinctExperimentsMaterialTypeFiberMaterialDistinctGet)                                                     | **GET** /experiments/material_type_fiber_material/distinct               | Get Material Type Fiber Material Distinct               |
 | _Ccfatigue.ExperimentsApi_ | [**getMaterialTypeResinDistinctExperimentsMaterialTypeResinDistinctGet**](docs/ExperimentsApi.md#getMaterialTypeResinDistinctExperimentsMaterialTypeResinDistinctGet)                                                                                     | **GET** /experiments/material_type_resin/distinct                        | Get Material Type Resin Distinct                        |
+| _Ccfatigue.TestsApi_       | [**getTestsTestsGet**](docs/TestsApi.md#getTestsTestsGet)                                                                                                                                                                                                 | **GET** /tests                                                           | Get Tests                                               |
 
 ## Documentation for Models
 
@@ -130,6 +131,8 @@ All URIs are relative to _http://localhost_
 - [Ccfatigue.ExperimentModel](docs/ExperimentModel.md)
 - [Ccfatigue.HTTPValidationError](docs/HTTPValidationError.md)
 - [Ccfatigue.PageExperimentModel](docs/PageExperimentModel.md)
+- [Ccfatigue.PageTestModel](docs/PageTestModel.md)
+- [Ccfatigue.TestModel](docs/TestModel.md)
 - [Ccfatigue.ValidationError](docs/ValidationError.md)
 
 ## Documentation for Authorization

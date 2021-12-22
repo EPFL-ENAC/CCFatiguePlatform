@@ -65,3 +65,19 @@ class ExperimentModel(OrmModel):
 
     dic_analysis_subset_size: Optional[int]
     dic_analysis_step_size: Optional[int]
+
+
+class TestModel(OrmModel):
+    """
+    Defines how test is seen on the API
+    """
+
+    id: int
+
+    experiment_id: int
+
+    specimen_number: Optional[str]
+    stress_ratio: Optional[float]
+    maximum_stress: Optional[float]
+    loading_rate: Optional[float]
+    run_out: Optional[bool]
