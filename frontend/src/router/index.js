@@ -7,14 +7,14 @@ import Home from "../views/Home.vue";
 const SearchDatabase = () =>
   import(/* webpackChunkName: "search" */ "../views/SearchDatabase.vue");
 const TestSelection = () =>
-  import(/* webpackChunkName: "test-selection" */ "../views/TestSelection.vue");
+  import(/* webpackChunkName: "test_selection" */ "../views/TestSelection.vue");
 const TestDashboard = () =>
-  import(/* webpackChunkName: "test-dashboard" */ "../views/TestDashboard.vue");
+  import(/* webpackChunkName: "test_dashboard" */ "../views/TestDashboard.vue");
 const DataUpload = () =>
-  import(/* webpackChunkName: "data-upload" */ "../views/DataUpload.vue");
+  import(/* webpackChunkName: "data_upload" */ "../views/DataUpload.vue");
 const CCFatigueAnalysis = () =>
   import(
-    /* webpackChunkName: "ccfatigue-analysis" */ "../views/CCFatigueAnalysis.vue"
+    /* webpackChunkName: "ccfatigue_analysis" */ "../views/CCFatigueAnalysis.vue"
   );
 const About = () =>
   import(/* webpackChunkName: "about" */ "../views/About.vue");
@@ -43,22 +43,22 @@ const routes = [
     component: SearchDatabase,
   },
   {
-    path: "/fatigue_database/test-selection",
+    path: "/fatigue_database/test_selection",
     name: "TestSelection",
     component: TestSelection,
   },
   {
-    path: "/fatigue_database/test-dashboard",
+    path: "/fatigue_database/test_dashboard",
     name: "TestDashboard",
     component: TestDashboard,
   },
   {
-    path: "/fatigue_database/data-upload",
+    path: "/fatigue_database/data_upload",
     name: "DataUpload",
     component: DataUpload,
   },
   {
-    path: "/ccfatigue-analysis",
+    path: "/ccfatigue_analysis",
     name: "CCFatigueAnalysis",
     component: CCFatigueAnalysis,
   },
