@@ -25,8 +25,8 @@ import Ccfatigue from "ccfatigue";
 
 let apiInstance = new Ccfatigue.ExperimentsApi();
 let opts = {
-  query: "query_example", // String |
-  textSearch: "textSearch_example", // String |
+  query: "''", // String |
+  textSearch: "''", // String |
   page: 1, // Number |
   size: 50, // Number |
 };
@@ -41,12 +41,12 @@ apiInstance.getExperimentsExperimentsGet(opts, (error, data, response) => {
 
 ### Parameters
 
-| Name           | Type       | Description | Notes                      |
-| -------------- | ---------- | ----------- | -------------------------- |
-| **query**      | **String** |             | [optional]                 |
-| **textSearch** | **String** |             | [optional]                 |
-| **page**       | **Number** |             | [optional] [default to 1]  |
-| **size**       | **Number** |             | [optional] [default to 50] |
+| Name           | Type       | Description | Notes                              |
+| -------------- | ---------- | ----------- | ---------------------------------- |
+| **query**      | **String** |             | [optional] [default to &#39;&#39;] |
+| **textSearch** | **String** |             | [optional] [default to &#39;&#39;] |
+| **page**       | **Number** |             | [optional] [default to 1]          |
+| **size**       | **Number** |             | [optional] [default to 50]         |
 
 ### Return type
 

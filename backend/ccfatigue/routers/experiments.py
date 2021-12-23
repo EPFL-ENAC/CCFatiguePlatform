@@ -25,8 +25,8 @@ router = APIRouter(
 @router.get("", response_model=Page[ExperimentModel])
 async def get_experiments(
     session: AsyncSession = Depends(get_session),
-    query: Optional[str] = Query(None),
-    text_search: Optional[str] = Query(None),
+    query: Optional[str] = Query(""),
+    text_search: Optional[str] = Query(""),
 ):
     """
     Get all experiments

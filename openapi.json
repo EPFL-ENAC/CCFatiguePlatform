@@ -37,7 +37,8 @@
             "required": false,
             "schema": {
               "title": "Query",
-              "type": "string"
+              "type": "string",
+              "default": ""
             },
             "name": "query",
             "in": "query"
@@ -46,7 +47,8 @@
             "required": false,
             "schema": {
               "title": "Text Search",
-              "type": "string"
+              "type": "string",
+              "default": ""
             },
             "name": "text_search",
             "in": "query"
