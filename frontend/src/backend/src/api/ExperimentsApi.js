@@ -44,8 +44,8 @@ export default class ExperimentsApi {
    * Get Experiments
    * Get all experiments
    * @param {Object} opts Optional parameters
-   * @param {String} opts.query
-   * @param {String} opts.textSearch
+   * @param {String} opts.query  (default to '')
+   * @param {String} opts.textSearch  (default to '')
    * @param {Number} opts.page  (default to 1)
    * @param {Number} opts.size  (default to 50)
    * @param {module:api/ExperimentsApi~getExperimentsExperimentsGetCallback} callback The callback function, accepting three arguments: error, data, response
