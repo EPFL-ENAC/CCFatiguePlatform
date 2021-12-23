@@ -131,10 +131,10 @@
           <v-data-table
             v-model="experimentSelected"
             :headers="headers"
-            :items="experiments"
-            :options.sync="paginationOptions"
-            :server-items-length="nbExperiments"
-            :loading="loading"
+            :items="filteredExperiments.experiments"
+            :options.sync="pagination"
+            :server-items-length="filteredExperiments.pagination.total"
+            :loading="filteredExperiments.loading"
             :footer-props="{
               'items-per-page-options': [5, 10, 15, 20, 40],
             }"
@@ -184,6 +184,11 @@ export default {
         textSearch: "",
       },
 
+      pagination: {
+        page: 1,
+        itemsPerPage: 10,
+      },
+
       headers: [
         { text: "Laboratory", value: "laboratory" },
         { text: "Experiment Type", value: "experiment_type" },
@@ -211,16 +216,11 @@ export default {
         },
       ],
       experimentSelected: [],
-      paginationOptions: {},
     };
   },
   computed: {
     ...mapState("experiments", {
-      loading: "loading",
-      experiments: "experiments",
-      page: "page",
-      itemsPerPage: "itemsPerPage",
-      nbExperiments: "nbExperiments",
+      filteredExperiments: "filteredExperiments",
       allFractureMode: "allFractureMode",
       allMaterialTypeFiberMaterial: "allMaterialTypeFiberMaterial",
       allMaterialTypeResin: "allMaterialTypeResin",
@@ -233,7 +233,7 @@ export default {
     this.fetchExperiments();
   },
   watch: {
-    paginationOptions: {
+    pagination: {
       handler() {
         this.fetchExperiments();
       },
@@ -242,56 +242,34 @@ export default {
   },
   methods: {
     fetchExperiments() {
-      let queryElements = [];
-      let types = [];
-      let filterToEmpty = false;
-
-      // type (FA|QS)
-      if (this.filters.typeFA) {
-        types.push("FA");
-      }
-      if (this.filters.typeQS) {
-        types.push("QS");
-      }
-      queryElements.push("experiment_type:" + types.join(","));
-
-      // fracture (true|false)
-      // fracture_mode (All modes|Mode I|Mode II|Mode III|Combined)
-      if (this.filters.withFracture && !this.filters.withoutFracture) {
-        queryElements.push("fracture:1");
-        if (this.filters.fractureMode !== this.fractureModeAll) {
-          queryElements.push(`fracture_mode:${this.filters.fractureMode}`);
-        }
-      } else if (!this.filters.withFracture && this.filters.withoutFracture) {
-        queryElements.push("fracture:0");
-      } else if (!this.filters.withFracture && !this.filters.withoutFracture) {
-        filterToEmpty = true;
-      }
-
-      // material_type_fiber_material
-      if (this.filters.fiberMaterial !== this.fiberMaterialsAll) {
-        queryElements.push(
-          `material_type_fiber_material:${this.filters.fiberMaterial}`
-        );
-      }
-
-      // material_type_resin
-      if (this.filters.resin !== this.resinsAll) {
-        queryElements.push(`material_type_resin:${this.filters.resin}`);
-      }
-
-      // laminates_and_assemblies_stacking_sequence
-      if (this.filters.stackingSequence !== this.stackingSequencesAll) {
-        queryElements.push(
-          `laminates_and_assemblies_stacking_sequence:${this.filters.stackingSequence}`
-        );
-      }
-
-      this.$store.dispatch("experiments/fetch", {
-        query: queryElements.join(";"),
-        textSearch: this.filters.textSearch,
-        paginationOptions: this.paginationOptions,
-        filterToEmpty,
+      this.$store.dispatch("experiments/fetchFilteredExperiments", {
+        filters: {
+          typeFA: this.filters.typeFA,
+          typeQS: this.filters.typeQS,
+          withFracture: this.filters.withFracture,
+          withoutFracture: this.filters.withoutFracture,
+          fractureMode:
+            this.filters.withFracture &&
+            !this.filters.withoutFracture &&
+            this.filters.fractureMode !== this.fractureModeAll
+              ? this.filters.fractureMode
+              : null,
+          fiberMaterial:
+            this.filters.fiberMaterial !== this.fiberMaterialsAll
+              ? this.filters.fiberMaterial
+              : null,
+          resin:
+            this.filters.resin !== this.resinsAll ? this.filters.resin : null,
+          stackingSequence:
+            this.filters.stackingSequence !== this.stackingSequencesAll
+              ? this.filters.stackingSequence
+              : null,
+          textSearch: this.filters.textSearch,
+        },
+        pagination: {
+          page: this.pagination.page,
+          size: this.pagination.itemsPerPage,
+        },
       });
     },
   },
