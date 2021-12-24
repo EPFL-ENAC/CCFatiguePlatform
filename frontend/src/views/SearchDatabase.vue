@@ -132,7 +132,7 @@
             v-model="experimentSelected"
             :headers="headers"
             :items="filteredExperiments.experiments"
-            :options.sync="pagination"
+            :options.sync="options"
             :server-items-length="filteredExperiments.pagination.total"
             :loading="filteredExperiments.loading"
             :footer-props="{
@@ -198,7 +198,7 @@ export default {
         textSearch: "",
       },
 
-      pagination: {
+      options: {
         page: 1,
         itemsPerPage: 10,
       },
@@ -247,7 +247,7 @@ export default {
     this.fetchExperiments();
   },
   watch: {
-    pagination: {
+    options: {
       handler() {
         this.fetchExperiments();
       },
@@ -281,8 +281,8 @@ export default {
           textSearch: this.filters.textSearch,
         },
         pagination: {
-          page: this.pagination.page,
-          size: this.pagination.itemsPerPage,
+          page: this.options.page,
+          size: this.options.itemsPerPage,
         },
       });
     },
