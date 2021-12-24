@@ -15,6 +15,17 @@ export default {
     allMaterialTypeFiberMaterial: [],
     allMaterialTypeResin: [],
     allLaminatesAndAssembliesStackingSequence: [],
+    oneExperiment: {
+      experimentId: null, // id of experiment
+      experiment: {}, // the experiment itself
+      tests: [], // list of tests fetched from API for that experiment
+      pagination: {
+        page: 1, // page number of current fetched tests. Overwrirten by UI
+        size: 0, // max number of fetched tests returned per request. Overwrirten by UI
+        total: 0, // number of tests in DB matching the filters. Given by backend
+      },
+      loading: false, // used to let the user know that data is loading
+    },
   },
   mutations: {
     nowWeLoadFilteredExperiments(state, payload) {
@@ -22,24 +33,34 @@ export default {
         filters: payload.filters,
         experiments: [],
         pagination: {
-          total: 0,
           page: payload.pagination.page,
           size: payload.pagination.size,
+          total: 0,
         },
         loading: true,
       };
     },
-    storeItemsPerPage(state, itemsPerPage) {
-      state.itemsPerPage = itemsPerPage;
+    nowWeLoadOneExperiment(state, payload) {
+      state.oneExperiment = {
+        experimentId: payload.experimentId,
+        experiment: {},
+        tests: [],
+        pagination: {
+          page: payload.pagination.page,
+          size: payload.pagination.size,
+          total: 0,
+        },
+        loading: true,
+      };
     },
     storeFilteredExperiments(state, data) {
       state.filteredExperiments = {
         ...state.filteredExperiments,
         experiments: data.items,
         pagination: {
-          total: data.total,
           page: data.page,
           size: data.size,
+          total: data.total,
         },
         loading: false,
       };
@@ -49,9 +70,9 @@ export default {
         ...state.filteredExperiments,
         experiments: [],
         pagination: {
-          total: 0,
           page: 1,
           size: state.filteredExperiments.pagination.size,
+          total: 0,
         },
         loading: false,
       };
@@ -68,8 +89,54 @@ export default {
     storeAllLaminatesAndAssembliesStackingSequence(state, data) {
       state.allLaminatesAndAssembliesStackingSequence = data;
     },
+    storeOneExperiment(state, data) {
+      state.oneExperiment = {
+        ...state.oneExperiment,
+        experiment: data.items[0],
+        loading: state.oneExperiment.tests.length === 0,
+      };
+    },
+    storeOneExperimentTests(state, data) {
+      state.oneExperiment = {
+        ...state.oneExperiment,
+        tests: data.items,
+        pagination: {
+          page: data.page,
+          size: data.size,
+          total: data.total,
+        },
+        loading: state.oneExperiment.experiment.id === undefined,
+      };
+    },
   },
   actions: {
+    fetchOneExperimentWithTests({ commit, state }, payload) {
+      commit("nowWeLoadOneExperiment", payload);
+      this._vm.$experimentsApi.getExperimentsExperimentsGet(
+        { query: `id:${payload.experimentId}` },
+        (error, data) => {
+          if (error) {
+            console.error(error);
+          } else {
+            commit("storeOneExperiment", data);
+          }
+        }
+      );
+      this._vm.$testsApi.getTestsTestsGet(
+        payload.experimentId,
+        {
+          page: state.oneExperiment.pagination.page,
+          size: state.oneExperiment.pagination.size,
+        },
+        (error, data) => {
+          if (error) {
+            console.error(error);
+          } else {
+            commit("storeOneExperimentTests", data);
+          }
+        }
+      );
+    },
     fetchFilteredExperiments({ commit, state }, payload) {
       commit("nowWeLoadFilteredExperiments", payload);
 
