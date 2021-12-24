@@ -145,13 +145,27 @@
           </v-data-table>
           <v-container>
             <v-row justify="center">
-              <v-btn class="ma-2">Download raw files</v-btn>
-              <v-btn class="ma-2" :to="{ name: 'TestSelection' }"
-                >View tests results</v-btn
+              <v-btn
+                class="ma-2"
+                :disabled="this.experimentSelected.length === 0"
+                @click="downloadRawFiles"
               >
-              <v-btn class="ma-2" :to="{ name: 'CCFatigueAnalysis' }"
-                >Analyse experiment</v-btn
+                Download raw files
+              </v-btn>
+              <v-btn
+                class="ma-2"
+                :disabled="this.experimentSelected.length === 0"
+                @click="viewTestsResults"
               >
+                View tests results
+              </v-btn>
+              <v-btn
+                class="ma-2"
+                :disabled="this.experimentSelected.length === 0"
+                @click="analyseExperiment"
+              >
+                Analyse experiment
+              </v-btn>
             </v-row>
           </v-container>
         </v-col>
@@ -167,7 +181,7 @@ export default {
   name: "SearchDatabase",
   data() {
     return {
-      fractureModeAll: "All modes",
+      fractureModeAll: "All fracture modes",
       fiberMaterialsAll: "All materials",
       resinsAll: "All resins",
       stackingSequencesAll: "All stacking sequences",
@@ -177,7 +191,7 @@ export default {
         typeQS: true,
         withFracture: true,
         withoutFracture: true,
-        fractureMode: "All modes",
+        fractureMode: "All fracture modes",
         fiberMaterial: "All materials",
         resin: "All resins",
         stackingSequence: "All stacking sequences",
@@ -271,6 +285,22 @@ export default {
           size: this.pagination.itemsPerPage,
         },
       });
+    },
+    downloadRawFiles() {
+      console.log(
+        `Download Raw files for experiment ${this.experimentSelected[0].id} : not implemented yet.`
+      );
+    },
+    viewTestsResults() {
+      this.$router.push({
+        name: "TestSelection",
+        params: { experimentId: this.experimentSelected[0].id },
+      });
+    },
+    analyseExperiment() {
+      console.log(
+        `Analyse experiment ${this.experimentSelected[0].id} : not implemented yet.`
+      );
     },
   },
 };
