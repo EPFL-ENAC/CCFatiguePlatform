@@ -6,8 +6,10 @@ import Home from "../views/Home.vue";
 // which is lazy-loaded when the route is visited.
 const SearchDatabase = () =>
   import(/* webpackChunkName: "search" */ "../views/SearchDatabase.vue");
-const TestSelection = () =>
-  import(/* webpackChunkName: "test_selection" */ "../views/TestSelection.vue");
+const TestsSelection = () =>
+  import(
+    /* webpackChunkName: "tests_selection" */ "../views/TestsSelection.vue"
+  );
 const TestDashboard = () =>
   import(/* webpackChunkName: "test_dashboard" */ "../views/TestDashboard.vue");
 const DataUpload = () =>
@@ -43,9 +45,9 @@ const routes = [
     component: SearchDatabase,
   },
   {
-    path: "/fatigue_database/test_selection/:experimentId",
-    name: "TestSelection",
-    component: TestSelection,
+    path: "/fatigue_database/tests_selection/:experimentId",
+    name: "TestsSelection",
+    component: TestsSelection,
     props(route) {
       // typecast experimentId to Number
       const props = { ...route.params };

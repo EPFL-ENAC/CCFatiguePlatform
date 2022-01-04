@@ -16,7 +16,7 @@
           <v-card-title>
             Test results
             <v-spacer> </v-spacer>
-            <v-btn :to="{ name: 'TestSelection' }">Add test(s)</v-btn>
+            <v-btn :to="{ name: 'TestsSelection' }">Add test(s)</v-btn>
           </v-card-title>
           <v-card-text>
             <v-container fluid>
