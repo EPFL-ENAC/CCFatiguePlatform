@@ -13,7 +13,7 @@
           :loading="experiment.loading"
           :footer-props="{ 'items-per-page-options': [5, 10, 15, 20, 40] }"
           item-key="id"
-          show-select
+          @click:row="rowClick"
         />
 
         <v-container>
@@ -71,6 +71,9 @@ export default {
     },
   },
   methods: {
+    rowClick(_item, row) {
+      row.select(!row.isSelected);
+    },
     goBack() {
       this.$router.go(-1);
     },

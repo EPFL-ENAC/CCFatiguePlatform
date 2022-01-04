@@ -139,10 +139,9 @@
               'items-per-page-options': [5, 10, 15, 20, 40],
             }"
             item-key="id"
-            show-select
+            @click:row="rowClick"
             single-select
-          >
-          </v-data-table>
+          />
           <v-container>
             <v-row justify="center">
               <v-btn
@@ -255,6 +254,9 @@ export default {
     },
   },
   methods: {
+    rowClick(_item, row) {
+      row.select(!row.isSelected);
+    },
     fetchExperiments() {
       this.$store.dispatch("experiments/fetchFilteredExperiments", {
         filters: {
