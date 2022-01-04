@@ -18,14 +18,31 @@
           <ul>
             <li>
               <experiment-s-v
-                subject="Publications"
-                :values="[experiment.publications]"
+                subject="Laboratory"
+                :values="[experiment.laboratory]"
               />
             </li>
             <li>
               <experiment-s-v
                 subject="Author"
                 :values="[experiment.researcher]"
+              />
+            </li>
+            <li>
+              <experiment-s-v subject="Date" :values="[experiment.date]" />
+            </li>
+            <li>
+              <experiment-s-v
+                subject="Type"
+                :values="[experiment.experiment_type]"
+              />
+            </li>
+            <li>
+              <experiment-s-v
+                subject="Publications"
+                :values="[
+                  `${experiment.publication_title} (${experiment.publication_year})`,
+                ]"
               />
             </li>
           </ul>
