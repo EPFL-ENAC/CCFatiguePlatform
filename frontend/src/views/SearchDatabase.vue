@@ -154,7 +154,7 @@
               <v-btn
                 class="ma-2"
                 :disabled="this.experimentSelected.length === 0"
-                @click="viewTestsResults"
+                @click="viewTestsSelection"
               >
                 View tests results
               </v-btn>
@@ -293,9 +293,9 @@ export default {
         `Download Raw files for experiment ${this.experimentSelected[0].id} : not implemented yet.`
       );
     },
-    viewTestsResults() {
+    viewTestsSelection() {
       this.$router.push({
-        name: "TestSelection",
+        name: "TestsSelection",
         params: { experimentId: this.experimentSelected[0].id },
       });
     },

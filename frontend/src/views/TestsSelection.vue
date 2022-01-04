@@ -33,7 +33,7 @@
 import { mapState } from "vuex";
 import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
 export default {
-  name: "TestSelection",
+  name: "TestsSelection",
   components: {
     ExperimentSpecifications,
   },
