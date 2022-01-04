@@ -108,7 +108,7 @@ var callback = function (error, data, response) {
     console.log("API called successfully. Returned data: " + data);
   }
 };
-api.rootGet(callback);
+api.getUnitsUnitsGet(callback);
 ```
 
 ## Documentation for API Endpoints
@@ -117,6 +117,7 @@ All URIs are relative to _http://localhost_
 
 | Class                      | Method                                                                                                                                                                                                                                                    | HTTP request                                                             | Description                                             |
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------- |
+| _Ccfatigue.DefaultApi_     | [**getUnitsUnitsGet**](docs/DefaultApi.md#getUnitsUnitsGet)                                                                                                                                                                                               | **GET** /units                                                           | Get Units                                               |
 | _Ccfatigue.DefaultApi_     | [**rootGet**](docs/DefaultApi.md#rootGet)                                                                                                                                                                                                                 | **GET** /                                                                | Root                                                    |
 | _Ccfatigue.ExperimentsApi_ | [**getExperimentsExperimentsGet**](docs/ExperimentsApi.md#getExperimentsExperimentsGet)                                                                                                                                                                   | **GET** /experiments                                                     | Get Experiments                                         |
 | _Ccfatigue.ExperimentsApi_ | [**getFractureModeDistinctExperimentsFractureModeDistinctGet**](docs/ExperimentsApi.md#getFractureModeDistinctExperimentsFractureModeDistinctGet)                                                                                                         | **GET** /experiments/fracture_mode/distinct                              | Get Fracture Mode Distinct                              |
@@ -133,6 +134,7 @@ All URIs are relative to _http://localhost_
 - [Ccfatigue.PageExperimentModel](docs/PageExperimentModel.md)
 - [Ccfatigue.PageTestModel](docs/PageTestModel.md)
 - [Ccfatigue.TestModel](docs/TestModel.md)
+- [Ccfatigue.UnitInfo](docs/UnitInfo.md)
 - [Ccfatigue.ValidationError](docs/ValidationError.md)
 
 ## Documentation for Authorization

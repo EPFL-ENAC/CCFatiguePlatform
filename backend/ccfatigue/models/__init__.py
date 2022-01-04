@@ -8,3 +8,12 @@ class AppInfo(BaseModel):
 
     name: str
     version: str
+
+
+class UnitInfo(BaseModel):
+    """
+    Unit Info
+    """
+
+    subject: str
+    unit: str

@@ -2,10 +2,7 @@
   <div>
     <v-container>
       <v-card elevation="0">
-        <v-card-title>
-          Test selection for experiment {{ experimentId }}
-        </v-card-title>
-        <!-- <experiment-specifications :experiment="test.experiment" /> -->
+        <experiment-specifications :experiment="experiment.experiment" />
 
         <v-data-table
           v-model="testsSelected"
@@ -14,13 +11,10 @@
           :options.sync="options"
           :server-items-length="experiment.pagination.total"
           :loading="experiment.loading"
-          :footer-props="{
-            'items-per-page-options': [5, 10, 15, 20, 40],
-          }"
+          :footer-props="{ 'items-per-page-options': [5, 10, 15, 20, 40] }"
           item-key="id"
           show-select
-        >
-        </v-data-table>
+        />
 
         <v-container>
           <v-row justify="end">
@@ -32,18 +26,17 @@
         </v-container>
       </v-card>
     </v-container>
-    <!-- </template> -->
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
-// import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
+import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
 export default {
   name: "TestSelection",
-  // components: {
-  //   ExperimentSpecifications,
-  // },
+  components: {
+    ExperimentSpecifications,
+  },
   props: {
     experimentId: Number,
   },
