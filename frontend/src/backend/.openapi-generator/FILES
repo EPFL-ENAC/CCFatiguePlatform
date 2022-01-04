@@ -12,6 +12,7 @@ docs/PageExperimentModel.md
 docs/PageTestModel.md
 docs/TestModel.md
 docs/TestsApi.md
+docs/UnitInfo.md
 docs/ValidationError.md
 git_push.sh
 mocha.opts
@@ -27,6 +28,7 @@ src/model/HTTPValidationError.js
 src/model/PageExperimentModel.js
 src/model/PageTestModel.js
 src/model/TestModel.js
+src/model/UnitInfo.js
 src/model/ValidationError.js
 test/api/DefaultApi.spec.js
 test/api/ExperimentsApi.spec.js
@@ -37,4 +39,5 @@ test/model/HTTPValidationError.spec.js
 test/model/PageExperimentModel.spec.js
 test/model/PageTestModel.spec.js
 test/model/TestModel.spec.js
+test/model/UnitInfo.spec.js
 test/model/ValidationError.spec.js

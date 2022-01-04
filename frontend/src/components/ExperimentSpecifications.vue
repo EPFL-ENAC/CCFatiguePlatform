@@ -11,21 +11,21 @@
       </info-button>
     </v-card-title>
     <v-card-text>
-      <v-row>
+      <v-skeleton-loader v-if="!readyToDisplay" type="article" />
+      <v-row v-else>
         <v-col>
           <h4>GENERAL INFORMATIONS</h4>
           <ul>
             <li>
               <experiment-s-v
                 subject="Publications"
-                :values="[experiment.Publications]"
-                valueType="PublicationsLinks"
+                :values="[experiment.publications]"
               />
             </li>
             <li>
               <experiment-s-v
                 subject="Author"
-                :values="[experiment.Researcher]"
+                :values="[experiment.researcher]"
               />
             </li>
           </ul>
@@ -36,32 +36,21 @@
             <li>
               <experiment-s-v
                 subject="Temperature"
-                :values="[experiment.Experiment['Test Conditions'].Temperature]"
-                :unit="experiment['Experiment Units'].Temperature"
+                :values="[experiment.test_condtions_temperature]"
+                :unit="units.temperature"
               />
             </li>
             <li>
               <experiment-s-v
-                subject="Relative humidity"
-                :values="[
-                  experiment.Experiment['Test Conditions']['Relative Humidity'],
-                ]"
-                unit="%"
-              />
-            </li>
-            <li>
-              <experiment-s-v
-                subject="Grip pressure"
-                :values="[
-                  experiment.Experiment['Test Conditions']['Grip Pressure'],
-                ]"
-                :unit="experiment['Experiment Units'].Pressure"
+                subject="Humidity"
+                :values="[experiment.test_condtions_humidity]"
+                :unit="units.humidity"
               />
             </li>
             <li>
               <experiment-s-v
                 subject="Measuring equipment"
-                :values="[experiment['Measuring Equipment']]"
+                :values="[experiment.measuring_equipment]"
               />
             </li>
           </ul>
@@ -72,54 +61,38 @@
             <li>
               <experiment-s-v
                 subject="Curing time"
-                :values="[
-                  experiment.Experiment['Laminates and Assemblies'][
-                    'Curing Time'
-                  ],
-                ]"
-                :unit="experiment['Experiment Units'].Time"
+                :values="[experiment.laminates_and_assemblies_curing_time]"
+                :unit="units.time"
               />
             </li>
             <li>
               <experiment-s-v
                 subject="Curing temperature"
                 :values="[
-                  experiment.Experiment['Laminates and Assemblies'][
-                    'Curing Temperature'
-                  ],
+                  experiment.laminates_and_assemblies_curing_temperature,
                 ]"
-                :unit="experiment['Experiment Units'].Temperature"
+                :unit="units.temperature"
               />
             </li>
             <li>
               <experiment-s-v
                 subject="Curing Pressure"
-                :values="[
-                  experiment.Experiment['Laminates and Assemblies'][
-                    'Curing Pressure'
-                  ],
-                ]"
-                :unit="experiment['Experiment Units'].Pressure"
+                :values="[experiment.laminates_and_assemblies_curing_pressure]"
+                :unit="units.pressure"
               />
             </li>
             <li>
               <experiment-s-v
                 subject="Stacking sequence"
                 :values="[
-                  experiment.Experiment['Laminates and Assemblies'][
-                    'Stacking Sequence'
-                  ],
+                  experiment.laminates_and_assemblies_stacking_sequence,
                 ]"
               />
             </li>
             <li>
               <experiment-s-v
                 subject="Fiber content"
-                :values="[
-                  experiment.Experiment['Laminates and Assemblies'][
-                    'Fiber Content'
-                  ],
-                ]"
+                :values="[experiment.laminates_and_assemblies_fiber_content]"
               />
             </li>
           </ul>
@@ -130,51 +103,37 @@
             <li>
               <experiment-s-v
                 subject="Resin"
-                :values="[experiment.Experiment['Material Type']['Resin']]"
+                :values="[experiment.material_type_resin]"
               />
             </li>
             <li>
               <experiment-s-v
                 subject="Hardener"
-                :values="[experiment.Experiment['Material Type']['Hardener']]"
+                :values="[experiment.material_type_hardener]"
               />
             </li>
             <li>
               <experiment-s-v
                 subject="Mixing ration"
-                :values="[
-                  experiment.Experiment['Material Type']['Mixing ratio'],
-                ]"
+                :values="[experiment.material_type_mixing_ratio]"
               />
             </li>
             <li>
               <experiment-s-v
                 subject="Fiber Material"
-                :values="[
-                  experiment.Experiment['Constituent Materials'][
-                    'Fiber Material'
-                  ],
-                ]"
+                :values="[experiment.material_type_fiber_material]"
               />
             </li>
             <li>
               <experiment-s-v
                 subject="Fiber Geometry"
-                :values="[
-                  experiment.Experiment['Constituent Materials'][
-                    'Fiber Geometry'
-                  ],
-                ]"
+                :values="[experiment.material_type_fiber_geometry]"
               />
             </li>
             <li>
               <experiment-s-v
                 subject="Area Density"
-                :values="[
-                  experiment.Experiment['Constituent Materials'][
-                    'Area Density'
-                  ],
-                ]"
+                :values="[experiment.material_type_area_density]"
               />
             </li>
           </ul>
@@ -185,6 +144,8 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 import InfoButton from "@/components/InfoButton";
 import ExperimentSV from "@/components/ExperimentSV";
 
@@ -196,6 +157,20 @@ export default {
   components: {
     InfoButton,
     ExperimentSV,
+  },
+  computed: {
+    readyToDisplay() {
+      return (
+        Object.keys(this.units).length !== 0 &&
+        Object.keys(this.experiment).length !== 0
+      );
+    },
+    ...mapState("experiments", {
+      units: "units",
+    }),
+  },
+  created() {
+    this.$store.dispatch("experiments/fetchUnits");
   },
 };
 </script>

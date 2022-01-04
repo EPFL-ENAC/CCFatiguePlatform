@@ -28,7 +28,7 @@
   var instance;
 
   beforeEach(function () {
-    instance = new Ccfatigue.DefaultApi();
+    instance = new Ccfatigue.UnitInfo();
   });
 
   var getProperty = function (object, getter, property) {
@@ -43,26 +43,23 @@
     else object[property] = value;
   };
 
-  describe("DefaultApi", function () {
-    describe("getUnitsUnitsGet", function () {
-      it("should call getUnitsUnitsGet successfully", function (done) {
-        //uncomment below and update the code to test getUnitsUnitsGet
-        //instance.getUnitsUnitsGet(function(error) {
-        //  if (error) throw error;
-        //expect().to.be();
-        //});
-        done();
-      });
+  describe("UnitInfo", function () {
+    it("should create an instance of UnitInfo", function () {
+      // uncomment below and update the code to test UnitInfo
+      //var instance = new Ccfatigue.UnitInfo();
+      //expect(instance).to.be.a(Ccfatigue.UnitInfo);
     });
-    describe("rootGet", function () {
-      it("should call rootGet successfully", function (done) {
-        //uncomment below and update the code to test rootGet
-        //instance.rootGet(function(error) {
-        //  if (error) throw error;
-        //expect().to.be();
-        //});
-        done();
-      });
+
+    it('should have the property subject (base name: "subject")', function () {
+      // uncomment below and update the code to test the property subject
+      //var instance = new Ccfatigue.UnitInfo();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property unit (base name: "unit")', function () {
+      // uncomment below and update the code to test the property unit
+      //var instance = new Ccfatigue.UnitInfo();
+      //expect(instance).to.be();
     });
   });
 });

@@ -24,6 +24,29 @@
         }
       }
     },
+    "/units": {
+      "get": {
+        "summary": "Get Units",
+        "description": "Get All standardized units",
+        "operationId": "get_units_units_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Get Units Units Get",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UnitInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/experiments": {
       "get": {
         "tags": [
@@ -569,6 +592,25 @@
           }
         },
         "description": "Defines how test is seen on the API"
+      },
+      "UnitInfo": {
+        "title": "UnitInfo",
+        "required": [
+          "subject",
+          "unit"
+        ],
+        "type": "object",
+        "properties": {
+          "subject": {
+            "title": "Subject",
+            "type": "string"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "description": "Unit Info"
       },
       "ValidationError": {
         "title": "ValidationError",

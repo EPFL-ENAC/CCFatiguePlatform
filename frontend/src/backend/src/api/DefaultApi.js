@@ -13,6 +13,7 @@
 
 import ApiClient from "../ApiClient";
 import AppInfo from "../model/AppInfo";
+import UnitInfo from "../model/UnitInfo";
 
 /**
  * Default service.
@@ -29,6 +30,49 @@ export default class DefaultApi {
    */
   constructor(apiClient) {
     this.apiClient = apiClient || ApiClient.instance;
+  }
+
+  /**
+   * Callback function to receive the result of the getUnitsUnitsGet operation.
+   * @callback module:api/DefaultApi~getUnitsUnitsGetCallback
+   * @param {String} error Error message, if any.
+   * @param {Array.<module:model/UnitInfo>} data The data returned by the service call.
+   * @param {String} response The complete HTTP response.
+   */
+
+  /**
+   * Get Units
+   * Get All standardized units
+   * @param {module:api/DefaultApi~getUnitsUnitsGetCallback} callback The callback function, accepting three arguments: error, data, response
+   * data is of type: {@link Array.<module:model/UnitInfo>}
+   */
+  getUnitsUnitsGet(callback) {
+    let postBody = null;
+
+    let pathParams = {};
+    let queryParams = {};
+    let headerParams = {};
+    let formParams = {};
+
+    let authNames = [];
+    let contentTypes = [];
+    let accepts = ["application/json"];
+    let returnType = [UnitInfo];
+    return this.apiClient.callApi(
+      "/units",
+      "GET",
+      pathParams,
+      queryParams,
+      headerParams,
+      formParams,
+      postBody,
+      authNames,
+      contentTypes,
+      accepts,
+      returnType,
+      null,
+      callback
+    );
   }
 
   /**

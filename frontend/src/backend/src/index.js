@@ -18,6 +18,7 @@ import HTTPValidationError from "./model/HTTPValidationError";
 import PageExperimentModel from "./model/PageExperimentModel";
 import PageTestModel from "./model/PageTestModel";
 import TestModel from "./model/TestModel";
+import UnitInfo from "./model/UnitInfo";
 import ValidationError from "./model/ValidationError";
 import DefaultApi from "./api/DefaultApi";
 import ExperimentsApi from "./api/ExperimentsApi";
@@ -90,6 +91,11 @@ export {
    * @property {module:model/TestModel}
    */
   TestModel,
+  /**
+   * The UnitInfo model constructor.
+   * @property {module:model/UnitInfo}
+   */
+  UnitInfo,
   /**
    * The ValidationError model constructor.
    * @property {module:model/ValidationError}

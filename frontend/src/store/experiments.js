@@ -26,6 +26,7 @@ export default {
       },
       loading: false, // used to let the user know that data is loading
     },
+    units: {},
   },
   mutations: {
     nowWeLoadFilteredExperiments(state, payload) {
@@ -108,8 +109,25 @@ export default {
         loading: state.oneExperiment.experiment.id === undefined,
       };
     },
+    storeUnits(state, data) {
+      state.units = data.reduce((acc, item) => {
+        acc[item.subject] = item.unit;
+        return acc;
+      }, {});
+    },
   },
   actions: {
+    fetchUnits({ commit, state }) {
+      if (Object.keys(state.units).length === 0) {
+        this._vm.$defaultApi.getUnitsUnitsGet((error, data) => {
+          if (error) {
+            console.error(error);
+          } else {
+            commit("storeUnits", data);
+          }
+        });
+      }
+    },
     fetchOneExperimentWithTests({ commit, state }, payload) {
       commit("nowWeLoadOneExperiment", payload);
       this._vm.$experimentsApi.getExperimentsExperimentsGet(
