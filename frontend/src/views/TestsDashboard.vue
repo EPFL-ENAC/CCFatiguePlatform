@@ -161,7 +161,7 @@ import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue"
 import * as Bokeh from "bokeh";
 
 export default {
-  name: "TestDashboard",
+  name: "TestsDashboard",
   components: {
     ExperimentSV,
     ExperimentSpecifications,
