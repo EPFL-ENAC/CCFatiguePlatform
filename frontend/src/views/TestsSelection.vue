@@ -19,7 +19,7 @@
         <v-container>
           <v-row justify="end">
             <v-btn class="ma-2" @click="goBack"> Back </v-btn>
-            <v-btn class="ma-2" :to="{ name: 'TestDashboard' }">
+            <v-btn class="ma-2" :to="{ name: 'TestsDashboard' }">
               View tests
             </v-btn>
           </v-row>

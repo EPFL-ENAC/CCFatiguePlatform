@@ -10,8 +10,10 @@ const TestsSelection = () =>
   import(
     /* webpackChunkName: "tests_selection" */ "../views/TestsSelection.vue"
   );
-const TestDashboard = () =>
-  import(/* webpackChunkName: "test_dashboard" */ "../views/TestDashboard.vue");
+const TestsDashboard = () =>
+  import(
+    /* webpackChunkName: "tests_dashboard" */ "../views/TestsDashboard.vue"
+  );
 const DataUpload = () =>
   import(/* webpackChunkName: "data_upload" */ "../views/DataUpload.vue");
 const CCFatigueAnalysis = () =>
@@ -56,9 +58,9 @@ const routes = [
     },
   },
   {
-    path: "/fatigue_database/test_dashboard",
-    name: "TestDashboard",
-    component: TestDashboard,
+    path: "/fatigue_database/tests_dashboard",
+    name: "TestsDashboard",
+    component: TestsDashboard,
   },
   {
     path: "/fatigue_database/data_upload",
