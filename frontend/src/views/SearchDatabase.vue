@@ -296,7 +296,7 @@ export default {
     viewTestsSelection() {
       this.$router.push({
         name: "TestsSelection",
-        params: { experimentId: this.experimentSelected[0].id },
+        query: { exp: this.experimentSelected[0].id },
       });
     },
     analyseExperiment() {

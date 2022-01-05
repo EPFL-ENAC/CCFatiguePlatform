@@ -47,15 +47,13 @@ const routes = [
     component: SearchDatabase,
   },
   {
-    path: "/fatigue_database/tests_selection/:experimentId",
+    path: "/fatigue_database/tests_selection",
     name: "TestsSelection",
     component: TestsSelection,
-    props(route) {
+    props: (route) => ({
       // typecast experimentId to Number
-      const props = { ...route.params };
-      props.experimentId = +props.experimentId;
-      return props;
-    },
+      experimentId: +route.query.exp,
+    }),
   },
   {
     path: "/fatigue_database/tests_dashboard",
