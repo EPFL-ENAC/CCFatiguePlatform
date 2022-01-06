@@ -5,6 +5,7 @@
 README.md
 docs/AppInfo.md
 docs/DefaultApi.md
+docs/ExperimentFieldNames.md
 docs/ExperimentModel.md
 docs/ExperimentsApi.md
 docs/HTTPValidationError.md
@@ -23,6 +24,7 @@ src/api/ExperimentsApi.js
 src/api/TestsApi.js
 src/index.js
 src/model/AppInfo.js
+src/model/ExperimentFieldNames.js
 src/model/ExperimentModel.js
 src/model/HTTPValidationError.js
 src/model/PageExperimentModel.js
@@ -34,6 +36,7 @@ test/api/DefaultApi.spec.js
 test/api/ExperimentsApi.spec.js
 test/api/TestsApi.spec.js
 test/model/AppInfo.spec.js
+test/model/ExperimentFieldNames.spec.js
 test/model/ExperimentModel.spec.js
 test/model/HTTPValidationError.spec.js
 test/model/PageExperimentModel.spec.js

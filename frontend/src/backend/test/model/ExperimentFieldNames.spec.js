@@ -27,9 +27,7 @@
 
   var instance;
 
-  beforeEach(function () {
-    instance = new Ccfatigue.ExperimentsApi();
-  });
+  beforeEach(function () {});
 
   var getProperty = function (object, getter, property) {
     // Use getter method if present; otherwise, get the property directly.
@@ -43,26 +41,11 @@
     else object[property] = value;
   };
 
-  describe("ExperimentsApi", function () {
-    describe("getExperimentsExperimentsGet", function () {
-      it("should call getExperimentsExperimentsGet successfully", function (done) {
-        //uncomment below and update the code to test getExperimentsExperimentsGet
-        //instance.getExperimentsExperimentsGet(function(error) {
-        //  if (error) throw error;
-        //expect().to.be();
-        //});
-        done();
-      });
-    });
-    describe("getFieldDistinctExperimentsFieldDistinctGet", function () {
-      it("should call getFieldDistinctExperimentsFieldDistinctGet successfully", function (done) {
-        //uncomment below and update the code to test getFieldDistinctExperimentsFieldDistinctGet
-        //instance.getFieldDistinctExperimentsFieldDistinctGet(function(error) {
-        //  if (error) throw error;
-        //expect().to.be();
-        //});
-        done();
-      });
+  describe("ExperimentFieldNames", function () {
+    it("should create an instance of ExperimentFieldNames", function () {
+      // uncomment below and update the code to test ExperimentFieldNames
+      //var instance = new Ccfatigue.ExperimentFieldNames();
+      //expect(instance).to.be.a(Ccfatigue.ExperimentFieldNames);
     });
   });
 });

@@ -2,13 +2,10 @@
 
 All URIs are relative to _http://localhost_
 
-| Method                                                                                                                                                                                                                                               | HTTP request                                                             | Description                                             |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------- |
-| [**getExperimentsExperimentsGet**](ExperimentsApi.md#getExperimentsExperimentsGet)                                                                                                                                                                   | **GET** /experiments                                                     | Get Experiments                                         |
-| [**getFractureModeDistinctExperimentsFractureModeDistinctGet**](ExperimentsApi.md#getFractureModeDistinctExperimentsFractureModeDistinctGet)                                                                                                         | **GET** /experiments/fracture_mode/distinct                              | Get Fracture Mode Distinct                              |
-| [**getLaminatesAndAssembliesStackingSequenceDistinctExperimentsLaminatesAndAssembliesStackingSequenceDistinctGet**](ExperimentsApi.md#getLaminatesAndAssembliesStackingSequenceDistinctExperimentsLaminatesAndAssembliesStackingSequenceDistinctGet) | **GET** /experiments/laminates_and_assemblies_stacking_sequence/distinct | Get Laminates And Assemblies Stacking Sequence Distinct |
-| [**getMaterialTypeFiberMaterialDistinctExperimentsMaterialTypeFiberMaterialDistinctGet**](ExperimentsApi.md#getMaterialTypeFiberMaterialDistinctExperimentsMaterialTypeFiberMaterialDistinctGet)                                                     | **GET** /experiments/material_type_fiber_material/distinct               | Get Material Type Fiber Material Distinct               |
-| [**getMaterialTypeResinDistinctExperimentsMaterialTypeResinDistinctGet**](ExperimentsApi.md#getMaterialTypeResinDistinctExperimentsMaterialTypeResinDistinctGet)                                                                                     | **GET** /experiments/material_type_resin/distinct                        | Get Material Type Resin Distinct                        |
+| Method                                                                                                           | HTTP request                          | Description        |
+| ---------------------------------------------------------------------------------------------------------------- | ------------------------------------- | ------------------ |
+| [**getExperimentsExperimentsGet**](ExperimentsApi.md#getExperimentsExperimentsGet)                               | **GET** /experiments                  | Get Experiments    |
+| [**getFieldDistinctExperimentsFieldDistinctGet**](ExperimentsApi.md#getFieldDistinctExperimentsFieldDistinctGet) | **GET** /experiments/{field}/distinct | Get Field Distinct |
 
 ## getExperimentsExperimentsGet
 
@@ -61,13 +58,13 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-## getFractureModeDistinctExperimentsFractureModeDistinctGet
+## getFieldDistinctExperimentsFieldDistinctGet
 
-> [String] getFractureModeDistinctExperimentsFractureModeDistinctGet()
+> [String] getFieldDistinctExperimentsFieldDistinctGet(field)
 
-Get Fracture Mode Distinct
+Get Field Distinct
 
-Get all distinct values for fracture_mode, sorted
+Get all distinct values for field column, sorted
 
 ### Example
 
@@ -75,7 +72,9 @@ Get all distinct values for fracture_mode, sorted
 import Ccfatigue from "ccfatigue";
 
 let apiInstance = new Ccfatigue.ExperimentsApi();
-apiInstance.getFractureModeDistinctExperimentsFractureModeDistinctGet(
+let field = new Ccfatigue.ExperimentFieldNames(); // ExperimentFieldNames |
+apiInstance.getFieldDistinctExperimentsFieldDistinctGet(
+  field,
   (error, data, response) => {
     if (error) {
       console.error(error);
@@ -88,133 +87,9 @@ apiInstance.getFractureModeDistinctExperimentsFractureModeDistinctGet(
 
 ### Parameters
 
-This endpoint does not need any parameter.
-
-### Return type
-
-**[String]**
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-## getLaminatesAndAssembliesStackingSequenceDistinctExperimentsLaminatesAndAssembliesStackingSequenceDistinctGet
-
-> [String] getLaminatesAndAssembliesStackingSequenceDistinctExperimentsLaminatesAndAssembliesStackingSequenceDistinctGet()
-
-Get Laminates And Assemblies Stacking Sequence Distinct
-
-Get all distinct values for laminates_and_assemblies_stacking_sequence, sorted
-
-### Example
-
-```javascript
-import Ccfatigue from "ccfatigue";
-
-let apiInstance = new Ccfatigue.ExperimentsApi();
-apiInstance.getLaminatesAndAssembliesStackingSequenceDistinctExperimentsLaminatesAndAssembliesStackingSequenceDistinctGet(
-  (error, data, response) => {
-    if (error) {
-      console.error(error);
-    } else {
-      console.log("API called successfully. Returned data: " + data);
-    }
-  }
-);
-```
-
-### Parameters
-
-This endpoint does not need any parameter.
-
-### Return type
-
-**[String]**
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-## getMaterialTypeFiberMaterialDistinctExperimentsMaterialTypeFiberMaterialDistinctGet
-
-> [String] getMaterialTypeFiberMaterialDistinctExperimentsMaterialTypeFiberMaterialDistinctGet()
-
-Get Material Type Fiber Material Distinct
-
-Get all distinct values for material_type_fiber_material, sorted
-
-### Example
-
-```javascript
-import Ccfatigue from "ccfatigue";
-
-let apiInstance = new Ccfatigue.ExperimentsApi();
-apiInstance.getMaterialTypeFiberMaterialDistinctExperimentsMaterialTypeFiberMaterialDistinctGet(
-  (error, data, response) => {
-    if (error) {
-      console.error(error);
-    } else {
-      console.log("API called successfully. Returned data: " + data);
-    }
-  }
-);
-```
-
-### Parameters
-
-This endpoint does not need any parameter.
-
-### Return type
-
-**[String]**
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-## getMaterialTypeResinDistinctExperimentsMaterialTypeResinDistinctGet
-
-> [String] getMaterialTypeResinDistinctExperimentsMaterialTypeResinDistinctGet()
-
-Get Material Type Resin Distinct
-
-Get all distinct values for material_type_resin, sorted
-
-### Example
-
-```javascript
-import Ccfatigue from "ccfatigue";
-
-let apiInstance = new Ccfatigue.ExperimentsApi();
-apiInstance.getMaterialTypeResinDistinctExperimentsMaterialTypeResinDistinctGet(
-  (error, data, response) => {
-    if (error) {
-      console.error(error);
-    } else {
-      console.log("API called successfully. Returned data: " + data);
-    }
-  }
-);
-```
-
-### Parameters
-
-This endpoint does not need any parameter.
+| Name      | Type                            | Description | Notes |
+| --------- | ------------------------------- | ----------- | ----- |
+| **field** | [**ExperimentFieldNames**](.md) |             |
 
 ### Return type
 

@@ -230,7 +230,8 @@ export default {
       );
     },
     fetchAllFiltersValues({ commit }) {
-      this._vm.$experimentsApi.getFractureModeDistinctExperimentsFractureModeDistinctGet(
+      this._vm.$experimentsApi.getFieldDistinctExperimentsFieldDistinctGet(
+        "fracture_mode",
         (error, data) => {
           if (error) {
             console.error(error);
@@ -239,7 +240,8 @@ export default {
           }
         }
       );
-      this._vm.$experimentsApi.getMaterialTypeFiberMaterialDistinctExperimentsMaterialTypeFiberMaterialDistinctGet(
+      this._vm.$experimentsApi.getFieldDistinctExperimentsFieldDistinctGet(
+        "material_type_fiber_material",
         (error, data) => {
           if (error) {
             console.error(error);
@@ -248,7 +250,8 @@ export default {
           }
         }
       );
-      this._vm.$experimentsApi.getMaterialTypeResinDistinctExperimentsMaterialTypeResinDistinctGet(
+      this._vm.$experimentsApi.getFieldDistinctExperimentsFieldDistinctGet(
+        "material_type_resin",
         (error, data) => {
           if (error) {
             console.error(error);
@@ -257,7 +260,8 @@ export default {
           }
         }
       );
-      this._vm.$experimentsApi.getLaminatesAndAssembliesStackingSequenceDistinctExperimentsLaminatesAndAssembliesStackingSequenceDistinctGet(
+      this._vm.$experimentsApi.getFieldDistinctExperimentsFieldDistinctGet(
+        "laminates_and_assemblies_stacking_sequence",
         (error, data) => {
           if (error) {
             console.error(error);
