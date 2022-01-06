@@ -2,6 +2,7 @@
 API Models
 """
 
+from enum import Enum
 from pydantic import BaseModel
 from typing import Optional
 
@@ -81,3 +82,16 @@ class TestModel(OrmModel):
     maximum_stress: Optional[float]
     loading_rate: Optional[float]
     run_out: Optional[bool]
+
+
+class ExperimentFieldNames(str, Enum):
+    """
+    Enumerate all fields that can be requested as distinct
+    """
+
+    fracture_mode = "fracture_mode"
+    material_type_fiber_material = "material_type_fiber_material"
+    material_type_resin = "material_type_resin"
+    laminates_and_assemblies_stacking_sequence = (
+        "laminates_and_assemblies_stacking_sequence"
+    )

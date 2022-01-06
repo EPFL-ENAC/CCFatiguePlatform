@@ -12,6 +12,7 @@
  */
 
 import ApiClient from "../ApiClient";
+import ExperimentFieldNames from "../model/ExperimentFieldNames";
 import HTTPValidationError from "../model/HTTPValidationError";
 import PageExperimentModel from "../model/PageExperimentModel";
 
@@ -87,23 +88,32 @@ export default class ExperimentsApi {
   }
 
   /**
-   * Callback function to receive the result of the getFractureModeDistinctExperimentsFractureModeDistinctGet operation.
-   * @callback module:api/ExperimentsApi~getFractureModeDistinctExperimentsFractureModeDistinctGetCallback
+   * Callback function to receive the result of the getFieldDistinctExperimentsFieldDistinctGet operation.
+   * @callback module:api/ExperimentsApi~getFieldDistinctExperimentsFieldDistinctGetCallback
    * @param {String} error Error message, if any.
    * @param {Array.<String>} data The data returned by the service call.
    * @param {String} response The complete HTTP response.
    */
 
   /**
-   * Get Fracture Mode Distinct
-   * Get all distinct values for fracture_mode, sorted
-   * @param {module:api/ExperimentsApi~getFractureModeDistinctExperimentsFractureModeDistinctGetCallback} callback The callback function, accepting three arguments: error, data, response
+   * Get Field Distinct
+   * Get all distinct values for field column, sorted
+   * @param {module:model/ExperimentFieldNames} field
+   * @param {module:api/ExperimentsApi~getFieldDistinctExperimentsFieldDistinctGetCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link Array.<String>}
    */
-  getFractureModeDistinctExperimentsFractureModeDistinctGet(callback) {
+  getFieldDistinctExperimentsFieldDistinctGet(field, callback) {
     let postBody = null;
+    // verify the required parameter 'field' is set
+    if (field === undefined || field === null) {
+      throw new Error(
+        "Missing the required parameter 'field' when calling getFieldDistinctExperimentsFieldDistinctGet"
+      );
+    }
 
-    let pathParams = {};
+    let pathParams = {
+      field: field,
+    };
     let queryParams = {};
     let headerParams = {};
     let formParams = {};
@@ -113,142 +123,7 @@ export default class ExperimentsApi {
     let accepts = ["application/json"];
     let returnType = ["String"];
     return this.apiClient.callApi(
-      "/experiments/fracture_mode/distinct",
-      "GET",
-      pathParams,
-      queryParams,
-      headerParams,
-      formParams,
-      postBody,
-      authNames,
-      contentTypes,
-      accepts,
-      returnType,
-      null,
-      callback
-    );
-  }
-
-  /**
-   * Callback function to receive the result of the getLaminatesAndAssembliesStackingSequenceDistinctExperimentsLaminatesAndAssembliesStackingSequenceDistinctGet operation.
-   * @callback module:api/ExperimentsApi~getLaminatesAndAssembliesStackingSequenceDistinctExperimentsLaminatesAndAssembliesStackingSequenceDistinctGetCallback
-   * @param {String} error Error message, if any.
-   * @param {Array.<String>} data The data returned by the service call.
-   * @param {String} response The complete HTTP response.
-   */
-
-  /**
-   * Get Laminates And Assemblies Stacking Sequence Distinct
-   * Get all distinct values for laminates_and_assemblies_stacking_sequence, sorted
-   * @param {module:api/ExperimentsApi~getLaminatesAndAssembliesStackingSequenceDistinctExperimentsLaminatesAndAssembliesStackingSequenceDistinctGetCallback} callback The callback function, accepting three arguments: error, data, response
-   * data is of type: {@link Array.<String>}
-   */
-  getLaminatesAndAssembliesStackingSequenceDistinctExperimentsLaminatesAndAssembliesStackingSequenceDistinctGet(
-    callback
-  ) {
-    let postBody = null;
-
-    let pathParams = {};
-    let queryParams = {};
-    let headerParams = {};
-    let formParams = {};
-
-    let authNames = [];
-    let contentTypes = [];
-    let accepts = ["application/json"];
-    let returnType = ["String"];
-    return this.apiClient.callApi(
-      "/experiments/laminates_and_assemblies_stacking_sequence/distinct",
-      "GET",
-      pathParams,
-      queryParams,
-      headerParams,
-      formParams,
-      postBody,
-      authNames,
-      contentTypes,
-      accepts,
-      returnType,
-      null,
-      callback
-    );
-  }
-
-  /**
-   * Callback function to receive the result of the getMaterialTypeFiberMaterialDistinctExperimentsMaterialTypeFiberMaterialDistinctGet operation.
-   * @callback module:api/ExperimentsApi~getMaterialTypeFiberMaterialDistinctExperimentsMaterialTypeFiberMaterialDistinctGetCallback
-   * @param {String} error Error message, if any.
-   * @param {Array.<String>} data The data returned by the service call.
-   * @param {String} response The complete HTTP response.
-   */
-
-  /**
-   * Get Material Type Fiber Material Distinct
-   * Get all distinct values for material_type_fiber_material, sorted
-   * @param {module:api/ExperimentsApi~getMaterialTypeFiberMaterialDistinctExperimentsMaterialTypeFiberMaterialDistinctGetCallback} callback The callback function, accepting three arguments: error, data, response
-   * data is of type: {@link Array.<String>}
-   */
-  getMaterialTypeFiberMaterialDistinctExperimentsMaterialTypeFiberMaterialDistinctGet(
-    callback
-  ) {
-    let postBody = null;
-
-    let pathParams = {};
-    let queryParams = {};
-    let headerParams = {};
-    let formParams = {};
-
-    let authNames = [];
-    let contentTypes = [];
-    let accepts = ["application/json"];
-    let returnType = ["String"];
-    return this.apiClient.callApi(
-      "/experiments/material_type_fiber_material/distinct",
-      "GET",
-      pathParams,
-      queryParams,
-      headerParams,
-      formParams,
-      postBody,
-      authNames,
-      contentTypes,
-      accepts,
-      returnType,
-      null,
-      callback
-    );
-  }
-
-  /**
-   * Callback function to receive the result of the getMaterialTypeResinDistinctExperimentsMaterialTypeResinDistinctGet operation.
-   * @callback module:api/ExperimentsApi~getMaterialTypeResinDistinctExperimentsMaterialTypeResinDistinctGetCallback
-   * @param {String} error Error message, if any.
-   * @param {Array.<String>} data The data returned by the service call.
-   * @param {String} response The complete HTTP response.
-   */
-
-  /**
-   * Get Material Type Resin Distinct
-   * Get all distinct values for material_type_resin, sorted
-   * @param {module:api/ExperimentsApi~getMaterialTypeResinDistinctExperimentsMaterialTypeResinDistinctGetCallback} callback The callback function, accepting three arguments: error, data, response
-   * data is of type: {@link Array.<String>}
-   */
-  getMaterialTypeResinDistinctExperimentsMaterialTypeResinDistinctGet(
-    callback
-  ) {
-    let postBody = null;
-
-    let pathParams = {};
-    let queryParams = {};
-    let headerParams = {};
-    let formParams = {};
-
-    let authNames = [];
-    let contentTypes = [];
-    let accepts = ["application/json"];
-    let returnType = ["String"];
-    return this.apiClient.callApi(
-      "/experiments/material_type_resin/distinct",
+      "/experiments/{field}/distinct",
       "GET",
       pathParams,
       queryParams,

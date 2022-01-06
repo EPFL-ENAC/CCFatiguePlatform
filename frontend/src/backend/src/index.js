@@ -13,6 +13,7 @@
 
 import ApiClient from "./ApiClient";
 import AppInfo from "./model/AppInfo";
+import ExperimentFieldNames from "./model/ExperimentFieldNames";
 import ExperimentModel from "./model/ExperimentModel";
 import HTTPValidationError from "./model/HTTPValidationError";
 import PageExperimentModel from "./model/PageExperimentModel";
@@ -66,6 +67,11 @@ export {
    * @property {module:model/AppInfo}
    */
   AppInfo,
+  /**
+   * The ExperimentFieldNames model constructor.
+   * @property {module:model/ExperimentFieldNames}
+   */
+  ExperimentFieldNames,
   /**
    * The ExperimentModel model constructor.
    * @property {module:model/ExperimentModel}

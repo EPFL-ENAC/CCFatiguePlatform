@@ -124,21 +124,31 @@
         }
       }
     },
-    "/experiments/fracture_mode/distinct": {
+    "/experiments/{field}/distinct": {
       "get": {
         "tags": [
           "experiments"
         ],
-        "summary": "Get Fracture Mode Distinct",
-        "description": "Get all distinct values for fracture_mode, sorted",
-        "operationId": "get_fracture_mode_distinct_experiments_fracture_mode_distinct_get",
+        "summary": "Get Field Distinct",
+        "description": "Get all distinct values for field column, sorted",
+        "operationId": "get_field_distinct_experiments__field__distinct_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ExperimentFieldNames"
+            },
+            "name": "field",
+            "in": "path"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Response Get Fracture Mode Distinct Experiments Fracture Mode Distinct Get",
+                  "title": "Response Get Field Distinct Experiments  Field  Distinct Get",
                   "type": "array",
                   "items": {
                     "type": "string"
@@ -146,81 +156,13 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/experiments/material_type_fiber_material/distinct": {
-      "get": {
-        "tags": [
-          "experiments"
-        ],
-        "summary": "Get Material Type Fiber Material Distinct",
-        "description": "Get all distinct values for material_type_fiber_material, sorted",
-        "operationId": "get_material_type_fiber_material_distinct_experiments_material_type_fiber_material_distinct_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
+          },
+          "422": {
+            "description": "Validation Error",
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Response Get Material Type Fiber Material Distinct Experiments Material Type Fiber Material Distinct Get",
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/experiments/material_type_resin/distinct": {
-      "get": {
-        "tags": [
-          "experiments"
-        ],
-        "summary": "Get Material Type Resin Distinct",
-        "description": "Get all distinct values for material_type_resin, sorted",
-        "operationId": "get_material_type_resin_distinct_experiments_material_type_resin_distinct_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "title": "Response Get Material Type Resin Distinct Experiments Material Type Resin Distinct Get",
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/experiments/laminates_and_assemblies_stacking_sequence/distinct": {
-      "get": {
-        "tags": [
-          "experiments"
-        ],
-        "summary": "Get Laminates And Assemblies Stacking Sequence Distinct",
-        "description": "Get all distinct values for laminates_and_assemblies_stacking_sequence, sorted",
-        "operationId": "get_laminates_and_assemblies_stacking_sequence_distinct_experiments_laminates_and_assemblies_stacking_sequence_distinct_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "title": "Response Get Laminates And Assemblies Stacking Sequence Distinct Experiments Laminates And Assemblies Stacking Sequence Distinct Get",
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -315,6 +257,17 @@
           }
         },
         "description": "App Info"
+      },
+      "ExperimentFieldNames": {
+        "title": "ExperimentFieldNames",
+        "enum": [
+          "fracture_mode",
+          "material_type_fiber_material",
+          "material_type_resin",
+          "laminates_and_assemblies_stacking_sequence"
+        ],
+        "type": "string",
+        "description": "Enumerate all fields that can be requested as distinct"
       },
       "ExperimentModel": {
         "title": "ExperimentModel",
