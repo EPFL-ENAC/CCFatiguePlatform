@@ -13,12 +13,15 @@
 
 import ApiClient from "./ApiClient";
 import AppInfo from "./model/AppInfo";
+import DashboardPlots from "./model/DashboardPlots";
 import ExperimentFieldNames from "./model/ExperimentFieldNames";
 import ExperimentModel from "./model/ExperimentModel";
 import HTTPValidationError from "./model/HTTPValidationError";
 import PageExperimentModel from "./model/PageExperimentModel";
 import PageTestModel from "./model/PageTestModel";
+import Plots from "./model/Plots";
 import TestModel from "./model/TestModel";
+import TestPlot from "./model/TestPlot";
 import UnitInfo from "./model/UnitInfo";
 import ValidationError from "./model/ValidationError";
 import DefaultApi from "./api/DefaultApi";
@@ -68,6 +71,11 @@ export {
    */
   AppInfo,
   /**
+   * The DashboardPlots model constructor.
+   * @property {module:model/DashboardPlots}
+   */
+  DashboardPlots,
+  /**
    * The ExperimentFieldNames model constructor.
    * @property {module:model/ExperimentFieldNames}
    */
@@ -93,10 +101,20 @@ export {
    */
   PageTestModel,
   /**
+   * The Plots model constructor.
+   * @property {module:model/Plots}
+   */
+  Plots,
+  /**
    * The TestModel model constructor.
    * @property {module:model/TestModel}
    */
   TestModel,
+  /**
+   * The TestPlot model constructor.
+   * @property {module:model/TestPlot}
+   */
+  TestPlot,
   /**
    * The UnitInfo model constructor.
    * @property {module:model/UnitInfo}

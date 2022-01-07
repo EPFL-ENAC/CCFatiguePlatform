@@ -170,6 +170,63 @@
         }
       }
     },
+    "/experiments/tests_dashboard_plots": {
+      "get": {
+        "tags": [
+          "experiments"
+        ],
+        "summary": "Get Tests Dashboard Plots",
+        "description": "Return the 4 Bokeh plots used in Test Dashboard\n\nNote: as we don't have real data yet, we hard code things this so it will\nrender the 10 first tests of the experiment 1 (only experiment we have) :\n+ experiment=1\n+ 1<tests_ids<10\nthen we mascarade test_id field so that it looks like\nto be matching the one asked for.",
+        "operationId": "get_tests_dashboard_plots_experiments_tests_dashboard_plots_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "title": "Experiment Id",
+              "type": "integer",
+              "default": ""
+            },
+            "name": "experiment_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Test Ids",
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "default": []
+            },
+            "name": "test_ids",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardPlots"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/tests": {
       "get": {
         "tags": [
@@ -257,6 +314,27 @@
           }
         },
         "description": "App Info"
+      },
+      "DashboardPlots": {
+        "title": "DashboardPlots",
+        "required": [
+          "tests",
+          "plots"
+        ],
+        "type": "object",
+        "properties": {
+          "tests": {
+            "title": "Tests",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestPlot"
+            }
+          },
+          "plots": {
+            "$ref": "#/components/schemas/Plots"
+          }
+        },
+        "description": "Defines data returned to the dashboard"
       },
       "ExperimentFieldNames": {
         "title": "ExperimentFieldNames",
@@ -507,6 +585,25 @@
           }
         }
       },
+      "Plots": {
+        "title": "Plots",
+        "type": "object",
+        "properties": {
+          "stress_strain": {
+            "title": "Stress Strain"
+          },
+          "creep": {
+            "title": "Creep"
+          },
+          "hysteresis_area": {
+            "title": "Hysteresis Area"
+          },
+          "stiffness": {
+            "title": "Stiffness"
+          }
+        },
+        "description": "Defines all plots types returned"
+      },
       "TestModel": {
         "title": "TestModel",
         "required": [
@@ -545,6 +642,35 @@
           }
         },
         "description": "Defines how test is seen on the API"
+      },
+      "TestPlot": {
+        "title": "TestPlot",
+        "required": [
+          "test_id",
+          "specimen_id",
+          "color",
+          "total_dissipated_energy"
+        ],
+        "type": "object",
+        "properties": {
+          "test_id": {
+            "title": "Test Id",
+            "type": "integer"
+          },
+          "specimen_id": {
+            "title": "Specimen Id",
+            "type": "integer"
+          },
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "total_dissipated_energy": {
+            "title": "Total Dissipated Energy",
+            "type": "integer"
+          }
+        },
+        "description": "Defines Test metadata related to a plot"
       },
       "UnitInfo": {
         "title": "UnitInfo",

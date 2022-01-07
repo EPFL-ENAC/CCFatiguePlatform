@@ -28,7 +28,7 @@
   var instance;
 
   beforeEach(function () {
-    instance = new Ccfatigue.ExperimentsApi();
+    instance = new Ccfatigue.TestPlot();
   });
 
   var getProperty = function (object, getter, property) {
@@ -43,36 +43,35 @@
     else object[property] = value;
   };
 
-  describe("ExperimentsApi", function () {
-    describe("getExperimentsExperimentsGet", function () {
-      it("should call getExperimentsExperimentsGet successfully", function (done) {
-        //uncomment below and update the code to test getExperimentsExperimentsGet
-        //instance.getExperimentsExperimentsGet(function(error) {
-        //  if (error) throw error;
-        //expect().to.be();
-        //});
-        done();
-      });
+  describe("TestPlot", function () {
+    it("should create an instance of TestPlot", function () {
+      // uncomment below and update the code to test TestPlot
+      //var instance = new Ccfatigue.TestPlot();
+      //expect(instance).to.be.a(Ccfatigue.TestPlot);
     });
-    describe("getFieldDistinctExperimentsFieldDistinctGet", function () {
-      it("should call getFieldDistinctExperimentsFieldDistinctGet successfully", function (done) {
-        //uncomment below and update the code to test getFieldDistinctExperimentsFieldDistinctGet
-        //instance.getFieldDistinctExperimentsFieldDistinctGet(function(error) {
-        //  if (error) throw error;
-        //expect().to.be();
-        //});
-        done();
-      });
+
+    it('should have the property testId (base name: "test_id")', function () {
+      // uncomment below and update the code to test the property testId
+      //var instance = new Ccfatigue.TestPlot();
+      //expect(instance).to.be();
     });
-    describe("getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet", function () {
-      it("should call getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet successfully", function (done) {
-        //uncomment below and update the code to test getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet
-        //instance.getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet(function(error) {
-        //  if (error) throw error;
-        //expect().to.be();
-        //});
-        done();
-      });
+
+    it('should have the property specimenId (base name: "specimen_id")', function () {
+      // uncomment below and update the code to test the property specimenId
+      //var instance = new Ccfatigue.TestPlot();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property color (base name: "color")', function () {
+      // uncomment below and update the code to test the property color
+      //var instance = new Ccfatigue.TestPlot();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property totalDissipatedEnergy (base name: "total_dissipated_energy")', function () {
+      // uncomment below and update the code to test the property totalDissipatedEnergy
+      //var instance = new Ccfatigue.TestPlot();
+      //expect(instance).to.be();
     });
   });
 });
