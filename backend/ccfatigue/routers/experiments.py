@@ -13,7 +13,10 @@ from ccfatigue.services.database import get_session
 from ccfatigue.models.database import Experiment
 from ccfatigue.models.api import ExperimentModel, ExperimentFieldNames
 from ccfatigue.utils.routers import get_where_clauses
-
+from ccfatigue.utils.bokeh_plots import (
+    generate_tests_dashboard_plots,
+    DashboardPlots,
+)
 
 router = APIRouter(
     prefix="/experiments",
@@ -58,3 +61,28 @@ async def get_field_distinct(
             )
         ]
     )
+
+
+@router.get("/tests_dashboard_plots", response_model=DashboardPlots)
+async def get_tests_dashboard_plots(
+    session: AsyncSession = Depends(get_session),
+    experiment_id: int = Query(""),
+    test_ids: List[int] = Query([]),
+):
+    """
+    Return the 4 Bokeh plots used in Test Dashboard
+
+    Note: as we don't have real data yet, we hard code things this so it will
+    render the 10 first tests of the experiment 1 (only experiment we have) :
+    + experiment=1
+    + 1<tests_ids<10
+    then we mascarade test_id field so that it looks like
+    to be matching the one asked for.
+    """
+    transposed_test_ids = [((test_id - 1) % 10) + 1 for test_id in test_ids]
+    dashboard_plots = await generate_tests_dashboard_plots(
+        session, 1, transposed_test_ids
+    )
+    for i in range(len(test_ids)):
+        dashboard_plots.tests[i].test_id = test_ids[i]
+    return dashboard_plots

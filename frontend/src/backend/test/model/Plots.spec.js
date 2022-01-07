@@ -28,7 +28,7 @@
   var instance;
 
   beforeEach(function () {
-    instance = new Ccfatigue.ExperimentsApi();
+    instance = new Ccfatigue.Plots();
   });
 
   var getProperty = function (object, getter, property) {
@@ -43,36 +43,35 @@
     else object[property] = value;
   };
 
-  describe("ExperimentsApi", function () {
-    describe("getExperimentsExperimentsGet", function () {
-      it("should call getExperimentsExperimentsGet successfully", function (done) {
-        //uncomment below and update the code to test getExperimentsExperimentsGet
-        //instance.getExperimentsExperimentsGet(function(error) {
-        //  if (error) throw error;
-        //expect().to.be();
-        //});
-        done();
-      });
+  describe("Plots", function () {
+    it("should create an instance of Plots", function () {
+      // uncomment below and update the code to test Plots
+      //var instance = new Ccfatigue.Plots();
+      //expect(instance).to.be.a(Ccfatigue.Plots);
     });
-    describe("getFieldDistinctExperimentsFieldDistinctGet", function () {
-      it("should call getFieldDistinctExperimentsFieldDistinctGet successfully", function (done) {
-        //uncomment below and update the code to test getFieldDistinctExperimentsFieldDistinctGet
-        //instance.getFieldDistinctExperimentsFieldDistinctGet(function(error) {
-        //  if (error) throw error;
-        //expect().to.be();
-        //});
-        done();
-      });
+
+    it('should have the property stressStrain (base name: "stress_strain")', function () {
+      // uncomment below and update the code to test the property stressStrain
+      //var instance = new Ccfatigue.Plots();
+      //expect(instance).to.be();
     });
-    describe("getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet", function () {
-      it("should call getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet successfully", function (done) {
-        //uncomment below and update the code to test getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet
-        //instance.getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet(function(error) {
-        //  if (error) throw error;
-        //expect().to.be();
-        //});
-        done();
-      });
+
+    it('should have the property creep (base name: "creep")', function () {
+      // uncomment below and update the code to test the property creep
+      //var instance = new Ccfatigue.Plots();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property hysteresisArea (base name: "hysteresis_area")', function () {
+      // uncomment below and update the code to test the property hysteresisArea
+      //var instance = new Ccfatigue.Plots();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property stiffness (base name: "stiffness")', function () {
+      // uncomment below and update the code to test the property stiffness
+      //var instance = new Ccfatigue.Plots();
+      //expect(instance).to.be();
     });
   });
 });

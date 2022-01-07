@@ -2,10 +2,11 @@
 
 All URIs are relative to _http://localhost_
 
-| Method                                                                                                           | HTTP request                          | Description        |
-| ---------------------------------------------------------------------------------------------------------------- | ------------------------------------- | ------------------ |
-| [**getExperimentsExperimentsGet**](ExperimentsApi.md#getExperimentsExperimentsGet)                               | **GET** /experiments                  | Get Experiments    |
-| [**getFieldDistinctExperimentsFieldDistinctGet**](ExperimentsApi.md#getFieldDistinctExperimentsFieldDistinctGet) | **GET** /experiments/{field}/distinct | Get Field Distinct |
+| Method                                                                                                                                   | HTTP request                               | Description               |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ | ------------------------- |
+| [**getExperimentsExperimentsGet**](ExperimentsApi.md#getExperimentsExperimentsGet)                                                       | **GET** /experiments                       | Get Experiments           |
+| [**getFieldDistinctExperimentsFieldDistinctGet**](ExperimentsApi.md#getFieldDistinctExperimentsFieldDistinctGet)                         | **GET** /experiments/{field}/distinct      | Get Field Distinct        |
+| [**getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet**](ExperimentsApi.md#getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet) | **GET** /experiments/tests_dashboard_plots | Get Tests Dashboard Plots |
 
 ## getExperimentsExperimentsGet
 
@@ -94,6 +95,56 @@ apiInstance.getFieldDistinctExperimentsFieldDistinctGet(
 ### Return type
 
 **[String]**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+## getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet
+
+> DashboardPlots getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet(opts)
+
+Get Tests Dashboard Plots
+
+Return the 4 Bokeh plots used in Test Dashboard Note: as we don&#39;t have real data yet, we hard code things this so it will render the 10 first tests of the experiment 1 (only experiment we have) : + experiment&#x3D;1 + 1&lt;tests_ids&lt;10 then we mascarade test_id field so that it looks like to be matching the one asked for.
+
+### Example
+
+```javascript
+import Ccfatigue from "ccfatigue";
+
+let apiInstance = new Ccfatigue.ExperimentsApi();
+let opts = {
+  experimentId: 56, // Number |
+  testIds: [null], // [Number] |
+};
+apiInstance.getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet(
+  opts,
+  (error, data, response) => {
+    if (error) {
+      console.error(error);
+    } else {
+      console.log("API called successfully. Returned data: " + data);
+    }
+  }
+);
+```
+
+### Parameters
+
+| Name             | Type                      | Description | Notes      |
+| ---------------- | ------------------------- | ----------- | ---------- |
+| **experimentId** | **Number**                |             | [optional] |
+| **testIds**      | [**[Number]**](Number.md) |             | [optional] |
+
+### Return type
+
+[**DashboardPlots**](DashboardPlots.md)
 
 ### Authorization
 

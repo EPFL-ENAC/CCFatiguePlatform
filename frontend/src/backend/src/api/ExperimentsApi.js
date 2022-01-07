@@ -12,6 +12,7 @@
  */
 
 import ApiClient from "../ApiClient";
+import DashboardPlots from "../model/DashboardPlots";
 import ExperimentFieldNames from "../model/ExperimentFieldNames";
 import HTTPValidationError from "../model/HTTPValidationError";
 import PageExperimentModel from "../model/PageExperimentModel";
@@ -124,6 +125,56 @@ export default class ExperimentsApi {
     let returnType = ["String"];
     return this.apiClient.callApi(
       "/experiments/{field}/distinct",
+      "GET",
+      pathParams,
+      queryParams,
+      headerParams,
+      formParams,
+      postBody,
+      authNames,
+      contentTypes,
+      accepts,
+      returnType,
+      null,
+      callback
+    );
+  }
+
+  /**
+   * Callback function to receive the result of the getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet operation.
+   * @callback module:api/ExperimentsApi~getTestsDashboardPlotsExperimentsTestsDashboardPlotsGetCallback
+   * @param {String} error Error message, if any.
+   * @param {module:model/DashboardPlots} data The data returned by the service call.
+   * @param {String} response The complete HTTP response.
+   */
+
+  /**
+   * Get Tests Dashboard Plots
+   * Return the 4 Bokeh plots used in Test Dashboard  Note: as we don't have real data yet, we hard code things this so it will render the 10 first tests of the experiment 1 (only experiment we have) : + experiment=1 + 1<tests_ids<10 then we mascarade test_id field so that it looks like to be matching the one asked for.
+   * @param {Object} opts Optional parameters
+   * @param {Number} opts.experimentId
+   * @param {Array.<Number>} opts.testIds
+   * @param {module:api/ExperimentsApi~getTestsDashboardPlotsExperimentsTestsDashboardPlotsGetCallback} callback The callback function, accepting three arguments: error, data, response
+   * data is of type: {@link module:model/DashboardPlots}
+   */
+  getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet(opts, callback) {
+    opts = opts || {};
+    let postBody = null;
+
+    let pathParams = {};
+    let queryParams = {
+      experiment_id: opts["experimentId"],
+      test_ids: this.apiClient.buildCollectionParam(opts["testIds"], "multi"),
+    };
+    let headerParams = {};
+    let formParams = {};
+
+    let authNames = [];
+    let contentTypes = [];
+    let accepts = ["application/json"];
+    let returnType = DashboardPlots;
+    return this.apiClient.callApi(
+      "/experiments/tests_dashboard_plots",
       "GET",
       pathParams,
       queryParams,
