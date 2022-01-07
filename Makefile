@@ -10,6 +10,12 @@ install_backend:
 install_frontend:
 	$(MAKE) -C frontend install
 
+init-db:
+	${MAKE} -C backend init-db
+
+init-db-with-fake:
+	${MAKE} -C backend init-db-with-fake
+
 compile_sncurve:
 	$(MAKE) -C CCFatigue_modules/2_S-NCurves compile
 
