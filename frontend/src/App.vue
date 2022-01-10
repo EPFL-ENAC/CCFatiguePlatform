@@ -51,14 +51,26 @@
     </v-app-bar>
 
     <v-main>
+      <disclaimer
+        title="Under development"
+        details="The development of this
+      service is not finished and most of the data presented here has been
+      randomly generated."
+        :timeout="8000"
+      />
       <router-view />
     </v-main>
   </v-app>
 </template>
 
 <script>
+import Disclaimer from "@/components/Disclaimer.vue";
+
 export default {
   name: "App",
+  components: {
+    Disclaimer,
+  },
 };
 </script>
 
