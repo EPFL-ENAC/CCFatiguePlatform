@@ -59,6 +59,16 @@ const routes = [
     path: "/fatigue_database/tests_dashboard",
     name: "TestsDashboard",
     component: TestsDashboard,
+    props: (route) => {
+      return {
+        // typecast experimentId & testIds to Array of Numbers
+        experimentId: +route.query.exp,
+        testIds:
+          typeof route.query.tests === "string"
+            ? [+route.query.tests]
+            : route.query.tests.map((item) => +item),
+      };
+    },
   },
   {
     path: "/fatigue_database/data_upload",

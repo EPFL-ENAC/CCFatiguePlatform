@@ -1,32 +1,34 @@
 <template>
-  <div>
-    <v-container>
-      <v-card elevation="0">
-        <experiment-specifications :experiment="experiment.experiment" />
+  <v-container>
+    <v-card elevation="0">
+      <experiment-specifications :experiment="experiment.experiment" />
 
-        <v-data-table
-          v-model="testsSelected"
-          :headers="headers"
-          :items="experiment.tests"
-          :options.sync="options"
-          :server-items-length="experiment.pagination.total"
-          :loading="experiment.loading"
-          :footer-props="{ 'items-per-page-options': [5, 10, 15, 20, 40] }"
-          item-key="id"
-          @click:row="rowClick"
-        />
+      <v-data-table
+        v-model="testsSelected"
+        :headers="headers"
+        :items="experiment.tests"
+        :options.sync="options"
+        :server-items-length="experiment.pagination.total"
+        :loading="experiment.loading"
+        :footer-props="{ 'items-per-page-options': [5, 10, 15, 20, 40] }"
+        item-key="id"
+        @click:row="rowClick"
+      />
 
-        <v-container>
-          <v-row justify="end">
-            <v-btn class="ma-2" @click="goBack"> Back </v-btn>
-            <v-btn class="ma-2" :to="{ name: 'TestsDashboard' }">
-              View tests
-            </v-btn>
-          </v-row>
-        </v-container>
-      </v-card>
-    </v-container>
-  </div>
+      <v-container>
+        <v-row justify="end">
+          <v-btn class="ma-2" @click="goBack"> Back </v-btn>
+          <v-btn
+            class="ma-2"
+            @click="goToTestsDashboard"
+            :disabled="this.testsSelected.length === 0"
+          >
+            View tests Dashboard
+          </v-btn>
+        </v-row>
+      </v-container>
+    </v-card>
+  </v-container>
 </template>
 
 <script>
@@ -76,6 +78,15 @@ export default {
     },
     goBack() {
       this.$router.go(-1);
+    },
+    goToTestsDashboard() {
+      this.$router.push({
+        name: "TestsDashboard",
+        query: {
+          exp: this.experimentId,
+          tests: this.testsSelected.map((item) => item.id),
+        },
+      });
     },
     fetchOneExperimentWithTests() {
       this.$store.dispatch("experiments/fetchOneExperimentWithTests", {

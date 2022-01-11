@@ -29,6 +29,7 @@ async def get_units():
             ("humidity", "%"),
             ("temperature", "°C"),
             ("pressure", "kN"),
+            ("stress", "MPa"),
             ("time", "sec"),
             ("length", "mm"),
         )
