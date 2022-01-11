@@ -144,27 +144,41 @@
           />
           <v-container>
             <v-row justify="center">
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    class="ma-2"
+                    :disabled="experimentSelected.length === 0"
+                    @click="downloadRawFiles"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    Download raw files
+                  </v-btn>
+                </template>
+                <span>- not implemented yet -</span>
+              </v-tooltip>
               <v-btn
                 class="ma-2"
-                :disabled="this.experimentSelected.length === 0"
-                @click="downloadRawFiles"
-              >
-                Download raw files
-              </v-btn>
-              <v-btn
-                class="ma-2"
-                :disabled="this.experimentSelected.length === 0"
+                :disabled="experimentSelected.length === 0"
                 @click="viewTestsSelection"
               >
                 View tests results
               </v-btn>
-              <v-btn
-                class="ma-2"
-                :disabled="this.experimentSelected.length === 0"
-                @click="analyseExperiment"
-              >
-                Analyse experiment
-              </v-btn>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    class="ma-2"
+                    :disabled="experimentSelected.length === 0"
+                    @click="analyseExperiment"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    Analyse experiment
+                  </v-btn>
+                </template>
+                <span>- not implemented yet -</span>
+              </v-tooltip>
             </v-row>
           </v-container>
         </v-col>
