@@ -1,5 +1,6 @@
 <template>
   <v-container fluid>
+    <p>- not implemented yet -</p>
     <v-row>
       <v-col cols="6">
         <v-card :loading="snCurve.loading">
@@ -44,10 +45,10 @@
                           <li>Residual strength [MPa]</li>
                         </ul>
                         <p>
-                          If a sample doesn’t break under loading, we call it a
+                          If a sample doesn't break under loading, we call it a
                           test run off and the value for residual strength is
                           obtained by means of a quasi static loading up to
-                          breaking. If the sample doesn’t break, residual
+                          breaking. If the sample doesn't break, residual
                           strength takes the same value as the stress parameter.
                         </p>
                       </info-tooltip>
