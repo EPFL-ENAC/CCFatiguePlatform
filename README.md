@@ -12,6 +12,18 @@ CCFatiguePlatform is an initiative from CCLab that aims to develop a web applica
 2. run backend according to [backend/README.md](backend/README.md)
 3. run frontend according to [frontend/README.md](frontend/README.md)
 
+## Secrets
+
+```bash
+mkdir -p backend/ccfatigue/DB/secrets && cat <<EOF > backend/ccfatigue/DB/secrets/database.env
+POSTGRES_USER=ccfatigue
+POSTGRES_PASSWORD=change-it!
+EOF
+cat <<EOF > backend/ccfatigue/.secrets.toml
+postgres_password = 'change-it!'
+EOF
+```
+
 ## Server provisioning
 
 See https://github.com/EPFL-ENAC/SB_Sysadmin/tree/enacvm0056
