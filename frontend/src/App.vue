@@ -53,9 +53,9 @@
     <v-main>
       <disclaimer
         title="Under development"
-        details="The development of this
-      service is not finished and most of the data presented here has been
-      randomly generated."
+        details="This platform is under active development.
+          Most of the data presented here has been randomly generated.
+          Go to the about tab if you want to report bugs and suggestions."
         :timeout="8000"
       />
       <router-view />
