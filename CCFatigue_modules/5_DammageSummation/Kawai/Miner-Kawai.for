@@ -102,6 +102,7 @@
 	Damage=0.0
 	jj=1.0
 	Sa=10000.0
+	write(*,*)Fact
 	do
 	READ (30,*,iostat=ierr) Range, Smean, RR, nn, Cumulative
             if (ierr /= 0) then
