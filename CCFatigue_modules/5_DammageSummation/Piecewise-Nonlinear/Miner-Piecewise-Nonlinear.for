@@ -8,6 +8,7 @@
 	real ONC(1000),NOD,Xb,Yb,P,Q,A(10),B(10),AN,NR,R1,R2,R3,RR
 	real Sm1,Sinf,S0, A1,B1,A2,B2,A3,B3
 	real A4,B4,Samp,Smean,jj
+	real HSF, LSF, increment
 	
      
       CHARACTER*40 NAME, NAM
@@ -168,6 +169,7 @@
 		jj=1.0
 		Sa=10000.0
 		MaxStlev=-10000
+		write(*,*)Fact
 		do
 		READ(30,*,iostat=ierr)	Range,Smean,rratio,NofC
                 if (ierr /= 0) then
@@ -243,7 +245,7 @@
 				end if
 				jj=jj+1
 			end do
-			
+		        
 			do while ((jj.GE.1000).AND.(jj.LE.10E5).AND.(Sa.GE.Samp))
 				Sm1=10**((log10(jj)-A(1))/B(1))	  !R1=-1
 				Sinf=10**((log10(jj)-A(2))/B(2))  !R2=+-inf, R2>1 or R2<-1
@@ -684,7 +686,7 @@
 				end if
 				jj=jj+10e18
 			end do			
-			
+
 			Damage=Damage+NofC/jj
 			!WRITE (50, *) Range/Fact,NofC, jj
 			jj=1.0
