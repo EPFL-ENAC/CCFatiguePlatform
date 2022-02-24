@@ -2,9 +2,7 @@
 
 ### File naming conventions
 
-<!-- * Experiment folder:  `AGG_{Researcher's lastname}_{Date}_{Test type}`
-* Metadata file: `AGG_{Date}_{Test type}_metadata.xls` -->
-* File: `AGG_{Date}_{Test type}_{###}.csv`
+* File: `AGG_{Researcher's lastname?}_{Date?}_{Test type?}_{###?}.csv`
 
 with:
 
@@ -14,6 +12,7 @@ with:
 
 ### AGG CSV files standards (column names must be exact) :
 
+Encoding format: UTF-8
 
 | Column name          | Description                                        | Unit  | Data type | Mandatory  |
 |----------------------|----------------------------------------------------|-------|-----------|------------|
