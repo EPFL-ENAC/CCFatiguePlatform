@@ -17,6 +17,8 @@ with:
 
 ## SNC JSON files standards :
 
+Encoding format: UTF-8
+
 ```json
 [
 	{
@@ -37,6 +39,8 @@ with:
 ```
 
 ## SNC CSV files standards (column names must be exact) :
+
+Encoding format: UTF-8
 
 
 | Column name          | Description                                        | Unit  | Data type | Mandatory  |
