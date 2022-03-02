@@ -40,7 +40,7 @@ Encoding format: UTF-8
 
 ## SNC CSV files standards (column names must be exact) :
 
-Encoding format: UTF-8
+Encoding format: UTF-8, Separator: ',' (comma)
 
 
 | Column name          | Description                                        | Unit  | Data type | Mandatory  |
