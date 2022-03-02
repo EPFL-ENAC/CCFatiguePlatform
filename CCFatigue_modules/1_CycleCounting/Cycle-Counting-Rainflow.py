@@ -1,17 +1,13 @@
 #!/usr/bin/env python
 """ Rainflow Counting
 This file is a translation from fortran Cycle-Counting-Rainflow.for
+Contributors: Anastasios Vassilopoulos & Nicolas Dubois
+
  """
 
-__author__ = "Nicolas Dubois"
-
-
-# import sys
-
-# from array import array
-# import numpy as np
-# import pandas as pd
-# import os
+MATRIX_SIZE = 64
+INPUT_FILENAME = "input.txt"
+OUTPUT_FILENAME = "CYC-Rainflow.csv"
 
 
 class Flow:
@@ -25,25 +21,24 @@ class Flow:
         self.peak1 = peak1
         self.peak2 = peak2
         self.noc = noc
-        # self.r = max(peak1, peak2) / min(peak1, peak2)
 
     def __str__(self):
-        return "{:10.4f} {:10.4f} {:10.4f} {:10.4f} {}".format(
-            self.range, self.mean, self.peak1, self.peak2, self.noc
+        return (
+            f"{self.range:10.4f} {self.mean:10.4f} {self.peak1:10.4f} "
+            "{self.peak2:10.4f} {self.noc}"
         )
 
 
-peak = []  # array('d')
+peak = []
 flows = []
 
 
-# os.chdir(os.path.dirname(__file__)) # cd to this file dir
-with open("./input.txt", "r") as inFile:
+with open(INPUT_FILENAME, "r", encoding="UTF-8") as inFile:
 
-    #   ! Rainflow Counting
-    #   ! ##########################################################################
+    # Rainflow Counting
+    # ##########################################################################
 
-    starp = 1
+    STARP = 1
 
     for line in inFile:
         peak.append(float(line))
@@ -54,21 +49,19 @@ with open("./input.txt", "r") as inFile:
             y = abs(peak[-2] - peak[-3])
 
             if x < y:
-                break  # exit while
-
-            if starp == len(peak) - 2:  # or starp == i - 1:
-                halfrange = y
-                _mean = (peak[-2] + peak[-3]) / 2
-                flows.append(Flow(halfrange, _mean, peak[-3], peak[-2], 1))
-
-                peak.pop(-2)
-                continue  # with next while iteration
+                break
 
             _mean = (peak[-2] + peak[-3]) / 2
             _range = y
-            flows.append(Flow(_range, _mean, peak[-3], peak[-2], 2))
-            peak.pop(-2)
-            peak.pop(-2)
+
+            if STARP == len(peak) - 2:  # len(peak) == 3
+                flows.append(Flow(_range, _mean, peak[-3], peak[-2], 1))
+                peak.pop(-2)
+
+            else:
+                flows.append(Flow(_range, _mean, peak[-3], peak[-2], 2))
+                peak.pop(-2)
+                peak.pop(-2)
 
     for j in range(len(peak) - 2):
         y = abs(peak[j + 1] - peak[j])
@@ -79,27 +72,14 @@ with open("./input.txt", "r") as inFile:
     inFile.close()
 
 
-# 	! Sorting output file
-# 	! ##########################################################################
+# Sorting output file
+# ##########################################################################
+# TODO: check with Tassos, seems this step could be skipped
 flows.sort(key=lambda x: x.range)
 
-# for i in range(len(flows) - 1):
-# 	for j in range(i + 1, len(flows) - 1):
-# 		if flows[i].range > flows[j].range:
-# 			# Switch both Flows
-# 			# flows.insert(i, flows.pop(j))
-# 			# flows.insert(j, flows.pop(i + 1))
-# 			flows[i], flows[j] = flows[j], flows[i]
 
-
-# with open("output.txt", "w") as outFile:
-# 	outFile.writelines("\n".join([str(x) for x in flows]))
-# 	outFile.close()
-
-# sys.exit()
-
-# 	! Creating 64*64 markov matrix
-# 	! ##########################################################################
+# Creating 64*64 markov matrix
+# ##########################################################################
 
 
 maxrange = max(flows, key=lambda p: p.range).range
@@ -107,48 +87,48 @@ minrange = min(flows, key=lambda p: p.range).range
 maxmean = max(flows, key=lambda p: p.mean).mean
 minmean = min(flows, key=lambda p: p.mean).mean
 
-matrixsize = 64
-deltarange = abs(maxrange - minrange) / matrixsize
-Deltamean = abs(maxmean - minmean) / matrixsize
+deltarange = abs(maxrange - minrange) / MATRIX_SIZE
+deltamean = abs(maxmean - minmean) / MATRIX_SIZE
 sumcum = 0.0
 cum = 0
 
-# init cc[matrixsize * matrixsize] filled with 0
-cc = [[0 for i in range(matrixsize)] for j in range(matrixsize)]
-
-for k in range(len(flows)):
-    for i in range(matrixsize):
-        if flows[k].range >= minrange + i * deltarange - deltarange / 100:
-            if flows[k].range <= minrange + (i + 1) * deltarange + deltarange / 100:
-
-                for j in range(matrixsize):
-                    if flows[k].mean >= minmean + j * Deltamean - Deltamean / 100:
-                        if (
-                            flows[k].mean
-                            <= minmean + (j + 1) * Deltamean + Deltamean / 100
-                        ):
-
-                            cc[i][j] += flows[k].noc
+# init cc[MATRIX_SIZE * MATRIX_SIZE] filled with 0
+cc = [[0 for i in range(MATRIX_SIZE)] for j in range(MATRIX_SIZE)]
 
 
-with open("output.txt", "w") as outFile:
+for flow in flows:
+    for i in range(MATRIX_SIZE):
+        if (
+            flow.range >= minrange + i * deltarange - deltarange / 100
+            and flow.range <= minrange + (i + 1) * deltarange + deltarange / 100
+        ):
+
+            for j in range(MATRIX_SIZE):
+                if (
+                    flow.mean >= minmean + j * deltamean - deltamean / 100
+                    and flow.mean <= minmean + (j + 1) * deltamean + deltamean / 100
+                ):
+
+                    cc[i][j] += flow.noc
+
+with open("output.txt", "w", encoding="UTF-8") as outFile:
     # outFile.write("Range\tMean\tR-ratio\tn\n")
 
-    for i in range(matrixsize):
-        for j in range(matrixsize):
+    for i in range(MATRIX_SIZE):
+        for j in range(MATRIX_SIZE):
             sumcum += cc[i][j]
 
-    for i in range(matrixsize):
-        for j in range(matrixsize):
+    for i in range(MATRIX_SIZE):
+        for j in range(MATRIX_SIZE):
             if cc[i][j] != 0:
                 downra = minrange + i * deltarange
                 upra = minrange + (i + 1) * deltarange
                 mra = (upra + downra) / 2
-                downme = minmean + j * Deltamean
-                upme = minmean + (j + 1) * Deltamean
+                downme = minmean + j * deltamean
+                upme = minmean + (j + 1) * deltamean
                 mme = (upme + downme) / 2
-                dr = -1 + (4 * downme) / (2 * downme + downra)
-                ur = -1 + (4 * upme) / (2 * upme + upra)
+                # dr = -1 + (4 * downme) / (2 * downme + downra)
+                # ur = -1 + (4 * upme) / (2 * upme + upra)
                 mr = -1 + (4 * mme) / (2 * mme + mra)
                 cum += cc[i][j]
                 pcum = abs(sumcum - cum) * 100 / sumcum
