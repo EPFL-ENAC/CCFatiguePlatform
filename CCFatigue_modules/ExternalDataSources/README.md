@@ -1,35 +1,28 @@
-# CCFatigue Modules External Data Sources
+# ASTM
 
-## CSV Data Files description
+### astm.csv 
+{Description of this dataset to be filled by Tassos!}
+
+This datasets contains values of t_a (??) in unit (??)
+
+Columns (	50	75	90	95	97.5	99	99.5) correspond to the confidence interval (??)
+
+Rows (indexed 3 to inf) correspond to (??)
+
+Source: STP313_Fittin_straight_lines.pdf, p.6.
+
+Used by methods: S-N-Curve-LogLog.py
 
 
-| File | Description | Source | Used in module |
-|------|-------------|--------|----------------|
-| astm.csv | ? | STP313_Fittin straight lines.pdf (page 6) | S-N-Curve-LogLog.py |
-| astm95.csv | ? ... P = 95% | STP313_Fittin straight lines.pdf (page 20-23) | S-N-Curve-LogLog.py |
-| astm99.csv | ? ... P = 99% | STP313_Fittin straight lines.pdf (page 20-23) | S-N-Curve-LogLog.py |
+### astm{reliability_level}.csv for reliability level = 95% and 99%
+{Description of this dataset to be filled by Tassos!}
 
+This datasets contains values of (??)
 
-## ASTM astm.csv file standards (column names must be exact) :
+Columns mean (??)
 
-Encoding format: UTF-8, Separator: ',' (comma)
+Rows mean (??)
 
-| Column name          | Description                                        | Unit  | Data type | Mandatory  |
-|----------------------|----------------------------------------------------|-------|-----------|------------|
-| n | ? (inf = infinity) | [-] | numbers | y |
-| 50 | Values for P = 50% ? | ? | double | y |
-| ... | | | | |
-| 99.5 | Values for P = 99.5% ? | ? | double | y |
+Source: STP313_Fittin_straight_lines.pdf, pp. 20-23
 
-## ASTM astm95.csv & astm99.csv files standards (column names must be exact) :
-
-Encoding format: UTF-8, Separator: ',' (comma)
-
-| Column name          | Description                                        | Unit  | Data type | Mandatory  |
-|----------------------|----------------------------------------------------|-------|-----------|------------|
-| n | ? (inf = infinity) | [-] | numbers | y |
-| 1 | ? | ? | double | y |
-| ... | | | | |
-| 120 | ? | ? | double | y |
-| inf | ? | ? | double | y |
-
+Used by methods: S-N-Curve-LogLog.py
