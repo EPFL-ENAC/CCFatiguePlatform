@@ -28,9 +28,10 @@ EOF
 
 See https://github.com/EPFL-ENAC/SB_Sysadmin/tree/enacvm0056
 
-# Web app structure
+# App architecture
 
-<img src="images/flowchart_CCFATIGUE.jpg" style="width: 650px; max-width: 100%; height: auto" title="Click to enlarge picture" />
+<img width="1791" alt="Screenshot 2022-03-02 at 18 37 07" src="https://user-images.githubusercontent.com/18381609/156417130-4ce6f53c-e89b-436c-a30d-ee88a760f8e8.png">
+
 
 # License
 
