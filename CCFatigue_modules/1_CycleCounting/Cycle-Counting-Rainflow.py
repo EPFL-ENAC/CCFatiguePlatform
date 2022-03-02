@@ -1,8 +1,16 @@
 #!/usr/bin/env python
-""" Rainflow Counting
-This file is a translation from fortran Cycle-Counting-Rainflow.for
-Contributors: Anastasios Vassilopoulos & Nicolas Dubois
+""" 
 
+CCFatigue Platform, Analysis module 1: Cycle Counting
+Method: Rainflow Counting. 
+
+Rainflow counting is a method that {Insert description here}.
+
+Input:
+- Data format to be defined !!!
+
+Output:
+- Description of data output, in CYC format. (see CYC Data convention)
  """
 
 MATRIX_SIZE = 64
