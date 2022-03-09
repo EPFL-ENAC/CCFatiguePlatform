@@ -30,6 +30,6 @@ Used by methods: S-N-Curve-LogLog.py
 ## ASTM STP 734 - Sendeckyj
 Fitting Models to Composite Materials Fatigue Data
 
-Source: STP734_1981.pdf, pp. 245-260
+Source: STP734_1981.pdf, pp. 245-260, DOI: 10.1520/STP29314S
 
 Used by methods: S-N-Curve-Sendeckyj
