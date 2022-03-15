@@ -17,7 +17,7 @@ Encoding format: UTF-8, Separator: ',' (comma)
 | Column name          | Description                                        | Unit  | Data type | Mandatory  |
 |----------------------|----------------------------------------------------|-------|-----------|------------|
 | Stress_ratio         | Stress ratio (R)                                   | [-]   | double    | y       |
-| Reliability_level    | Reliability_level P(N)                             | %     | int       | y       |
+| Reliability_level    | Reliability_level P(N)                             | %     | double    | y       |
 | Stress_level         | Index of the cluster of stress level               | [-]   | int       | y for withney      |
 | Stress_parameter     | Cyclic max stress Sigma_max                        | [MPa] | double       | y       |
 | Number_of_cycles     | Number of cycles at failure N                       | [-]   | double      | y       |
