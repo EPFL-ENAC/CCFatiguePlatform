@@ -16,10 +16,10 @@ Encoding format: UTF-8, Separator: ',' (comma)
 
 | Column name          | Description                                        | Unit  | Data type | Mandatory  |
 |----------------------|----------------------------------------------------|-------|-----------|------------|
-| Stress_ratio         | Stress ratio (R)                                   | [-]   | double    | y(?)       |
-| Reliability_level    | (input parameter)                                  | ?     | int       | ?(?)       |
-| Stress_level         | Stress_level no.                                   | ?     | int       | ?(?)       |
-| Stress_parameter     | ?                                                  | [MPa] | int       | ?(?)       |
-| Number_of_cycles     | ?                                                  | [-]   | int       | ?(?)       |
-| Residual_strength    | ?                                                  | [MPa] | int       | ?(?)       |
+| Stress_ratio         | Stress ratio (R)                                   | [-]   | double    | y       |
+| Reliability_level    | Reliability_level P(N)                             | %     | int       | y       |
+| Stress_level         | Index of the cluster of stress level               | [-]   | int       | y for withney      |
+| Stress_parameter     | Cyclic max stress Sigma_max                        | [MPa] | double       | y       |
+| Number_of_cycles     | Number of cycles at failure N                       | [-]   | double      | y       |
+| Residual_strength    | Residual_strength   Sigma_e                        | [MPa] | double       | y for Sendeckyj  |
 
