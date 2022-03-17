@@ -45,9 +45,9 @@ Encoding format: UTF-8, Separator: ',' (comma)
 
 | Column name          | Description                                        | Unit  | Data type | Mandatory  |
 |----------------------|----------------------------------------------------|-------|-----------|------------|
-| Stress_ratio         | Stress ratio (R)                                   | [-]   | double    | y(?)       |
-| Cycles_to_failure    | Number of cycles to failure | (input parameter)    | [-]   | int       | ?(?)       |
-| Stress_parameter     | Stress at failure                                  | [MPa] | double    | ?(?)       |
-| ?                    | ?                                                  | ?     | double    | ?(?)       |
-| ?                    | ?                                                  | ?     | double    | ?(?)       |
+| stress_ratio         | Stress ratio: R                                    | [-]   | double    | y         |
+| cycles_to_failure    | Number of cycles to failure: N                     | [-]   | int       | y       |
+| stress               | Stress at failure: sigma_max (median)              | [MPa] | double    | y       |
+| stress_lowerbound    | Stress at failure: sigma_max (lower bound)         | [MPa] | double    |        |
+| stress_upperbound    | Stress at failure: sigma_max (upper bound)         | [MPa] | double    |        |
 
