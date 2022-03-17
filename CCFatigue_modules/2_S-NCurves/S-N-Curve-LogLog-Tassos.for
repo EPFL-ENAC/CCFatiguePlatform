@@ -173,7 +173,6 @@
         ! For each Stress(R)
         do f=1,NOR
             
-            ! TODO: Check with Tassos is this part is still useful because actualy
             ! the scratch file is written but never read, the read part is commented
             OPEN (30, STATUS='SCRATCH')
             Ssigma=asigma(f,1)
@@ -390,7 +389,7 @@
                 FN=FN+(Replicate(f,i)*((A+B*log10(averagesigma(f,i)))
                 &			-averagelogN(f,i))**2)
                 
-                ! TODO ask Tasso: For each data in current stress_level
+                ! For each data in current stress_level
                 do ii=1,Replicate(f,i)
                     FD=FD+(log10(CycleRL(f,i,ii))-averagelogN(f,i))**2
                     !WRITE(20,*) FN,FD
