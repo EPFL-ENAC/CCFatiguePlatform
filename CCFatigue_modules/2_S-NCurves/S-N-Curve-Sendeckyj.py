@@ -2,7 +2,7 @@
 """
 G. P. Sendeckyj, Fitting Models to Composite Materials Fatigue Data.
 ASTM STP 734, ed. By C.C.Chamis, American Society for Testing and Materials,
-West Conshohocken, 1981, pp 245-260. 
+West Conshohocken, 1981, pp 245-260.
 DOI:10.1520/STP29314S
 
 sigma_a: maximum applied cyclic stress (see ref, p 248)
@@ -23,15 +23,18 @@ g: ?? TODO
 
 import os
 
+# from statistics import mean
+
 # import json
-import numpy as np
+# import numpy as np
 import pandas as pd
-from scipy import stats
 import math
+import sendeckyj
+from itertools import chain
 
 
 SRC_DIR = os.path.dirname(os.path.realpath(__file__))
-DATA_DIR = os.path.join(SRC_DIR, "..", "..", "data")
+DATA_DIR = os.path.join(SRC_DIR, "..", "..", "Data")
 PARAM_DIR = os.path.join(SRC_DIR, "..", "ExternalDataSources")
 
 INPUT_FILENAME = "AGG_input.csv"
@@ -45,7 +48,7 @@ OUTPUT_CSV_FILE = os.path.join(DATA_DIR, OUTPUT_CSV_FILENAME)
 #  applied cyclic stress levels (see ref, p 248)
 C_MIN = 0.000001
 C_MAX = 10
-C_STEP = 0.000001
+C_INITIAL_INCREMENT = 0.000001
 
 # S is the absolute value of the asymptotic slope at long life on log-log plot of the
 # S-N curve (see ref, p 248)
@@ -62,35 +65,277 @@ def sendeckyj_equation_1(sigma_a, sigma_r, n, c, s):
     return sigma_e
 
 
-def sendeckyj_equation_17(m, k, serie_of_sigme_e):
-    """Returns G TODO G = ??
+def sendeckyj_equation_16(sigma_e, g):
+    """Returns X
+    Eq 16 (see ref, p259)
+    """
+    x = sigma_e / g
+    return x
 
+
+def sendeckyj_equation_17(m, k, sigma_e):
+    """Returns G TODO G = ??
     Eq 17 (see ref, p259)
     """
-    return math.exp(1 / (m - k)) * serie_of_sigme_e.apply(lambda x: math.log(x).sum())
+    sum_of_log_sigma_e = sigma_e.apply(lambda x: math.log(x)).sum()
+    # TODO ask Tassos if exp(1/(m-k)) or exp((1/(m-k)) * sum...)
+    g = math.exp((1 / (m - k)) * sum_of_log_sigma_e)
+    return g
 
 
-# Import input file (SNC format)
+def sendeckyj_equation_19(g, m, k, xs, alpha):
+    """Returns beta TODO beta = ??
+    Eq 19 (see ref, p259)
+    """
+    beta = g * (1 / (m - k) * xs.apply(lambda x: x**alpha).sum()) ** (1 / alpha)
+    return beta
+
+
+# def sendeckyj_equation_20(m, x_max, x_min):
+#     """Returns alpha
+#     Eq 20  (see ref, p259)
+#     """
+#     alpha = math.log(math.log(m / (m + 1)) / math.log(1 / (m + 1))) / math.log(
+#         # x_max / x_min TODO check with Tassos
+#         x_min
+#         / x_max
+#     )
+#     return alpha
+
+
+# def sendeckyj_equation_21(x, alpha):
+#     """Returns s1
+#     Eq 21 (see ref, p259)
+#     """
+#     s1 = x.apply(lambda x: x**alpha).sum()
+#     return s1
+
+
+# def sendeckyj_equation_22(x, alpha):
+#     """Returns s2
+#     Eq 22 (see ref, p259)
+#     """
+#     s2 = x.apply(lambda x: x**alpha * math.log(x)).sum()
+#     return s2
+
+
+# def sendeckyj_equation_23(x, alpha):
+#     """Returns s3
+#     Eq 23 (see ref, p259)
+#     """
+#     s3 = x.apply(lambda x: x**alpha * math.log(x) ** 2).sum()
+#     return s3
+
+
+# def sendeckyj_equation_24(s1, s2, s3, alpha):
+#     """Returns delta_alpha
+#     Eq 24 (see ref, p259)
+#     """
+#     delta_alpha = (s1 - alpha * s2) / (alpha * s3)
+#     return delta_alpha
+
+
+def tassos_equation(reliability_level, alpha, c, s, nn, a, beta):
+    """TODO"""
+    k1 = (-math.log(reliability_level / 100.0)) ** (1.0 / alpha)
+    k2 = 1 / ((nn - a) * c)
+    k3 = k2**s
+    k4 = k1 * k3
+    spn = beta * k4
+    return spn
+
+
+# Import input file (AGG format)
 df = pd.read_csv(INPUT_FILE)
 
-for c in np.arange(C_MIN, C_MAX, C_STEP):
-    for s in np.arange(S_MIN, S_MAX, S_STEP):
 
-        # results = df.groupby("stress_ratio")
-        # results[].co
+# Prepare SNC output list of cycles to failure
 
-        # Eq 1
-        df["sigma_e"] = df.apply(
-            lambda x: sendeckyj_equation_1(
-                x.stress_parameter,
-                x.residual_strength,
-                x.number_of_cycles,
-                c,
+snc_output_json_df = pd.DataFrame(
+    columns=[
+        "stress_ratio",
+        "RSQL",
+        "A",
+        "B",
+        "LRSQ",
+        "Fp",
+        "Linearity",
+        "RMSE",
+        "SSE",
+        "SST",
+        "RSQ",
+        "Sstar",
+        "Cstar",
+    ],
+)
+snc_output_json_df["stress_ratio"] = df["stress_ratio"].unique()
+snc_output_json_df.set_index("stress_ratio", inplace=True)
+# print(snc_output_json_df)
+
+cycles_to_failure = pd.DataFrame(
+    chain(
+        range(1, 1000, 50),
+        range(1000, 1001),
+        range(10000, 2000000, 10000),
+        range(3000000, 20000000, 1000000),
+        range(30000000, 1400000000, 100000000),
+    ),
+    columns=["cycles_to_failure"],
+)
+
+snc_output_csv_df = pd.DataFrame(
+    columns=[
+        "stress_ratio",
+        "cycles_to_failure",
+        "stress_parameter",
+        "stress_lowerbound",
+        "stress_upperbound",
+    ]
+)
+
+c_mean = 0
+s_mean = 0
+alpha_mean = 0
+
+
+# For each stress_ratio
+for stress_ratio in df["stress_ratio"].unique():
+
+    # Find the optimum solution
+    alpha_max = 0
+    p = 1
+    q = 1
+    alpha_old = 0
+    c = C_MIN
+    c_increment = C_INITIAL_INCREMENT
+    c_old = 0
+    c_c_old = 0  # TODO ??
+    s_old = 0
+    alpha_c_old = 0  # TODO ??
+
+    stress_ratio_df = df.loc[df.stress_ratio == stress_ratio]
+    data_count = len(stress_ratio_df)
+    censored_data_count = len(
+        stress_ratio_df[
+            (stress_ratio_df.stress_parameter != stress_ratio_df.residual_strength)
+        ]
+    )
+
+    residual_strength = stress_ratio_df.residual_strength
+    stress_parameter = stress_ratio_df.stress_parameter
+    number_of_cycles = stress_ratio_df.number_of_cycles
+
+    counter = 0
+
+    while c < C_MAX:
+
+        s = S_MIN
+        while s < S_MAX:
+
+            s_done = False
+
+            alpha = -sendeckyj.maximum_likelihood_estimators(
                 s,
-            ),
-            axis=1,
-        )
+                c,
+                residual_strength,
+                stress_parameter,
+                number_of_cycles,
+                0,
+            )
 
-        # Eq 17
-        # g = df.apply(lambda x: sendeckyj_equation_17(
-        #     x))
+            if alpha > alpha_max:
+                alpha_max = alpha
+                p_star = p
+                q_star = q
+                s_star = s
+                c_star = c
+
+            if p > 1:
+                # if (alpha - alpha_old) / (s - s_old) >= 0:
+                if alpha >= alpha_old:
+                    alpha_old = alpha
+                    s_old = s
+                    c_old = c
+                else:
+                    break
+
+            p += 1
+            s += S_STEP
+
+        if q > 1:
+            # if (alpha_old - alpha_c_old) / (c - c_c_old) >= 0:
+            if alpha_old >= alpha_c_old:
+                if alpha_old - alpha_c_old < 0.01 * alpha_max:
+                    c_increment = 0.000001
+                if alpha_old - alpha_c_old < 0.001 * alpha_max:
+                    c_increment = 0.00001
+                if alpha_old - alpha_c_old < 0.0001 * alpha_max:
+                    c_increment = 0.0001
+                if alpha_old - alpha_c_old < 0.00001 * alpha_max:
+                    c_increment = 0.001
+                if alpha_old - alpha_c_old < 0.000001 * alpha_max:
+                    c_increment = 0.01
+                if alpha_old - alpha_c_old < 0.0000001 * alpha_max:
+                    c_increment = 0.1
+                counter = 0
+            else:
+                counter += 1
+                if counter > 500:
+                    break
+        p = 1
+        q += 1
+        alpha_c_old = alpha_max
+        c_c_old = c
+        alpha_old = 0
+        s_old = 0
+        c_old = 0
+        c += c_increment
+
+    # Eq 1
+    # stress_ratio_df["sigma_e"] = stress_ratio_df.apply(
+    sigmas_e = stress_ratio_df.apply(
+        lambda x: sendeckyj_equation_1(
+            x.stress_parameter,
+            x.residual_strength,
+            x.number_of_cycles,
+            c_star,
+            s_star,
+        ),
+        axis=1,
+    )
+
+    # Eq 17
+    g = sendeckyj_equation_17(data_count, censored_data_count, sigmas_e)
+
+    # Eq 16
+    # stress_ratio_df["x"] = sigmas_e.apply(
+    xs = sigmas_e.apply(
+        lambda x: sendeckyj_equation_16(x, g)
+        # axis=1,
+    )
+
+    # Eq 19
+    beta = sendeckyj_equation_19(g, data_count, censored_data_count, xs, alpha)
+
+    reliability_level = stress_ratio_df.iloc[0].reliability_level
+
+    # print(stress_ratio, alpha_max, beta, s_star, c_star)
+    snc_output_json_df.loc[stress_ratio].RSQL = reliability_level
+    snc_output_json_df.loc[stress_ratio].A = alpha_max
+    snc_output_json_df.loc[stress_ratio].B = beta
+    snc_output_json_df.loc[stress_ratio].Sstar = s_star
+    snc_output_json_df.loc[stress_ratio].Cstar = c_star
+
+    a = -(1 - c_star) / c_star
+
+    stress_parameter = cycles_to_failure.copy()
+    stress_parameter["stress_parameter"] = stress_parameter.apply(
+        lambda x: tassos_equation(reliability_level, alpha, c_star, s_star, x, a, beta)
+    )
+
+    stress_parameter["stress_ratio"] = stress_ratio
+
+    snc_output_csv_df = pd.concat([snc_output_csv_df, stress_parameter])
+
+print(snc_output_json_df)
+print(snc_output_csv_df)
