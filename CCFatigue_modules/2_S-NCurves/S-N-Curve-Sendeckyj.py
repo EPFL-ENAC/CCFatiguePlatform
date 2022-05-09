@@ -22,11 +22,6 @@ g: ?? TODO
 """
 
 import os
-
-# from statistics import mean
-
-# import json
-# import numpy as np
 import pandas as pd
 import math
 import sendeckyj
@@ -104,6 +99,11 @@ def tassos_equation(reliability_level, alpha, c, s, nn, a, beta):
 # Import input file (AGG format)
 df = pd.read_csv(INPUT_FILE)
 
+# Data are grouped by stress_ratio but one experiment
+# can have two separate groups with same stress_ratio so we need to identify
+# the groups
+df["grp_id"] = (df.stress_ratio != df.stress_ratio.shift()).cumsum()
+
 
 # Prepare SNC output list of cycles to failure
 
@@ -153,8 +153,11 @@ s_mean = 0
 alpha_mean = 0
 
 
-# For each stress_ratio
-for stress_ratio in df["stress_ratio"].unique():
+# For each group of stress_ratio
+for grp_id in df["grp_id"].unique():
+
+    stress_ratio_df = df.loc[df.grp_id == grp_id]
+    stress_ratio = stress_ratio_df.iloc[0].stress_ratio
 
     # Find the optimum solution
     alpha_max = 0
@@ -168,7 +171,6 @@ for stress_ratio in df["stress_ratio"].unique():
     s_old = 0
     alpha_c_old = 0  # TODO ??
 
-    stress_ratio_df = df.loc[df.stress_ratio == stress_ratio]
     data_count = len(stress_ratio_df)
     censored_data_count = len(
         stress_ratio_df[
