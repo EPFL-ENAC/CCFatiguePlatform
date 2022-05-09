@@ -91,50 +91,6 @@ def sendeckyj_equation_19(g, m, k, xs, alpha):
     return beta
 
 
-# def sendeckyj_equation_20(m, x_max, x_min):
-#     """Returns alpha
-#     Eq 20  (see ref, p259)
-#     """
-#     alpha = math.log(math.log(m / (m + 1)) / math.log(1 / (m + 1))) / math.log(
-#         # x_max / x_min TODO check with Tassos
-#         x_min
-#         / x_max
-#     )
-#     return alpha
-
-
-# def sendeckyj_equation_21(x, alpha):
-#     """Returns s1
-#     Eq 21 (see ref, p259)
-#     """
-#     s1 = x.apply(lambda x: x**alpha).sum()
-#     return s1
-
-
-# def sendeckyj_equation_22(x, alpha):
-#     """Returns s2
-#     Eq 22 (see ref, p259)
-#     """
-#     s2 = x.apply(lambda x: x**alpha * math.log(x)).sum()
-#     return s2
-
-
-# def sendeckyj_equation_23(x, alpha):
-#     """Returns s3
-#     Eq 23 (see ref, p259)
-#     """
-#     s3 = x.apply(lambda x: x**alpha * math.log(x) ** 2).sum()
-#     return s3
-
-
-# def sendeckyj_equation_24(s1, s2, s3, alpha):
-#     """Returns delta_alpha
-#     Eq 24 (see ref, p259)
-#     """
-#     delta_alpha = (s1 - alpha * s2) / (alpha * s3)
-#     return delta_alpha
-
-
 def tassos_equation(reliability_level, alpha, c, s, nn, a, beta):
     """TODO"""
     k1 = (-math.log(reliability_level / 100.0)) ** (1.0 / alpha)
@@ -168,9 +124,8 @@ snc_output_json_df = pd.DataFrame(
         "Cstar",
     ],
 )
-snc_output_json_df["stress_ratio"] = df["stress_ratio"].unique()
-snc_output_json_df.set_index("stress_ratio", inplace=True)
-# print(snc_output_json_df)
+# snc_output_json_df["stress_ratio"] = df["stress_ratio"].unique()
+# snc_output_json_df.set_index("stress_ratio", inplace=True)
 
 cycles_to_failure = pd.DataFrame(
     chain(
@@ -292,7 +247,6 @@ for stress_ratio in df["stress_ratio"].unique():
         c += c_increment
 
     # Eq 1
-    # stress_ratio_df["sigma_e"] = stress_ratio_df.apply(
     sigmas_e = stress_ratio_df.apply(
         lambda x: sendeckyj_equation_1(
             x.stress_parameter,
@@ -308,23 +262,19 @@ for stress_ratio in df["stress_ratio"].unique():
     g = sendeckyj_equation_17(data_count, censored_data_count, sigmas_e)
 
     # Eq 16
-    # stress_ratio_df["x"] = sigmas_e.apply(
-    xs = sigmas_e.apply(
-        lambda x: sendeckyj_equation_16(x, g)
-        # axis=1,
-    )
+    xs = sigmas_e.apply(lambda x: sendeckyj_equation_16(x, g))
 
     # Eq 19
     beta = sendeckyj_equation_19(g, data_count, censored_data_count, xs, alpha)
 
     reliability_level = stress_ratio_df.iloc[0].reliability_level
 
-    # print(stress_ratio, alpha_max, beta, s_star, c_star)
-    snc_output_json_df.loc[stress_ratio].RSQL = reliability_level
-    snc_output_json_df.loc[stress_ratio].A = alpha_max
-    snc_output_json_df.loc[stress_ratio].B = beta
-    snc_output_json_df.loc[stress_ratio].Sstar = s_star
-    snc_output_json_df.loc[stress_ratio].Cstar = c_star
+    # Prepare output data
+    json_df = pd.DataFrame(
+        [[stress_ratio, reliability_level, alpha_max, beta, s_star, c_star]],
+        columns=["stress_ratio", "RSQL", "A", "B", "Sstar", "Cstar"],
+    )
+    snc_output_json_df = pd.concat([snc_output_json_df, json_df], ignore_index=True)
 
     a = -(1 - c_star) / c_star
 
@@ -337,5 +287,9 @@ for stress_ratio in df["stress_ratio"].unique():
 
     snc_output_csv_df = pd.concat([snc_output_csv_df, stress_parameter])
 
-print(snc_output_json_df)
-print(snc_output_csv_df)
+# Export dataframes to files
+snc_output_json_df.to_json(OUTPUT_JSON_FILE, orient="records")
+snc_output_csv_df.to_csv(
+    OUTPUT_CSV_FILE,
+    index=False,
+)
