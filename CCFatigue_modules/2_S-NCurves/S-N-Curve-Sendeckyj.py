@@ -273,8 +273,15 @@ for grp_id in df["grp_id"].unique():
 
     # Prepare output data
     json_df = pd.DataFrame(
-        [[stress_ratio, reliability_level, alpha_max, beta, s_star, c_star]],
-        columns=["stress_ratio", "RSQL", "A", "B", "Sstar", "Cstar"],
+        {
+            "stress_ratio": stress_ratio,
+            "RSQL": reliability_level,
+            "A": alpha_max,
+            "B": beta,
+            "Sstar": s_star,
+            "Cstar": c_star,
+        },
+        index=[0],
     )
     snc_output_json_df = pd.concat([snc_output_json_df, json_df], ignore_index=True)
 
