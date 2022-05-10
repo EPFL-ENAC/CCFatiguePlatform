@@ -19,7 +19,7 @@ with:
 
 Encoding format: UTF-8
 
-```json
+```javascript
 [
 	{
 		"Stress-ratio": double, // R-Ratio (R) [-]
@@ -28,11 +28,6 @@ Encoding format: UTF-8
 		"B": double, // S-N Curve parameter [1/MPa]
 		"LRSQ": double, // [?]
 		"Fp": double, // Fp Linearity criterion [?]
-		"Linearity": double, // Linearity index [?]
-		"RMSE": double, // Root mean square error [?]
-		"SSE": double, // Sum of squares due to errors [?]
-		"SST": double, // Sum of squares about the mean [?]
-		"RSQ": double // R-square [?]
 	},
 	...
 ]
@@ -45,9 +40,9 @@ Encoding format: UTF-8, Separator: ',' (comma)
 
 | Column name          | Description                                        | Unit  | Data type | Mandatory  |
 |----------------------|----------------------------------------------------|-------|-----------|------------|
-| stress_ratio         | Stress ratio: R                                    | [-]   | double    | y         |
-| cycles_to_failure    | Number of cycles to failure: N                     | [-]   | int       | y       |
-| stress               | Stress at failure: sigma_max (median)              | [MPa] | double    | y       |
-| stress_lowerbound    | Stress at failure: sigma_max (lower bound)         | [MPa] | double    |        |
-| stress_upperbound    | Stress at failure: sigma_max (upper bound)         | [MPa] | double    |        |
+| stress_ratio         | Stress ratio: R                                    | [-]   | double    | y          |
+| cycles_to_failure    | Number of cycles to failure: N                     | [-]   | int       | y          |
+| stress               | Stress at failure: sigma_max (median)              | [MPa] | double    | y          |
+| stress_lowerbound    | Stress at failure: sigma_max (lower bound)         | [MPa] | double    |            |
+| stress_upperbound    | Stress at failure: sigma_max (upper bound)         | [MPa] | double    |            |
 
