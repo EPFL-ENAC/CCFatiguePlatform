@@ -211,9 +211,7 @@ results["level"] = (
 
 
 # Variance
-results["variance"] = results.lsse / (
-    results.nod - 2
-)  # results.apply(lambda x: x.lsse / (x.nod - 2), axis=1)
+results["variance"] = results.apply(lambda x: math.sqrt(x.lsse / (x.nod - 2)), axis=1)
 
 
 # Fp
