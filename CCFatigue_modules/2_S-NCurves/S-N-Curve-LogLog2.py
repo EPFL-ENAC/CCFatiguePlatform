@@ -7,10 +7,16 @@ DOI: 10.1520/STP313-EB
 TODO
 """
 
+import math
 import os
+from re import A
+from statistics import variance
 import numpy as np
 import pandas as pd
 from scipy import stats
+from itertools import chain
+
+import Astm
 
 
 CONFIDENCE = 95  # TODO check with Tassos if this should be a parameter (95, 99)
@@ -18,10 +24,12 @@ RELIABILITY_LEVEL = 50
 
 SRC_DIR = os.path.dirname(os.path.realpath(__file__))
 DATA_DIR = os.path.join(SRC_DIR, "..", "..", "Data")
-PARAM_DIR = os.path.join(SRC_DIR, "..", "ExternalDataSources")
+# PARAM_DIR = os.path.join(SRC_DIR, "..", "ExternalDataSources")
 
-PARAM_ASTM_FILENAME = "astm.csv"
-PARAM_ASTM_RELIABILITY_LEVEL_FILENAME = f"astm{CONFIDENCE}.csv"
+# PARAM_ASTM_FILENAME = "astm.csv" # Used only in Tassos commented code
+# PARAM_ASTM_RELIABILITY_LEVEL_FILENAME = f"astm{CONFIDENCE}.csv"
+
+astm = Astm.Astm(CONFIDENCE)
 
 INPUT_FILENAME = "AGG_input.csv"
 INPUT_FILE = os.path.join(DATA_DIR, INPUT_FILENAME)
@@ -37,11 +45,45 @@ def equation_ycar(slope, intercept, log10_stress_parameter):
     return ycar
 
 
+def stress_at_failure(aa, bb, nn):
+    """TODO"""
+    spn = aa * nn ** (-bb)
+    return spn
+
+
+def get_stress_at_failure(nod, q, a, b, nn, pp, xb):
+    """Get Stress at failure (sigma_max)
+    returns (lower bound, upper bound)"""
+
+    termi = (nod * q * a * b) - (nod * q * math.log10(nn) * b) + (pp * nod * xb)
+    termii = math.sqrt(
+        nod
+        * pp
+        * q
+        * (
+            2 * nod * a * b * xb
+            - 2 * nod * math.log10(nn) * b * xb
+            + q * b**2
+            + nod * b**2 * xb**2
+            + nod * math.log10(nn) ** 2
+            - 2 * nod * math.log10(nn) * a
+            - pp
+            + nod * a**2
+        )
+    )
+    termiii = nod * (b**2 * q - pp)
+
+    spnu = 10 ** (-(termi + termii) / termiii)
+    spnl = 10 ** (-(termi - termii) / termiii)
+
+    return (spnl, spnu)
+
+
 # RROUT = 1e7
 
 # Import ASTM files
-astm_df = pd.read_csv(os.path.join(PARAM_DIR, PARAM_ASTM_FILENAME))
-astm_rl_df = pd.read_csv(os.path.join(PARAM_DIR, PARAM_ASTM_RELIABILITY_LEVEL_FILENAME))
+# astm_df = pd.read_csv(os.path.join(PARAM_DIR, PARAM_ASTM_FILENAME))
+# astm_rl_df = pd.read_csv(os.path.join(PARAM_DIR, PARAM_ASTM_RELIABILITY_LEVEL_FILENAME))
 
 # Import input file (SNC format)
 df = pd.read_csv(INPUT_FILE)
@@ -74,6 +116,27 @@ results = (
     .mean()
 )
 
+cycles_to_failure = pd.DataFrame(
+    chain(
+        range(1, 1000, 50),
+        range(1000, 1001),
+        range(10000, 2000000, 10000),
+        range(3000000, 20000000, 1000000),
+        range(30000000, 1400000000, 100000000),
+    ),
+    columns=["cycles_to_failure"],
+)
+
+snc_output_csv_df = pd.DataFrame(
+    columns=[
+        "stress_ratio",
+        "cycles_to_failure",
+        "stress_parameter",
+        "stress_lowerbound",
+        "stress_upperbound",
+    ]
+)
+
 # Calculate A (Eq 4) and B (Eq 5)
 linregress = df.groupby("stress_ratio_id").apply(
     lambda x: stats.linregress(x.log10_stress_parameter, x.log10_number_of_cycles)
@@ -91,7 +154,7 @@ results["intercept"] = linregress.apply(lambda x: x[0])
 #         stress_ratio_id
 #     ][0]
 
-# Add AA and BB
+# Add AA and BB TODO reference for these equations
 results["stress_parameter_aa"] = 10 ** (-results.slope / results.intercept)
 results["stress_parameter_bb"] = -1 / results.intercept
 
@@ -104,11 +167,12 @@ df["ycar"] = df.apply(
     axis=1,
 )
 
-df["lsse"] = (df.log10_number_of_cycles - df.ycar) ** 2
-results["lsse"] = df[["stress_ratio_id", "lsse"]].groupby("stress_ratio_id").sum()
+# LNb
 results["log10_number_of_cycles"] = (
     df[["stress_ratio_id", "log10_number_of_cycles"]].groupby("stress_ratio_id").mean()
 )
+
+# LSST
 df["lsst"] = df.apply(
     lambda x: (
         x.log10_stress_parameter - results.loc[x.stress_ratio_id].log10_number_of_cycles
@@ -117,7 +181,50 @@ df["lsst"] = df.apply(
     axis=1,
 )
 results["lsst"] = df[["stress_ratio_id", "lsst"]].groupby("stress_ratio_id").sum()
+
+# LSSE
+df["lsse"] = (df.log10_number_of_cycles - df.ycar) ** 2
+results["lsse"] = df[["stress_ratio_id", "lsse"]].groupby("stress_ratio_id").sum()
+
+# LRSQ
 results["lrsq"] = 1 - results.lsse / results.lsst
+
+# Q
+results["xb"] = (
+    df[["stress_ratio_id", "log10_stress_parameter"]].groupby("stress_ratio_id").mean()
+)
+df["q"] = df.apply(
+    lambda x: (x.log10_stress_parameter - results.loc[x.stress_ratio_id].xb) ** 2,
+    axis=1,
+)
+results["q"] = df[["stress_ratio_id", "q"]].groupby("stress_ratio_id").sum()
+
+# NOD
+results["nod"] = (
+    df[["stress_ratio_id", "stress_ratio"]].groupby("stress_ratio_id").count()
+)
+
+# level
+results["level"] = (
+    df[["stress_ratio_id", "stress_level"]].groupby("stress_ratio_id").nunique()
+)
+
+
+# Variance
+results["variance"] = results.lsse / (
+    results.nod - 2
+)  # results.apply(lambda x: x.lsse / (x.nod - 2), axis=1)
+
+
+# Fp
+results["fp"] = results.apply(
+    # lambda x: astm_rl_df.loc[astm_rl_df.n == x.nod - x.level][str(int(x.level - 2))],
+    lambda x: astm.get_astm_val(x.level - 2, x.nod - x.level),
+    axis=1,
+)
+
+# PP
+results["pp"] = 2 * results.fp * results.variance**2
 
 
 # Prepare SNC output list of cycles to failure
@@ -145,11 +252,38 @@ snc_output_csv_df = pd.DataFrame(
     ]
 )
 
-# # For each group of stress_ratio
-# for stress_ratio_id in df["stress_ratio_id"].unique():
+# For each group of stress_ratio
+for stress_ratio_id in df["stress_ratio_id"].unique():
 
-#     stress_ratio_df = df.loc[df.stress_ratio_id == stress_ratio_id]
-#     stress_ratio = stress_ratio_df.iloc[0].stress_ratio
+    stress_ratio_df = df.loc[df.stress_ratio_id == stress_ratio_id]
+    stress_ratio = stress_ratio_df.iloc[0].stress_ratio
+    result = results.loc[stress_ratio_id]
+
+    stress_parameter = cycles_to_failure.copy()
+    stress_parameter["stress_parameter"] = stress_parameter.apply(
+        lambda x: stress_at_failure(
+            result.stress_parameter_aa, result.stress_parameter_bb, x
+        )
+    )
+
+    stress_bounds = stress_parameter.apply(
+        lambda x: get_stress_at_failure(
+            result.nod,
+            result.q,
+            result.slope,
+            result.intercept,
+            x.cycles_to_failure,
+            result.pp,
+            result.xb,
+        ),
+        axis=1,
+    )
+    stress_parameter["spnu"] = stress_bounds.apply(lambda x: x[1])
+    stress_parameter["spnl"] = stress_bounds.apply(lambda x: x[0])
+
+    stress_parameter["stress_ratio"] = stress_ratio
+
+    snc_output_csv_df = pd.concat([snc_output_csv_df, stress_parameter])
 
 #     json_df = pd.DataFrame(
 #         {
