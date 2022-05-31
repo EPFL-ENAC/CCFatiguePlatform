@@ -33,7 +33,7 @@
          PreR=Rtest(i)
          Write(200,*) Rtest(i),Value1,Value2
 
-         ! Copy all lines except parameters to temp file
+         ! Copy samples (only stress_ratio, cycles_to_failure, stress) to temp file
          do
             m=m+1
             READ(10,*,iostat=ierr) Rtest(i),Value1,Value2
@@ -66,9 +66,9 @@
 
          OPEN (10, FILE = 'Temp-input.txt')
 
-         p1=0 ! Count 0 <= stress ratio < 1
-         p2=0 ! Count stress ratio < 0
-         p3=0 ! Count stress ratio > 1
+         p1=0 ! Count (0 <= stress ratio < 1)
+         p2=0 ! Count (stress ratio < 0)
+         p3=0 ! Count (stress ratio > 1)
          p4=0 ! unused
 
          ! For each stress ratio
@@ -83,13 +83,20 @@
 
                   do m=1,NOD
                      READ(10,*) Nu,N(1,p1,m),maxsigma(1,p1,m)
+                     ! Nu = stress_ratio
+                     ! N() = cycles_to_failure
+                     ! maxsigma() = stress
                      if (abs(R(1,p1)).GT.1) then
+                        ! asigma = (1 - (1 / R)) * maxsigma / 2
                         asigma(1,p1,m)=(1-(1/R(1,p1)))*maxsigma(1,p1,m)/2
+                        ! msigma = -(1 + (1 / R)) * maxsigma / 2
                         msigma(1,p1,m)=-(1+(1/R(1,p1)))*maxsigma(1,p1,m)/2
                      else
+                        ! asigma = (1 - R) * maxsigma / 2
                         asigma(1,p1,m)=(1-R(1,p1))*maxsigma(1,p1,m)/2
+                        ! msigma = (1 + R)  * maxsigma / 2
                         msigma(1,p1,m)=(1+R(1,p1))*maxsigma(1,p1,m)/2
-                     end if
+                     end ifN
 
                   end do
                end if
@@ -130,9 +137,9 @@
          end do
 
 
-         ! Sorting of part 1
+         ! Sorting each
          !#####################################################################
-         do i=1,p1
+         do i=1,p1 ! for each stress_ratio in p1
             do j=i+1,p1
                if (R(1,i).LT.R(1,j)) then
 
@@ -223,10 +230,10 @@
          end do
          ! ##########################################################################
 
-         do t=1,7,1
+         do t=1,7,1 ! for ONC in [1e3, 1e4, ..., 1e9]
             WRITE(20,*) ONC(t),0,UTS
             ! ##########################################################################
-            do i=1,p1
+            do i=1,p1 ! for each stress_ratio in p1 group
                Yb=0
                Xb=0
                P=0
@@ -249,7 +256,7 @@
                   sa=10**(-(A/B)+(1/B)*log10(ONC(t)))
                   sm=(1+R(1,i))*sa/(1-R(1,i))
                   !WRITE(20,*) R(1,i),ONC(t),sa,sm
-                  WRITE(20,*) ONC(t),sa,sm
+                  WRITE(20,*) ONC(t),sa,sm, A, B
                end if
             end do
             ! ##########################################################################
