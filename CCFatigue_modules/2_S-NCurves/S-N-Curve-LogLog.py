@@ -24,8 +24,6 @@ SRC_DIR = os.path.dirname(os.path.realpath(__file__))
 DATA_DIR = os.path.join(SRC_DIR, "..", "..", "Data")
 
 
-astm = Astm(CONFIDENCE)
-
 INPUT_FILENAME = "AGG_input.csv"
 INPUT_FILE = os.path.join(DATA_DIR, INPUT_FILENAME)
 OUTPUT_JSON_FILENAME = "SNC_LogLog.json"
@@ -79,6 +77,8 @@ def stress_at_failure_bounds(sample_count, q, a, b, nn, pp, xb):
 
 
 if __name__ == "__main__":
+
+    astm = Astm(CONFIDENCE)
 
     # Import input file (SNC format)
     samples = pd.read_csv(INPUT_FILE)
