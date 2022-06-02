@@ -30,7 +30,7 @@ UTS = 27.7
 CRITICAL_STRESS_RATIO = 0.1
 
 # Cycles for the isolines (the lines of the CLD)
-ONC = [10**x for x in range(3, 10)]  # ONC = 1e3, 1e4, ..., 1e9
+CYCLES_COUNT = [10**x for x in range(3, 10)]  # = 1e3, 1e4, ..., 1e9
 
 ## Variables def
 ##
@@ -94,15 +94,12 @@ ONC = [10**x for x in range(3, 10)]  # ONC = 1e3, 1e4, ..., 1e9
 #     return sigma_prime_a
 
 
-def sa_equation(A, B, onc):
+def stress_amplitude_equation(slope, intercept, cycles_count):
     """TODO"""
-    sa = 10 ** (-(A / B) + (1 / B) * math.log10(onc))
-    return sa
-
-
-# def sm_equation(stress_ratio, sa):
-#     sm=(1+R(1,i))*sa/(1-R(1,i))
-#     return sm
+    stress_amplitude = 10 ** (
+        -(slope / intercept) + (1 / intercept) * math.log10(cycles_count)
+    )
+    return stress_amplitude
 
 
 if __name__ == "__main__":
@@ -166,17 +163,21 @@ if __name__ == "__main__":
         by=["stress_ratio", "stress_ratio_id", "cycles_to_failure"], inplace=True
     )
 
-    onc_df = pd.DataFrame()
-    # onc_df["sa"] = onc_df.apply(lambda x: x, axis=1)
+    CLD_df = pd.DataFrame()
 
-    for onc in ONC:
+    for onc in CYCLES_COUNT:
 
         row = stress_ratios_df.copy()
         row["onc"] = onc
-        row["sa"] = row.apply(lambda x: sa_equation(x.slope, x.intercept, onc), axis=1)
+        row["stress_amplitude"] = row.apply(
+            lambda x: stress_amplitude_equation(x.slope, x.intercept, onc), axis=1
+        )
 
-        row["sm"] = (1 + row.stress_ratio) * row.sa / (1 - row.stress_ratio)
+        # Eq 1
+        row["mean_stress"] = (
+            (1 + row.stress_ratio) * row.stress_amplitude / (1 - row.stress_ratio)
+        )
 
-        onc_df = pd.concat([onc_df, row], ignore_index=True)
-
+        CLD_df = pd.concat([CLD_df, row], ignore_index=True)
+    pass  # debug purpose
     # TODO generate output files
