@@ -29,8 +29,8 @@ UCS = 27.1
 UTS = 27.7
 CRITICAL_STRESS_RATIO = 0.1
 
-# ONC = 1e3, 1e4, ..., 1e9
-ONC = [10**x for x in range(3, 10)]
+# Cycles for the isolines (the lines of the CLD)
+ONC = [10**x for x in range(3, 10)]  # ONC = 1e3, 1e4, ..., 1e9
 
 ## Variables def
 ##
@@ -166,17 +166,17 @@ if __name__ == "__main__":
         by=["stress_ratio", "stress_ratio_id", "cycles_to_failure"], inplace=True
     )
 
+    onc_df = pd.DataFrame()
+    # onc_df["sa"] = onc_df.apply(lambda x: x, axis=1)
+
     for onc in ONC:
-        stress_ratios_df["sa"] = stress_ratios_df.apply(
-            lambda x: sa_equation(x.slope, x.intercept, onc), axis=1
-        )
 
-        stress_ratios_df["sm"] = (
-            (1 + stress_ratios_df.stress_ratio)
-            * stress_ratios_df.sa
-            / (1 - stress_ratios_df.stress_ratio)
-        )
+        row = stress_ratios_df.copy()
+        row["onc"] = onc
+        row["sa"] = row.apply(lambda x: sa_equation(x.slope, x.intercept, onc), axis=1)
 
-        pass
+        row["sm"] = (1 + row.stress_ratio) * row.sa / (1 - row.stress_ratio)
 
-    pass
+        onc_df = pd.concat([onc_df, row], ignore_index=True)
+
+    # TODO generate output files
