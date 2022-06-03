@@ -8,23 +8,15 @@ https://www.sciencedirect.com/science/article/pii/S014211230200004X?via%3Dihub (
 
 import os
 import math
-import numpy as np
 import pandas as pd
-from scipy import stats
 from itertools import chain
 
 SRC_DIR = os.path.dirname(os.path.realpath(__file__))
 DATA_DIR = os.path.join(SRC_DIR, "..", "..", "..", "Data")
 
-# INPUT_X_CSV_FILENAME = "SNC_inputX.csv"
-# INPUT_Y_CSV_FILENAME = "SNC_inputY.csv"
-# INPUT_F_CSV_FILENAME = "SNC_inputF.csv"
 INPUT_X_JSON_FILENAME = "SNC_inputX.json"
 INPUT_Y_JSON_FILENAME = "SNC_inputY.json"
 INPUT_F_JSON_FILENAME = "SNC_inputF.json"
-# INPUT_X_CSV_FILE = os.path.join(DATA_DIR, INPUT_X_CSV_FILENAME)
-# INPUT_Y_CSV_FILE = os.path.join(DATA_DIR, INPUT_Y_CSV_FILENAME)
-# INPUT_F_CSV_FILE = os.path.join(DATA_DIR, INPUT_F_CSV_FILENAME)
 INPUT_X_JSON_FILE = os.path.join(DATA_DIR, INPUT_X_JSON_FILENAME)
 INPUT_Y_JSON_FILE = os.path.join(DATA_DIR, INPUT_Y_JSON_FILENAME)
 INPUT_F_JSON_FILE = os.path.join(DATA_DIR, INPUT_F_JSON_FILENAME)
@@ -85,9 +77,6 @@ def get_ssqr(x, y, tnc, tm, tmn, t):
 if __name__ == "__main__":
 
     # Import input files (SNC format)
-    # SNC_X_df = pd.read_csv(INPUT_X_CSV_FILE)
-    # SNC_Y_df = pd.read_csv(INPUT_Y_CSV_FILE)
-    # SNC_F_df = pd.read_csv(INPUT_F_CSV_FILE)
     SNC_x_df = pd.read_json(INPUT_X_JSON_FILE, orient="records")
     SNC_y_df = pd.read_json(INPUT_Y_JSON_FILE, orient="records")
     SNC_f_df = pd.read_json(INPUT_F_JSON_FILE, orient="records")
@@ -138,60 +127,34 @@ if __name__ == "__main__":
 
     if SN_MODEL == "Log-Log":
         get_stress = get_loglog_stress
+        get_sn = get_loglog_sn
     else:
         get_stress = get_linlog_stress
+        get_sn = get_linlog_sn
 
-        # output_df["x"] = a_x * output_df.cycles_to_failure ** (-b_x)
-        output_df["x"] = get_stress(a_x, b_x, output_df.cycles_to_failure)
-        output_df["y"] = a_y * output_df.cycles_to_failure ** (-b_y)
+    output_df["x"] = get_stress(a_x, b_x, output_df.cycles_to_failure)
+    output_df["y"] = get_stress(a_y, b_y, output_df.cycles_to_failure)
 
-        if THIRDSN != 0:
+    if THIRDSN != 0:
 
-            output_df["t"] = a_f * output_df.cycles_to_failure ** (-b_f)
+        output_df["t"] = get_stress(a_f, b_f, output_df.cycles_to_failure)
 
-            output_df["ssqr"] = output_df.apply(
-                lambda z: get_ssqr(z.x, z.y, tnc, tm, tmn, z.t), axis=1
-            )
-
-            # Remove rows where ssqr >= 0
-            output_df.drop(output_df[output_df.ssqr < 0].index, inplace=True)
-            output_df["s"] = output_df.apply(lambda z: 1 / math.sqrt(z.ssqr), axis=1)
-
-        else:
-            output_df["s"] = a_f * output_df.cycles_to_failure ** (-b_f)
-
-        if THIRDSN == 22.5:
-            output_df["s"] = output_df["t"] / 2.2
-
-        output_df["stress_parameter"] = output_df.apply(
-            lambda z: get_loglog_sn(z.x, z.y, nc, m, mn, z.s), axis=1
+        output_df["ssqr"] = output_df.apply(
+            lambda z: get_ssqr(z.x, z.y, tnc, tm, tmn, z.t), axis=1
         )
 
-    if SN_MODEL == "Lin-Log":
+        # Remove rows where ssqr >= 0
+        output_df.drop(output_df[output_df.ssqr < 0].index, inplace=True)
+        output_df["s"] = output_df.apply(lambda z: 1 / math.sqrt(z.ssqr), axis=1)
 
-        output_df["x"] = a_x + b_x * math.log10(output_df.cycles_to_failure)
-        output_df["y"] = a_y + b_y * math.log10(output_df.cycles_to_failure)
+    else:
+        output_df["s"] = get_stress(a_f, b_f, output_df.cycles_to_failure)
 
-        if THIRDSN != 0:
+    if THIRDSN == 22.5:
+        output_df["s"] = output_df["t"] / 2.2
 
-            output_df["t"] = a_f + b_f * math.log(output_df.cycles_to_failure)
-
-            output_df["ssqr"] = output_df.apply(
-                lambda z: get_ssqr(z.x, z.y, tnc, tm, tmn, z.t), axis=1
-            )
-
-            # Remove rows where ssqr >= 0
-            output_df.drop(output_df[output_df.ssqr < 0].index, inplace=True)
-            output_df["s"] = output_df.apply(lambda z: 1 / math.sqrt(z.ssqr), axis=1)
-
-        else:
-            output_df["s"] = a_f + b_f * math.log10(output_df.cycles_to_failure)
-
-        if THIRDSN == 22.5:
-            output_df["s"] = output_df["t"] / 2.2
-
-        output_df["stress_parameter"] = output_df.apply(
-            lambda z: get_linlog_sn(z.x, z.y, nc, m, mn, z.s), axis=1
-        )
+    output_df["stress_parameter"] = output_df.apply(
+        lambda z: get_sn(z.x, z.y, nc, m, mn, z.s), axis=1
+    )
 
     pass
