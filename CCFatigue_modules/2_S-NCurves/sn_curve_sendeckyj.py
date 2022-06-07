@@ -29,9 +29,7 @@ from scipy import stats
 from itertools import chain
 import sendeckyj  # Fortran optimized functions
 from astm import Astm
-import importlib
-
-sn_curve_loglog = importlib.import_module("S-N-Curve-LogLog")
+import sn_curve_loglog
 
 
 SRC_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -60,7 +58,9 @@ S_STEP = 0.0005
 CONFIDENCE = 95  # TODO check with Tassos if this should be a parameter (95, 99)
 
 
-def sendeckyj_equation_1(sigma_a, sigma_r, n, c, s):
+def sendeckyj_equation_1(
+    sigma_a: float, sigma_r: float, n: int, c: float, s: float
+) -> float:
     """Returns sigma_e = the equivalent static strength
     Eq 1 (see ref, p248)
     """
@@ -68,7 +68,7 @@ def sendeckyj_equation_1(sigma_a, sigma_r, n, c, s):
     return sigma_e
 
 
-def sendeckyj_equation_16(sigma_e, g):
+def sendeckyj_equation_16(sigma_e: float, g: float) -> float:
     """Returns X
     Eq 16 (see ref, p259)
     """
@@ -76,7 +76,7 @@ def sendeckyj_equation_16(sigma_e, g):
     return x
 
 
-def sendeckyj_equation_17(m, k, sigma_e):
+def sendeckyj_equation_17(m: int, k: int, sigma_e: float) -> float:
     """Returns G TODO G = ??
     Eq 17 (see ref, p259)
     """
@@ -86,7 +86,7 @@ def sendeckyj_equation_17(m, k, sigma_e):
     return g
 
 
-def sendeckyj_equation_19(g, m, k, xs, alpha):
+def sendeckyj_equation_19(g: float, m: int, k: int, xs: float, alpha: float) -> float:
     """Returns beta TODO beta = ??
     Eq 19 (see ref, p259)
     """
@@ -94,7 +94,15 @@ def sendeckyj_equation_19(g, m, k, xs, alpha):
     return beta
 
 
-def tassos_equation(reliability_level, alpha, c, s, nn, a, beta):
+def tassos_equation(
+    reliability_level: float,
+    alpha: float,
+    c: float,
+    s: float,
+    nn: float,
+    a: float,
+    beta: float,
+) -> float:
     """TODO"""
     k1 = (-math.log(reliability_level / 100.0)) ** (1.0 / alpha)
     k2 = 1 / ((nn - a) * c)
