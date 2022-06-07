@@ -17,17 +17,14 @@ DATA_DIR = os.path.join(SRC_DIR, "..", "..", "..", "Data")
 INPUT_X_JSON_FILENAME = "SNC_inputX.json"
 INPUT_Y_JSON_FILENAME = "SNC_inputY.json"
 INPUT_F_JSON_FILENAME = "SNC_inputF.json"
+INPUT_REFDATA_FILENAME = "SNC_refdata.json"
 INPUT_X_JSON_FILE = os.path.join(DATA_DIR, INPUT_X_JSON_FILENAME)
 INPUT_Y_JSON_FILE = os.path.join(DATA_DIR, INPUT_Y_JSON_FILENAME)
 INPUT_F_JSON_FILE = os.path.join(DATA_DIR, INPUT_F_JSON_FILENAME)
+INPUT_REFDATA_FILE = os.path.join(DATA_DIR, INPUT_REFDATA_FILENAME)
 
 # OUTPUT_CSV_FILENAME = "CLD_PiecewiseLinear.csv"
 # OUTPUT_CSV_FILE = os.path.join(DATA_DIR, OUTPUT_CSV_FILENAME)
-
-# TODO replace the following constants by input file (Refdata.txt)
-SN_MODEL = "Log-Log"
-DANGLE = 30
-THIRDSN = 0
 
 
 def get_loglog_stress(a, b, n):
@@ -76,6 +73,9 @@ def get_ssqr(x, y, tnc, tm, tmn, t):
 
 if __name__ == "__main__":
 
+    # Import param files
+    SNC_refdata_df = pd.read_json(INPUT_REFDATA_FILE, orient="index")
+
     # Import input files (SNC format)
     SNC_x_df = pd.read_json(INPUT_X_JSON_FILE, orient="records")
     SNC_y_df = pd.read_json(INPUT_Y_JSON_FILE, orient="records")
@@ -93,8 +93,12 @@ if __name__ == "__main__":
     b_y = SNC_y_df.iloc[0].B
     b_f = SNC_f_df.iloc[0].B
 
-    theta = math.radians(DANGLE)  # (DANGLE / 180) * 3.14159265
-    tempangle = math.radians(THIRDSN)  # (THIRDSN / 180) * 3.14159265
+    theta = math.radians(
+        SNC_refdata_df.loc["desirable_angle"][0]
+    )  # (DANGLE / 180) * 3.14159265
+    tempangle = math.radians(
+        SNC_refdata_df.loc["off_axis_angle"][0]
+    )  # (THIRDSN / 180) * 3.14159265
 
     tm = math.sin(tempangle) ** 4
     tnc = math.cos(tempangle) ** 4
@@ -125,7 +129,7 @@ if __name__ == "__main__":
 
     output_df["stress_ratio"] = stress_ratio
 
-    if SN_MODEL == "Log-Log":
+    if SNC_refdata_df.loc["sn_model"][0] == "Log-Log":
         get_stress = get_loglog_stress
         get_sn = get_loglog_sn
     else:
@@ -135,7 +139,7 @@ if __name__ == "__main__":
     output_df["x"] = get_stress(a_x, b_x, output_df.cycles_to_failure)
     output_df["y"] = get_stress(a_y, b_y, output_df.cycles_to_failure)
 
-    if THIRDSN != 0:
+    if SNC_refdata_df.loc["off_axis_angle"][0] != 0:
 
         output_df["t"] = get_stress(a_f, b_f, output_df.cycles_to_failure)
 
@@ -150,7 +154,7 @@ if __name__ == "__main__":
     else:
         output_df["s"] = get_stress(a_f, b_f, output_df.cycles_to_failure)
 
-    if THIRDSN == 22.5:
+    if SNC_refdata_df.loc["off_axis_angle"][0] == 22.5:
         output_df["s"] = output_df["t"] / 2.2
 
     output_df["stress_parameter"] = output_df.apply(
