@@ -32,19 +32,23 @@ OUTPUT_CSV_FILENAME = "SNC_LogLog.csv"
 OUTPUT_CSV_FILE = os.path.join(DATA_DIR, OUTPUT_CSV_FILENAME)
 
 
-def equation_ycar(slope, intercept, log10_stress_parameter):
+def equation_ycar(
+    slope: float, intercept: float, log10_stress_parameter: float
+) -> float:
     """TODO"""
     ycar = slope + intercept * log10_stress_parameter
     return ycar
 
 
-def stress_at_failure(aa, bb, nn):
+def stress_at_failure(aa: float, bb: float, nn: float) -> float:
     """TODO"""
     spn = aa * nn ** (-bb)
     return spn
 
 
-def stress_at_failure_bounds(sample_count, q, a, b, nn, pp, xb):
+def stress_at_failure_bounds(
+    sample_count: int, q: float, a: float, b: float, nn: float, pp: float, xb: float
+) -> tuple[float, float]:
     """Get Stress at failure (sigma_max)
     returns (lower bound, upper bound)"""
 
