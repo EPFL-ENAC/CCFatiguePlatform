@@ -30,7 +30,7 @@ See https://github.com/EPFL-ENAC/enacit-srv-lin-sysadmin/blob/develop/test/ccfat
 
 # App architecture
 
-![flowchart_CCFATIGUE.jpg](flowchart_CCFATIGUE.jpg)
+![flowchart_CCFATIGUE.png](flowchart_CCFATIGUE.png)
 
 # License
 
