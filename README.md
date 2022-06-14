@@ -34,7 +34,7 @@ See https://github.com/EPFL-ENAC/enacit-srv-lin-sysadmin/blob/develop/test/ccfat
 
 # License
 
-TBD.
+MIT
 
 # Contributors
 
