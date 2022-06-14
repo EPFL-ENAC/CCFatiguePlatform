@@ -4,7 +4,8 @@
   "description": "Initiative from the Composite Construction Laboratory (CCLab) that aims at facilitating access to and analysis of composite materials testings",
   "main": "vetur.config.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,15 @@
   "bugs": {
     "url": "https://github.com/EPFL-ENAC/CCFatiguePlatform/issues"
   },
-  "homepage": "https://github.com/EPFL-ENAC/CCFatiguePlatform#readme"
+  "homepage": "https://github.com/EPFL-ENAC/CCFatiguePlatform#readme",
+  "devDependencies": {
+    "@commitlint/cli": "^17.0.2",
+    "@commitlint/config-conventional": "^17.0.2",
+    "husky": "^8.0.1"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  }
 }
