@@ -1,0 +1,19 @@
+{
+  "name": "ccfatigue-platform",
+  "version": "0.1.0",
+  "description": "Initiative from the Composite Construction Laboratory (CCLab) that aims at facilitating access to and analysis of composite materials testings",
+  "main": "vetur.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EPFL-ENAC/CCFatiguePlatform.git"
+  },
+  "author": "ENACIT4Research@EPFL",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/EPFL-ENAC/CCFatiguePlatform/issues"
+  },
+  "homepage": "https://github.com/EPFL-ENAC/CCFatiguePlatform#readme"
+}
