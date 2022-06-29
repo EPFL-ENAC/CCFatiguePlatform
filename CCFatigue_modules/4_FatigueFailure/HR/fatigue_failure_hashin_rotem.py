@@ -26,7 +26,7 @@ INPUT_REFDATA_FILE = os.path.join(SRC_DIR, INPUT_REFDATA_FILENAME)
 # OUTPUT_CSV_FILE = os.path.join(DATA_DIR, OUTPUT_CSV_FILENAME)
 
 
-def eq23(
+def hashin_equation_23(
     f_tau: float,
     tau_s: float,
     theta: float,
@@ -66,7 +66,7 @@ def get_loglog_sn_case1(
 
     ft = sigmat / transverse_strength
     fs = Sigmas / shear_strength
-    sn = strength_at_desirable_angle * eq23(
+    sn = strength_at_desirable_angle * hashin_equation_23(
         f_tau=fs,
         tau_s=shear_strength,
         theta=theta,
@@ -98,7 +98,7 @@ def get_loglog_sn_case2(
     const1 = ((shear_strength / transverse_strength) * math.tan(oangle2)) ** 2
     ff = ((a_2 * cycles_to_failure ** (-b_2)) / strength2) ** 2
     fs = math.sqrt((ff * ft**2) / ((1 + const1) * ft**2 - (ff * const1)))
-    sn = strength_at_desirable_angle * eq23(
+    sn = strength_at_desirable_angle * hashin_equation_23(
         f_tau=fs,
         tau_s=shear_strength,
         theta=theta,
@@ -142,7 +142,7 @@ def get_loglog_sn_case3(
         ft = math.sqrt(ft2)
         fs = math.sqrt(fs2)
 
-    sn = strength_at_desirable_angle * eq23(
+    sn = strength_at_desirable_angle * hashin_equation_23(
         f_tau=fs,
         tau_s=shear_strength,
         theta=theta,
@@ -268,7 +268,7 @@ def get_linlog_sn_case1(
 
     ft = sigmat / transverse_strength
     fs = sigmas / shear_strength
-    sn = strength_at_desirable_angle * eq23(
+    sn = strength_at_desirable_angle * hashin_equation_23(
         f_tau=fs,
         tau_s=shear_strength,
         theta=theta,
@@ -300,7 +300,7 @@ def get_linlog_sn_case2(
     const1 = ((shear_strength / transverse_strength) * math.tan(oangle2)) ** 2
     ff = ((a_2 + b_2 * math.log10(cycles_to_failure)) / strength2) ** 2
     fs = math.sqrt((ff * ft**2) / ((1 + const1) * ft**2 - (ff * const1)))
-    sn = strength_at_desirable_angle * eq23(
+    sn = strength_at_desirable_angle * hashin_equation_23(
         f_tau=fs,
         tau_s=shear_strength,
         theta=theta,
@@ -345,7 +345,7 @@ def get_linlog_sn_case3(
         ft = math.sqrt(ft2)
         fs = math.sqrt(fs2)
 
-    sn = strength_at_desirable_angle * eq23(
+    sn = strength_at_desirable_angle * hashin_equation_23(
         f_tau=fs,
         tau_s=shear_strength,
         theta=theta,
