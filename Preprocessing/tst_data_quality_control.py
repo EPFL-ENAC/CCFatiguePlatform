@@ -165,9 +165,7 @@ def check_test_data_csv(test_data_fp):
     logger.write(f"Checking {tst['filename']}")
     with logger.indent:
         dataset = pd.read_csv(
-            test_data_fp,
-            sep=",",
-            header=0,
+            test_data_fp, sep=",", header=0, dtype={"Specimen_name": "string"}
         )
 
         found_columns = dataset.columns
