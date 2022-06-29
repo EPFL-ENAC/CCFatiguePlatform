@@ -216,10 +216,10 @@ def get_loglog_sn(
             b_t=b_t,
             a_2=a_2,
             b_2=b_2,
-            transverse_strength=tensile_transverse_strength,
+            transverse_strength=transverse_strength,
             shear_strength=shear_strength,
             strength_at_desirable_angle=strength_at_desirable_angle,
-            strength2=tensile_strength2,
+            strength2=strength2,
             oangle2=oangle2,
             theta=theta,
         )
@@ -423,7 +423,7 @@ def get_linlog_sn(
             transverse_strength=transverse_strength,
             shear_strength=shear_strength,
             strength_at_desirable_angle=strength_at_desirable_angle,
-            strength2=tensile_strength2,
+            strength2=strength2,
             oangle2=oangle2,
             theta=theta,
         )
