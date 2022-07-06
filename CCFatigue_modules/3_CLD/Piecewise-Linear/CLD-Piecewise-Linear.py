@@ -2,7 +2,8 @@
 """
 Implementation of the Piecewise Linear Methods as described in:
 Anastasios P. Vassilopoulos, Behzad D. Manshadi, Thomas Keller,
-Influence of the constant life diagram formulation on the fatigue life prediction of composite materials,
+Influence of the constant life diagram formulation on the fatigue life prediction of
+composite materials,
 International Journal of Fatigue,
 Volume 32, Issue 4, 2010, Pages 659-669, ISSN 0142-1123,
 https://doi.org/10.1016/j.ijfatigue.2009.09.008
@@ -32,9 +33,9 @@ CRITICAL_STRESS_RATIO = 0.1
 # Cycles for the isolines (the lines of the CLD)
 CYCLES_COUNT = [10**x for x in range(3, 10)]  # = 1e3, 1e4, ..., 1e9
 
-## Variables def
-##
-## sigma prime a = ???
+# Variables def
+#
+# sigma prime a = ???
 
 
 # def calculate_sigma_prime_a(R, R_ratios):
@@ -134,12 +135,14 @@ if __name__ == "__main__":
         .mean()
     )
 
-    # For each samples with abs(stress_ratio) > 1, calculate asigma and msigma
+    # For each samples with abs(stress_ratio) > 1,
+    #     calculate the amplitude and mean stress
     SNC_df.loc[abs(SNC_df.stress_ratio) > 1, "asigma"] = (
         (1 - (1 / SNC_df.stress_ratio)) * SNC_df.stress_parameter / 2
     )
 
-    # For each samples with abs(stress_ratio) <= 1, calculate asigma and msigma
+    # For each samples with abs(stress_ratio) <= 1,
+    #     calculate the amplitude and mean stress
     SNC_df.loc[abs(SNC_df.stress_ratio) <= 1, "asigma"] = (
         (1 - SNC_df.stress_ratio) * SNC_df.stress_parameter / 2
     )
