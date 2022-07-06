@@ -2,10 +2,10 @@
 """ CCFatigue - Module 3 - CLD-Harris.py
 
 Harris diagram is described in Tassos red book p. 108 - the original papers are:
-- https://www.sciencedirect.com/science/article/pii/0142112394904782?via%3Dihub
-  (https://doi.org/10.1016/0142-1123(94)90478-2)
-- https://www.sciencedirect.com/science/article/pii/S0266353897001218?via%3Dihub
-  (https://doi.org/10.1016/S0266-3538(97)00121-8)
+[1] https://www.sciencedirect.com/science/article/pii/0142112394904782?via%3Dihub
+    (https://doi.org/10.1016/0142-1123(94)90478-2)
+[2] https://www.sciencedirect.com/science/article/pii/S0266353897001218?via%3Dihub
+    (https://doi.org/10.1016/S0266-3538(97)00121-8)
 """
 
 import os
@@ -19,7 +19,7 @@ DATA_DIR = os.path.join(SRC_DIR, "..", "..", "..", "Data")
 
 INPUT_FILENAME = "SNC_input.csv"
 INPUT_FILE = os.path.join(DATA_DIR, INPUT_FILENAME)
-OUTPUT_CSV_FILENAME = "CLD_PiecewiseLinear.csv"
+OUTPUT_CSV_FILENAME = "CLD_Harris.csv"
 OUTPUT_CSV_FILE = os.path.join(DATA_DIR, OUTPUT_CSV_FILENAME)
 
 # staticvalue.txt => constants
@@ -134,6 +134,7 @@ if __name__ == "__main__":
 
     for onc in CYCLES_COUNT:
 
+        # Eq 8 p530 ref[1]
         ff = linregress_f.slope * math.log10(onc) + linregress_f.intercept
         uu = linregress_u.slope * math.log10(onc) + linregress_u.intercept
         vv = linregress_v.slope * math.log10(onc) + linregress_v.intercept
@@ -164,4 +165,6 @@ if __name__ == "__main__":
             )
 
     pass
-    # TODO generate output files
+
+    # Generate output files
+    CLD_df.to_csv(OUTPUT_CSV_FILE, index=False)
