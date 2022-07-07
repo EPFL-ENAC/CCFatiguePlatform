@@ -1,7 +1,5 @@
 # FAF Standard Data format
 
-Note: in all the Fortran codes, the output range of mean stress needs to be checked and tuned!
-
 ## File naming conventions
 
 - Files: `FAF_{Date?}_{Test type}_{###?}.json`

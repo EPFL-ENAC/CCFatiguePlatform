@@ -1,7 +1,5 @@
 # DAS Standard Data format
 
-Note: in all the Fortran codes, the output range of mean stress needs to be checked and tuned!
-
 ## File naming conventions
 
 - Files: `DAS_{Date?}_{Test type}_{###?}.json`
@@ -12,6 +10,8 @@ with:
 - date: `YYYY-MM` (starting month of the experiment)
 
 ## DAS CSV files standards (column names must be exact) :
+
+One line per factor.
 
 Encoding format: UTF-8, Separator: ',' (comma)
 
