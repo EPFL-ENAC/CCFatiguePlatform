@@ -18,4 +18,4 @@ Encoding format: UTF-8, Separator: ',' (comma)
 | stress_mean  | (sigma_m)             | ?    | double    | y         |
 | R_ratio      | ?                     | ?    | double    | y         |
 | N_cycles     | ?                     | ?    | double    | y         |
-| Cum_N_cycles | ?                     | ?    | double    | y         |
+| Cum_N_cycles | percentage?           | ?    | double    | y         |

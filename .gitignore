@@ -18,3 +18,5 @@ Icon
 **/Icon?
 gitignore/
 secrets/
+
+node_modules/

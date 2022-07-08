@@ -26,16 +26,15 @@ EOF
 
 ## Server provisioning
 
-See https://github.com/EPFL-ENAC/SB_Sysadmin/tree/enacvm0056
+See https://github.com/EPFL-ENAC/enacit-srv-lin-sysadmin/blob/develop/test/ccfatigue-test/README.md
 
 # App architecture
 
-<img width="1791" alt="Screenshot 2022-03-02 at 18 37 07" src="https://user-images.githubusercontent.com/18381609/156417130-4ce6f53c-e89b-436c-a30d-ee88a760f8e8.png">
-
+![flowchart_CCFATIGUE.png](flowchart_CCFATIGUE.png)
 
 # License
 
-TBD.
+MIT
 
 # Contributors
 
