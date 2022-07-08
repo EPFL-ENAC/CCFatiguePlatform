@@ -15,8 +15,9 @@ with:
 
 Encoding format: UTF-8, Separator: ',' (comma)
 
-| Column name       | Description                    | Unit  | Data type | Mandatory |
-| ----------------- | ------------------------------ | ----- | --------- | --------- |
-| cycles_to_failure | Number of cycles to failure: N | [-]   | int       | y         |
-| stress_amplitude  | Stress amplitude               | [MPa] | double    | y         |
-| mean_stress       | Mean stress                    | [MPa] | double    | y         |
+
+| Variable name        | Description                            | Symbol    | Unit    | Data type | Mandatory          |
+|----------------------|----------------------------------------|-----------|---------|-----------|--------------------|
+| cycles_to_failure    | Number of cycles to failure            | N         | [-]     | int       | y                |
+| stress_amplitude     | Stress amplitude                       | sigma_a   | [MPa]   | double    | y                |
+| mean_stress          | Mean stress                            | ?         | [MPa]   | double    | y                |
