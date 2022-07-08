@@ -36,16 +36,31 @@ CYCLES_COUNT = [10**x for x in range(3, 10)]  # = 1e3, 1e4, ..., 1e9
 # Variables def
 #
 # sigma prime a = ???
+known_R_ratios = ### Here make a list of known R ratios from the SNC json input.
 
+def calculate_stress_amplitude(R, known_R_ratios):
+   """
+   Calculates stress amplitude corresponsing to given R, according to method
+   Inputs :
+    - R for which we want to estimate stress amplitude
+    - known_R_ratios
+    - corresponding_stress_amplitudes_for_known_R_ratios = ????
 
-# def calculate_sigma_prime_a(R, R_ratios):
-#     """
-#     Step 1 - Identifiy between whic R ratios R' is located.
+    Outputs :
+    - stress amplitude (sigma_a') corresponding to given R
+    """
 
-#     SNC_df = Dataframe with cols:
-#     - stress_ratio (R): is a vector of known R_ratios.
-#     - stress_amplitudes (sigma_a) :
-#     """
+#     Step 1 - Identifiy between which R ratios R' is located.
+
+     if abs(R) > 1:
+         stress_amplitude = CC_sector_equation()
+     else: #elif R < 0:
+         stress_amplitude = TT_sector_equation()
+     elif R == 0 :
+         ?? ## What happens when R == 0 or 1 ?
+     elif R == 1 :
+         ?? ## What happens when R == 0 or 1 ?
+
 #     R_1_TT = SNC_df.R_ratios[0]
 
 #     if abs(R) > 1:
