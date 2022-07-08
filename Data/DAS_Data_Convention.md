@@ -23,11 +23,8 @@ Output : 3 columns ? (Re-run it to check)
 
 Encoding format: UTF-8, Separator: ',' (comma)
 
-| Column name       | Description                     | Unit  | Data type | Mandatory |
-| ----------------- | ------------------------------- | ----- | --------- | --------- |
-| max_stress        | Max stress (sigma_max)          | [MPa] | double    | y         |
-| cycles_to_failure | Number of cycles to failure (N) | [-]   | double    | y         |
-
-cycles_to_failure = 1/Damage (TBC)
-Other columns that may be written
-| Damage | D | [-] | double | y |
+| Variable name        | Description                            | Symbol    | Unit    | Data type | Mandatory          |
+|----------------------|----------------------------------------|-----------|---------|-----------|--------------------|
+| max_stress           | Max stress                             | sigma_max | [MPa]   | double    | y                |
+| cycles_to_failure    | Number of cycles to failure            | N         | [-]     | int       |  |
+| damage               | 1/Damage                               | D         | [-]     | double    |  |

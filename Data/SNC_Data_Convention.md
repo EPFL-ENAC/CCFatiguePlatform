@@ -22,12 +22,12 @@ Encoding format: UTF-8
 ```javascript
 [
 	{
-		"Stress-ratio": double, // R-Ratio (R) [-]
-		"RSQL": int, // Reliability level [-]
-		"A": double, // S-N Curve parameter [-]
-		"B": double, // S-N Curve parameter [1/MPa]
-		"LRSQ": double, // [?]
-		"Fp": double, // Fp Linearity criterion [?]
+		"stress-ratio": double, // Stress ratio (R) [-]
+		"reliability_level": int, // Reliability level (rsql) [-]
+		"a": double, // S-N Curve parameter [-]
+		"b": double, // S-N Curve parameter [1/MPa]
+		"lrsq": double, // [?]
+		"fp": double, // Fp Linearity criterion [?]
 	},
 	...
 ]
@@ -38,11 +38,10 @@ Encoding format: UTF-8
 Encoding format: UTF-8, Separator: ',' (comma)
 
 
-| Column name          | Description                                        | Unit  | Data type | Mandatory  |
-|----------------------|----------------------------------------------------|-------|-----------|------------|
-| stress_ratio         | Stress ratio: R                                    | [-]   | double    | y          |
-| cycles_to_failure    | Number of cycles to failure: N                     | [-]   | int       | y          |
-| stress               | Stress at failure: sigma_max (median)              | [MPa] | double    | y          |
-| stress_lowerbound    | Stress at failure: sigma_max (lower bound)         | [MPa] | double    |            |
-| stress_upperbound    | Stress at failure: sigma_max (upper bound)         | [MPa] | double    |            |
-
+| Variable name        | Description                            | Symbol    | Unit    | Data type | Mandatory          |
+|----------------------|----------------------------------------|-----------|---------|-----------|--------------------|
+| stress_ratio         | Stress ratio                           | R         | [-]     | double    | y                  |
+| cycles_to_failure    | Number of cycles to failure            | N         | [-]     | int       | y                  |
+| stress               | Stress at failure (median)             | sigma_max | [MPa]   | double    | y                  |
+| stress_lowerbound    | Stress at failure (lower bound)        | sigma_max | [MPa]   | double    |                    |
+| stress_upperbound    | Stress at failure (upper bound)        | sigma_max | [MPa]   | double    |                    |
