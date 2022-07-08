@@ -12,10 +12,11 @@ with:
 
 Encoding format: UTF-8, Separator: ',' (comma)
 
-| Column name  | Description           | Unit | Data type | Mandatory |
-| ------------ | --------------------- | ---- | --------- | --------- |
-| stress_range | sigma_max - sigma_min | ?    | double    | y         |
-| stress_mean  | (sigma_m)             | ?    | double    | y         |
-| R_ratio      | ?                     | ?    | double    | y         |
-| N_cycles     | ?                     | ?    | double    | y         |
-| Cum_N_cycles | percentage?           | ?    | double    | y         |
+
+| Variable name        | Description                            | Symbol    | Unit    | Data type | Mandatory          |
+|----------------------|----------------------------------------|-----------|---------|-----------|--------------------|
+| stress_range         | sigma_max - sigma_min                  | ?         |         | double    | y                  |
+| stress_mean          | ?                                      | sigma_mean |         | double    | y                |
+| stress_ratio         | Stress ratio                           | R         | [-]     | double    | y |
+| n_cycles?            | ?                                      | ?         |         | double    | y                |
+| cum_n_cycles?        | percentage?                            | ?         |         | double    | y                |
