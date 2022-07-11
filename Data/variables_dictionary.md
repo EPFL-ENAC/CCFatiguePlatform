@@ -15,9 +15,8 @@
 | b                    | S-N Curve parameter                    | B         | [1/MPa] | double    | SNC                |
 | lrsq                 | ?                                      | LRSQ      | [?]     | double    | SNC                |
 | fp                   | Linearity criterion                    | Fp        | [?]     | double    | SNC                |
-| stress_amplitude     | Stress amplitude                       | sigma_a   | [MPa]   | double    | CLD                |
+| stress_amplitude     | Stress amplitude                       | sigma_a   | [MPa]   | double    | CLD, CYC           |
 | mean_stress          | Mean stress                            | ?         | [MPa]   | double    | CLD                |
-| stress_range         | sigma_max - sigma_min                  | ?         |         | double    | CYC                |
 | stress_mean          | ?                                      | sigma_mean |         | double    | CYC                |
 | n_cycles?            | ?                                      | ?         |         | double    | CYC                |
 | cum_n_cycles?        | percentage?                            | ?         |         | double    | CYC                |

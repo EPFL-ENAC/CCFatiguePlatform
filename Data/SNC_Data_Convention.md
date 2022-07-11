@@ -22,7 +22,7 @@ Encoding format: UTF-8
 ```javascript
 [
 	{
-		"stress-ratio": double, // Stress ratio (R) [-]
+		"stress_ratio": double, // Stress ratio (R) [-]
 		"reliability_level": int, // Reliability level (rsql) [-]
 		"a": double, // S-N Curve parameter [-]
 		"b": double, // S-N Curve parameter [1/MPa]
