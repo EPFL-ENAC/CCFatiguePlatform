@@ -52,14 +52,14 @@ def calculate_stress_amplitude(R, known_R_ratios):
 
 #     Step 1 - Identifiy between which R ratios R' is located.
 
-     if abs(R) > 1:
-         stress_amplitude = CC_sector_equation()
-     else: #elif R < 0:
-         stress_amplitude = TT_sector_equation()
-     elif R == 0 :
-         ?? ## What happens when R == 0 or 1 ?
-     elif R == 1 :
-         ?? ## What happens when R == 0 or 1 ?
+    if abs(R) > 1:
+        stress_amplitude = CC_sector_equation()
+    else: #elif R < 0:
+        stress_amplitude = TT_sector_equation()
+    elif R == 0 :
+        ?? ## What happens when R == 0 or 1 ?
+    elif R == 1 :
+        ?? ## What happens when R == 0 or 1 ?
 
 #     R_1_TT = SNC_df.R_ratios[0]
 
@@ -110,7 +110,22 @@ def calculate_stress_amplitude(R, known_R_ratios):
 #     return sigma_prime_a
 
 
-def stress_amplitude_equation(slope, intercept, cycles_count):
+def get_asigma(stress_ratio: float, stress_parameter: float) -> float:
+    """TODO
+    Function also used by module 5
+    """
+    asigma = 0
+    if abs(stress_ratio) > 1:
+        asigma = (1 - (1 / stress_ratio)) * stress_parameter / 2
+    else:
+        asigma = (1 - stress_ratio) * stress_parameter / 2
+
+    return asigma
+
+
+def stress_amplitude_equation(
+    slope: float, intercept: float, cycles_count: int
+) -> float:
     """TODO"""
     stress_amplitude = 10 ** (
         -(slope / intercept) + (1 / intercept) * math.log10(cycles_count)
@@ -150,16 +165,19 @@ if __name__ == "__main__":
         .mean()
     )
 
-    # For each samples with abs(stress_ratio) > 1,
-    #     calculate the amplitude and mean stress
-    SNC_df.loc[abs(SNC_df.stress_ratio) > 1, "asigma"] = (
-        (1 - (1 / SNC_df.stress_ratio)) * SNC_df.stress_parameter / 2
-    )
+    # # For each samples with abs(stress_ratio) > 1,
+    # #     calculate the amplitude and mean stress
+    # SNC_df.loc[abs(SNC_df.stress_ratio) > 1, "asigma"] = (
+    #     (1 - (1 / SNC_df.stress_ratio)) * SNC_df.stress_parameter / 2
+    # )
 
-    # For each samples with abs(stress_ratio) <= 1,
-    #     calculate the amplitude and mean stress
-    SNC_df.loc[abs(SNC_df.stress_ratio) <= 1, "asigma"] = (
-        (1 - SNC_df.stress_ratio) * SNC_df.stress_parameter / 2
+    # # For each samples with abs(stress_ratio) <= 1,
+    # #     calculate the amplitude and mean stress
+    # SNC_df.loc[abs(SNC_df.stress_ratio) <= 1, "asigma"] = (
+    #     (1 - SNC_df.stress_ratio) * SNC_df.stress_parameter / 2
+    # )
+    SNC_df["asigma"] = SNC_df.apply(
+        lambda x: get_asigma(x.stress_ratio, x.stress_parameter), axis=1
     )
 
     # Add columns with log10(stress_parameter) and log10(number_of_cycles)
