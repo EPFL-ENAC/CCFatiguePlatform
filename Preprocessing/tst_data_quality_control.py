@@ -17,6 +17,7 @@ Validate data quality in TST experiment folders
 #
 
 import os
+import re
 import glob
 import pandas as pd
 import simplejson as json
@@ -77,40 +78,79 @@ def check_test_data_csv(test_data_fp):
     """
     check requirements for an experiment test data csv file
     """
+    """
     EXPECTED_COLUMNS = {
+        r"pattern": {
+            "type": int|float|string,
+            mandatory: True|False,
+        }
+    """
+    EXPECTED_COLUMNS = {
+        "Machine_Time": {
+            "type": int,
+            "mandatory": False,
+        },
         "Machine_N_cycles": {
             "type": int,
-            "mandatory": True,
-        },
-        "Machine_Load": {
-            "type": float,
-            "mandatory": True,
+            "mandatory": False,
         },
         "Machine_Displacement": {
             "type": float,
-            "mandatory": True,
+            "mandatory": False,
         },
-        "index": {
+        "Machine_Load": {
+            "type": float,
+            "mandatory": False,
+        },
+        r"MD_index--\d": {
             "type": int,
             "mandatory": False,
         },
-        "Camera_N_cycles": {
+        r"MD_N_cycles--\d": {
             "type": int,
             "mandatory": False,
         },
-        "exx": {
+        r"MD_Displacement--\d": {
             "type": float,
             "mandatory": False,
         },
-        "eyy": {
+        r"MD_Load--\d": {
             "type": float,
             "mandatory": False,
         },
-        "exy": {
+        r"u--\d": {
             "type": float,
             "mandatory": False,
         },
-        "crack_length": {
+        r"v--\d": {
+            "type": float,
+            "mandatory": False,
+        },
+        r"exx--\d": {
+            "type": float,
+            "mandatory": False,
+        },
+        r"eyy--\d": {
+            "type": float,
+            "mandatory": False,
+        },
+        r"exy--\d": {
+            "type": float,
+            "mandatory": False,
+        },
+        "Crack_length": {
+            "type": float,
+            "mandatory": False,
+        },
+        "Crack_N_cycles": {
+            "type": float,
+            "mandatory": False,
+        },
+        "Crack_Displacement": {
+            "type": float,
+            "mandatory": False,
+        },
+        "Crack_Load": {
             "type": float,
             "mandatory": False,
         },
@@ -142,7 +182,19 @@ def check_test_data_csv(test_data_fp):
             "type": float,
             "mandatory": False,
         },
-        "Specimen Name": {
+        r"T--\d": {
+            "type": float,
+            "mandatory": False,
+        },
+        "Storage_modulus": {
+            "type": float,
+            "mandatory": False,
+        },
+        "Tan_delta": {
+            "type": float,
+            "mandatory": False,
+        },
+        "Specimen_name": {
             "type": str,
             "mandatory": False,
         },
@@ -169,32 +221,49 @@ def check_test_data_csv(test_data_fp):
         )
 
         found_columns = dataset.columns
-        for mandatory_col in filter(
+        for mandatory_col_pattern in filter(
             lambda c: EXPECTED_COLUMNS[c]["mandatory"], EXPECTED_COLUMNS
         ):
-            if mandatory_col not in found_columns:
-                logger.error(f"mandatory column not found: '{mandatory_col}'")
+            mandatory_col_found = list(
+                common.grep_matching_columns(mandatory_col_pattern, found_columns)
+            )
+            if len(mandatory_col_found) == 0:
+                logger.error(f"mandatory column not found: '{mandatory_col_pattern}'")
             else:
-                if dataset[mandatory_col].isnull().values.any():
-                    logger.error(
-                        f"mandatory column has empty values: '{mandatory_col}'"
-                    )
-        for optional_col in filter(
+                for mandatory_col in mandatory_col_found:
+                    if dataset[mandatory_col].isnull().values.any():
+                        logger.error(
+                            f"mandatory column has empty values: '{mandatory_col}'"
+                        )
+        for optional_col_pattern in filter(
             lambda c: not EXPECTED_COLUMNS[c]["mandatory"], EXPECTED_COLUMNS
         ):
-            if optional_col not in found_columns:
-                logger.info(f"optional column not found: '{optional_col}'")
+            optional_col_found = list(
+                common.grep_matching_columns(optional_col_pattern, found_columns)
+            )
+
+            if len(optional_col_found) == 0:
+                logger.info(f"optional column not found: '{optional_col_pattern}'")
+
         for found_col in found_columns:
-            if found_col not in EXPECTED_COLUMNS:
+            expected = False
+            for col_pattern in EXPECTED_COLUMNS:
+                if re.match(col_pattern, found_col):
+                    expected = True
+                    break
+            if not expected:
                 logger.warning(f"unexpected column found: '{found_col}'")
 
-        for col in EXPECTED_COLUMNS:
-            if col in found_columns:
-                if not COLUMN_TYPE_CHECK[EXPECTED_COLUMNS[col]["type"]](dataset, col):
-                    logger.error(
-                        f"column '{col}' is expected to be"
-                        f" of type '{TYPE_NAMES[EXPECTED_COLUMNS[col]['type']]}'"
-                    )
+        for col in found_columns:
+            for col_pattern in EXPECTED_COLUMNS:
+                if re.match(col_pattern, col):
+                    if not COLUMN_TYPE_CHECK[EXPECTED_COLUMNS[col_pattern]["type"]](
+                        dataset, col
+                    ):
+                        logger.error(
+                            f"column '{col}' is expected to be of type "
+                            f"'{TYPE_NAMES[EXPECTED_COLUMNS[col_pattern]['type']]}'"
+                        )
 
         if dataset.isnull().all(axis=1).any():
             logger.error("found empty rows")
