@@ -121,7 +121,9 @@ def meta_dict_fix_types(meta):
 
 if __name__ == "__main__":
     with common.Logger(None) as logger:
-        for experiment_fp_folder in common.EXPERIMENT_FP_FOLDERS:
+        for experiment_fp_folder in common.get_tst_folders_to_parse(
+            description="Transform TST's CSV to JSON"
+        ):
             logger.info(f"Processing {experiment_fp_folder}")
             with logger.indent:
                 exp = common.get_experiment_meta(experiment_fp_folder)
