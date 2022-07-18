@@ -1,4 +1,4 @@
- Machine_Time  ,Machine_N_cycles,Machine_Displacement,Machine_Load,MD_index--# ,u--#,v--#,eyy--#,exx--#,exy--#,MD_N_cycles--# ,MD_Load--# ,Crack_length,Crack_N_cycles,Crack_Displacement,Crack_Load ,Th_time,Th_N_cycles,Th_specimen_max,Th_specimen_mean,Th_chamber,Th_uppergrips,Th_lowergrips ,Specimen_name
+Machine_Time,Machine_N_cycles,Machine_Displacement,Machine_Load,MD_index--1,u--1,v--1,eyy--1,exx--1,exy--1,MD_N_cycles--1,MD_Load--1,Crack_length,Crack_N_cycles,Crack_Displacement,Crack_Load,Th_time,Th_N_cycles,Th_specimen_max,Th_specimen_mean,Th_chamber,Th_uppergrips,Th_lowergrips,Specimen_name
 ,1,0.386071944,0.989178162,0,0,0,0,0,1.20E-18,0,-0.00126324,,,,,,,,,,,,BAM2_T1_50_2
 ,1,0.385385763,0.989234985,1,1.23E-05,-0.000690174,3.02E-06,-2.35E-05,4.57E-06,0,0.002392838,,,,,,,,,,,,
 ,1,0.386142725,0.989478027,2,-0.000311977,-0.000870683,-2.43E-06,-1.33E-05,5.90E-06,0,0.004261142,,,,,,,,,,,,
