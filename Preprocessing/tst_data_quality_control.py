@@ -201,7 +201,9 @@ def check_test_data_csv(test_data_fp):
 
 
 if __name__ == "__main__":
-    for experiment_fp_folder in common.EXPERIMENT_FP_FOLDERS:
+    for experiment_fp_folder in common.get_tst_folders_to_parse(
+        description="Controls TST data quality"
+    ):
         try:
             with common.Logger(
                 os.path.join(
