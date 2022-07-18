@@ -5,6 +5,7 @@ Common functions for preprocessing
 import os
 import re
 import glob
+import argparse
 import numpy as np
 
 
@@ -63,6 +64,29 @@ class Logger:
 
     def error(self, message="", end="\n"):
         self.write(message=message, prefix="ERROR: ", end=end)
+
+
+def get_tst_folders_to_parse(
+    description,
+    help=f"Folder containing the TST dataset. "
+    "if none provided, then will parse all dataset "
+    f"under {EXPERIMENTS_FOLDER}",
+):
+    """
+    Read arguments. If tst_folders are given, then return it.
+    Otherwise return default EXPERIMENT_FP_FOLDERS
+    """
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument(
+        "tst_folders",
+        nargs="*",
+        help=help,
+    )
+    args = parser.parse_args()
+    if args.tst_folders != []:
+        return args.tst_folders
+    else:
+        return EXPERIMENT_FP_FOLDERS
 
 
 def check_int_column(df, column_name):
