@@ -89,6 +89,13 @@ def get_tst_folders_to_parse(
         return EXPERIMENT_FP_FOLDERS
 
 
+def grep_matching_columns(pattern, columns):
+    """
+    return the list of all columns matching the pattern
+    """
+    return filter(lambda column: re.match(pattern, column), columns)
+
+
 def check_int_column(df, column_name):
     """
     Check that all values of a specified column has int values
