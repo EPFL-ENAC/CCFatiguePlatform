@@ -145,7 +145,7 @@ if __name__ == "__main__":
 
                 os.makedirs(exp["preprocessed_folder"], exist_ok=True)
                 with open(exp["metadata_json_fp"], "w") as f:
-                    json.dump(contents_dict, f, ignore_nan=True, indent=4)
+                    json.dump(contents_dict, f, ignore_nan=True, indent=2)
                 logger.info(f"saved {exp['metadata_json_fp']}")
 
                 # Tests tab to CSV metadata
