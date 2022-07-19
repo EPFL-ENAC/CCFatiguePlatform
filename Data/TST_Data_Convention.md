@@ -1,6 +1,6 @@
 # TST Standard Data format
 
-### Structure
+## Structure
 
 Each experiment is composed of several tests.
 
@@ -13,7 +13,7 @@ Each experiment is composed of several tests.
 
 ```
 
-### Directory/file naming conventions
+## Directory/file naming conventions
 
 - Experiment folder: `TST_{Researcher's lastname}_{Date}_{Test type}`
 - Metadata file: `TST_{Date}_{Test type}_metadata.xls`
@@ -25,7 +25,7 @@ with:
 - Test type: `FA` = standard fatigue or `QS` = standard quasi-static.
 - `###`: Specimen number
 
-### TST CSV files standards (column names must be exact) :
+## TST CSV files standards (column names must be exact) :
 
 | Column name            | Description                                           | Unit     | Data type | Mandatory | Multiple measurement points |
 | ---------------------- | ----------------------------------------------------- | -------- | --------- | --------- | --------------------------- |
@@ -57,3 +57,51 @@ with:
 | `Storage_modulus`      | Storage modulus measured from DMA                     | [GPa]    | double    |           |                             |
 | `Tan_delta`            | Tan delta measured from DMA                           | [-]      | double    |           |                             |
 | `Specimen_name`        | Name of the specimen                                  | [-]      | string    |           |                             |
+
+### `FA` without fracture specifities :
+
+Mandatory data columns
+
+- one of :
+  - `Machine_N_cycles`
+  - `MD_N_cycles--#`
+- one of :
+  - `Machine_Displacement`
+  - `MD_Displacement--#`
+  - `exx--#`
+- one of :
+  - `Machine_Load`
+  - `MD_Load--#`
+
+### `FA` with fracture specifities :
+
+Mandatory data columns
+
+- `Crack_N_cycles`
+- `Crack_length`
+
+### `QS` without fracture specifities :
+
+Mandatory data columns
+
+- one of :
+  - `Machine_Displacement`
+  - `MD_Displacement--#`
+  - `exx--#`
+- one of :
+  - `Machine_Load`
+  - `MD_Load--#`
+
+### `QS` with fracture specifities :
+
+Mandatory data columns
+
+- one of :
+  - `Machine_Displacement`
+  - `MD_Displacement--#`
+  - `Crack_length`
+  - `Crack_Displacement`
+- one of :
+  - `Machine_Load`
+  - `MD_Load--#`
+  - `Crack_Load`
