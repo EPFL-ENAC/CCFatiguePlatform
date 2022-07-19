@@ -16,7 +16,7 @@ Encoding format: UTF-8, Separator: ',' (comma)
 | Variable name        | Description                            | Symbol     | Unit    | Data type | Mandatory          |
 |----------------------|----------------------------------------|------------|---------|-----------|--------------------|
 | stress_amplitude     | Stress amplitude                       | sigma_a    | [MPa]   | double    | y                  |
-| stress_mean          | ?                                      | sigma_mean |         | double    | y                  |
+| stress_mean          | Mean stress                            | sigma_mean | [MPa]   | double    | y                  |
 | stress_ratio         | Stress ratio                           | R          | [-]     | double    | y                  |
 | n_cycles?            | ?                                      | ?          |         | double    | y                  |
 | cum_n_cycles?        | percentage?                            | ?          |         | double    | y                  |
