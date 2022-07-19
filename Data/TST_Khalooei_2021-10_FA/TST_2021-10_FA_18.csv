@@ -1,4 +1,4 @@
-﻿Machine_N_cycles,Machine_Load,Machine_Displacement,MD_index--1,Camera_N_cycles,exx--1,eyy--1,exy--1,Crack_length,Th_time,Th_N_cycles,Th_specimen_max,Th_specimen_mean,Th_chamber,Th_uppergrips,Th_lowergrips
+﻿Machine_N_cycles,Machine_Load,Machine_Displacement,MD_index--1,MD_N_cycles--1,exx--1,eyy--1,exy--1,Crack_length,Th_time,Th_N_cycles,Th_specimen_max,Th_specimen_mean,Th_chamber,Th_uppergrips,Th_lowergrips
 1,5.576680176,2.228451194,,,,,,,,,,,,,
 1,5.582944336,2.234874992,,,,,,,,,,,,,
 1,5.586532715,2.241992624,,,,,,,,,,,,,
