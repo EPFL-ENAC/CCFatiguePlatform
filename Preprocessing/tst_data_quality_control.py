@@ -296,6 +296,14 @@ def check_test_data_csv(test_data_fp, test_type, fracture):
         )
 
         found_columns = dataset.columns
+
+        # Check that no column name contain space
+        col_w_space = list(common.grep_matching_columns(r".* .*", found_columns))
+        if len(col_w_space) != 0:
+            logger.error("Following columns contain space :")
+            logger.error(", ".join(map(lambda col: f"'{col}'", col_w_space)))
+
+        # Check for mandatory columns
         for mandatory_col_pattern in filter(
             lambda c: EXPECTED_COLUMNS[c]["mandatory"], EXPECTED_COLUMNS
         ):
@@ -310,6 +318,8 @@ def check_test_data_csv(test_data_fp, test_type, fracture):
                         logger.error(
                             f"mandatory column has empty values: '{mandatory_col}'"
                         )
+
+        # Info for all non-mandatory columns that are not present
         for optional_col_pattern in filter(
             lambda c: not EXPECTED_COLUMNS[c]["mandatory"], EXPECTED_COLUMNS
         ):
@@ -320,6 +330,7 @@ def check_test_data_csv(test_data_fp, test_type, fracture):
             if len(optional_col_found) == 0:
                 logger.info(f"optional column not found: '{optional_col_pattern}'")
 
+        # Warning for all unexpected columns
         for found_col in found_columns:
             expected = False
             for col_pattern in EXPECTED_COLUMNS:
@@ -329,6 +340,7 @@ def check_test_data_csv(test_data_fp, test_type, fracture):
             if not expected:
                 logger.warning(f"unexpected column found: '{found_col}'")
 
+        # Check column data type
         for col in found_columns:
             for col_pattern in EXPECTED_COLUMNS:
                 if re.match(col_pattern, col):
@@ -357,6 +369,7 @@ def check_test_data_csv(test_data_fp, test_type, fracture):
                 )
                 logger.error(" or ".join(mandatory_cols_pattern))
 
+        # Check that there are no empty rows
         if dataset.isnull().all(axis=1).any():
             logger.error("found empty rows")
 
