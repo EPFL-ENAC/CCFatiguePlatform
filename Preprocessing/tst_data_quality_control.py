@@ -71,10 +71,14 @@ def check_experiment(experiment_fp_folder):
                 )
             )
         ):
-            check_test_data_csv(test_data_fp)
+            check_test_data_csv(
+                test_data_fp,
+                exp_metadata["Experiment"]["General"]["Experiment Type"],
+                exp_metadata["Experiment"]["General"]["Fracture"],
+            )
 
 
-def check_test_data_csv(test_data_fp):
+def check_test_data_csv(test_data_fp, test_type, fracture):
     """
     check requirements for an experiment test data csv file
     """
@@ -199,6 +203,55 @@ def check_test_data_csv(test_data_fp):
             "mandatory": False,
         },
     }
+    MANDATORY_TEST_TYPE_SPECIFIC = {
+        ("FA", False): [
+            [
+                "Machine_N_cycles",
+                r"MD_N_cycles--\d",
+            ],
+            [
+                "Machine_Displacement",
+                r"MD_Displacement--\d",
+                r"exx--\d",
+            ],
+            [
+                "Machine_Load",
+                r"MD_Load--\d",
+            ],
+        ],
+        ("FA", True): [
+            [
+                "Crack_N_cycles",
+            ],
+            [
+                "Crack_length",
+            ],
+        ],
+        ("QS", False): [
+            [
+                "Machine_Displacement",
+                r"MD_Displacement--\d",
+                r"exx--\d",
+            ],
+            [
+                "Machine_Load",
+                r"MD_Load--\d",
+            ],
+        ],
+        ("QS", True): [
+            [
+                "Machine_Displacement",
+                r"MD_Displacement--\d",
+                "Crack_length",
+                "Crack_Displacement",
+            ],
+            [
+                "Machine_Load",
+                r"MD_Load--\d",
+                "Crack_Load",
+            ],
+        ],
+    }
     COLUMN_TYPE_CHECK = {
         int: common.check_int_column,
         float: common.check_float_column,
@@ -264,6 +317,23 @@ def check_test_data_csv(test_data_fp):
                             f"column '{col}' is expected to be of type "
                             f"'{TYPE_NAMES[EXPECTED_COLUMNS[col_pattern]['type']]}'"
                         )
+
+        # Look for type specific mandatory columns
+        for mandatory_cols_pattern in MANDATORY_TEST_TYPE_SPECIFIC[
+            (test_type, fracture)
+        ]:
+            for mandatory_col_pattern in mandatory_cols_pattern:
+                mandatory_col_found = list(
+                    common.grep_matching_columns(mandatory_col_pattern, found_columns)
+                )
+                if len(mandatory_col_found) != 0:
+                    break
+            else:
+                logger.error(
+                    f"mandatory column missing for test type {test_type} "
+                    f"{'with' if fracture else 'without'} fracture :"
+                )
+                logger.error(" or ".join(mandatory_cols_pattern))
 
         if dataset.isnull().all(axis=1).any():
             logger.error("found empty rows")
