@@ -1,0 +1,46 @@
+{
+  "Experiment": {
+    "General": {
+      "Laboratory": "CCLAB",
+      "Researcher": "Dharun Vadugappatty Srinivasan",
+      "Date": "2020-10",
+      "Experiment Type": "QS",
+      "Fracture": false,
+      "Fracture Mode": null,
+      "Initial Crack length": null,
+      "Fatigue Test Type": null,
+      "Quasi-static test type": "Tensile",
+      "Measuring Equipment": "MTS 25kN",
+      "Reliability Level": null,
+      "Control mode": "Displacement controlled"
+    },
+    "Publication": {
+      "Title": null,
+      "Author": null,
+      "Year": null,
+      "DOI": null,
+      "Images Repository": null,
+      "Sample type": "Adhesive"
+    },
+    "Material Type": {
+      "Fiber Material": null,
+      "Fiber form": null,
+      "Area Density": null,
+      "Resin": "Epoxy",
+      "Hardener": null,
+      "Mixing ratio": "100/34"
+    },
+    "Laminates and Assemblies": {
+      "Curing Time": 2.0,
+      "Curing Temperature": 70.0,
+      "Curing Pressure": 1.0,
+      "Fiber volume ratio": null,
+      "Stacking Sequence": null,
+      "Joint type": null
+    },
+    "DIC Analysis": {
+      "Subset Size": null,
+      "Step Size": null
+    }
+  }
+}
