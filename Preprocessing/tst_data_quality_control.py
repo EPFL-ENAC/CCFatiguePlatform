@@ -251,6 +251,28 @@ def check_test_data_csv(test_data_fp, test_type, fracture):
                 "Crack_Load",
             ],
         ],
+        ("TM", False): [
+            [
+                r"T--\d",
+            ],
+            [
+                "Storage_modulus",
+                "Tan_delta",
+                "Machine_Load",
+                r"MD_Load--\d",
+            ],
+        ],
+        ("TM", True): [
+            [
+                r"T--\d",
+            ],
+            [
+                "Storage_modulus",
+                "Tan_delta",
+                "Machine_Load",
+                r"MD_Load--\d",
+            ],
+        ],
     }
     COLUMN_TYPE_CHECK = {
         int: common.check_int_column,

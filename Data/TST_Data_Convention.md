@@ -22,7 +22,10 @@ Each experiment is composed of several tests.
 with:
 
 - date: `YYYY-MM` (starting month of the experiment)
-- Test type: `FA` = standard fatigue or `QS` = standard quasi-static.
+- Test type:
+  - `FA` = standard fatigue
+  - `QS` = standard quasi-static
+  - `TM` = DMA or temperature
 - `###`: Specimen number
 
 ## TST CSV files standards (column names must be exact) :
@@ -105,3 +108,14 @@ Mandatory data columns
   - `Machine_Load`
   - `MD_Load--#`
   - `Crack_Load`
+
+### `TM` with and without fracture specifities:
+
+Mandatory data columns
+
+- `T--#`
+- one of :
+  - `Storage_modulus`
+  - `Tan_delta`
+  - `Machine_Load`
+  - `MD_Load--#`
