@@ -62,61 +62,92 @@ def to_bool(value):
     """
     if type(value) == bool:
         return value
-    if value.lower().startswith("y"):
-        return True
-    elif value.lower().startswith("n"):
-        return False
+    elif type(value) == str:
+        if value.lower().startswith("y") or value == "1":
+            return True
+        elif value.lower().startswith("n") or value == "0":
+            return False
+        else:
+            raise ValueError
     else:
-        raise ValueError
+        return to_bool(str(value))
 
 
-def meta_dict_fix_types(meta):
+def get_meta_fixed(meta):
     """
-    Turn expected fields into bool / float (double) / int
+    return approved dict with
+        + only expected fields
+        + only non-empty fields
+        + fields casted as bool / float (double) / int / str
     """
+    CASTING = {
+        bool: to_bool,
+        int: int,
+        float: float,
+        str: str,
+    }
+
+    fixed_meta = {}
+
     # Booleans
-    for (k1, k2, k3) in (("Experiment", "General", "Fracture"),):
-        try:
-            meta[k1][k2][k3] = to_bool(meta[k1][k2][k3])
-        except KeyError:
-            pass
-        except ValueError as e:
-            logger.error(f"exception: {e}")
-
-    # Double
-    for (k1, k2, k3) in (
-        ("Experiment", "General", "Initial Crack length"),
-        ("Experiment", "General", "Reliability Level"),
-        ("Experiment", "Material Type", "Area Density"),
-        ("Experiment", "Geometry", "Length"),
-        ("Experiment", "Geometry", "Width"),
-        ("Experiment", "Geometry", "Thickness"),
-        ("Experiment", "Laminates and Assemblies", "Curing Time"),
-        ("Experiment", "Laminates and Assemblies", "Curing Temperature"),
-        ("Experiment", "Laminates and Assemblies", "Curing Pressure"),
-        ("Experiment", "Laminates and Assemblies", "Fiber Content"),
-        ("Experiment", "Test condtions", "Temperature"),
-        ("Experiment", "Test condtions", "Humidity"),
+    for constraint in (
+        {"path": "Experiment>General>Laboratory", "type": str},
+        {"path": "Experiment>General>Researcher", "type": str},
+        {"path": "Experiment>General>Date", "type": str},
+        {"path": "Experiment>General>Experiment Type", "type": str},
+        {"path": "Experiment>General>Fracture", "type": bool},
+        {"path": "Experiment>General>Fracture Mode", "type": str},
+        {"path": "Experiment>General>Initial Crack length", "type": float},
+        {"path": "Experiment>General>Fatigue Test Type", "type": str},
+        {"path": "Experiment>General>Measuring Equipment", "type": str},
+        {"path": "Experiment>General>Reliability Level", "type": float},
+        {"path": "Experiment>General>Control mode", "type": str},
+        {"path": "Experiment>Publication>Title", "type": str},
+        {"path": "Experiment>Publication>Author", "type": str},
+        {"path": "Experiment>Publication>Year", "type": int},
+        {"path": "Experiment>Publication>DOI", "type": str},
+        {"path": "Experiment>Publication>Images Repository", "type": str},
+        {"path": "Experiment>Material Type>Fiber Material", "type": str},
+        {"path": "Experiment>Material Type>Fiber Geometry", "type": str},
+        {"path": "Experiment>Material Type>Area Density", "type": float},
+        {"path": "Experiment>Material Type>Resin", "type": str},
+        {"path": "Experiment>Material Type>Hardener", "type": str},
+        {"path": "Experiment>Material Type>Mixing ratio", "type": str},
+        {"path": "Experiment>Geometry>Length", "type": float},
+        {"path": "Experiment>Geometry>Width", "type": float},
+        {"path": "Experiment>Geometry>Thickness", "type": float},
+        {"path": "Experiment>Laminates and Assemblies>Curing Time", "type": float},
+        {
+            "path": "Experiment>Laminates and Assemblies>Curing Temperature",
+            "type": float,
+        },
+        {"path": "Experiment>Laminates and Assemblies>Curing Pressure", "type": float},
+        {"path": "Experiment>Laminates and Assemblies>Fiber Content", "type": float},
+        {"path": "Experiment>Laminates and Assemblies>Stacking Sequence", "type": str},
+        {"path": "Experiment>Test condtions>Temperature", "type": float},
+        {"path": "Experiment>Test condtions>Humidity", "type": float},
+        {"path": "Experiment>DIC Analysis>Subset Size", "type": int},
+        {"path": "Experiment>DIC Analysis>Step Size", "type": int},
     ):
         try:
-            meta[k1][k2][k3] = float(meta[k1][k2][k3])
+            try:
+                isnan = np.isnan(common.get_val_at(meta, constraint["path"]))
+            except TypeError:
+                isnan = False
+            if not isnan:
+                # cast and save expected values
+                common.set_val_at(
+                    fixed_meta,
+                    constraint["path"],
+                    CASTING[constraint["type"]](
+                        common.get_val_at(meta, constraint["path"])
+                    ),
+                )
         except KeyError:
             pass
         except ValueError as e:
             logger.error(f"exception: {e}")
-
-    # Int
-    for (k1, k2, k3) in (
-        ("Experiment", "DIC Analysis", "Subset Size"),
-        ("Experiment", "DIC Analysis", "Step Size"),
-    ):
-        try:
-            if not np.isnan(meta[k1][k2][k3]):
-                meta[k1][k2][k3] = int(meta[k1][k2][k3])
-        except KeyError:
-            pass
-        except ValueError as e:
-            logger.error(f"exception: {e}")
+    return fixed_meta
 
 
 if __name__ == "__main__":
@@ -143,7 +174,7 @@ if __name__ == "__main__":
 
                 # Cleanup
                 dict_typo_fix(contents_dict)
-                meta_dict_fix_types(contents_dict)
+                contents_dict = get_meta_fixed(contents_dict)
 
                 os.makedirs(exp["preprocessed_folder"], exist_ok=True)
                 with open(exp["metadata_json_fp"], "w") as f:
