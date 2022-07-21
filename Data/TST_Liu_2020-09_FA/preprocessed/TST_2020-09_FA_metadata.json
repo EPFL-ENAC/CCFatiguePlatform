@@ -6,44 +6,22 @@
       "Date": "2020-09",
       "Experiment Type": "FA",
       "Fracture": false,
-      "Fracture Mode": null,
-      "Initial Crack length": null,
       "Fatigue Test Type": "Tension",
-      "Quasi-static test type": null,
       "Measuring Equipment": "Instron 100kN",
-      "Reliability Level": null,
       "Control mode": "Load controlled"
     },
     "Publication": {
       "Title": "Tension-tension fatigue behavior of ductile adhesively-bonded FRP joints\nLulu",
       "Author": "Lulu Liu, Xin Wang, Zhishen Wu, Thomas Keller",
       "Year": 2021,
-      "DOI": "10.1016/j.compstruct.2021.113925",
-      "Images Repository": null,
-      "Sample type": "Joints"
+      "DOI": "10.1016/j.compstruct.2021.113925"
     },
     "Material Type": {
       "Fiber Material": "Basalt FRP",
-      "Fiber form": "Fiber rovings",
-      "Area Density": null,
-      "Resin": "Aradur 1562-1 epoxy",
-      "Hardener": null,
-      "Mixing ratio": null
+      "Resin": "Aradur 1562-1 epoxy"
     },
     "Laminates and Assemblies": {
-      "Curing Time": null,
-      "Curing Temperature": null,
-      "Curing Pressure": null,
-      "Fiber volume ratio": 0.66,
-      "Stacking Sequence": "UD",
-      "Joint type": "Adhesively-bonded joints"
-    },
-    "Measurement": {
-      "Measuring points": null
-    },
-    "DIC Analysis": {
-      "Subset Size": null,
-      "Step Size": null
+      "Stacking Sequence": "UD"
     }
   }
 }

@@ -6,41 +6,17 @@
       "Date": "2021-12",
       "Experiment Type": "QS",
       "Fracture": false,
-      "Fracture Mode": null,
-      "Initial Crack length": null,
-      "Fatigue Test Type": null,
-      "Quasi-static test type": "Tensile",
       "Measuring Equipment": "MTS 25kN",
-      "Reliability Level": null,
       "Control mode": "Load controlled"
     },
-    "Publication": {
-      "Title": null,
-      "Author": null,
-      "Year": null,
-      "DOI": null,
-      "Images Repository": null,
-      "Sample type": "Adhesive"
-    },
     "Material Type": {
-      "Fiber Material": null,
-      "Fiber form": null,
-      "Area Density": null,
       "Resin": "Epoxy",
-      "Hardener": null,
       "Mixing ratio": "4:1"
     },
     "Laminates and Assemblies": {
       "Curing Time": 4.0,
       "Curing Temperature": 60.0,
-      "Curing Pressure": 1.0,
-      "Fiber volume ratio": null,
-      "Stacking Sequence": null,
-      "Joint type": null
-    },
-    "DIC Analysis": {
-      "Subset Size": null,
-      "Step Size": null
+      "Curing Pressure": 1.0
     }
   }
 }
