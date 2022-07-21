@@ -1,5 +1,8 @@
 """
-Writes TST metadata JSON and CSV files from TST metadata Excel file.
++ read `xls(x)` metadata file
++ extract expected field
++ cast them
++ and save it to `json` and `csv` files
 """
 
 import os
@@ -73,7 +76,7 @@ def to_bool(value):
         return to_bool(str(value))
 
 
-def get_meta_fixed(meta):
+def get_experiment_meta_fixed(meta):
     """
     return approved dict with
         + only expected fields
@@ -150,12 +153,43 @@ def get_meta_fixed(meta):
     return fixed_meta
 
 
+def get_tests_meta_fixed(tests_df):
+    """
+    + Fix typos in column names
+    + Error msgs when incompatibility with Convention
+    """
+    MANDATORY_COLS = (
+        "Specimen number",
+        "Stress Ratio",
+        "Maximum Stress",
+        "Loading rate",
+        "Run-out",
+    )
+
+    # Strip spaces and \n on column names
+    tests_df.columns = tests_df.columns.str.strip(" \n")
+    found_columns = tests_df.columns
+
+    # Check mandatory columns
+    for mandatory_col in MANDATORY_COLS:
+        if mandatory_col not in found_columns:
+            logger.error(f"mandatory column '{mandatory_col}' not found")
+
+    # Remove unexpected columns
+    unexpected_columns = list(set(found_columns) - set(MANDATORY_COLS))
+    if len(unexpected_columns) != 0:
+        logger.warning(f"drop unexpected columns {unexpected_columns}")
+        tests_df = tests_df.drop(columns=unexpected_columns)
+
+    return tests_df
+
+
 if __name__ == "__main__":
     with common.Logger(None) as logger:
         for experiment_fp_folder in common.get_tst_folders_to_parse(
             description="Transform TST's CSV to JSON"
         ):
-            logger.info(f"Processing {experiment_fp_folder}")
+            logger.info(f"Processing {experiment_fp_folder} Experiment tab")
             with logger.indent:
                 exp = common.get_experiment_meta(experiment_fp_folder)
                 if exp["metadata_xls_fp"] is None:
@@ -164,25 +198,31 @@ if __name__ == "__main__":
 
                 # Experiment tab to JSON metadata
                 # - - - - - - - - - - - - - - - -
-                contents_df = pd.read_excel(
+                experiment_df = pd.read_excel(
                     exp["metadata_xls_fp"],
                     sheet_name="Experiment",
                     header=[0, 1],
                 )
-                contents_dict = {}
-                contents_dict["Experiment"] = df_to_nested_dict(contents_df)[0]
+                experiment_dict = {}
+                experiment_dict["Experiment"] = df_to_nested_dict(experiment_df)[0]
 
                 # Cleanup
-                dict_typo_fix(contents_dict)
-                contents_dict = get_meta_fixed(contents_dict)
+                dict_typo_fix(experiment_dict)
+                experiment_dict = get_experiment_meta_fixed(experiment_dict)
 
                 os.makedirs(exp["preprocessed_folder"], exist_ok=True)
                 with open(exp["metadata_json_fp"], "w") as f:
-                    json.dump(contents_dict, f, ignore_nan=True, indent=2)
+                    json.dump(experiment_dict, f, ignore_nan=True, indent=2)
                 logger.info(f"saved {exp['metadata_json_fp']}")
 
+            logger.info(f"Processing {experiment_fp_folder} Tests tab")
+            with logger.indent:
                 # Tests tab to CSV metadata
                 # - - - - - - - - - - - - -
-                contents_df = pd.read_excel(exp["metadata_xls_fp"], sheet_name="Tests")
-                contents_df.to_csv(exp["metadata_csv_fp"], index=False)
+                tests_df = pd.read_excel(exp["metadata_xls_fp"], sheet_name="Tests")
+
+                # Cleanup
+                tests_df = get_tests_meta_fixed(tests_df)
+
+                tests_df.to_csv(exp["metadata_csv_fp"], index=False)
                 logger.info(f"saved {exp['metadata_csv_fp']}")
