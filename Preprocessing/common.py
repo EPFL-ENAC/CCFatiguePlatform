@@ -143,6 +143,48 @@ def check_exist_in_dict(dic, keys):
         return False
 
 
+def get_val_at(dic, path, default=None):
+    """
+    return value from dic at multidepth
+    path can be
+    + a list/tuple of strings that are the successive keys to follow
+    + a string that is splitted at ">" char to get a list of strings
+
+    if no value, then return default if provided or raise KeyError
+    """
+    if type(path) == str:
+        keys = path.split(">")
+    else:
+        keys = path
+    try:
+        obj = dic
+        for key in keys:
+            obj = obj[key]
+        return obj
+    except KeyError:
+        if default is not None:
+            return default
+        else:
+            raise
+
+
+def set_val_at(dic, path, value):
+    """
+    set value in dic at multidepth
+    `path` is as in get_val_at
+    """
+    if type(path) == str:
+        keys = path.split(">")
+    else:
+        keys = path
+    last_key = keys.pop()
+    walk_in_dic = dic
+    for k in keys:
+        walk_in_dic.setdefault(k, {})
+        walk_in_dic = walk_in_dic[k]
+    walk_in_dic[last_key] = value
+
+
 def check_str_in_dict(dic, keys):
     try:
         obj = dic
