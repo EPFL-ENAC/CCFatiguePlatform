@@ -5,12 +5,12 @@
 Each experiment is composed of several tests.
 
 ```
+raw
 └───Experiment folder
 	   │   Metadata file .xls
 	   │   Test data 001 .csv
 	   │   Test data 002 .csv
 	   │   ...
-
 ```
 
 ## Directory/file naming conventions
