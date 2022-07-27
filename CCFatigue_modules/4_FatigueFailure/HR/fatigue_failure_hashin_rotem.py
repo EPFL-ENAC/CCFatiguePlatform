@@ -3,6 +3,7 @@
 
 H-R is described in the red book, in p. 159 - the original paper is
 https://journals.sagepub.com/doi/10.1177/002199837300700404
+https://drive.google.com/drive/u/1/folders/1SVank5TEcCxHG5vIgcmxaR9zAov8qj2l?ths=true
 """
 
 import os

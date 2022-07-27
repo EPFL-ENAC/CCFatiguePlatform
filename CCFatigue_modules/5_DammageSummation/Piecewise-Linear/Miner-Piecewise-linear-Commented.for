@@ -1,3 +1,5 @@
+      ! Ref:
+      !  [1] https://doi.org/10.1016/j.ijfatigue.2009.09.008
       Program LINEAR CLD
 
          integer i,j,ierr
@@ -240,12 +242,12 @@
                end if
                smax=smean+range/2
                smin=smean-range/2
-               sa=(smax-smin)/2 ! sa == smean
+               sa=(smax-smin)/2 ! sa == range / 2
                Yb=0
                Xb=0
                p=0
                q=0
-               Rps=(1+rratio)/(1-rratio)
+               r_prime=(1+rratio)/(1-rratio)
 
                ! If at least one stress ratio in [0 <= R < 1]
                if (p1.GE.1) then
@@ -258,11 +260,12 @@
                         Xb=0
                         Yb=0
                         do j=1,NOD,1
+                           ! Eq 3 p661 ref [1]
                            K1=UTS
                            K2=UTS/asigma(1,1,j)
-                           asigmap=K1/(K2+Rps-Rs(1,1))
+                           sigma_prime_a=K1/(K2+r_prime-Rs(1,1))
                            ! ##########################################################################
-                           X(j)=log10(asigmap)
+                           X(j)=log10(sigma_prime_a)
                            Y(j)=log10(N(1,1,j))
                            Yb=Yb+Y(j)
                            Xb=Xb+X(j)
@@ -273,8 +276,8 @@
                            P=P+((X(i)-Xb)*(Y(i)-Yb))
                            Q=Q+(X(i)-Xb)**2
                         end do
-                        B=P/Q
-                        A=Yb-B*Xb
+                        B=P/Q     ! Intercept
+                        A=Yb-B*Xb ! Slope
                         AN=10**(A+B*log10(sa))
                         Damage=Damage+NofC/AN
                         !WRITE (50, *) Range/Fact,NofC,AN
@@ -291,9 +294,9 @@
                         do j=1,NOD
                            K1=UTS
                            K2=UTS/asigma(2,1,j)
-                           asigmap=K1/(K2+Rps-Rs(2,1))
+                           sigma_prime_a=K1/(K2+r_prime-Rs(2,1))
                            ! ##########################################################################
-                           X(j)=log10(asigmap)
+                           X(j)=log10(sigma_prime_a)
                            Y(j)=log10(N(2,1,j))
                            Yb=Yb+Y(j)
                            Xb=Xb+X(j)
@@ -322,9 +325,9 @@
                         do j=1,NOD
                            K1=UTS
                            K2=UTS/asigma(3,1,j)
-                           asigmap=K1/(K2+Rps-Rs(3,1))
+                           sigma_prime_a=K1/(K2+r_prime-Rs(3,1))
                            ! ##########################################################################
-                           X(j)=log10(asigmap)
+                           X(j)=log10(sigma_prime_a)
                            Y(j)=log10(N(3,1,j))
                            Yb=Yb+Y(j)
                            Xb=Xb+X(j)
@@ -357,10 +360,10 @@
                         Xb=0
                         do j=1,NOD
                            K1=asigma(1,i,j)*(Rs(1,i)-Rs(1,i+1))
-                           K2=(Rs(1,i)-Rps)*asigma(1,i,j)/asigma(1,i+1,j)
-                           asigmap=K1/(K2+Rps-Rs(1,i+1))
+                           K2=(Rs(1,i)-r_prime)*asigma(1,i,j)/asigma(1,i+1,j)
+                           sigma_prime_a=K1/(K2+r_prime-Rs(1,i+1))
                            ! ##########################################################################
-                           X(j)=log10(asigmap)
+                           X(j)=log10(sigma_prime_a)
                            Y(j)=log10(N(1,i,j))
                            Yb=Yb+Y(j)
                            Xb=Xb+X(j)
@@ -392,11 +395,12 @@
                            Yb=0
                            Xb=0
                            do j=1,NOD
+                              ! Eq 4 p661 ref [1]
                               K1=asigma(1,p1,j)*(Rs(1,p1)-Rs(2,1))
-                              K2=(Rs(1,p1)-Rps)*asigma(1,p1,j)/asigma(2,1,j)
-                              asigmap=K1/(K2+Rps-Rs(2,1))
+                              K2=(Rs(1,p1)-r_prime)*asigma(1,p1,j)/asigma(2,1,j)
+                              sigma_prime_a=K1/(K2+r_prime-Rs(2,1))
                               ! ##########################################################################
-                              X(j)=log10(asigmap)
+                              X(j)=log10(sigma_prime_a)
                               Y(j)=log10(N(1,p1,j))
                               Yb=Yb+Y(j)
                               Xb=Xb+X(j)
@@ -428,10 +432,10 @@
                         Xb=0
                         do j=1,NOD
                            K1=asigma(2,i,j)*(Rs(2,i)-Rs(2,i+1))
-                           K2=abs(Rs(2,i)-Rps)*asigma(2,i,j)/asigma(2,i+1,j)
-                           asigmap=K1/(K2+Rps-Rs(2,i+1))
+                           K2=abs(Rs(2,i)-r_prime)*asigma(2,i,j)/asigma(2,i+1,j)
+                           sigma_prime_a=K1/(K2+r_prime-Rs(2,i+1))
                            ! ##########################################################################
-                           X(j)=log10(asigmap)
+                           X(j)=log10(sigma_prime_a)
                            Y(j)=log10(N(2,i,j))
                            Yb=Yb+Y(j)
                            Xb=Xb+X(j)
@@ -462,10 +466,10 @@
                         Xb=0
                         do j=1,NOD
                            K1=asigma(2,p2,j)*(Rs(2,p2)-Rs(3,1))
-                           K2=(Rs(2,p2)-Rps)*asigma(2,p2,j)/asigma(3,1,j)
-                           asigmap=K1/(K2+Rps-Rs(3,1))
+                           K2=(Rs(2,p2)-r_prime)*asigma(2,p2,j)/asigma(3,1,j)
+                           sigma_prime_a=K1/(K2+r_prime-Rs(3,1))
                            ! ##########################################################################
-                           X(j)=log10(asigmap)
+                           X(j)=log10(sigma_prime_a)
                            Y(j)=log10(N(2,p2,j))
                            Yb=Yb+Y(j)
                            Xb=Xb+X(j)
@@ -494,10 +498,10 @@
                         Xb=0
                         do j=1,NOD
                            K1=asigma(2,p2,j)*(Rs(2,p2)-Rs(3,1))
-                           K2=(Rs(2,p2)-Rps)*asigma(2,p2,j)/asigma(3,1,j)
-                           asigmap=K1/(K2+Rps-Rs(3,1))
+                           K2=(Rs(2,p2)-r_prime)*asigma(2,p2,j)/asigma(3,1,j)
+                           sigma_prime_a=K1/(K2+r_prime-Rs(3,1))
                            ! ##########################################################################
-                           X(j)=log10(asigmap)
+                           X(j)=log10(sigma_prime_a)
                            Y(j)=log10(N(2,p2,j))
                            Yb=Yb+Y(j)
                            Xb=Xb+X(j)
@@ -531,10 +535,10 @@
                         Xb=0
                         do j=1,NOD
                            K1=asigma(3,i,j)*(Rs(3,i)-Rs(3,i+1))
-                           K2=abs(Rs(3,i)-Rps)*asigma(3,i,j)/asigma(3,i+1,j)
-                           asigmap=K1/(K2+Rps-Rs(3,i+1))
+                           K2=abs(Rs(3,i)-r_prime)*asigma(3,i,j)/asigma(3,i+1,j)
+                           sigma_prime_a=K1/(K2+r_prime-Rs(3,i+1))
                            ! ##########################################################################
-                           X(j)=log10(asigmap)
+                           X(j)=log10(sigma_prime_a)
                            Y(j)=log10(N(3,i,j))
                            Yb=Yb+Y(j)
                            Xb=Xb+X(j)
@@ -569,10 +573,10 @@
                         do j=1,NOD
                            K1=UCS
                            K2=UCS/asigma(3,p3,j)
-                           asigmap=K1/(K2-Rps+Rs(3,p3))
+                           sigma_prime_a=K1/(K2-r_prime+Rs(3,p3))
 
                            ! ##########################################################################
-                           X(j)=log10(asigmap)
+                           X(j)=log10(sigma_prime_a)
                            Y(j)=log10(N(3,p3,j))
                            Yb=Yb+Y(j)
                            Xb=Xb+X(j)
@@ -603,9 +607,9 @@
                         do j=1,NOD
                            K1=UCS
                            K2=UCS/asigma(2,p2,j)
-                           asigmap=K1/(K2-Rps+Rs(2,p2))
+                           sigma_prime_a=K1/(K2-r_prime+Rs(2,p2))
                            ! ##########################################################################
-                           X(j)=log10(asigmap)
+                           X(j)=log10(sigma_prime_a)
                            Y(j)=log10(N(2,p2,j))
                            Yb=Yb+Y(j)
                            Xb=Xb+X(j)
@@ -635,9 +639,9 @@
                         do j=1,NOD
                            K1=UCS
                            K2=UCS/asigma(1,p1,j)
-                           asigmap=K1/(K2-Rps+Rs(1,p1))
+                           sigma_prime_a=K1/(K2-r_prime+Rs(1,p1))
                            ! ##########################################################################
-                           X(j)=log10(asigmap)
+                           X(j)=log10(sigma_prime_a)
                            Y(j)=log10(N(1,p1,j))
                            Yb=Yb+Y(j)
                            Xb=Xb+X(j)

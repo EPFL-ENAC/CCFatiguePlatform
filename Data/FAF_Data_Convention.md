@@ -16,8 +16,8 @@ Encoding format: UTF-8
 ```javascript
 [
 	{
-		"stress-ratio": double, // Stress ratio (R) [-]
-		"rsql": int, // Reliability level (?) [-]
+		"stress_ratio": double, // Stress ratio (R) [-]
+		"reliability_level": int, // Reliability level (rsql) [-]
 		"a1": double, // S-N Curve parameter (-) [-]
 		"b1": double, // S-N Curve parameter (-) [1/MPa]
 		"a2": double, // (optional) S-N Curve parameter (-) [-]
@@ -32,7 +32,6 @@ Encoding format: UTF-8
 ## FAF CSV files standards (column names must be exact) :
 
 Encoding format: UTF-8, Separator: ',' (comma)
-
 
 | Variable name        | Description                            | Symbol    | Unit    | Data type | Mandatory          |
 |----------------------|----------------------------------------|-----------|---------|-----------|--------------------|
