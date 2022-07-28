@@ -5,6 +5,7 @@ import { DefaultApi, ExperimentsApi, TestsApi } from "@/backend/src/index";
 import ApiClient from "@/backend/src/ApiClient";
 import experiments from "./experiments";
 import bokehPlots from "./bokehPlots";
+import echartsPlots from "./echartsPlots";
 
 Vue.use(Vuex);
 
@@ -17,5 +18,6 @@ export default new Vuex.Store({
   modules: {
     experiments,
     bokehPlots,
+    echartsPlots,
   },
 });

@@ -44,6 +44,16 @@
   };
 
   describe("ExperimentsApi", function () {
+    describe("getDataTestsDashboardPlotsExperimentsDataTestsDashboardPlotsGet", function () {
+      it("should call getDataTestsDashboardPlotsExperimentsDataTestsDashboardPlotsGet successfully", function (done) {
+        //uncomment below and update the code to test getDataTestsDashboardPlotsExperimentsDataTestsDashboardPlotsGet
+        //instance.getDataTestsDashboardPlotsExperimentsDataTestsDashboardPlotsGet(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
     describe("getExperimentsExperimentsGet", function () {
       it("should call getExperimentsExperimentsGet successfully", function (done) {
         //uncomment below and update the code to test getExperimentsExperimentsGet

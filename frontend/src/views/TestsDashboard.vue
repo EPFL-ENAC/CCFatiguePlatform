@@ -6,6 +6,7 @@
         <v-col :cols="12">
           <experiment-specifications :experiment="experiment.experiment" />
         </v-col>
+
         <v-col :cols="12">
           <v-card flat>
             <v-card-title>
@@ -28,8 +29,8 @@
                             three graphs.
                           </info-tooltip>
                           <div
-                            :id="bokehPlotsIds.stressStrain"
-                            class="bokeh"
+                            ref="echartsPlotStressStrain"
+                            class="echarts"
                           ></div>
                         </v-row>
                       </v-col>
@@ -44,8 +45,8 @@
                             graph 1.
                           </info-tooltip>
                           <div
-                            :id="bokehPlotsIds.hysteresisArea"
-                            class="bokeh"
+                            ref="echartsPlotHysteresisArea"
+                            class="echarts"
                           ></div>
                         </v-row>
                       </v-col>
@@ -57,7 +58,7 @@
                             understanding of how much deformation occurs at each
                             cycle.
                           </info-tooltip>
-                          <div :id="bokehPlotsIds.creep" class="bokeh"></div>
+                          <div ref="echartsPlotCreep" class="echarts"></div>
                         </v-row>
                       </v-col>
                       <v-col cols="6">
@@ -68,10 +69,7 @@
                             we show how this capacity evolves over a fatigue
                             life cycle.
                           </info-tooltip>
-                          <div
-                            :id="bokehPlotsIds.stiffness"
-                            class="bokeh"
-                          ></div>
+                          <div ref="echartsPlotStiffness" class="echarts"></div>
                         </v-row>
                       </v-col>
                     </v-row>
@@ -83,16 +81,16 @@
                           <li>
                             <experiment-s-v
                               subject="Specimen number"
-                              :values="bokehTests.map((t) => t.specimen_id)"
+                              :values="echartsTests.map((t) => t.specimen_id)"
                               valueType="bigNumber"
-                              :colors="bokehTests.map((t) => t.color)"
+                              :colors="echartsTests.map((t) => t.color)"
                             />
                           </li>
                           <li>
                             <experiment-s-v
                               subject="Stress at failure"
-                              :values="bokehTests.map((t) => '-')"
-                              :colors="bokehTests.map((t) => t.color)"
+                              :values="echartsTests.map((t) => '-')"
+                              :colors="echartsTests.map((t) => t.color)"
                               :unit="units.stress"
                               tooltip="σ_fail is defined as the stress level that induced failure from the tested specimen and is measured in [MPa]"
                             />
@@ -100,8 +98,8 @@
                           <li>
                             <experiment-s-v
                               subject="Strain at failure"
-                              :values="bokehTests.map((t) => '-')"
-                              :colors="bokehTests.map((t) => t.color)"
+                              :values="echartsTests.map((t) => '-')"
+                              :colors="echartsTests.map((t) => t.color)"
                               unit="%"
                               tooltip="ε_fail is defined as the deformation at the time of failure and is measured in [%]"
                             />
@@ -109,8 +107,8 @@
                           <li>
                             <experiment-s-v
                               subject="N_cycles"
-                              :values="bokehTests.map((t) => '-')"
-                              :colors="bokehTests.map((t) => t.color)"
+                              :values="echartsTests.map((t) => '-')"
+                              :colors="echartsTests.map((t) => t.color)"
                               valueType="bigNumber"
                               tooltip="defined as the number of cycles to failure [-]"
                             />
@@ -118,8 +116,8 @@
                           <li>
                             <experiment-s-v
                               subject="R"
-                              :values="bokehTests.map((t) => '-')"
-                              :colors="bokehTests.map((t) => t.color)"
+                              :values="echartsTests.map((t) => '-')"
+                              :colors="echartsTests.map((t) => t.color)"
                               tooltip="defined as the stress ratio (σ_min/σ_max) [-] and has relevance in the context of constant amplitude experiments."
                             />
                           </li>
@@ -127,10 +125,12 @@
                             <experiment-s-v
                               subject="Total dissipated energy (TDE)"
                               :values="
-                                bokehTests.map((t) => t.total_dissipated_energy)
+                                echartsTests.map(
+                                  (t) => t.total_dissipated_energy
+                                )
                               "
                               valueType="bigNumber"
-                              :colors="bokehTests.map((t) => t.color)"
+                              :colors="echartsTests.map((t) => t.color)"
                               tooltip="defined as the sum of all the hysteresis areas over the course of an experiment. It gives a good measure of the amount of energy that has been dissipated in deformation and heat over the course of an experiment."
                             />
                           </li>
@@ -149,7 +149,8 @@
 </template>
 
 <script>
-import * as Bokeh from "bokeh";
+import * as echarts from "echarts";
+
 import { mapState } from "vuex";
 import InfoTooltip from "@/components/InfoTooltip";
 import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
@@ -171,70 +172,183 @@ export default {
       experiment: "oneExperiment",
       units: "units",
     }),
-    ...mapState("bokehPlots", {
-      bokehLoading: "loading",
-      bokehTests: "tests",
-      bokehPlots: "plots",
+    ...mapState("echartsPlots", {
+      echartsLoading: "loading",
+      echartsTests: "tests",
+      echartsPlots: "plots",
     }),
   },
   data() {
     return {
-      bokehPlotsIds: {
-        stressStrain: "bokeh-stress-strain",
-        creep: "bokeh-creep",
-        hysteresisArea: "bokeh-hysteresis-area",
-        stiffness: "bokeh-stiffness",
-      },
-      bokehPlotsRendered: false,
+      echartsPlotsRendered: false,
     };
   },
   methods: {
     goBack() {
       this.$router.go(-1);
     },
-    renderBokehPlotsIfGoodTime() {
+    renderEChartsPlotsIfGoodTime() {
       if (
         !this.experiment.loading &&
-        !this.bokehLoading &&
-        !this.bokehPlotsRendered
+        !this.echartsLoading &&
+        !this.echartsPlotsRendered
       ) {
-        Bokeh.embed.embed_item(
-          this.bokehPlots.stress_strain,
-          this.bokehPlotsIds.stressStrain
+        this.plotEcharts(
+          this.$refs.echartsPlotStressStrain,
+          this.echartsPlots.stress_strain
         );
-        Bokeh.embed.embed_item(this.bokehPlots.creep, this.bokehPlotsIds.creep);
-        Bokeh.embed.embed_item(
-          this.bokehPlots.hysteresis_area,
-          this.bokehPlotsIds.hysteresisArea
+        this.plotEcharts(
+          this.$refs.echartsPlotHysteresisArea,
+          this.echartsPlots.hysteresis_area
         );
-        Bokeh.embed.embed_item(
-          this.bokehPlots.stiffness,
-          this.bokehPlotsIds.stiffness
+        this.plotEcharts(this.$refs.echartsPlotCreep, this.echartsPlots.creep);
+        this.plotEcharts(
+          this.$refs.echartsPlotStiffness,
+          this.echartsPlots.stiffness
         );
-        this.bokehPlotsRendered = true;
+
+        this.echartsPlotsRendered = true;
       }
     },
+    plotEcharts(div, plot) {
+      // Initialize the echarts instance based on the prepared dom
+      var myChart = echarts.init(div, null, { renderer: "canvas" });
+
+      const [x_axis_key, x_axis_label] = plot.x_axis,
+        [y_axis_key, y_axis_label] = plot.y_axis;
+
+      // Chart stress - strain includes many series of the same test, so we need to create a custom tooltip for this special "3D" chart
+
+      const is3D = plot.tooltips.length > 2,
+        id3D = (line) =>
+          `Specimen ${line.legend_label} - cycle ${
+            line.data[plot.tooltips[2][0]][0]
+          }`;
+
+      let htmlDot = (color) =>
+        `<span style="height: 10px;width: 10px;background-color: ${color};border-radius: 50%; display: inline-block;"></span>`;
+
+      let tooltip3D = {
+        trigger: "axis",
+        formatter: (params) =>
+          params
+            .map(
+              ({ seriesId, data, color }) =>
+                `${htmlDot(color)} ${seriesId} : <br />
+              ${x_axis_label} ${data[0].toFixed(
+                  4
+                )} - ${y_axis_label} ${data[1].toFixed(4)}<br />`
+            )
+            .join("<br /><br />"),
+      };
+
+      // Normal tooltips
+      let tooltip2D = {
+        trigger: "axis",
+        valueFormatter: (v) => v.toFixed(5),
+      };
+
+      let series = plot.lines
+        .map((line) => ({
+          name: line.legend_label,
+          type: "line",
+          showSymbol: false,
+
+          // I use id property to create a nice tooltip for 3D charts
+          id: is3D ? id3D(line) : line.legend_label,
+
+          data: line.data[x_axis_key].map((x, i) => [
+            x,
+            line.data[y_axis_key][i],
+          ]),
+        }))
+        // They are some problems in data, especially for stress strain where API returns duplicates values of same test
+        .filter(
+          (serie, i, a) =>
+            serie.data.length > 0 && a.findIndex((s) => s.id === serie.id) === i
+        );
+
+      // Specify the configuration items and data for the chart
+      var option = {
+        title: {
+          text: plot.title,
+        },
+        //Need to specifiy empty legend param so echarts gets values automatically in series
+        legend: {
+          backgroundColor: "#fff",
+          itemGap: 5,
+          itemWidth: 20,
+          itemHeight: 12,
+          orient: "horizontal",
+          left: "center",
+          top: 40,
+        },
+        grid: {
+          left: "4%",
+          right: "3%",
+          bottom: "7%",
+          containLabel: true,
+        },
+        tooltip: is3D ? tooltip3D : tooltip2D,
+        dataZoom: [],
+        toolbox: {
+          show: true,
+          feature: {
+            dataZoom: {},
+            dataView: { readOnly: false },
+            restore: {},
+            saveAsImage: {},
+          },
+        },
+        xAxis: {
+          nameLocation: "center",
+          name: x_axis_label,
+          nameGap: 25,
+          axisLabel: {
+            formatter: (v) =>
+              x_axis_key === "n_cycles" ? v.toExponential() : v,
+            align: "center",
+          },
+          nameTextStyle: {
+            fontWeight: "bold",
+          },
+        },
+        yAxis: {
+          type: "value",
+          name: y_axis_label,
+          nameTextStyle: {
+            fontWeight: "bold",
+          },
+        },
+        series,
+      };
+
+      // Display the chart using the configuration items and data just specified.
+      myChart.setOption(option);
+    },
   },
-  created() {
+  mounted() {
     const storeUnwatch1 = this.$store.watch(
-      (state) => state.bokehPlots.loading,
+      (state) => state.experiments.oneExperiment.loading,
       () => {
-        if (!this.bokehLoading) {
-          this.renderBokehPlotsIfGoodTime();
+        if (!this.experiment.loading) {
+          this.renderEChartsPlotsIfGoodTime();
           storeUnwatch1();
         }
       }
     );
     const storeUnwatch2 = this.$store.watch(
-      (state) => state.experiments.oneExperiment.loading,
+      (state) => state.echartsPlots.loading,
       () => {
-        if (!this.experiment.loading) {
-          this.renderBokehPlotsIfGoodTime();
+        if (!this.echartsLoading) {
+          this.renderEChartsPlotsIfGoodTime();
           storeUnwatch2();
         }
       }
     );
-    this.$store.dispatch("bokehPlots/fetchBokehPlots", {
+  },
+  created() {
+    this.$store.dispatch("echartsPlots/fetchEchartsPlots", {
       experimentId: this.experimentId,
       testIds: this.testIds,
     });
@@ -250,8 +364,8 @@ export default {
 </script>
 
 <style scoped>
-div.bokeh {
+div.echarts {
   min-height: 250px;
-  height: 25vh;
+  width: 600px;
 }
 </style>
