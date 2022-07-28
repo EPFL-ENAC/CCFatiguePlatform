@@ -7,6 +7,8 @@ import numeral from "numeral";
 import numFormat from "vue-filter-number-format";
 
 Vue.config.productionTip = false;
+// allow devtools if developping env
+if (process.env.NODE_ENV === "development") Vue.config.devtools = true;
 
 numeral.register("locale", "fr-CH", {
   delimiters: {

@@ -2,11 +2,62 @@
 
 All URIs are relative to _http://localhost_
 
-| Method                                                                                                                                   | HTTP request                               | Description               |
-| ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ | ------------------------- |
-| [**getExperimentsExperimentsGet**](ExperimentsApi.md#getExperimentsExperimentsGet)                                                       | **GET** /experiments                       | Get Experiments           |
-| [**getFieldDistinctExperimentsFieldDistinctGet**](ExperimentsApi.md#getFieldDistinctExperimentsFieldDistinctGet)                         | **GET** /experiments/{field}/distinct      | Get Field Distinct        |
-| [**getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet**](ExperimentsApi.md#getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet) | **GET** /experiments/tests_dashboard_plots | Get Tests Dashboard Plots |
+| Method                                                                                                                                                   | HTTP request                                    | Description                    |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- | ------------------------------ |
+| [**getDataTestsDashboardPlotsExperimentsDataTestsDashboardPlotsGet**](ExperimentsApi.md#getDataTestsDashboardPlotsExperimentsDataTestsDashboardPlotsGet) | **GET** /experiments/data_tests_dashboard_plots | Get Data Tests Dashboard Plots |
+| [**getExperimentsExperimentsGet**](ExperimentsApi.md#getExperimentsExperimentsGet)                                                                       | **GET** /experiments                            | Get Experiments                |
+| [**getFieldDistinctExperimentsFieldDistinctGet**](ExperimentsApi.md#getFieldDistinctExperimentsFieldDistinctGet)                                         | **GET** /experiments/{field}/distinct           | Get Field Distinct             |
+| [**getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet**](ExperimentsApi.md#getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet)                 | **GET** /experiments/tests_dashboard_plots      | Get Tests Dashboard Plots      |
+
+## getDataTestsDashboardPlotsExperimentsDataTestsDashboardPlotsGet
+
+> DashboardPlots getDataTestsDashboardPlotsExperimentsDataTestsDashboardPlotsGet(opts)
+
+Get Data Tests Dashboard Plots
+
+Return data for the 4 echarts plots used in Test Dashboard Note: this serves the same data as get_test_dashboard_plots, and was created to migrate to echarts, if successful the Bokeh utils and routes should be removed Warning : this serves _data_ not Bokeh plots themselves
+
+### Example
+
+```javascript
+import Ccfatigue from "ccfatigue";
+
+let apiInstance = new Ccfatigue.ExperimentsApi();
+let opts = {
+  experimentId: 56, // Number |
+  testIds: [null], // [Number] |
+};
+apiInstance.getDataTestsDashboardPlotsExperimentsDataTestsDashboardPlotsGet(
+  opts,
+  (error, data, response) => {
+    if (error) {
+      console.error(error);
+    } else {
+      console.log("API called successfully. Returned data: " + data);
+    }
+  }
+);
+```
+
+### Parameters
+
+| Name             | Type                      | Description | Notes      |
+| ---------------- | ------------------------- | ----------- | ---------- |
+| **experimentId** | **Number**                |             | [optional] |
+| **testIds**      | [**[Number]**](Number.md) |             | [optional] |
+
+### Return type
+
+[**DashboardPlots**](DashboardPlots.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
 
 ## getExperimentsExperimentsGet
 
