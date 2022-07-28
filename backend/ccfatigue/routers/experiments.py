@@ -2,6 +2,7 @@
 Handle /experiments requests
 """
 
+import json
 from typing import List, Any, Optional
 from fastapi import APIRouter, Depends, Query, Path
 from sqlalchemy import and_
@@ -13,9 +14,11 @@ from ccfatigue.services.database import get_session
 from ccfatigue.models.database import Experiment
 from ccfatigue.models.api import ExperimentModel, ExperimentFieldNames
 from ccfatigue.utils.routers import get_where_clauses
-from ccfatigue.utils.bokeh_plots import (
-    generate_tests_dashboard_plots,
+from ccfatigue.utils.bokeh_plots import generate_tests_dashboard_plots
+from ccfatigue.utils.echarts_plots import (
+    generate_data_tests_dashboard_plots,
     DashboardPlots,
+    encoderNp,
 )
 
 router = APIRouter(
@@ -60,6 +63,32 @@ async def get_field_distinct(
                 select(Experiment.__dict__[field.value]).distinct()
             )
         ]
+    )
+
+
+@router.get("/data_tests_dashboard_plots", response_model=DashboardPlots)
+async def get_data_tests_dashboard_plots(
+    session: AsyncSession = Depends(get_session),
+    experiment_id: int = Query(""),
+    test_ids: List[int] = Query([]),
+):
+    """
+    Return data for the 4 echarts plots used in Test Dashboard
+
+    Note: this serves the same data as get_test_dashboard_plots,
+    and was created to migrate to echarts,
+    if successful the Bokeh utils and routes should be removed
+    Warning : this serves *data* not Bokeh plots themselves
+    """
+    transposed_test_ids = [((test_id - 1) % 10) + 1 for test_id in test_ids]
+    dashboard_plots = await generate_data_tests_dashboard_plots(
+        session, 1, transposed_test_ids
+    )
+    for i in range(len(test_ids)):
+        dashboard_plots.tests[i].test_id = test_ids[i]
+
+    return json.loads(
+        dashboard_plots.json(encoder=encoderNp), parse_constant=lambda n: 0
     )
 
 

@@ -170,6 +170,63 @@
         }
       }
     },
+    "/experiments/data_tests_dashboard_plots": {
+      "get": {
+        "tags": [
+          "experiments"
+        ],
+        "summary": "Get Data Tests Dashboard Plots",
+        "description": "Return data for the 4 echarts plots used in Test Dashboard\n\nNote: this serves the same data as get_test_dashboard_plots, and was created to migrate to echarts, if successful the Bokeh utils and routes should be removed\nWarning : this serves *data* not Bokeh plots themselves",
+        "operationId": "get_data_tests_dashboard_plots_experiments_data_tests_dashboard_plots_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "title": "Experiment Id",
+              "type": "integer",
+              "default": ""
+            },
+            "name": "experiment_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Test Ids",
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "default": []
+            },
+            "name": "test_ids",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardPlots"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/experiments/tests_dashboard_plots": {
       "get": {
         "tags": [

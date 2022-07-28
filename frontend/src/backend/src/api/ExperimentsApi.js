@@ -35,6 +35,59 @@ export default class ExperimentsApi {
   }
 
   /**
+   * Callback function to receive the result of the getDataTestsDashboardPlotsExperimentsDataTestsDashboardPlotsGet operation.
+   * @callback module:api/ExperimentsApi~getDataTestsDashboardPlotsExperimentsDataTestsDashboardPlotsGetCallback
+   * @param {String} error Error message, if any.
+   * @param {module:model/DashboardPlots} data The data returned by the service call.
+   * @param {String} response The complete HTTP response.
+   */
+
+  /**
+   * Get Data Tests Dashboard Plots
+   * Return data for the 4 echarts plots used in Test Dashboard  Note: this serves the same data as get_test_dashboard_plots, and was created to migrate to echarts, if successful the Bokeh utils and routes should be removed Warning : this serves *data* not Bokeh plots themselves
+   * @param {Object} opts Optional parameters
+   * @param {Number} opts.experimentId
+   * @param {Array.<Number>} opts.testIds
+   * @param {module:api/ExperimentsApi~getDataTestsDashboardPlotsExperimentsDataTestsDashboardPlotsGetCallback} callback The callback function, accepting three arguments: error, data, response
+   * data is of type: {@link module:model/DashboardPlots}
+   */
+  getDataTestsDashboardPlotsExperimentsDataTestsDashboardPlotsGet(
+    opts,
+    callback
+  ) {
+    opts = opts || {};
+    let postBody = null;
+
+    let pathParams = {};
+    let queryParams = {
+      experiment_id: opts["experimentId"],
+      test_ids: this.apiClient.buildCollectionParam(opts["testIds"], "multi"),
+    };
+    let headerParams = {};
+    let formParams = {};
+
+    let authNames = [];
+    let contentTypes = [];
+    let accepts = ["application/json"];
+    let returnType = DashboardPlots;
+    return this.apiClient.callApi(
+      "/experiments/data_tests_dashboard_plots",
+      "GET",
+      pathParams,
+      queryParams,
+      headerParams,
+      formParams,
+      postBody,
+      authNames,
+      contentTypes,
+      accepts,
+      returnType,
+      null,
+      callback
+    );
+  }
+
+  /**
    * Callback function to receive the result of the getExperimentsExperimentsGet operation.
    * @callback module:api/ExperimentsApi~getExperimentsExperimentsGetCallback
    * @param {String} error Error message, if any.
