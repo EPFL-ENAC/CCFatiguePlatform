@@ -60,14 +60,16 @@ def get_loglog_sn_case1(
     strength_at_desirable_angle: float,
     theta: float,
 ) -> float:
-    """TODO"""
+    """
+    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/HR/Fatigue-Failure-Hashin-Rotem.for#L120
+    """
 
     sigmat = a_t * cycles_to_failure ** (-b_t)
     Sigmas = a_s * cycles_to_failure ** (-b_s)
 
     ft = sigmat / transverse_strength
     fs = Sigmas / shear_strength
-    sn = strength_at_desirable_angle * hashin_equation_23(
+    stress_parameter = strength_at_desirable_angle * hashin_equation_23(
         f_tau=fs,
         tau_s=shear_strength,
         theta=theta,
@@ -75,7 +77,7 @@ def get_loglog_sn_case1(
         f_t=ft,
     )
 
-    return sn
+    return stress_parameter
 
 
 def get_loglog_sn_case2(
@@ -91,7 +93,9 @@ def get_loglog_sn_case2(
     oangle2: float,
     theta: float,
 ) -> float:
-    """TODO"""
+    """
+    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/HR/Fatigue-Failure-Hashin-Rotem.for#L140
+    """
 
     sigmat = a_t * cycles_to_failure ** (-b_t)
 
@@ -99,7 +103,7 @@ def get_loglog_sn_case2(
     const1 = ((shear_strength / transverse_strength) * math.tan(oangle2)) ** 2
     ff = ((a_2 * cycles_to_failure ** (-b_2)) / strength2) ** 2
     fs = math.sqrt((ff * ft**2) / ((1 + const1) * ft**2 - (ff * const1)))
-    sn = strength_at_desirable_angle * hashin_equation_23(
+    stress_parameter = strength_at_desirable_angle * hashin_equation_23(
         f_tau=fs,
         tau_s=shear_strength,
         theta=theta,
@@ -107,7 +111,7 @@ def get_loglog_sn_case2(
         f_t=ft,
     )
 
-    return sn
+    return stress_parameter
 
 
 def get_loglog_sn_case3(
@@ -125,7 +129,9 @@ def get_loglog_sn_case3(
     oangle2: float,
     theta: float,
 ) -> float:
-    """TODO"""
+    """
+    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/HR/Fatigue-Failure-Hashin-Rotem.for#L180
+    """
 
     const1 = ((shear_strength / transverse_strength) * math.tan(oangle1)) ** 2
     const2 = ((shear_strength / transverse_strength) * math.tan(oangle2)) ** 2
@@ -143,7 +149,7 @@ def get_loglog_sn_case3(
         ft = math.sqrt(ft2)
         fs = math.sqrt(fs2)
 
-    sn = strength_at_desirable_angle * hashin_equation_23(
+    stress_parameter = strength_at_desirable_angle * hashin_equation_23(
         f_tau=fs,
         tau_s=shear_strength,
         theta=theta,
@@ -151,7 +157,7 @@ def get_loglog_sn_case3(
         f_t=ft,
     )
 
-    return sn
+    return stress_parameter
 
 
 def get_loglog_sn(
@@ -180,7 +186,9 @@ def get_loglog_sn(
     stress_ratio: float,
     theta: float,
 ) -> float:
-    """TODO"""
+    """
+    Get stress parameter, loglog version.
+    """
 
     if stress_ratio >= 0 and stress_ratio < 1:
         transverse_strength = tensile_transverse_strength
@@ -198,7 +206,7 @@ def get_loglog_sn(
         raise NotImplementedError("stress_ratio = " + str(stress_ratio))
 
     if off_axis_angle1 == 0 and off_axis_angle2 == 0:
-        sn = get_loglog_sn_case1(
+        stress_parameter = get_loglog_sn_case1(
             cycles_to_failure=cycles_to_failure,
             a_t=a_t,
             b_t=b_t,
@@ -211,7 +219,7 @@ def get_loglog_sn(
         )
 
     elif off_axis_angle1 == 90:
-        sn = get_loglog_sn_case2(
+        stress_parameter = get_loglog_sn_case2(
             cycles_to_failure=cycles_to_failure,
             a_t=a_t,
             b_t=b_t,
@@ -227,7 +235,7 @@ def get_loglog_sn(
 
     elif off_axis_angle1 != 0 and off_axis_angle2 != 0 and off_axis_angle1 != 90:
 
-        sn = get_loglog_sn_case3(
+        stress_parameter = get_loglog_sn_case3(
             cycles_to_failure=cycles_to_failure,
             a_1=a_1,
             b_1=b_1,
@@ -245,10 +253,9 @@ def get_loglog_sn(
 
     else:  # Not implemented in Tassos algo
         # TODO for instance off_axis_angle1=0 and off_axis_angle2=90
-        sn = 0
         raise NotImplementedError(f"{off_axis_angle1=}, {off_axis_angle2=}")
 
-    return sn
+    return stress_parameter
 
 
 def get_linlog_sn_case1(
@@ -262,14 +269,16 @@ def get_linlog_sn_case1(
     strength_at_desirable_angle: float,
     theta: float,
 ) -> float:
-    """TODO"""
+    """
+    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/HR/Fatigue-Failure-Hashin-Rotem.for#L449
+    """
 
     sigmat = a_t + b_t * math.log10(cycles_to_failure)
     sigmas = a_s + b_s * math.log10(cycles_to_failure)
 
     ft = sigmat / transverse_strength
     fs = sigmas / shear_strength
-    sn = strength_at_desirable_angle * hashin_equation_23(
+    stress_parameter = strength_at_desirable_angle * hashin_equation_23(
         f_tau=fs,
         tau_s=shear_strength,
         theta=theta,
@@ -277,7 +286,7 @@ def get_linlog_sn_case1(
         f_t=ft,
     )
 
-    return sn
+    return stress_parameter
 
 
 def get_linlog_sn_case2(
@@ -293,7 +302,9 @@ def get_linlog_sn_case2(
     oangle2: float,
     theta: float,
 ) -> float:
-    """TODO"""
+    """
+    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/HR/Fatigue-Failure-Hashin-Rotem.for#L474
+    """
 
     sigmat = a_t + b_t * math.log10(cycles_to_failure)
 
@@ -301,7 +312,7 @@ def get_linlog_sn_case2(
     const1 = ((shear_strength / transverse_strength) * math.tan(oangle2)) ** 2
     ff = ((a_2 + b_2 * math.log10(cycles_to_failure)) / strength2) ** 2
     fs = math.sqrt((ff * ft**2) / ((1 + const1) * ft**2 - (ff * const1)))
-    sn = strength_at_desirable_angle * hashin_equation_23(
+    stress_parameter = strength_at_desirable_angle * hashin_equation_23(
         f_tau=fs,
         tau_s=shear_strength,
         theta=theta,
@@ -309,7 +320,7 @@ def get_linlog_sn_case2(
         f_t=ft,
     )
 
-    return sn
+    return stress_parameter
 
 
 def get_linlog_sn_case3(
@@ -327,7 +338,9 @@ def get_linlog_sn_case3(
     oangle2: float,
     theta: float,
 ) -> float:
-    """TODO"""
+    """
+    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/HR/Fatigue-Failure-Hashin-Rotem.for#L514
+    """
 
     const1 = ((shear_strength / transverse_strength) * math.tan(oangle1)) ** 2
     const2 = ((shear_strength / transverse_strength) * math.tan(oangle2)) ** 2
@@ -346,7 +359,7 @@ def get_linlog_sn_case3(
         ft = math.sqrt(ft2)
         fs = math.sqrt(fs2)
 
-    sn = strength_at_desirable_angle * hashin_equation_23(
+    stress_parameter = strength_at_desirable_angle * hashin_equation_23(
         f_tau=fs,
         tau_s=shear_strength,
         theta=theta,
@@ -354,7 +367,7 @@ def get_linlog_sn_case3(
         f_t=ft,
     )
 
-    return sn
+    return stress_parameter
 
 
 def get_linlog_sn(
@@ -383,7 +396,9 @@ def get_linlog_sn(
     stress_ratio: float,
     theta: float,
 ) -> float:
-    """TODO"""
+    """
+    Get stress parameter
+    """
 
     if stress_ratio >= 0 and stress_ratio < 1:
         transverse_strength = tensile_transverse_strength
@@ -402,7 +417,7 @@ def get_linlog_sn(
 
     if off_axis_angle1 == 0 and off_axis_angle2 == 0:
 
-        sn = get_linlog_sn_case1(
+        stress_parameter = get_linlog_sn_case1(
             cycles_to_failure=cycles_to_failure,
             a_t=a_t,
             b_t=b_t,
@@ -415,7 +430,7 @@ def get_linlog_sn(
 
     elif off_axis_angle1 == 90:
 
-        sn = get_linlog_sn_case2(
+        stress_parameter = get_linlog_sn_case2(
             cycles_to_failure=cycles_to_failure,
             a_t=a_t,
             b_t=b_t,
@@ -431,7 +446,7 @@ def get_linlog_sn(
 
     elif off_axis_angle1 != 0 and off_axis_angle2 != 0 and off_axis_angle1 != 90:
 
-        sn = get_linlog_sn_case3(
+        stress_parameter = get_linlog_sn_case3(
             cycles_to_failure=cycles_to_failure,
             a_1=a_1,
             b_1=b_1,
@@ -449,10 +464,9 @@ def get_linlog_sn(
 
     else:  # Not implemented in Tassos algo
         # TODO for instance off_axis_angle1=0 and off_axis_angle2=90
-        sn = 0
         raise NotImplementedError(f"{off_axis_angle1=}, {off_axis_angle2=}")
 
-    return sn
+    return stress_parameter
 
 
 if __name__ == "__main__":

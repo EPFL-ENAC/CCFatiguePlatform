@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-""" 
+"""
 
 CCFatigue Platform, Analysis module 1: Cycle Counting
 Method: Rainflow Counting. 
@@ -12,9 +12,14 @@ Input:
 Output:
 - Description of data output, in CYC format. (see CYC Data convention)
  """
+import os
 
 MATRIX_SIZE = 64
+
+SRC_DIR = os.path.dirname(os.path.realpath(__file__))
+DATA_DIR = os.path.join(SRC_DIR, "..", "..", "Data")
 INPUT_FILENAME = "input.txt"
+INPUT_FILE = os.path.join(SRC_DIR, INPUT_FILENAME)
 OUTPUT_FILENAME = "CYC-Rainflow.csv"
 
 
@@ -41,14 +46,14 @@ peak = []
 flows = []
 
 
-with open(INPUT_FILENAME, "r", encoding="UTF-8") as inFile:
+with open(INPUT_FILE, "r", encoding="UTF-8") as inputFile:
 
     # Rainflow Counting
     # ##########################################################################
 
     STARP = 1
 
-    for line in inFile:
+    for line in inputFile:
         peak.append(float(line))
 
         while len(peak) >= 3:
@@ -77,7 +82,7 @@ with open(INPUT_FILENAME, "r", encoding="UTF-8") as inFile:
         _mean = (peak[j + 1] + peak[j]) / 2
         flows.append(Flow(halfrange, _mean, peak[-2], peak[-1], 1))
 
-    inFile.close()
+    inputFile.close()
 
 
 # Sorting output file
