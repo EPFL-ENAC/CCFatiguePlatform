@@ -2,20 +2,14 @@
 
 ## Install
 
-Do it only once
+Prerequisite
 
-```bash
-sudo snap install docker
-```
-
-## venv setup
-
-Do it only once
+- Docker
 
 ```bash
 make install
 
-# Check default encoding is UTF-8
+# Check default encoding is UTF-8 (for Windows only)
 poetry run python
 >>> import locale
 >>> locale.getpreferredencoding()
@@ -25,8 +19,7 @@ poetry run python
 ## Serve DB
 
 ```bash
-cd ccfatigue/DB
-docker-compose up
+make run-db
 ```
 
 ## Create schema + initialize DB with alembic
