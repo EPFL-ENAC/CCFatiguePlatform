@@ -26,11 +26,15 @@ generate-api:
 	$(MAKE) -C backend generate-api
 	$(MAKE) -C frontend generate-api
 
-run-db:
-	$(MAKE) -C backend run-db
-
 run-backend:
 	$(MAKE) -C backend run
 
 run-frontend:
 	$(MAKE) -C frontend run
+
+run-database:
+	docker-compose up -d database
+
+deploy-docker:
+	docker-compose build --parallel --pull
+	docker-compose up --remove-orphans

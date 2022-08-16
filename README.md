@@ -15,12 +15,9 @@ CCFatiguePlatform is an initiative from CCLab that aims to develop a web applica
 ## Secrets
 
 ```bash
-mkdir -p backend/ccfatigue/DB/secrets && cat <<EOF > backend/ccfatigue/DB/secrets/database.env
+mkdir -p secrets && cat <<EOF > secrets/.env
 POSTGRES_USER=ccfatigue
 POSTGRES_PASSWORD=change-it!
-EOF
-cat <<EOF > backend/ccfatigue/.secrets.toml
-postgres_password = 'change-it!'
 EOF
 ```
 
