@@ -840,11 +840,14 @@ class Experiment:
                         col_constraint["path_pattern"], self.tests.columns
                     )
                 ):
-                    val = Experiment.__get_val_at(self.experiment, path)
-                    if type(val) != col_constraint["type"]:
-                        self.logger.error(
-                            f"Wrong type for column {col_constraint['path']}: {val}"
-                        )
+                    try:
+                        val = Experiment.__get_val_at(self.experiment, path)
+                        if type(val) != col_constraint["type"]:
+                            self.logger.error(
+                                f"Wrong type for column {col_constraint['path']}: {val}"
+                            )
+                    except KeyError:
+                        pass
 
     def _save_preprocessed_tests(self):
         """
