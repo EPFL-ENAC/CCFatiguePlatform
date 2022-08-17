@@ -306,43 +306,41 @@ class Experiment:
             fixed_experiment = {}
 
             for constraint in (
-                {"path": "General>Laboratory", "type": str},
-                {"path": "General>Researcher", "type": str},
-                {"path": "General>Date", "type": str},
-                {"path": "General>Experiment Type", "type": str},
-                {"path": "General>Fracture", "type": bool},
-                {"path": "General>Fracture Mode", "type": str},
-                {"path": "General>Initial Crack length", "type": float},
-                {"path": "General>Fatigue Test Type", "type": str},
-                {"path": "General>Measuring Equipment", "type": str},
-                {"path": "General>Reliability Level", "type": float},
-                {"path": "General>Control mode", "type": str},
-                {"path": "Publication>Title", "type": str},
-                {"path": "Publication>Author", "type": str},
-                {"path": "Publication>Year", "type": int},
-                {"path": "Publication>DOI", "type": str},
-                {"path": "Publication>Images Repository", "type": str},
-                {"path": "Material Type>Fiber Material", "type": str},
-                {"path": "Material Type>Fiber Geometry", "type": str},
-                {"path": "Material Type>Area Density", "type": float},
-                {"path": "Material Type>Resin", "type": str},
-                {"path": "Material Type>Hardener", "type": str},
-                {"path": "Material Type>Mixing ratio", "type": str},
-                {"path": "Geometry>Length", "type": float},
-                {"path": "Geometry>Width", "type": float},
-                {"path": "Geometry>Thickness", "type": float},
-                {"path": "Laminates and Assemblies>Curing Time", "type": float},
+                {"path": "General>laboratory", "type": str},
+                {"path": "General>researcher", "type": str},
+                {"path": "General>date", "type": str},
+                {"path": "General>experiment type", "type": str},
+                {"path": "General>fracture", "type": bool},
+                {"path": "General>fracture mode", "type": str},
+                {"path": "General>fatigue test type", "type": str},
+                {"path": "General>quasi-static test type", "type": str},
+                {"path": "General>temperature test type", "type": str},
+                {"path": "General>measuring equipment", "type": str},
+                {"path": "General>reliability level", "type": float},
+                {"path": "General>control mode", "type": str},
+                {"path": "Publication>title", "type": str},
+                {"path": "Publication>author", "type": str},
+                {"path": "Publication>year", "type": int},
+                {"path": "Publication>doi", "type": str},
+                {"path": "Publication>images repository", "type": str},
+                {"path": "Material Type>sample type", "type": str},
+                {"path": "Material Type>fiber material", "type": str},
+                {"path": "Material Type>fiber form", "type": str},
+                {"path": "Material Type>area density", "type": float},
+                {"path": "Material Type>resin", "type": str},
+                {"path": "Material Type>hardener", "type": str},
+                {"path": "Material Type>mixing ratio", "type": str},
+                {"path": "Laminates and Assemblies>curing time", "type": float},
                 {
-                    "path": "Laminates and Assemblies>Curing Temperature",
+                    "path": "Laminates and Assemblies>curing temperature",
                     "type": float,
                 },
-                {"path": "Laminates and Assemblies>Curing Pressure", "type": float},
-                {"path": "Laminates and Assemblies>Fiber Content", "type": float},
-                {"path": "Laminates and Assemblies>Stacking Sequence", "type": str},
-                {"path": "Test condtions>Temperature", "type": float},
-                {"path": "Test condtions>Humidity", "type": float},
-                {"path": "DIC Analysis>Subset Size", "type": int},
-                {"path": "DIC Analysis>Step Size", "type": int},
+                {"path": "Laminates and Assemblies>curing pressure", "type": float},
+                {"path": "Laminates and Assemblies>fiber volume ratio", "type": float},
+                {"path": "Laminates and Assemblies>stacking sequence", "type": str},
+                {"path": "Measurement>measuring points", "type": int},
+                {"path": "DIC Analysis>subset size", "type": int},
+                {"path": "DIC Analysis>step size", "type": int},
             ):
                 try:
                     try:
@@ -379,53 +377,57 @@ class Experiment:
             # Mandatory fields check
             for col_constraint in (
                 {
-                    "path": "General>Laboratory",
+                    "path": "General>laboratory",
                     "mandatory": True,
                 },
                 {
-                    "path": "General>Researcher",
+                    "path": "General>researcher",
                     "mandatory": True,
                 },
                 {
-                    "path": "General>Experiment Type",
+                    "path": "General>date",
                     "mandatory": True,
                 },
                 {
-                    "path": "General>Fracture",
+                    "path": "General>experiment type",
                     "mandatory": True,
                 },
                 {
-                    "path": "General>Fracture Mode",
+                    "path": "General>fracture",
+                    "mandatory": True,
+                },
+                {
+                    "path": "General>fracture mode",
                     "mandatory": Experiment.__get_val_at(
                         self.experiment,
-                        "General>Fracture",
+                        "General>fracture",
                         False,
                     ),
                     "mandatory_condition": "when fracture",
                 },
                 {
-                    "path": "General>Fatigue Test Type",
+                    "path": "General>fatigue test type",
                     "mandatory": Experiment.__get_val_at(
-                        self.experiment, "General>Experiment Type", ""
+                        self.experiment, "General>experiment type", ""
                     )
                     == "FA",
-                    "mandatory_condition": "when Experiment Type is 'FA'",
+                    "mandatory_condition": "when experiment type is 'FA'",
                 },
                 {
-                    "path": "General>Control mode",
-                    "mandatory": True,
+                    "path": "General>quasi-static test type",
+                    "mandatory": Experiment.__get_val_at(
+                        self.experiment, "General>experiment type", ""
+                    )
+                    == "QS",
+                    "mandatory_condition": "when experiment type is 'QS'",
                 },
                 {
-                    "path": "Geometry>Length",
-                    "mandatory": True,
-                },
-                {
-                    "path": "Geometry>Width",
-                    "mandatory": True,
-                },
-                {
-                    "path": "Geometry>Thickness",
-                    "mandatory": True,
+                    "path": "General>temperature test type",
+                    "mandatory": Experiment.__get_val_at(
+                        self.experiment, "General>experiment type", ""
+                    )
+                    == "TM",
+                    "mandatory_condition": "when experiment type is 'TM'",
                 },
             ):
                 try:
@@ -442,11 +444,11 @@ class Experiment:
             # Date check : YYYY-MM
             if not re.match(
                 r"\d{4}-\d{2}",
-                Experiment.__get_val_at(self.experiment, "General>Date"),
+                Experiment.__get_val_at(self.experiment, "General>date"),
             ):
                 self.logger.error(
                     "Unrecognized Date : "
-                    f"'{Experiment.__get_val_at(self.experiment, 'General>Date')}'"
+                    f"'{Experiment.__get_val_at(self.experiment, 'General>date')}'"
                 )
 
             # Enums check
@@ -455,32 +457,33 @@ class Experiment:
                 (
                     {
                         "check_needed": True,
-                        "path": "General>Experiment Type",
+                        "path": "General>experiment type",
                         "enum": (
                             "FA",
                             "QS",
+                            "TM",
                         ),
                     },
                     {
                         "check_needed": Experiment.__get_val_at(
-                            self.experiment, "General>Fracture", False
+                            self.experiment, "General>fracture", False
                         ),
-                        "path": "General>Fracture Mode",
+                        "path": "General>fracture mode",
                         "enum": (
                             "Mode I",
                             "Mode II",
                             "Mode III",
-                            "Combined",
+                            "Mixed-Mode",
                         ),
                     },
                     {
                         "check_needed": Experiment.__get_val_at(
                             self.experiment,
-                            "General>Experiment Type",
+                            "General>experiment type",
                             "",
                         )
                         == "FA",
-                        "path": "General>Fatigue Test Type",
+                        "path": "General>fatigue test type",
                         "enum": (
                             "CA",
                             "VA",
@@ -489,8 +492,40 @@ class Experiment:
                         ),
                     },
                     {
+                        "check_needed": Experiment.__get_val_at(
+                            self.experiment,
+                            "General>experiment type",
+                            "",
+                        )
+                        == "QS",
+                        "path": "General>quasi-static test type",
+                        "enum": (
+                            "Tensile",
+                            "Compressive",
+                            "Shear",
+                            "Bending",
+                            "Fracture",
+                            "Unspecified",
+                        ),
+                    },
+                    {
+                        "check_needed": Experiment.__get_val_at(
+                            self.experiment,
+                            "General>experiment type",
+                            "",
+                        )
+                        == "TM",
+                        "path": "General>temperature test type",
+                        "enum": (
+                            "DMA",
+                            "DSC",
+                            "FIRE",
+                            "Unspecified",
+                        ),
+                    },
+                    {
                         "check_needed": True,
-                        "path": "General>Control mode",
+                        "path": "General>control mode",
                         "enum": (
                             "Load Controlled",
                             "Displacement Controlled",
@@ -513,119 +548,107 @@ class Experiment:
             # Type check
             for col_constraint in (
                 {
-                    "path": "General>Laboratory",
+                    "path": "General>laboratory",
                     "type": str,
                 },
                 {
-                    "path": "General>Researcher",
+                    "path": "General>researcher",
                     "type": str,
                 },
                 {
-                    "path": "General>Fracture",
+                    "path": "General>fracture",
                     "type": bool,
                 },
                 {
-                    "path": "General>Initial Crack length",
+                    "path": "General>measuring equipment",
+                    "type": str,
+                },
+                {
+                    "path": "General>reliability level",
                     "type": float,
                 },
                 {
-                    "path": "General>Measuring Equipment",
+                    "path": "Publication>title",
                     "type": str,
                 },
                 {
-                    "path": "General>Reliability Level",
-                    "type": float,
-                },
-                {
-                    "path": "Publication>Title",
+                    "path": "Publication>author",
                     "type": str,
                 },
                 {
-                    "path": "Publication>Author",
-                    "type": str,
-                },
-                {
-                    "path": "Publication>Year",
+                    "path": "Publication>year",
                     "type": int,
                 },
                 {
-                    "path": "Publication>DOI",
+                    "path": "Publication>doi",
                     "type": str,
                 },
                 {
-                    "path": "Publication>Images Repository",
+                    "path": "Publication>images repository",
                     "type": str,
                 },
                 {
-                    "path": "Material Type>Fiber Material",
+                    "path": "Material Type>sample type",
                     "type": str,
                 },
                 {
-                    "path": "Material Type>Fiber Geometry",
+                    "path": "Material Type>fiber material",
                     "type": str,
                 },
                 {
-                    "path": "Material Type>Area Density",
-                    "type": float,
-                },
-                {
-                    "path": "Material Type>Resin",
+                    "path": "Material Type>fiber form",
                     "type": str,
                 },
                 {
-                    "path": "Material Type>Hardener",
+                    "path": "Material Type>area density",
                     "type": str,
                 },
                 {
-                    "path": "Material Type>Mixing ratio",
+                    "path": "Material Type>resin",
                     "type": str,
                 },
                 {
-                    "path": "Geometry>Length",
-                    "type": float,
-                },
-                {
-                    "path": "Geometry>Width",
-                    "type": float,
-                },
-                {
-                    "path": "Geometry>Thickness",
-                    "type": float,
-                },
-                {
-                    "path": "Laminates and Assemblies>Curing Time",
-                    "type": float,
-                },
-                {
-                    "path": "Laminates and Assemblies>Curing Temperature",
-                    "type": float,
-                },
-                {
-                    "path": "Laminates and Assemblies>Curing Pressure",
-                    "type": float,
-                },
-                {
-                    "path": "Laminates and Assemblies>Fiber Content",
-                    "type": float,
-                },
-                {
-                    "path": "Laminates and Assemblies>Stacking Sequence",
+                    "path": "Material Type>hardener",
                     "type": str,
                 },
                 {
-                    "path": "Test condtions>Temperature",
+                    "path": "Material Type>mixing ratio",
+                    "type": str,
+                },
+                {
+                    "path": "Laminates and Assemblies>curing time",
                     "type": float,
                 },
                 {
-                    "path": "Test condtions>Humidity",
+                    "path": "Laminates and Assemblies>curing temperature",
                     "type": float,
                 },
                 {
-                    "path": "DIC Analysis>Subset Size",
+                    "path": "Laminates and Assemblies>curing pressure",
+                    "type": float,
+                },
+                {
+                    "path": "Laminates and Assemblies>fiber volume ratio",
+                    "type": float,
+                },
+                {
+                    "path": "Laminates and Assemblies>stacking sequence",
+                    "type": str,
+                },
+                {
+                    "path": "Measurement>measuring points",
                     "type": int,
                 },
                 {
-                    "path": "DIC Analysis>Step Size",
+                    "path": "Test condtions>humidity",
+                    "type": float,
+                },
+                {
+                    "path": "DIC Analysis>subset size",
+                    "type": int,
+                },
+                {
+                    "path": "DIC Analysis>step size",
                     "type": int,
                 },
             ):
@@ -672,18 +695,39 @@ class Experiment:
         self.logger.info("Cleanup tests")
         with self.logger.indent:
             EXPECTED_COLS = (
-                "Specimen number",
-                "Stress Ratio",
-                "Maximum Stress",
-                "Loading rate",
-                "Run-out",
+                "specimen number",
+                "specimen name",
+                "stress ratio",
+                "maximum stress",
+                "frequency",
+                "run out",
+                "displacement controlled loading rate",
+                "load controlled loading rate",
+                "length",
+                "width",
+                "thickness",
+                "temperature",
+                "humidity",
+                "initial crack length",
+                r"x coordinate of measuring point \d",
+                r"y coordinate of measuring point \d",
             )
 
             # Strip spaces and \n on column names
             self.tests.columns = self.tests.columns.str.strip(" \n")
 
+            found_matching_columns = set()
+            for pattern in EXPECTED_COLS:
+                found_matching_columns.update(
+                    list(
+                        Experiment.__grep_matching_columns(pattern, self.tests.columns)
+                    )
+                )
+
+            # drop unexpected columns
+            unexpected_columns = list(set(self.tests.columns) - found_matching_columns)
+
             # Remove unexpected columns
-            unexpected_columns = list(set(self.tests.columns) - set(EXPECTED_COLS))
             if len(unexpected_columns) != 0:
                 for unexpected_column in unexpected_columns:
                     self.logger.warning(f"drop unexpected column {unexpected_column}")
@@ -696,16 +740,131 @@ class Experiment:
         self.logger.info("Validate tests")
         with self.logger.indent:
             # Check mandatory columns
-            MANDATORY_COLS = (
-                "Specimen number",
-                "Stress Ratio",
-                "Maximum Stress",
-                "Loading rate",
-                "Run-out",
-            )
-            for mandatory_col in MANDATORY_COLS:
-                if mandatory_col not in self.tests.columns:
-                    self.logger.error(f"mandatory column '{mandatory_col}' not found")
+            for col_constraint in (
+                {
+                    "path": "specimen number",
+                    "mandatory": True,
+                },
+                {
+                    "path": "stress ratio",
+                    "mandatory": Experiment.__get_val_at(
+                        self.experiment, "General>experiment type", ""
+                    )
+                    == "FA",
+                    "mandatory_condition": "when experiment type is 'FA'",
+                },
+                {
+                    "path": "maximum stress",
+                    "mandatory": Experiment.__get_val_at(
+                        self.experiment, "General>experiment type", ""
+                    )
+                    == "FA",
+                    "mandatory_condition": "when experiment type is 'FA'",
+                },
+                {
+                    "path": "frequency",
+                    "mandatory": Experiment.__get_val_at(
+                        self.experiment, "General>experiment type", ""
+                    )
+                    == "FA",
+                    "mandatory_condition": "when experiment type is 'FA'",
+                },
+                {
+                    "path": "run out",
+                    "mandatory": Experiment.__get_val_at(
+                        self.experiment, "General>experiment type", ""
+                    )
+                    == "FA",
+                    "mandatory_condition": "when experiment type is 'FA'",
+                },
+            ):
+                if (
+                    col_constraint["mandatory"]
+                    and col_constraint["path"] not in self.tests.columns
+                ):
+                    self.logger.error(
+                        "missing mandatory column "
+                        f"{col_constraint.get('mandatory_condition', '')}: "
+                        f"{col_constraint['path']}"
+                    )
+
+            # Type check
+            for col_constraint in (
+                {
+                    "path_pattern": "Specimen number",
+                    "type": int,
+                },
+                {
+                    "path_pattern": "Specimen name",
+                    "type": str,
+                },
+                {
+                    "path_pattern": "Stress Ratio",
+                    "type": float,
+                },
+                {
+                    "path_pattern": "Maximum Stress",
+                    "type": float,
+                },
+                {
+                    "path_pattern": "Frequency",
+                    "type": float,
+                },
+                {
+                    "path_pattern": "Run out",
+                    "type": bool,
+                },
+                {
+                    "path_pattern": "Displacement controlled loading rate",
+                    "type": float,
+                },
+                {
+                    "path_pattern": "Load controlled loading rate",
+                    "type": float,
+                },
+                {
+                    "path_pattern": "Length",
+                    "type": float,
+                },
+                {
+                    "path_pattern": "Width",
+                    "type": float,
+                },
+                {
+                    "path_pattern": "Thickness",
+                    "type": float,
+                },
+                {
+                    "path_pattern": "Temperature",
+                    "type": float,
+                },
+                {
+                    "path_pattern": "Humidity",
+                    "type": float,
+                },
+                {
+                    "path_pattern": "initial crack length",
+                    "type": float,
+                },
+                {
+                    "path_pattern": r"x coordinate of measuring point \d",
+                    "type": float,
+                },
+                {
+                    "path_pattern": r"y coordinate of measuring point \d",
+                    "type": float,
+                },
+            ):
+                for path in list(
+                    Experiment.__grep_matching_columns(
+                        col_constraint["path_pattern"], self.tests.columns
+                    )
+                ):
+                    val = Experiment.__get_val_at(self.experiment, path)
+                    if type(val) != col_constraint["type"]:
+                        self.logger.error(
+                            f"Wrong type for column {col_constraint['path']}: {val}"
+                        )
 
     def _save_preprocessed_tests(self):
         """
@@ -1046,9 +1205,9 @@ class Experiment:
 
                 # Look for type specific mandatory columns
                 experiment_type = Experiment.__get_val_at(
-                    self.experiment, "General>Experiment Type"
+                    self.experiment, "General>experiment type"
                 )
-                fracture = Experiment.__get_val_at(self.experiment, "General>Fracture")
+                fracture = Experiment.__get_val_at(self.experiment, "General>fracture")
                 for mandatory_cols_pattern in MANDATORY_TEST_TYPE_SPECIFIC[
                     (experiment_type, fracture)
                 ]:
