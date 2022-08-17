@@ -1,5 +1,5 @@
 {
-  "General": {
+  "general": {
     "laboratory": "CCLAB",
     "researcher": "Dharun Vadugappatty Srinivasan",
     "date": "2020-11",
@@ -9,11 +9,11 @@
     "measuring equipment": "MTS 25 kN",
     "control mode": "Load Controlled"
   },
-  "Material Type": {
+  "material type": {
     "resin": "Epoxy",
     "mixing ratio": "100/34"
   },
-  "Laminates and Assemblies": {
+  "laminates and assemblies": {
     "curing time": 2.0,
     "curing temperature": 70.0,
     "curing pressure": 1.0
