@@ -28,6 +28,10 @@ with:
   - `TM` = DMA or temperature
 - `###`: Specimen number
 
+## TST XLS file standards
+
+Must match template : [TST_Data_Template.xls](TST_Data_Template.xls)
+
 ## TST CSV files standards (column names must be exact) :
 
 | Column name            | Description                                           | Unit     | Data type | Mandatory | Multiple measurement points |
