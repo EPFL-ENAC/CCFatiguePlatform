@@ -270,32 +270,10 @@ class Experiment:
             else:
                 return to_bool(str(value))
 
-        def dict_cleanup(dic):
-            """
-            Recursively clean dictionary
-            + keys :
-                + strip white + \n
-                + remove unexpected "Unnamed: *_level_*"
-                + lowercase
-            + values :
-                + strip white + \n
-            """
-            for k, v in list(dic.items()):
-                new_k = k.strip(" \n").lower()
-                if new_k != k:
-                    dic[new_k] = dic.pop(k)
-                    k = new_k
-                if re.match(r"Unnamed: \d+_level_\d+", k):
-                    del dic[k]
-                elif type(v) == dict:
-                    dict_cleanup(v)
-                elif type(v) == str:
-                    dic[k] = v.strip(" \n")
-
         self.logger.info("Cleanup experiment")
         with self.logger.indent:
 
-            dict_cleanup(self.experiment)
+            Experiment.__dict_cleanup(self.experiment)
 
             CASTING = {
                 bool: to_bool,
@@ -695,6 +673,7 @@ class Experiment:
         """
         self.logger.info("Cleanup tests")
         with self.logger.indent:
+            Experiment.__dict_cleanup(self.tests)
             EXPECTED_COLS = (
                 "specimen number",
                 "specimen name",
@@ -1326,6 +1305,30 @@ class Experiment:
             walk_in_dic.setdefault(k, {})
             walk_in_dic = walk_in_dic[k]
         walk_in_dic[last_key] = value
+
+    @classmethod
+    def __dict_cleanup(cls, dic):
+        """
+        Recursively clean dictionary
+        works the same on Pandas DataFrame
+        + keys :
+            + strip white + \n
+            + remove unexpected "Unnamed: *_level_*"
+            + lowercase
+        + values :
+            + strip white + \n
+        """
+        for k, v in list(dic.items()):
+            new_k = k.strip(" \n").lower()
+            if new_k != k:
+                dic[new_k] = dic.pop(k)
+                k = new_k
+            if re.match(r"Unnamed: \d+_level_\d+", k):
+                del dic[k]
+            elif type(v) == dict:
+                Experiment.__dict_cleanup(v)
+            elif type(v) == str:
+                dic[k] = v.strip(" \n")
 
 
 def get_tst_folders_to_parse(
