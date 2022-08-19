@@ -30,7 +30,8 @@ with:
 
 ## TST XLS file standards
 
-Must match template : [TST_Data_Template.xls](TST_Data_Template.xls)
+Must match metadata template : [TST_Data_Template.xls](TST_Data_Template.xls)
+In the Excel metadata template, note that only row 4 (sheet 1) and row 3 (sheet 2) must be filled with metadata. The rest must remain unchanged.
 
 ## TST CSV files standards (column names must be exact) :
 
