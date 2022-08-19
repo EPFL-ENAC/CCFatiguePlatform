@@ -1,5 +1,5 @@
 """
-Common functions for preprocessing
+Common tools for TST data preprocessing
 """
 
 import os
