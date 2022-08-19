@@ -25,7 +25,12 @@ According to ./README.md
     - `measures_###.csv` (produced from raw `csv` files)
 """
 
-from tst_data import Logger, Experiment, NotAnExperimentFolder, get_tst_folders_to_parse
+from tst_data_lib import (
+    Logger,
+    Experiment,
+    NotAnExperimentFolder,
+    get_tst_folders_to_parse,
+)
 
 if __name__ == "__main__":
     with Logger(None) as logger:
