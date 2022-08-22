@@ -2,7 +2,7 @@ import io
 import os
 import subprocess
 from tempfile import NamedTemporaryFile, SpooledTemporaryFile
-from typing import Any, Dict, List
+from typing import IO, Any, Dict, List
 
 import pandas as pd
 from pandas.core.frame import DataFrame
@@ -14,7 +14,7 @@ from ccfatigue.plotter import DataKey, Line, Plot
 ROUND_DECIMAL = 8
 
 
-def run_fortran(exec_path: str, input_file: SpooledTemporaryFile) -> bytes:
+def run_fortran(exec_path: str, input_file: SpooledTemporaryFile[bytes] | IO) -> bytes:
     with NamedTemporaryFile() as tmp_file:
         input_file.seek(0)
         tmp_file.write(input_file.read())
@@ -64,11 +64,12 @@ def create_line(output: bytes, method: SnCurveMethod, r_ratio: float) -> Any:
             DataKey.STRESS_PARAM: stress_param,
         },
         legend_label=f"{method.value} {r_ratio}",
+        color=None,
     )
 
 
 def run_sn_curve(
-    file: SpooledTemporaryFile,
+    file: SpooledTemporaryFile[bytes] | IO,
     methods: List[SnCurveMethod],
     r_ratios: List[float],
 ) -> SnCurveResult:

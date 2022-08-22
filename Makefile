@@ -22,9 +22,9 @@ compile_sncurve:
 build_frontend:
 	$(MAKE) -C frontend build
 
-generate-api:
-	$(MAKE) -C backend generate-api
-	$(MAKE) -C frontend generate-api
+api:
+	$(MAKE) -C backend api
+	$(MAKE) -C frontend api
 
 run-backend:
 	$(MAKE) -C backend run
