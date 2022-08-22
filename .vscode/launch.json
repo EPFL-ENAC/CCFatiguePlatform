@@ -12,7 +12,8 @@
       "args": ["ccfatigue.main:app", "--reload"],
       "jinja": true,
       "cwd": "${workspaceFolder}/backend",
-      "envFile": "${workspaceFolder}/secrets/.env"
+      "envFile": "${workspaceFolder}/secrets/.env",
+      "preLaunchTask": "database"
     },
     {
       "name": "frontend: run",
