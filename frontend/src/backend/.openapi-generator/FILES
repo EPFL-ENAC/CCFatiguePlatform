@@ -3,6 +3,7 @@
 .openapi-generator-ignore
 .travis.yml
 README.md
+docs/AnalysisApi.md
 docs/AppInfo.md
 docs/DashboardPlots.md
 docs/DefaultApi.md
@@ -13,6 +14,7 @@ docs/HTTPValidationError.md
 docs/PageExperimentModel.md
 docs/PageTestModel.md
 docs/Plots.md
+docs/SnCurveMethod.md
 docs/TestModel.md
 docs/TestPlot.md
 docs/TestsApi.md
@@ -22,6 +24,7 @@ git_push.sh
 mocha.opts
 package.json
 src/ApiClient.js
+src/api/AnalysisApi.js
 src/api/DefaultApi.js
 src/api/ExperimentsApi.js
 src/api/TestsApi.js
@@ -34,10 +37,12 @@ src/model/HTTPValidationError.js
 src/model/PageExperimentModel.js
 src/model/PageTestModel.js
 src/model/Plots.js
+src/model/SnCurveMethod.js
 src/model/TestModel.js
 src/model/TestPlot.js
 src/model/UnitInfo.js
 src/model/ValidationError.js
+test/api/AnalysisApi.spec.js
 test/api/DefaultApi.spec.js
 test/api/ExperimentsApi.spec.js
 test/api/TestsApi.spec.js
@@ -49,6 +54,7 @@ test/model/HTTPValidationError.spec.js
 test/model/PageExperimentModel.spec.js
 test/model/PageTestModel.spec.js
 test/model/Plots.spec.js
+test/model/SnCurveMethod.spec.js
 test/model/TestModel.spec.js
 test/model/TestPlot.spec.js
 test/model/UnitInfo.spec.js

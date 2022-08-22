@@ -20,10 +20,12 @@ import HTTPValidationError from "./model/HTTPValidationError";
 import PageExperimentModel from "./model/PageExperimentModel";
 import PageTestModel from "./model/PageTestModel";
 import Plots from "./model/Plots";
+import SnCurveMethod from "./model/SnCurveMethod";
 import TestModel from "./model/TestModel";
 import TestPlot from "./model/TestPlot";
 import UnitInfo from "./model/UnitInfo";
 import ValidationError from "./model/ValidationError";
+import AnalysisApi from "./api/AnalysisApi";
 import DefaultApi from "./api/DefaultApi";
 import ExperimentsApi from "./api/ExperimentsApi";
 import TestsApi from "./api/TestsApi";
@@ -106,6 +108,11 @@ export {
    */
   Plots,
   /**
+   * The SnCurveMethod model constructor.
+   * @property {module:model/SnCurveMethod}
+   */
+  SnCurveMethod,
+  /**
    * The TestModel model constructor.
    * @property {module:model/TestModel}
    */
@@ -125,6 +132,11 @@ export {
    * @property {module:model/ValidationError}
    */
   ValidationError,
+  /**
+   * The AnalysisApi service constructor.
+   * @property {module:api/AnalysisApi}
+   */
+  AnalysisApi,
   /**
    * The DefaultApi service constructor.
    * @property {module:api/DefaultApi}

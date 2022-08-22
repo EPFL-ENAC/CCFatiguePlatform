@@ -292,6 +292,95 @@
           }
         }
       }
+    },
+    "/analysis/snCurve/file": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run Sn Curve File",
+        "operationId": "run_sn_curve_file_analysis_snCurve_file_post",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/SnCurveMethod"
+              }
+            },
+            "name": "methods",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Rratios",
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "name": "rRatios",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Page",
+              "minimum": 1.0,
+              "type": "integer",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Size",
+              "maximum": 100.0,
+              "minimum": 1.0,
+              "type": "integer",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_sn_curve_file_analysis_snCurve_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ExperimentModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -314,6 +403,20 @@
           }
         },
         "description": "App Info"
+      },
+      "Body_run_sn_curve_file_analysis_snCurve_file_post": {
+        "title": "Body_run_sn_curve_file_analysis_snCurve_file_post",
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string",
+            "format": "binary"
+          }
+        }
       },
       "DashboardPlots": {
         "title": "DashboardPlots",
@@ -603,6 +706,17 @@
           }
         },
         "description": "Defines all plots types returned"
+      },
+      "SnCurveMethod": {
+        "title": "SnCurveMethod",
+        "enum": [
+          "LinLog",
+          "LogLog",
+          "Sendeckyj",
+          "Whitney"
+        ],
+        "type": "string",
+        "description": "An enumeration."
       },
       "TestModel": {
         "title": "TestModel",
