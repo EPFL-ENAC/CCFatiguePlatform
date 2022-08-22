@@ -23,6 +23,18 @@
       "options": {
         "cwd": "frontend"
       }
+    },
+    {
+      "label": "database",
+      "type": "docker-compose",
+      "dockerCompose": {
+        "up": {
+          "detached": true,
+          "build": true,
+          "services": ["database"]
+        },
+        "files": ["${workspaceFolder}/docker-compose.yml"]
+      }
     }
   ]
 }
