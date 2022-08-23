@@ -13,7 +13,7 @@ from itertools import chain
 from astm import Astm
 
 
-CONFIDENCE = 95  # TODO check with Tassos if this should be a parameter (95, 99)
+CONFIDENCE = 95
 RELIABILITY_LEVEL = 50
 
 SRC_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -22,9 +22,9 @@ DATA_DIR = os.path.join(SRC_DIR, "..", "..", "Data")
 
 INPUT_FILENAME = "AGG_input.csv"
 INPUT_FILE = os.path.join(DATA_DIR, INPUT_FILENAME)
-OUTPUT_JSON_FILENAME = "SNC_LogLog.json"
+OUTPUT_JSON_FILENAME = "SNC_LinLog.json"
 OUTPUT_JSON_FILE = os.path.join(DATA_DIR, OUTPUT_JSON_FILENAME)
-OUTPUT_CSV_FILENAME = "SNC_LogLog.csv"
+OUTPUT_CSV_FILENAME = "SNC_LinLog.csv"
 OUTPUT_CSV_FILE = os.path.join(DATA_DIR, OUTPUT_CSV_FILENAME)
 
 
