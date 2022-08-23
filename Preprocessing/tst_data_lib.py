@@ -305,7 +305,7 @@ class Experiment:
                 {"path": "material type>sample type", "type": str},
                 {"path": "material type>fiber material", "type": str},
                 {"path": "material type>fiber form", "type": str},
-                {"path": "material type>area density", "type": float},
+                {"path": "material type>area density", "type": str},
                 {"path": "material type>resin", "type": str},
                 {"path": "material type>hardener", "type": str},
                 {"path": "material type>mixing ratio", "type": str},
