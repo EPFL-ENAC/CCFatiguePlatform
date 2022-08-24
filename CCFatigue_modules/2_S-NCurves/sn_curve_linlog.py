@@ -1,9 +1,6 @@
 #!/usr/bin/env python
-""" CCFatigue - Module 2 - S-N-Curve-LogLog.py
+""" CCFatigue - Module 2 - sn_curve_linlog.py
 This code takes in AGG data and output SNC data
-It applies a linear regression on log(number of cycles) and log(stress ratios)
-as described in https://www.astm.org/stp313-eb.html pp. 20-23
-DOI: 10.1520/STP313-EB
 """
 
 import os
@@ -25,41 +22,38 @@ DATA_DIR = os.path.join(SRC_DIR, "..", "..", "Data")
 
 INPUT_FILENAME = "AGG_input.csv"
 INPUT_FILE = os.path.join(DATA_DIR, INPUT_FILENAME)
-OUTPUT_JSON_FILENAME = "SNC_LogLog.json"
+OUTPUT_JSON_FILENAME = "SNC_LinLog.json"
 OUTPUT_JSON_FILE = os.path.join(DATA_DIR, OUTPUT_JSON_FILENAME)
-OUTPUT_CSV_FILENAME = "SNC_LogLog.csv"
+OUTPUT_CSV_FILENAME = "SNC_LinLog.csv"
 OUTPUT_CSV_FILE = os.path.join(DATA_DIR, OUTPUT_CSV_FILENAME)
 
 
-def equation_ycar(
-    slope: float, intercept: float, log10_stress_parameter: float
-) -> float:
+def equation_ycar(slope: float, intercept: float, stress_parameter: float) -> float:
     """
-    Calculate ycar
-    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/feat/fortran2py/dev/CCFatigue_modules/2_S-NCurves/S-N-Curve-LogLog.for#L317
+    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/2_S-NCurves/S-N-Curve-LinLog.for#L314
     Inputs:
-    - slope: float
-    - intercept: float
-    - log10_stress_parameter: float
-    Output:
-    - ycar: float
+    - slope
+    - intercept
+    - stress_parameter
+    Outputs:
+    - ycar
     """
-    ycar = slope + intercept * log10_stress_parameter
+    ycar = slope + intercept * stress_parameter
     return ycar
 
 
 def stress_at_failure(aa: float, bb: float, nn: float) -> float:
     """
     Calculate stress at failure
-    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/feat/fortran2py/dev/CCFatigue_modules/2_S-NCurves/S-N-Curve-LogLog.for#L398
+    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/2_S-NCurves/S-N-Curve-LinLog.for#L397
     Inputs:
-    - aa: float
-    - bb: float
-    - nn: float
+    - aa
+    - bb
+    - nn
     Outputs:
-    - spn: float
+    - spn: stress at failure
     """
-    spn = aa * nn ** (-bb)
+    spn = aa + math.log10(nn) * bb
     return spn
 
 
@@ -91,8 +85,8 @@ def stress_at_failure_bounds(
     )
     term3 = sample_count * (b**2 * q - pp)
 
-    stress_upperbound = 10 ** (-(term1 + term2) / term3)
-    stress_lowerbound = 10 ** (-(term1 - term2) / term3)
+    stress_upperbound = -(term1 + term2) / term3
+    stress_lowerbound = -(term1 - term2) / term3
 
     return (stress_lowerbound, stress_upperbound)
 
@@ -101,28 +95,27 @@ if __name__ == "__main__":
 
     astm = Astm(CONFIDENCE)
 
-    # Import input file (SNC format)
-    samples = pd.read_csv(INPUT_FILE)
+    # Import input file (AGG format)
+    agg_df = pd.read_csv(INPUT_FILE)
 
-    # Add columns with log10(stress_parameter) and log10(number_of_cycles)
-    samples["log10_stress_parameter"] = np.log10(samples.stress_parameter)
-    samples["log10_number_of_cycles"] = np.log10(samples.number_of_cycles)
+    # Add columns with log10(stress_parameter) and log10(cycles_to_failure)
+    # agg_df["log10_stress_parameter"] = np.log10(agg_df.stress_parameter)
+    agg_df["log10_cycles_to_failure"] = np.log10(agg_df.cycles_to_failure)
 
     # Data are grouped by stress_ratio but one experiment
     # can have two separate groups with same stress_ratio so we need to identify
-    samples["stress_ratio_id"] = (
-        samples.stress_ratio != samples.stress_ratio.shift()
+    agg_df["stress_ratio_id"] = (
+        agg_df.stress_ratio != agg_df.stress_ratio.shift()
     ).cumsum()
 
     # Average by stress_ratio
     stress_ratios_df = (
-        samples[
+        agg_df[
             [
                 "stress_ratio_id",
                 "stress_ratio",
-                "log10_stress_parameter",
-                "log10_number_of_cycles",
-                "number_of_cycles",
+                "log10_cycles_to_failure",
+                "cycles_to_failure",
             ]
         ]
         .groupby(["stress_ratio_id"])
@@ -134,7 +127,7 @@ if __name__ == "__main__":
             range(1, 1000, 50),
             range(1000, 1001),
             range(10000, 2000000, 10000),
-            range(3000000, 20000000, 1000000),
+            range(2000000, 20000000, 1000000),
             range(30000000, 1400000000, 100000000),
         ),
         columns=["cycles_to_failure"],
@@ -150,58 +143,53 @@ if __name__ == "__main__":
         ]
     )
 
-    # Calculate A (Eq 4) and B (Eq 5)
-    linregress = samples.groupby("stress_ratio_id").apply(
-        lambda x: stats.linregress(x.log10_stress_parameter, x.log10_number_of_cycles)
+    # Calculate slope A and intercept B
+    linregress = agg_df.groupby("stress_ratio_id").apply(
+        lambda x: stats.linregress(x.stress_parameter, x.log10_cycles_to_failure)
     )
-
-    # Eq 4 and 5
-    # Add A and B in avg_by_stress_ratio
-    # Slope = A, Intercept = B
     stress_ratios_df["slope"] = linregress.apply(lambda x: x[1])
     stress_ratios_df["intercept"] = linregress.apply(lambda x: x[0])
 
-    # Add AA and BB
-    # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/feat/fortran2py/dev/CCFatigue_modules/2_S-NCurves/S-N-Curve-LogLog.for#L368
-    stress_ratios_df["stress_parameter_aa"] = 10 ** (
+    # Add AA and BB TODO reference for these equations
+    stress_ratios_df["stress_parameter_aa"] = (
         -stress_ratios_df.slope / stress_ratios_df.intercept
     )
-    stress_ratios_df["stress_parameter_bb"] = -1 / stress_ratios_df.intercept
+    stress_ratios_df["stress_parameter_bb"] = 1 / stress_ratios_df.intercept
 
-    samples["ycar"] = samples.apply(
+    agg_df["ycar"] = agg_df.apply(
         lambda x: equation_ycar(
             stress_ratios_df.loc[x.stress_ratio_id].slope,
             stress_ratios_df.loc[x.stress_ratio_id].intercept,
-            x.log10_stress_parameter,
+            x.stress_parameter,
         ),
         axis=1,
     )
 
     # LNb
-    stress_ratios_df["log10_number_of_cycles"] = (
-        samples[["stress_ratio_id", "log10_number_of_cycles"]]
+    stress_ratios_df["log10_cycles_to_failure"] = (
+        agg_df[["stress_ratio_id", "log10_cycles_to_failure"]]
         .groupby("stress_ratio_id")
         .mean()
     )
 
     # LSST
-    samples["lsst"] = samples.apply(
+    agg_df["lsst"] = agg_df.apply(
         lambda x: (
-            x.log10_stress_parameter
-            - stress_ratios_df.loc[x.stress_ratio_id].log10_number_of_cycles
+            x.log10_cycles_to_failure
+            - stress_ratios_df.loc[x.stress_ratio_id].log10_cycles_to_failure
         )
         ** 2,
         axis=1,
     )
     stress_ratios_df["lsst"] = (
-        samples[["stress_ratio_id", "lsst"]].groupby("stress_ratio_id").sum()
+        agg_df[["stress_ratio_id", "lsst"]].groupby("stress_ratio_id").sum()
     )
 
     # Eq 9
     # LSSE
-    samples["lsse"] = (samples.log10_number_of_cycles - samples.ycar) ** 2
+    agg_df["lsse"] = (agg_df.log10_cycles_to_failure - agg_df.ycar) ** 2
     stress_ratios_df["lsse"] = (
-        samples[["stress_ratio_id", "lsse"]].groupby("stress_ratio_id").sum()
+        agg_df[["stress_ratio_id", "lsse"]].groupby("stress_ratio_id").sum()
     )
 
     # LRSQ
@@ -209,31 +197,27 @@ if __name__ == "__main__":
 
     # Q
     stress_ratios_df["xb"] = (
-        samples[["stress_ratio_id", "log10_stress_parameter"]]
+        agg_df[["stress_ratio_id", "stress_parameter"]]
         .groupby("stress_ratio_id")
         .mean()
     )
-    samples["q"] = samples.apply(
-        lambda x: (
-            x.log10_stress_parameter - stress_ratios_df.loc[x.stress_ratio_id].xb
-        )
+    agg_df["q"] = agg_df.apply(
+        lambda x: (x.stress_parameter - stress_ratios_df.loc[x.stress_ratio_id].xb)
         ** 2,
         axis=1,
     )
     stress_ratios_df["q"] = (
-        samples[["stress_ratio_id", "q"]].groupby("stress_ratio_id").sum()
+        agg_df[["stress_ratio_id", "q"]].groupby("stress_ratio_id").sum()
     )
 
     # NOD
     stress_ratios_df["sample_count"] = (
-        samples[["stress_ratio_id", "stress_ratio"]].groupby("stress_ratio_id").count()
+        agg_df[["stress_ratio_id", "stress_ratio"]].groupby("stress_ratio_id").count()
     )
 
     # level
     stress_ratios_df["level"] = (
-        samples[["stress_ratio_id", "stress_level"]]
-        .groupby("stress_ratio_id")
-        .nunique()
+        agg_df[["stress_ratio_id", "stress_level"]].groupby("stress_ratio_id").nunique()
     )
 
     # Eq 6
@@ -256,10 +240,11 @@ if __name__ == "__main__":
     snc_output_json_df = pd.DataFrame(
         columns=[
             "stress_ratio",
-            "RSQL",
-            "A",
-            "B",
-            "Fp",
+            "rsql",
+            "a",
+            "b",
+            "lrsq",
+            "fp",
         ],
     )
 
@@ -282,8 +267,9 @@ if __name__ == "__main__":
             lambda x: stress_at_failure(
                 stress_ratio_df.stress_parameter_aa,
                 stress_ratio_df.stress_parameter_bb,
-                x,
-            )
+                x.cycles_to_failure,
+            ),
+            axis=1,
         )
 
         stress_bounds = stress_parameter.apply(
@@ -309,10 +295,11 @@ if __name__ == "__main__":
         json_df = pd.DataFrame(
             {
                 "stress_ratio": stress_ratio_df.stress_ratio,
-                "RSQL": RELIABILITY_LEVEL,
-                "A": stress_ratio_df.stress_parameter_aa,
-                "B": stress_ratio_df.stress_parameter_bb,
-                "Fp": stress_ratio_df.fp,
+                "rsql": None,
+                "a": stress_ratio_df.slope,
+                "b": stress_ratio_df.intercept,
+                "lrsq": stress_ratio_df.lrsq,
+                "fp": stress_ratio_df.fp,
             },
             index=[0],
         )
