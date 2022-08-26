@@ -12,6 +12,7 @@
  */
 
 import ApiClient from "../ApiClient";
+import LocationInner from "./LocationInner";
 
 /**
  * The ValidationError model module.
@@ -22,7 +23,7 @@ class ValidationError {
   /**
    * Constructs a new <code>ValidationError</code>.
    * @alias module:model/ValidationError
-   * @param loc {Array.<String>}
+   * @param loc {Array.<module:model/LocationInner>}
    * @param msg {String}
    * @param type {String}
    */
@@ -53,7 +54,7 @@ class ValidationError {
       obj = obj || new ValidationError();
 
       if (data.hasOwnProperty("loc")) {
-        obj["loc"] = ApiClient.convertToType(data["loc"], ["String"]);
+        obj["loc"] = ApiClient.convertToType(data["loc"], [LocationInner]);
       }
       if (data.hasOwnProperty("msg")) {
         obj["msg"] = ApiClient.convertToType(data["msg"], "String");
@@ -67,7 +68,7 @@ class ValidationError {
 }
 
 /**
- * @member {Array.<String>} loc
+ * @member {Array.<module:model/LocationInner>} loc
  */
 ValidationError.prototype["loc"] = undefined;
 

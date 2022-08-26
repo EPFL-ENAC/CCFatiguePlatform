@@ -8,7 +8,7 @@ All URIs are relative to _http://localhost_
 
 ## runSnCurveFileAnalysisSnCurveFilePost
 
-> PageExperimentModel runSnCurveFileAnalysisSnCurveFilePost(methods, rRatios, file, opts)
+> SnCurveResult runSnCurveFileAnalysisSnCurveFilePost(methods, rRatios, file)
 
 Run Sn Curve File
 
@@ -21,15 +21,10 @@ let apiInstance = new Ccfatigue.AnalysisApi();
 let methods = [new Ccfatigue.SnCurveMethod()]; // [SnCurveMethod] |
 let rRatios = [null]; // [Number] |
 let file = "/path/to/file"; // File |
-let opts = {
-  page: 1, // Number |
-  size: 50, // Number |
-};
 apiInstance.runSnCurveFileAnalysisSnCurveFilePost(
   methods,
   rRatios,
   file,
-  opts,
   (error, data, response) => {
     if (error) {
       console.error(error);
@@ -42,17 +37,15 @@ apiInstance.runSnCurveFileAnalysisSnCurveFilePost(
 
 ### Parameters
 
-| Name        | Type                                    | Description | Notes                      |
-| ----------- | --------------------------------------- | ----------- | -------------------------- |
+| Name        | Type                                    | Description | Notes |
+| ----------- | --------------------------------------- | ----------- | ----- |
 | **methods** | [**[SnCurveMethod]**](SnCurveMethod.md) |             |
 | **rRatios** | [**[Number]**](Number.md)               |             |
 | **file**    | **File**                                |             |
-| **page**    | **Number**                              |             | [optional] [default to 1]  |
-| **size**    | **Number**                              |             | [optional] [default to 50] |
 
 ### Return type
 
-[**PageExperimentModel**](PageExperimentModel.md)
+[**SnCurveResult**](SnCurveResult.md)
 
 ### Authorization
 

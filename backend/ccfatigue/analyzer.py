@@ -2,14 +2,16 @@ import io
 import os
 import subprocess
 from tempfile import NamedTemporaryFile, SpooledTemporaryFile
-from typing import IO, Any, Dict, List
+from typing import IO, Any, Callable, Dict, List, Optional
 
 import pandas as pd
 from pandas.core.frame import DataFrame
+from pandas._typing import ReadBuffer, WriteBuffer
 
 from ccfatigue import plotter
 from ccfatigue.model import SnCurveMethod, SnCurveResult
 from ccfatigue.plotter import DataKey, Line, Plot
+import ccfatigue.modules.sn_curve_loglog as sn_curve_loglog
 
 ROUND_DECIMAL = 8
 
@@ -30,6 +32,19 @@ def run_fortran(exec_path: str, input_file: SpooledTemporaryFile[bytes] | IO) ->
             cwd=directory,
         )
         return ouput
+
+
+def run_python(
+    execute: Callable[
+        [Optional[ReadBuffer], Optional[WriteBuffer], Optional[WriteBuffer]], None
+    ],
+    input_file: SpooledTemporaryFile[bytes] | IO,
+) -> bytes:
+    with NamedTemporaryFile() as output_tmp_file:
+        print(f"executing -> {output_tmp_file.name}")
+        execute(input_file, None, output_tmp_file)
+        output_tmp_file.seek(0)
+        return output_tmp_file.read()
 
 
 def create_dataframe(output: bytes, method: SnCurveMethod) -> DataFrame:
@@ -82,9 +97,13 @@ def run_sn_curve(
     )
     outputs: Dict[SnCurveMethod, bytes] = {}
     for method in methods:
-        output = run_fortran(
-            f"../CCFatigue_modules/2_S-NCurves/S-N-Curve-{method.value}", file
-        )
+        match method:
+            case SnCurveMethod.LOG_LOG:
+                output = run_python(sn_curve_loglog.execute, file)
+            case _:
+                # FIXME
+                output = run_python(sn_curve_loglog.execute, file)
+
         outputs[method] = output
         for r_ratio in r_ratios:
             plot.lines.append(create_line(output, method, r_ratio))

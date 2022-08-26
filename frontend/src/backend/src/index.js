@@ -17,10 +17,12 @@ import DashboardPlots from "./model/DashboardPlots";
 import ExperimentFieldNames from "./model/ExperimentFieldNames";
 import ExperimentModel from "./model/ExperimentModel";
 import HTTPValidationError from "./model/HTTPValidationError";
+import LocationInner from "./model/LocationInner";
 import PageExperimentModel from "./model/PageExperimentModel";
 import PageTestModel from "./model/PageTestModel";
 import Plots from "./model/Plots";
 import SnCurveMethod from "./model/SnCurveMethod";
+import SnCurveResult from "./model/SnCurveResult";
 import TestModel from "./model/TestModel";
 import TestPlot from "./model/TestPlot";
 import UnitInfo from "./model/UnitInfo";
@@ -93,6 +95,11 @@ export {
    */
   HTTPValidationError,
   /**
+   * The LocationInner model constructor.
+   * @property {module:model/LocationInner}
+   */
+  LocationInner,
+  /**
    * The PageExperimentModel model constructor.
    * @property {module:model/PageExperimentModel}
    */
@@ -112,6 +119,11 @@ export {
    * @property {module:model/SnCurveMethod}
    */
   SnCurveMethod,
+  /**
+   * The SnCurveResult model constructor.
+   * @property {module:model/SnCurveResult}
+   */
+  SnCurveResult,
   /**
    * The TestModel model constructor.
    * @property {module:model/TestModel}
