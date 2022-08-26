@@ -4,8 +4,6 @@ Handle /analysis requests
 
 from typing import List
 from fastapi import APIRouter, Query, UploadFile, File
-from fastapi_pagination import Page
-from ccfatigue.models.api import ExperimentModel
 from ccfatigue.analyzer import run_sn_curve
 from ccfatigue.model import SnCurveMethod, SnCurveResult
 
@@ -15,7 +13,7 @@ router = APIRouter(
 )
 
 
-@router.post("/snCurve/file", response_model=Page[ExperimentModel])
+@router.post("/snCurve/file", response_model=SnCurveResult)
 async def run_sn_curve_file(
     file: UploadFile = File(...),
     methods: List[SnCurveMethod] = Query(...),

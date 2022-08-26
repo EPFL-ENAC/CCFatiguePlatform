@@ -1,7 +1,5 @@
 import os
 
-# import pandas as pd
-
 SRC_DIR = os.path.dirname(os.path.realpath(__file__))
 DATA_DIR = os.path.join(SRC_DIR, "..", "..", "Data")
 OUTPUT_DIR = os.path.join(DATA_DIR, "output")
@@ -35,7 +33,3 @@ def test_sn_curve_linlog():
     print(f"{OUTPUT_JSON_FILE=}")
     print(f"{OUTPUT_CSV_FILE=}")
     sn_curve_linlog.execute(INPUT_FILE, OUTPUT_JSON_FILE, OUTPUT_CSV_FILE)
-
-
-if __name__ == "__main__":
-    test_sn_curve_linlog()

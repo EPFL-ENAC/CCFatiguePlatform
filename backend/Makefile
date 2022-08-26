@@ -21,3 +21,6 @@ api:
 
 run:
 	poetry run uvicorn ccfatigue.main:app --reload
+
+test:
+	poetry run pytest

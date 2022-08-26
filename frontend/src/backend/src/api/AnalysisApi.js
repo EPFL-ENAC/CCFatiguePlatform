@@ -13,8 +13,8 @@
 
 import ApiClient from "../ApiClient";
 import HTTPValidationError from "../model/HTTPValidationError";
-import PageExperimentModel from "../model/PageExperimentModel";
 import SnCurveMethod from "../model/SnCurveMethod";
+import SnCurveResult from "../model/SnCurveResult";
 
 /**
  * Analysis service.
@@ -37,7 +37,7 @@ export default class AnalysisApi {
    * Callback function to receive the result of the runSnCurveFileAnalysisSnCurveFilePost operation.
    * @callback module:api/AnalysisApi~runSnCurveFileAnalysisSnCurveFilePostCallback
    * @param {String} error Error message, if any.
-   * @param {module:model/PageExperimentModel} data The data returned by the service call.
+   * @param {module:model/SnCurveResult} data The data returned by the service call.
    * @param {String} response The complete HTTP response.
    */
 
@@ -46,20 +46,10 @@ export default class AnalysisApi {
    * @param {Array.<module:model/SnCurveMethod>} methods
    * @param {Array.<Number>} rRatios
    * @param {File} file
-   * @param {Object} opts Optional parameters
-   * @param {Number} opts.page  (default to 1)
-   * @param {Number} opts.size  (default to 50)
    * @param {module:api/AnalysisApi~runSnCurveFileAnalysisSnCurveFilePostCallback} callback The callback function, accepting three arguments: error, data, response
-   * data is of type: {@link module:model/PageExperimentModel}
+   * data is of type: {@link module:model/SnCurveResult}
    */
-  runSnCurveFileAnalysisSnCurveFilePost(
-    methods,
-    rRatios,
-    file,
-    opts,
-    callback
-  ) {
-    opts = opts || {};
+  runSnCurveFileAnalysisSnCurveFilePost(methods, rRatios, file, callback) {
     let postBody = null;
     // verify the required parameter 'methods' is set
     if (methods === undefined || methods === null) {
@@ -84,8 +74,6 @@ export default class AnalysisApi {
     let queryParams = {
       methods: this.apiClient.buildCollectionParam(methods, "multi"),
       rRatios: this.apiClient.buildCollectionParam(rRatios, "multi"),
-      page: opts["page"],
-      size: opts["size"],
     };
     let headerParams = {};
     let formParams = {
@@ -95,7 +83,7 @@ export default class AnalysisApi {
     let authNames = [];
     let contentTypes = ["multipart/form-data"];
     let accepts = ["application/json"];
-    let returnType = PageExperimentModel;
+    let returnType = SnCurveResult;
     return this.apiClient.callApi(
       "/analysis/snCurve/file",
       "POST",

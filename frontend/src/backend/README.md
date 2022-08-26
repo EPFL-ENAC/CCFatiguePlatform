@@ -104,10 +104,6 @@ var api = new Ccfatigue.AnalysisApi();
 var methods = [new Ccfatigue.SnCurveMethod()]; // {[SnCurveMethod]}
 var rRatios = [null]; // {[Number]}
 var file = "/path/to/file"; // {File}
-var opts = {
-  page: 1, // {Number}
-  size: 50, // {Number}
-};
 var callback = function (error, data, response) {
   if (error) {
     console.error(error);
@@ -115,13 +111,7 @@ var callback = function (error, data, response) {
     console.log("API called successfully. Returned data: " + data);
   }
 };
-api.runSnCurveFileAnalysisSnCurveFilePost(
-  methods,
-  rRatios,
-  file,
-  opts,
-  callback
-);
+api.runSnCurveFileAnalysisSnCurveFilePost(methods, rRatios, file, callback);
 ```
 
 ## Documentation for API Endpoints
@@ -145,10 +135,12 @@ All URIs are relative to _http://localhost_
 - [Ccfatigue.ExperimentFieldNames](docs/ExperimentFieldNames.md)
 - [Ccfatigue.ExperimentModel](docs/ExperimentModel.md)
 - [Ccfatigue.HTTPValidationError](docs/HTTPValidationError.md)
+- [Ccfatigue.LocationInner](docs/LocationInner.md)
 - [Ccfatigue.PageExperimentModel](docs/PageExperimentModel.md)
 - [Ccfatigue.PageTestModel](docs/PageTestModel.md)
 - [Ccfatigue.Plots](docs/Plots.md)
 - [Ccfatigue.SnCurveMethod](docs/SnCurveMethod.md)
+- [Ccfatigue.SnCurveResult](docs/SnCurveResult.md)
 - [Ccfatigue.TestModel](docs/TestModel.md)
 - [Ccfatigue.TestPlot](docs/TestPlot.md)
 - [Ccfatigue.UnitInfo](docs/UnitInfo.md)

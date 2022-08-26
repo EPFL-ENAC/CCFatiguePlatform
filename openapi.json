@@ -323,29 +323,6 @@
             },
             "name": "rRatios",
             "in": "query"
-          },
-          {
-            "required": false,
-            "schema": {
-              "title": "Page",
-              "minimum": 1.0,
-              "type": "integer",
-              "default": 1
-            },
-            "name": "page",
-            "in": "query"
-          },
-          {
-            "required": false,
-            "schema": {
-              "title": "Size",
-              "maximum": 100.0,
-              "minimum": 1.0,
-              "type": "integer",
-              "default": 50
-            },
-            "name": "size",
-            "in": "query"
           }
         ],
         "requestBody": {
@@ -364,7 +341,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Page_ExperimentModel_"
+                  "$ref": "#/components/schemas/SnCurveResult"
                 }
               }
             }
@@ -448,7 +425,7 @@
           "laminates_and_assemblies_stacking_sequence"
         ],
         "type": "string",
-        "description": "Enumerate all fields that can be requested as distinct"
+        "description": "\n    Enumerate all fields that can be requested as distinct\n    "
       },
       "ExperimentModel": {
         "title": "ExperimentModel",
@@ -718,6 +695,26 @@
         "type": "string",
         "description": "An enumeration."
       },
+      "SnCurveResult": {
+        "title": "SnCurveResult",
+        "required": [
+          "outputs"
+        ],
+        "type": "object",
+        "properties": {
+          "outputs": {
+            "title": "Outputs",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "format": "binary"
+            }
+          },
+          "plot": {
+            "title": "Plot"
+          }
+        }
+      },
       "TestModel": {
         "title": "TestModel",
         "required": [
@@ -818,7 +815,14 @@
             "title": "Location",
             "type": "array",
             "items": {
-              "type": "string"
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
             }
           },
           "msg": {
