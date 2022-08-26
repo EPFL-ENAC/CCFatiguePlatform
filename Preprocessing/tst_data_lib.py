@@ -95,6 +95,8 @@ class Experiment:
         self._cleanup_experiment()
         self._validate_experiment()
 
+        self._validate_files_naming()
+
         self._read_tests()
         self._cleanup_tests()
         self._validate_tests()
@@ -652,6 +654,30 @@ class Experiment:
                 json.dump(self.experiment, f, indent=2)
             self.logger.info(
                 f"saved {self.exp_meta_meta['preprocessed_experiment_json_fp']}"
+            )
+
+    def _validate_files_naming(self):
+        """
+        Validate that metadata from file/folder naming matches those found in the XLS
+        """
+
+        if self.exp_meta_meta["date"] != self.experiment["general"]["date"]:
+            self.logger.error(
+                "Date from experiment folder "
+                f"({self.exp_meta_meta['date']}) "
+                "doesn't match the one from the XLS file "
+                f"({self.experiment['general']['date']})"
+            )
+
+        if (
+            self.exp_meta_meta["test_type"]
+            != self.experiment["general"]["experiment type"]
+        ):
+            self.logger.error(
+                "Experiment type from experiment folder "
+                f"({self.exp_meta_meta['test_type']}) "
+                "doesn't match the one from the XLS file "
+                f"({self.experiment['general']['experiment type']})"
             )
 
     def _read_tests(self):
