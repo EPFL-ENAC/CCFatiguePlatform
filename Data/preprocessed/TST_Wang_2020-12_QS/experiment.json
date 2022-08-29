@@ -1,0 +1,25 @@
+{
+  "general": {
+    "laboratory": "CCLab",
+    "researcher": "Congzhe Wang",
+    "date": "2020-12",
+    "experiment type": "QS",
+    "fracture": true,
+    "fracture mode": "Mode II",
+    "quasi-static test type": "Fracture",
+    "measuring equipment": "W+B 50 kN",
+    "control mode": "Displacement Controlled"
+  },
+  "material type": {
+    "sample type": "Composites",
+    "fiber material": "Glass",
+    "fiber form": "continuous filament mat",
+    "area density": "600",
+    "resin": "Epoxy",
+    "hardener": "CH83-2",
+    "mixing ratio": "10:03:00"
+  },
+  "measurement": {
+    "measuring points": 0
+  }
+}
