@@ -1,0 +1,5 @@
+specimen number,specimen name,stress ratio,maximum stress,frequency,run out,displacement controlled loading rate,load controlled loading rate,length,width,thickness,temperature,humidity,initial crack length,x coordinate of measuring point 1,y coordinate of measuring point 1
+1,ELS1,,,,,,,250,40,12.73,,,80,,
+2,ELS2,,,,,,,250,40,12.82,,,80,,
+3,ELS3,,,,,,,250,40,12.48,,,80,,
+4,ELS4,,,,,,,250,40,12.95,,,80,,
