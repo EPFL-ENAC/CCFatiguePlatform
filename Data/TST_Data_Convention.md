@@ -37,7 +37,7 @@ In the Excel metadata template, note that only row 4 (sheet 1) and row 3 (sheet 
 
 | Column name            | Description                                           | Unit     | Data type | Mandatory | Multiple measurement points |
 | ---------------------- | ----------------------------------------------------- | -------- | --------- | --------- | --------------------------- |
-| `Machine_Time`         | Absolute or relative time recorded by the machine     | [-]      | int       |           |                             |
+| `Machine_Time`         | Absolute or relative time recorded by the machine     | [-]      | string    |           |                             |
 | `Machine_N_cycles`     | Number of cycles counted by the machine               | [-]      | int       |           |                             |
 | `Machine_Displacement` | Displacement measured by the machine                  | [mm]     | double    |           |                             |
 | `Machine_Load`         | Load measured by the machine                          | [kN]/[N] | double    |           |                             |
