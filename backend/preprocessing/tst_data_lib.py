@@ -7,7 +7,6 @@ import re
 import glob
 import json
 import copy
-import argparse
 import numpy as np
 import pandas as pd
 
@@ -1362,26 +1361,3 @@ class Experiment:
                 Experiment.__dict_cleanup(v)
             elif type(v) == str:
                 dic[k] = v.strip(" \n")
-
-
-def get_tst_folders_to_parse(
-    description,
-    help=f"Folder containing the TST dataset. "
-    "if none provided, then will parse all dataset "
-    f"under {EXPERIMENTS_FOLDER}",
-):
-    """
-    Read arguments. If tst_folders are given, then return it.
-    Otherwise return default RAW_EXPERIMENT_FP_FOLDERS
-    """
-    parser = argparse.ArgumentParser(description=description)
-    parser.add_argument(
-        "tst_folders",
-        nargs="*",
-        help=help,
-    )
-    args = parser.parse_args()
-    if args.tst_folders != []:
-        return args.tst_folders
-    else:
-        return RAW_EXPERIMENT_FP_FOLDERS
