@@ -970,7 +970,7 @@ class Experiment:
             with self.logger.indent:
                 EXPECTED_COLUMNS = {
                     "Machine_Time": {
-                        "type": int,
+                        "type": str,
                         "mandatory": False,
                     },
                     "Machine_N_cycles": {
@@ -987,6 +987,10 @@ class Experiment:
                     },
                     r"MD_index--\d": {
                         "type": int,
+                        "mandatory": False,
+                    },
+                    r"MD_time--\d": {
+                        "type": str,
                         "mandatory": False,
                     },
                     r"MD_N_cycles--\d": {
