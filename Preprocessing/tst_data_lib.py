@@ -989,6 +989,10 @@ class Experiment:
                         "type": int,
                         "mandatory": False,
                     },
+                    r"MD_time--\d": {
+                        "type": str,
+                        "mandatory": False,
+                    },
                     r"MD_N_cycles--\d": {
                         "type": int,
                         "mandatory": False,

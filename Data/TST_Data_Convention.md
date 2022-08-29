@@ -42,6 +42,7 @@ In the Excel metadata template, note that only row 4 (sheet 1) and row 3 (sheet 
 | `Machine_Displacement` | Displacement measured by the machine                  | [mm]     | double    |           |                             |
 | `Machine_Load`         | Load measured by the machine                          | [kN]/[N] | double    |           |                             |
 | `MD_index--#`          | index for the measurement, e.g. image number          | [-]      | int       |           | y                           |
+| `MD_time--#`           | Time recored by the measuring device                  | [-]      | string    |           | y                           |
 | `MD_N_cycles--#`       | Number of cycles from measuring device                | [-]      | int       |           | y                           |
 | `MD_Displacement--#`   | Displacement from measuring device                    | [mm]     | double    |           | y                           |
 | `MD_Load--#`           | Load from measuring device                            | [kN]/[N] | double    |           | y                           |
