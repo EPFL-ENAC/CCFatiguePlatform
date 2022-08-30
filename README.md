@@ -52,6 +52,39 @@ make init-database
 make dev-frontend
 ```
 
+## First time setup
+
+```bash
+make install
+```
+
+## Run Preprocessing
+
+```bash
+make run-preprocessing
+```
+
+## Run Backend
+
+```bash
+make run-db
+make run-backend
+```
+
+First time backend setup/init :
+
+```bash
+cd backend
+make init-db  # 1st time init
+make alembic-upgrade  # or only create/update schema in DB
+```
+
+## Run Frontend
+
+```bash
+make run-frontend
+```
+
 ## Server provisioning
 
 ```bash
