@@ -13,6 +13,7 @@
 
 import ApiClient from "../ApiClient";
 import DashboardPlots from "../model/DashboardPlots";
+import ExperimentDataPreprocessed from "../model/ExperimentDataPreprocessed";
 import ExperimentFieldNames from "../model/ExperimentFieldNames";
 import HTTPValidationError from "../model/HTTPValidationError";
 import PageExperimentModel from "../model/PageExperimentModel";
@@ -176,6 +177,57 @@ export default class ExperimentsApi {
     return this.apiClient.callApi(
       "/experiments/tests_dashboard_plots",
       "GET",
+      pathParams,
+      queryParams,
+      headerParams,
+      formParams,
+      postBody,
+      authNames,
+      contentTypes,
+      accepts,
+      returnType,
+      null,
+      callback
+    );
+  }
+
+  /**
+   * Callback function to receive the result of the postDataPreprocessCheckExperimentsDataPreprocessCheckPost operation.
+   * @callback module:api/ExperimentsApi~postDataPreprocessCheckExperimentsDataPreprocessCheckPostCallback
+   * @param {String} error Error message, if any.
+   * @param {module:model/ExperimentDataPreprocessed} data The data returned by the service call.
+   * @param {String} response The complete HTTP response.
+   */
+
+  /**
+   * Post Data Preprocess Check
+   * @param {File} file
+   * @param {module:api/ExperimentsApi~postDataPreprocessCheckExperimentsDataPreprocessCheckPostCallback} callback The callback function, accepting three arguments: error, data, response
+   * data is of type: {@link module:model/ExperimentDataPreprocessed}
+   */
+  postDataPreprocessCheckExperimentsDataPreprocessCheckPost(file, callback) {
+    let postBody = null;
+    // verify the required parameter 'file' is set
+    if (file === undefined || file === null) {
+      throw new Error(
+        "Missing the required parameter 'file' when calling postDataPreprocessCheckExperimentsDataPreprocessCheckPost"
+      );
+    }
+
+    let pathParams = {};
+    let queryParams = {};
+    let headerParams = {};
+    let formParams = {
+      file: file,
+    };
+
+    let authNames = [];
+    let contentTypes = ["multipart/form-data"];
+    let accepts = ["application/json"];
+    let returnType = ExperimentDataPreprocessed;
+    return this.apiClient.callApi(
+      "/experiments/data_preprocess_check",
+      "POST",
       pathParams,
       queryParams,
       headerParams,
