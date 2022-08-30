@@ -32,8 +32,9 @@ class Logger:
         def __exit__(self, typ, value, traceback):
             self.current_indent -= 1
 
-    def __init__(self, filename=None):
+    def __init__(self, filename=None, write_to_stdout=True):
         self.filename = filename
+        self.write_to_stdout = write_to_stdout
         self.messages = []
         self.warning_count = 0
         self.error_count = 0
@@ -52,7 +53,8 @@ class Logger:
         message = end.join(messages)
         if self.filename is not None:
             self.f_handler.write(f"{message}{end}")
-        print(message, end=end)
+        if self.write_to_stdout:
+            print(message, end=end)
 
     def reset_counts(self):
         self.warning_count = 0
