@@ -11,7 +11,7 @@ import argparse
 import numpy as np
 import pandas as pd
 
-EXPERIMENTS_FOLDER = os.path.abspath(f"{__file__}/../../Data")
+EXPERIMENTS_FOLDER = os.path.abspath(f"{__file__}/../../../Data")
 RAW_EXPERIMENT_FP_FOLDERS = sorted(
     filter(lambda fp: os.path.isdir(fp), glob.glob(f"{EXPERIMENTS_FOLDER}/raw/TST_*"))
 )
@@ -140,7 +140,7 @@ class Experiment:
         self.exp_meta_meta = {}
         self.exp_meta_meta["folder"] = os.path.basename(self.experiment_fp_folder)
         self.exp_meta_meta["preprocessed_folder"] = os.path.abspath(
-            f"{__file__}/../../Data/preprocessed/{self.exp_meta_meta['folder']}"
+            f"{EXPERIMENTS_FOLDER}/preprocessed/{self.exp_meta_meta['folder']}"
         )
         m = re.match("TST_([^_]+)_([0-9-]+)_(FA|QS)", self.exp_meta_meta["folder"])
         if not m:

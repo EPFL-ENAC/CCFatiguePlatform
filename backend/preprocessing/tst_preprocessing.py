@@ -1,7 +1,6 @@
 """
-According to ./README.md
-
 - Source is `/Data/raw`
+  see [/Data/TST_Data_Convention.md](/Data/TST_Data_Convention.md)
   - Folder is named `TST_ResearcherName_YYY-MM_Type` e.g. `TST_Srinivasan_2021-10_QS`
   - contains following files
     - `TST_YYYY-MM_Type_metadata.xls`
