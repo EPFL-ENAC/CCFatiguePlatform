@@ -13,9 +13,6 @@ install_frontend:
 init-db:
 	${MAKE} -C backend init-db
 
-init-db-with-fake:
-	${MAKE} -C backend init-db-with-fake
-
 compile_sncurve:
 	$(MAKE) -C CCFatigue_modules/2_S-NCurves compile
 
@@ -25,6 +22,9 @@ build_frontend:
 generate-api:
 	$(MAKE) -C backend generate-api
 	$(MAKE) -C frontend generate-api
+
+run-preprocessing:
+	$(MAKE) -C backend/preprocessing run
 
 run-db:
 	$(MAKE) -C backend run-db
