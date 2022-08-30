@@ -6,12 +6,6 @@ CCFatiguePlatform is an initiative from CCLab that aims to develop a web applica
 
 # Web app: Usage
 
-## Setup & run locally (without CCFatigue modules)
-
-1. run preprocessing according to [Preprocessing/README.md](Preprocessing/README.md)
-2. run backend according to [backend/README.md](backend/README.md)
-3. run frontend according to [frontend/README.md](frontend/README.md)
-
 ## Secrets
 
 ```bash
@@ -19,6 +13,39 @@ mkdir -p secrets && cat <<EOF > secrets/.env
 POSTGRES_USER=ccfatigue
 POSTGRES_PASSWORD=change-it!
 EOF
+```
+
+## First time setup
+
+```bash
+make install
+```
+
+## Run Preprocessing
+
+```bash
+make run-preprocessing
+```
+
+## Run Backend
+
+```bash
+make run-db
+make run-backend
+```
+
+First time backend setup/init :
+
+```bash
+cd backend
+make init-db  # 1st time init
+make alembic-upgrade  # or only create/update schema in DB
+```
+
+## Run Frontend
+
+```bash
+make run-frontend
 ```
 
 ## Server provisioning
