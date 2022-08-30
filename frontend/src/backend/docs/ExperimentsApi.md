@@ -2,11 +2,12 @@
 
 All URIs are relative to _http://localhost_
 
-| Method                                                                                                                                   | HTTP request                               | Description               |
-| ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ | ------------------------- |
-| [**getExperimentsExperimentsGet**](ExperimentsApi.md#getExperimentsExperimentsGet)                                                       | **GET** /experiments                       | Get Experiments           |
-| [**getFieldDistinctExperimentsFieldDistinctGet**](ExperimentsApi.md#getFieldDistinctExperimentsFieldDistinctGet)                         | **GET** /experiments/{field}/distinct      | Get Field Distinct        |
-| [**getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet**](ExperimentsApi.md#getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet) | **GET** /experiments/tests_dashboard_plots | Get Tests Dashboard Plots |
+| Method                                                                                                                                       | HTTP request                                | Description                |
+| -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | -------------------------- |
+| [**getExperimentsExperimentsGet**](ExperimentsApi.md#getExperimentsExperimentsGet)                                                           | **GET** /experiments                        | Get Experiments            |
+| [**getFieldDistinctExperimentsFieldDistinctGet**](ExperimentsApi.md#getFieldDistinctExperimentsFieldDistinctGet)                             | **GET** /experiments/{field}/distinct       | Get Field Distinct         |
+| [**getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet**](ExperimentsApi.md#getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet)     | **GET** /experiments/tests_dashboard_plots  | Get Tests Dashboard Plots  |
+| [**postDataPreprocessCheckExperimentsDataPreprocessCheckPost**](ExperimentsApi.md#postDataPreprocessCheckExperimentsDataPreprocessCheckPost) | **POST** /experiments/data_preprocess_check | Post Data Preprocess Check |
 
 ## getExperimentsExperimentsGet
 
@@ -153,4 +154,48 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: Not defined
+- **Accept**: application/json
+
+## postDataPreprocessCheckExperimentsDataPreprocessCheckPost
+
+> ExperimentDataPreprocessed postDataPreprocessCheckExperimentsDataPreprocessCheckPost(file)
+
+Post Data Preprocess Check
+
+### Example
+
+```javascript
+import Ccfatigue from "ccfatigue";
+
+let apiInstance = new Ccfatigue.ExperimentsApi();
+let file = "/path/to/file"; // File |
+apiInstance.postDataPreprocessCheckExperimentsDataPreprocessCheckPost(
+  file,
+  (error, data, response) => {
+    if (error) {
+      console.error(error);
+    } else {
+      console.log("API called successfully. Returned data: " + data);
+    }
+  }
+);
+```
+
+### Parameters
+
+| Name     | Type     | Description | Notes |
+| -------- | -------- | ----------- | ----- |
+| **file** | **File** |             |
+
+### Return type
+
+[**ExperimentDataPreprocessed**](ExperimentDataPreprocessed.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: multipart/form-data
 - **Accept**: application/json
