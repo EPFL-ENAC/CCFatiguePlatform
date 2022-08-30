@@ -227,6 +227,47 @@
         }
       }
     },
+    "/experiments/data_preprocess_check": {
+      "post": {
+        "tags": [
+          "experiments"
+        ],
+        "summary": "Post Data Preprocess Check",
+        "operationId": "post_data_preprocess_check_experiments_data_preprocess_check_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_post_data_preprocess_check_experiments_data_preprocess_check_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Experiment_Data_Preprocessed"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/tests": {
       "get": {
         "tags": [
@@ -314,6 +355,20 @@
           }
         },
         "description": "App Info"
+      },
+      "Body_post_data_preprocess_check_experiments_data_preprocess_check_post": {
+        "title": "Body_post_data_preprocess_check_experiments_data_preprocess_check_post",
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string",
+            "format": "binary"
+          }
+        }
       },
       "DashboardPlots": {
         "title": "DashboardPlots",
@@ -503,6 +558,24 @@
           }
         },
         "description": "Defines how experiment is seen on the API"
+      },
+      "Experiment_Data_Preprocessed": {
+        "title": "Experiment_Data_Preprocessed",
+        "required": [
+          "output",
+          "success"
+        ],
+        "type": "object",
+        "properties": {
+          "output": {
+            "title": "Output",
+            "type": "string"
+          },
+          "success": {
+            "title": "Success",
+            "type": "boolean"
+          }
+        }
       },
       "HTTPValidationError": {
         "title": "HTTPValidationError",

@@ -13,6 +13,11 @@ class Experiment(BaseModel):
     date: date
 
 
+class Experiment_Data_Preprocessed(BaseModel):
+    output: List[Any]
+    success: bool
+
+
 class Test(BaseModel):
     number: int
     color: str
