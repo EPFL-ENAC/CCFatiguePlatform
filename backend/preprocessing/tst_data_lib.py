@@ -34,6 +34,7 @@ class Logger:
 
     def __init__(self, filename=None):
         self.filename = filename
+        self.messages = []
         self.warning_count = 0
         self.error_count = 0
 
@@ -51,7 +52,6 @@ class Logger:
         message = end.join(messages)
         if self.filename is not None:
             self.f_handler.write(f"{message}{end}")
-            # self.f_handler.flush()
         print(message, end=end)
 
     def reset_counts(self):
@@ -62,6 +62,14 @@ class Logger:
         indent = " " * self.indent.current_indent
         lines = [f"{indent}{prefix}{line}" for line in message.split("\n")]
         self._write(lines, end)
+        self.messages.append(
+            {
+                "indent": self.indent.current_indent,
+                "lines": message.split("\n"),
+                "prefix": prefix,
+                "end": end,
+            }
+        )
 
     def info(self, message="", end="\n"):
         self.write(message=message, prefix="(i): ", end=end)
