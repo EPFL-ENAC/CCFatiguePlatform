@@ -36,6 +36,6 @@ Encoding format: UTF-8, Separator: ',' (comma)
 
 | Variable name        | Description                            | Symbol    | Unit    | Data type | Mandatory          |
 |----------------------|----------------------------------------|-----------|---------|-----------|--------------------|
-| stress_ratio         | Stress ratio                           | R         | [-]     | double    | y |
-| cycles_to_failure    | Number of cycles to failure            | N         | [-]     | int       | y |
-| stress_parameter     | Cyclic max stress                      | sigma_max | [MPa]   | double    | y           |
+| stress_ratio         | Stress ratio                           | R         | [-]     | double    | y                  |
+| cycles_to_failure    | Number of cycles to failure            | N         | [-]     | int       | y                  |
+| stress_max           | Max stress                             | sigma_max | [MPa]   | double    | y                  |
