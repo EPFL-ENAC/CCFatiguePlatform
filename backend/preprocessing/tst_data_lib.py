@@ -7,7 +7,6 @@ import re
 import glob
 import json
 import copy
-import argparse
 import numpy as np
 import pandas as pd
 
@@ -33,8 +32,10 @@ class Logger:
         def __exit__(self, typ, value, traceback):
             self.current_indent -= 1
 
-    def __init__(self, filename=None):
+    def __init__(self, filename=None, write_to_stdout=True):
         self.filename = filename
+        self.write_to_stdout = write_to_stdout
+        self.messages = []
         self.warning_count = 0
         self.error_count = 0
 
@@ -52,8 +53,8 @@ class Logger:
         message = end.join(messages)
         if self.filename is not None:
             self.f_handler.write(f"{message}{end}")
-            # self.f_handler.flush()
-        print(message, end=end)
+        if self.write_to_stdout:
+            print(message, end=end)
 
     def reset_counts(self):
         self.warning_count = 0
@@ -63,6 +64,14 @@ class Logger:
         indent = " " * self.indent.current_indent
         lines = [f"{indent}{prefix}{line}" for line in message.split("\n")]
         self._write(lines, end)
+        self.messages.append(
+            {
+                "indent": self.indent.current_indent,
+                "lines": message.split("\n"),
+                "prefix": prefix,
+                "end": end,
+            }
+        )
 
     def info(self, message="", end="\n"):
         self.write(message=message, prefix="(i): ", end=end)
@@ -234,7 +243,9 @@ class Experiment:
             d = df.to_dict(orient="index")
             return {k: nest(v) for k, v in d.items()}
 
-        self.logger.info(f"Read {self.exp_meta_meta['raw_xls_fp']} Experiment tab")
+        self.logger.info(
+            f"Read {os.path.basename(self.exp_meta_meta['raw_xls_fp'])} Experiment tab"
+        )
         with self.logger.indent:
             if self.exp_meta_meta["raw_xls_fp"] is None:
                 self.logger.error("xls metadata file not found !")
@@ -653,7 +664,10 @@ class Experiment:
             with open(self.exp_meta_meta["preprocessed_experiment_json_fp"], "w") as f:
                 json.dump(self.experiment, f, indent=2)
             self.logger.info(
-                f"saved {self.exp_meta_meta['preprocessed_experiment_json_fp']}"
+                "saved "
+                + os.path.basename(
+                    self.exp_meta_meta["preprocessed_experiment_json_fp"]
+                )
             )
 
     def _validate_files_naming(self):
@@ -684,7 +698,9 @@ class Experiment:
         """
         Read tests metadata from XLS Tests tab
         """
-        self.logger.info(f"Read {self.exp_meta_meta['raw_xls_fp']} Tests tab")
+        self.logger.info(
+            f"Read {os.path.basename(self.exp_meta_meta['raw_xls_fp'])} Tests tab"
+        )
         with self.logger.indent:
             self.tests = pd.read_excel(
                 self.exp_meta_meta["raw_xls_fp"], sheet_name="Tests"
@@ -884,7 +900,10 @@ class Experiment:
             self.tests.to_csv(
                 self.exp_meta_meta["preprocessed_tests_csv_fp"], index=False
             )
-            self.logger.info(f"saved {self.exp_meta_meta['preprocessed_tests_csv_fp']}")
+            self.logger.info(
+                "saved "
+                + os.path.basename(self.exp_meta_meta["preprocessed_tests_csv_fp"])
+            )
 
     def _read_measures(self):
         """
@@ -892,7 +911,7 @@ class Experiment:
         """
         self.measures_list = copy.deepcopy(self.exp_meta_meta["measures"])
         for measures in self.measures_list:
-            self.logger.info(f"Read measures {measures['raw_fp']}")
+            self.logger.info(f"Read measures {os.path.basename(measures['raw_fp'])}")
             with self.logger.indent:
                 measures["df"] = pd.read_csv(measures["raw_fp"], low_memory=False)
 
@@ -903,7 +922,7 @@ class Experiment:
         + only expected columns
         """
         for measures in self.measures_list:
-            self.logger.info(f"Cleanup measures {measures['raw_fp']}")
+            self.logger.info(f"Cleanup measures {os.path.basename(measures['raw_fp'])}")
             with self.logger.indent:
 
                 # Strip spaces and \n on column names
@@ -966,7 +985,9 @@ class Experiment:
         Validate measures
         """
         for measures in self.measures_list:
-            self.logger.info(f"Validate measures {measures['raw_fp']}")
+            self.logger.info(
+                f"Validate measures {os.path.basename(measures['raw_fp'])}"
+            )
             with self.logger.indent:
                 EXPECTED_COLUMNS = {
                     "Machine_Time": {
@@ -1251,7 +1272,9 @@ class Experiment:
         for measures in self.measures_list:
             with self.logger.indent:
                 measures["df"].to_csv(measures["preprocessed_fp"], index=False)
-                self.logger.info(f"saved to {measures['preprocessed_fp']}")
+                self.logger.info(
+                    f"saved to {os.path.basename(measures['preprocessed_fp'])}"
+                )
 
     @classmethod
     def __grep_matching_columns(cls, pattern, columns):
@@ -1362,26 +1385,3 @@ class Experiment:
                 Experiment.__dict_cleanup(v)
             elif type(v) == str:
                 dic[k] = v.strip(" \n")
-
-
-def get_tst_folders_to_parse(
-    description,
-    help=f"Folder containing the TST dataset. "
-    "if none provided, then will parse all dataset "
-    f"under {EXPERIMENTS_FOLDER}",
-):
-    """
-    Read arguments. If tst_folders are given, then return it.
-    Otherwise return default RAW_EXPERIMENT_FP_FOLDERS
-    """
-    parser = argparse.ArgumentParser(description=description)
-    parser.add_argument(
-        "tst_folders",
-        nargs="*",
-        help=help,
-    )
-    args = parser.parse_args()
-    if args.tst_folders != []:
-        return args.tst_folders
-    else:
-        return RAW_EXPERIMENT_FP_FOLDERS
