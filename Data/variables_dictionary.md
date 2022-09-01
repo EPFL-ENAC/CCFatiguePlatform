@@ -7,7 +7,7 @@
 | stress_lowerbound     | Stress at failure (lower bound)        | sigma_max   | [MPa]   | double    | SNC                     |
 | stress_upperbound     | Stress at failure (upper bound)        | sigma_max   | [MPa]   | double    | SNC                     |
 | stress                | Stress at failure (median)             | sigma_max   | [MPa]   | double    | SNC                     |
-| max_stress            | Max stress                             | sigma_max   | [MPa]   | double    | AGG, FAF, DAS           |
+| stress_max            | Max stress                             | sigma_max   | [MPa]   | double    | AGG, FAF, DAS           |
 | cycles_to_failure     | Number of cycles to failure            | N           | [-]     | int       | AGG, SNC, CLD, FAF      |
 | n_cycles              | Number of cycles                       | n           |         | double    | CYC                     |
 | residual_strength     | Residual strength                      | sigma_r     | [MPa]   | double    | AGG                     |
