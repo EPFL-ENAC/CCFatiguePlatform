@@ -11,9 +11,10 @@ body:
         # Submission of a new dataset
 
         - Datasets conventions are documented [here](https://github.com/EPFL-ENAC/CCFatiguePlatform/tree/develop/Data)
-        - Dataset online checker is available [here](http://ccfatigue-test.epfl.ch/fatigue_database/data_upload)
+        - Datasets online checker is available [here](http://ccfatigue-test.epfl.ch/fatigue_database/data_upload)
   - type: checkboxes
     attributes:
+      label: Dataset validation
       options:
         - label: This dataset passed the online checker linked above
           required: true
