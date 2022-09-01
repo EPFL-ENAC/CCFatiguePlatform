@@ -1,0 +1,25 @@
+name: Dataset integration request
+description: Request to integrate a new dataset into the project
+title: "[New Dataset] : {3LettersDataCode}_{Researcher's lastname}_{Date}_{Test type}"
+labels: ["Dataset", "triage"]
+assignees:
+  - sbancal
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Submission of a new dataset
+  - type: checkboxes
+    attributes:
+      label: Datasets conventions are available [here](https://github.com/EPFL-ENAC/CCFatiguePlatform/tree/develop/Data)
+      options:
+        - label: I have checked that this dataset conforms to the conventions by checking it on [Data Upload Checker](http://ccfatigue-test.epfl.ch/fatigue_database/data_upload)
+          required: true
+  - type: textarea
+    attributes:
+      label: Dataset zip 
+      description: |
+        Upload your dataset by dragging your zip file in the area below.
+        Leave also a comment if needed.
+    validations:
+      required: false
