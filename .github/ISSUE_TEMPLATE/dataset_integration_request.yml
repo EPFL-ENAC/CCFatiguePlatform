@@ -8,16 +8,18 @@ body:
   - type: markdown
     attributes:
       value: |
-        Submission of a new dataset
+        # Submission of a new dataset
+
+        - Datasets conventions are documented [here](https://github.com/EPFL-ENAC/CCFatiguePlatform/tree/develop/Data)
+        - Dataset online checker is available [here](http://ccfatigue-test.epfl.ch/fatigue_database/data_upload)
   - type: checkboxes
     attributes:
-      label: Datasets conventions are available [here](https://github.com/EPFL-ENAC/CCFatiguePlatform/tree/develop/Data)
       options:
-        - label: I have checked that this dataset conforms to the conventions by checking it on [Data Upload Checker](http://ccfatigue-test.epfl.ch/fatigue_database/data_upload)
+        - label: This dataset passed the online checker linked above
           required: true
   - type: textarea
     attributes:
-      label: Dataset zip 
+      label: Dataset zip
       description: |
         Upload your dataset by dragging your zip file in the area below.
         Leave also a comment if needed.
