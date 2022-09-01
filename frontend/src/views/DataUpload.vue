@@ -22,7 +22,7 @@
               <br />
               You can send your dataset for integration
               <a
-                href="https://github.com/EPFL-ENAC/CCFatiguePlatform/issues/new"
+                href="https://github.com/EPFL-ENAC/CCFatiguePlatform/issues/new?assignees=sbancal&labels=Dataset%2Ctriage&template=dataset_integration_request.yml&title=%5BNew+Dataset%5D+%3A+%7B3LettersDataCode%7D_%7BResearcher%27s+lastname%7D_%7BDate%7D_%7BTest+type%7D"
               >
                 here
               </a>
