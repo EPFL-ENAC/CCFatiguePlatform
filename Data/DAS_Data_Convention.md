@@ -13,9 +13,11 @@ with:
 
 ## Module 5 inputs
 
-- CCInput.txt >
-- Factor.txt > bounds for plot
-- Miner.txt > experimental data for validation (same format as DAS)
+CCInput.txt >
+Factor.txt > bounds for plot
+Miner.txt > experimental data for validation (same format as DAS)
+
+Output : 3 columns ? (Re-run it to check)
 
 ## CLD CSV files standards (column names must be exact) :
 
@@ -23,5 +25,6 @@ Encoding format: UTF-8, Separator: ',' (comma)
 
 | Variable name        | Description                            | Symbol    | Unit    | Data type | Mandatory          |
 |----------------------|----------------------------------------|-----------|---------|-----------|--------------------|
-| stress_max           | Max stress                             | sigma_max | [MPa]   | double    | y                  |
-| damage               | Damage                                 | D         | [-]     | double    | y                  |
+| max_stress           | Max stress                             | sigma_max | [MPa]   | double    | y                |
+| cycles_to_failure    | Number of cycles to failure            | N         | [-]     | int       |  |
+| damage               | 1/Damage                               | D         | [-]     | double    |  |
