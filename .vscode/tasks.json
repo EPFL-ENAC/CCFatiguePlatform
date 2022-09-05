@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "serve",
+      "label": "serve-frontend",
       "type": "npm",
       "script": "serve",
       "isBackground": true,
@@ -22,6 +22,18 @@
       },
       "options": {
         "cwd": "frontend"
+      }
+    },
+    {
+      "label": "run-database",
+      "type": "docker-compose",
+      "dockerCompose": {
+        "up": {
+          "detached": true,
+          "build": true,
+          "services": ["database"]
+        },
+        "files": ["${workspaceFolder}/docker-compose.yml"]
       }
     }
   ]
