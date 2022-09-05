@@ -1,5 +1,8 @@
 FROM python:3.10-alpine as build-stage
 WORKDIR /app
+RUN apk add --no-cache \
+    gcc \
+    musl-dev
 RUN pip install poetry
 COPY ./pyproject.toml ./poetry.lock* /app/
 RUN poetry export --output requirements.txt
