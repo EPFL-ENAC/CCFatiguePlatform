@@ -1,0 +1,38 @@
+name: Feature request
+description: Request to integrate a new feature into the project
+title: "[New Feature] : {Feature summarized in 1 sentence}"
+labels: ["triage", "enhancement"]
+assignees:
+  - sbancal
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # Submission of a new feature request
+
+        **Is your feature request related to a problem? Please describe.**
+        A clear and concise description of what the problem is. Ex. I'm missing [...], when I [...].
+
+        **What section of the project your feature is about?**
+        Is it about the _Fatigue database_, _Fatigue analysis_ or something else? Give us as much info as possible so that we understand what part of the project is concerned by your request.
+        If possible give us the URL concerned by your request.
+
+        **Describe the solution you'd like**
+        A clear and concise description of what you want to happen. Please explain why and how it will help you.
+
+        **Describe alternatives you've considered**
+        A clear and concise description of any alternative solutions or features you've considered.
+
+        **Additional context**
+        Add any other context or screenshots about the feature request here.
+  - type: checkboxes
+    attributes:
+      label: Not a duplicate
+      options:
+        - label: I have checked that this feature is not already present in the [open issues](https://github.com/EPFL-ENAC/CCFatiguePlatform/issues/)
+          required: true
+  - type: textarea
+    attributes:
+      label: Feature description
+    validations:
+      required: false
