@@ -34,3 +34,10 @@ run-backend:
 
 run-frontend:
 	$(MAKE) -C frontend run
+
+run-database:
+	docker-compose up -d database
+
+deploy-docker:
+	docker-compose build --parallel --pull
+	docker-compose up --remove-orphans

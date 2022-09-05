@@ -1,0 +1,56 @@
+version: "3.8"
+services:
+  reverse-proxy:
+    image: traefik:v2.8
+    command:
+      - "--providers.docker"
+      - "--providers.file.directory=/configuration/"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
+      - "--entrypoints.websecure.address=:443"
+    environment:
+      - SSL_CERT_CRT=${SSL_CERT_CRT}
+      - SSL_CERT_KEY=${SSL_CERT_KEY}
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.yaml:/configuration/traefik.yml
+      - /etc/ssl:/etc/ssl
+  frontend:
+    build: ./frontend
+    labels:
+      - "traefik.http.routers.frontend.tls=true"
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+    restart: unless-stopped
+  backend:
+    build: ./backend
+    depends_on:
+      - database
+    env_file: secrets/.env
+    environment:
+      MODULE_NAME: ccfatigue.main
+      FORWARDED_ALLOW_IPS: "*"
+      CORS_ENABLED: "true"
+      POSTGRES_HOST: database
+      ROOT_PATH: /api
+    labels:
+      - "traefik.http.routers.backend.tls=true"
+      - "traefik.http.routers.backend.rule=PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.middlewares=backend-stripprefix"
+      - "traefik.http.middlewares.backend-stripprefix.stripprefix.prefixes=/api"
+    restart: unless-stopped
+  database:
+    image: postgres:14-alpine
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./secrets/.env
+    volumes:
+      - database:/var/lib/postgresql/data
+volumes:
+  database: {}

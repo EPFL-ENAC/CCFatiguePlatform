@@ -15,8 +15,5 @@ init-db:
 generate-api:
 	poetry run python api.py ../openapi.json
 
-run-db:
-	cd ccfatigue/DB/; docker-compose up
-
 run:
 	poetry run uvicorn ccfatigue.main:app --reload
