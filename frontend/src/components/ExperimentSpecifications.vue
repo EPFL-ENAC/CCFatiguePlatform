@@ -39,35 +39,16 @@
             </li>
             <li>
               <experiment-s-v
+                subject="Measuring equipment"
+                :values="[experiment.measuring_equipment]"
+              />
+            </li>
+            <li>
+              <experiment-s-v
                 subject="Publications"
                 :values="[
                   `${experiment.publication_title} (${experiment.publication_year})`,
                 ]"
-              />
-            </li>
-          </ul>
-        </v-col>
-        <v-col>
-          <h4>TEST CONDITIONS</h4>
-          <ul>
-            <li>
-              <experiment-s-v
-                subject="Temperature"
-                :values="[experiment.test_condtions_temperature]"
-                :unit="units.temperature"
-              />
-            </li>
-            <li>
-              <experiment-s-v
-                subject="Humidity"
-                :values="[experiment.test_condtions_humidity]"
-                :unit="units.humidity"
-              />
-            </li>
-            <li>
-              <experiment-s-v
-                subject="Measuring equipment"
-                :values="[experiment.measuring_equipment]"
               />
             </li>
           </ul>
@@ -108,8 +89,10 @@
             </li>
             <li>
               <experiment-s-v
-                subject="Fiber content"
-                :values="[experiment.laminates_and_assemblies_fiber_content]"
+                subject="Fiber volume ratio"
+                :values="[
+                  experiment.laminates_and_assemblies_fiber_volume_ratio,
+                ]"
               />
             </li>
           </ul>
@@ -143,8 +126,8 @@
             </li>
             <li>
               <experiment-s-v
-                subject="Fiber Geometry"
-                :values="[experiment.material_type_fiber_geometry]"
+                subject="Fiber form"
+                :values="[experiment.material_type_fiber_form]"
               />
             </li>
             <li>
