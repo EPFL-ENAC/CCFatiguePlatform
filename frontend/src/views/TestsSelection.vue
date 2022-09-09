@@ -9,11 +9,13 @@
         :items="experiment.tests"
         :options.sync="options"
         :server-items-length="experiment.pagination.total"
-        :loading="experiment.loading"
+        :loading="experiment.loadingTests"
         :footer-props="{ 'items-per-page-options': [5, 10, 15, 20, 40] }"
         item-key="id"
         @click:row="rowClick"
-      />
+      >
+        <template v-slot:no-data>No test for this experiment</template>
+      </v-data-table>
 
       <v-container>
         <v-row justify="end">
