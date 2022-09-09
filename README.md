@@ -24,33 +24,39 @@ make install
 ## Run Preprocessing
 
 ```bash
-make run-preprocessing
+make preprocessing
+```
+
+## Re-generate API bindings btw backend and frontend
+
+```bash
+make api
 ```
 
 ## Run Backend
 
 ```bash
-make run-db
-make run-backend
+make dev-database
+make dev-backend
 ```
 
 First time backend setup/init :
 
 ```bash
-cd backend
-make init-db  # 1st time init
-make alembic-upgrade  # or only create/update schema in DB
+make init-database
 ```
 
 ## Run Frontend
 
 ```bash
-make run-frontend
+make dev-frontend
 ```
 
 ## Server provisioning
 
-See https://github.com/EPFL-ENAC/enacit-srv-lin-sysadmin/blob/develop/test/ccfatigue-test/README.md
+```bash
+make run
+```
 
 # App architecture
 
