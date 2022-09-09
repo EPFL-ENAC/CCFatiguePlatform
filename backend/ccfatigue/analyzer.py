@@ -12,6 +12,7 @@ from ccfatigue import plotter
 from ccfatigue.model import SnCurveMethod, SnCurveResult
 from ccfatigue.plotter import DataKey, Line, Plot
 import ccfatigue.modules.sn_curve_loglog as sn_curve_loglog
+import ccfatigue.modules.sn_curve_sendeckyj as sn_curve_sendeckyj
 
 ROUND_DECIMAL = 8
 
@@ -100,6 +101,8 @@ def run_sn_curve(
         match method:
             case SnCurveMethod.LOG_LOG:
                 output = run_python(sn_curve_loglog.execute, file)
+            case SnCurveMethod.SENDECKYJ:
+                output = run_python(sn_curve_sendeckyj.execute, file)
             case _:
                 # FIXME
                 output = run_python(sn_curve_loglog.execute, file)

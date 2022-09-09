@@ -24,3 +24,6 @@ run:
 
 test:
 	poetry run pytest
+
+compile:
+	poetry run python -m numpy.f2py -c fortran/sendeckyj.f -m ccfatigue.fortran.sendeckyj
