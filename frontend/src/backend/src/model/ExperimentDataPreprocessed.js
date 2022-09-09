@@ -22,7 +22,7 @@ class ExperimentDataPreprocessed {
   /**
    * Constructs a new <code>ExperimentDataPreprocessed</code>.
    * @alias module:model/ExperimentDataPreprocessed
-   * @param output {String}
+   * @param output {Array.<Object>}
    * @param success {Boolean}
    */
   constructor(output, success) {
@@ -51,7 +51,7 @@ class ExperimentDataPreprocessed {
       obj = obj || new ExperimentDataPreprocessed();
 
       if (data.hasOwnProperty("output")) {
-        obj["output"] = ApiClient.convertToType(data["output"], "String");
+        obj["output"] = ApiClient.convertToType(data["output"], [Object]);
       }
       if (data.hasOwnProperty("success")) {
         obj["success"] = ApiClient.convertToType(data["success"], "Boolean");
@@ -62,7 +62,7 @@ class ExperimentDataPreprocessed {
 }
 
 /**
- * @member {String} output
+ * @member {Array.<Object>} output
  */
 ExperimentDataPreprocessed.prototype["output"] = undefined;
 
