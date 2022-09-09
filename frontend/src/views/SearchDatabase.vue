@@ -141,7 +141,9 @@
             item-key="id"
             @click:row="rowClick"
             single-select
-          />
+          >
+            <template v-slot:no-data>No experiment in database</template>
+          </v-data-table>
           <v-container>
             <v-row justify="center">
               <v-tooltip bottom>

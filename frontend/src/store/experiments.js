@@ -25,6 +25,7 @@ export default {
         total: 0, // number of tests in DB matching the filters. Given by backend
       },
       loading: false, // used to let the user know that data is loading
+      loadingTests: false,
     },
     units: {},
   },
@@ -52,6 +53,7 @@ export default {
           total: 0,
         },
         loading: true,
+        loadingTests: true,
       };
     },
     storeFilteredExperiments(state, data) {
@@ -94,7 +96,7 @@ export default {
       state.oneExperiment = {
         ...state.oneExperiment,
         experiment: data.items[0],
-        loading: state.oneExperiment.tests.length === 0,
+        loading: false,
       };
     },
     storeOneExperimentTests(state, data) {
@@ -106,7 +108,7 @@ export default {
           size: data.size,
           total: data.total,
         },
-        loading: state.oneExperiment.experiment.id === undefined,
+        loadingTests: false,
       };
     },
     storeUnits(state, data) {
