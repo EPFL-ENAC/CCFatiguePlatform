@@ -236,10 +236,6 @@ export default {
           value: "laminates_and_assemblies_curing_pressure",
         },
         {
-          text: "Fiber Content",
-          value: "laminates_and_assemblies_fiber_content",
-        },
-        {
           text: "Stacking Sequence",
           value: "laminates_and_assemblies_stacking_sequence",
         },
