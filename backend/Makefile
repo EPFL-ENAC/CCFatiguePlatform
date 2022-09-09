@@ -27,3 +27,9 @@ test:
 
 compile:
 	poetry run python -m numpy.f2py -c fortran/sendeckyj.f -m ccfatigue.fortran.sendeckyj
+
+compile-win:
+	rm -rf ccfatigue/fortran
+	${MAKE} compile
+	mv ccfatigue/.libs/* ccfatigue/fortran
+	rmdir ccfatigue/.libs
