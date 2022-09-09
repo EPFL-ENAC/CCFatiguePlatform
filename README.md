@@ -67,22 +67,20 @@ make run-preprocessing
 ## Run Backend
 
 ```bash
-make run-db
-make run-backend
+make dev-database
+make dev-backend
 ```
 
 First time backend setup/init :
 
 ```bash
-cd backend
-make init-db  # 1st time init
-make alembic-upgrade  # or only create/update schema in DB
+make init-database
 ```
 
 ## Run Frontend
 
 ```bash
-make run-frontend
+make dev-frontend
 ```
 
 ## Server provisioning
