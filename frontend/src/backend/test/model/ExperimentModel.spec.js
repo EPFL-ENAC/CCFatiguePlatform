@@ -92,14 +92,20 @@
       //expect(instance).to.be();
     });
 
-    it('should have the property initialCrackLength (base name: "initial_crack_length")', function () {
-      // uncomment below and update the code to test the property initialCrackLength
+    it('should have the property fatigueTestType (base name: "fatigue_test_type")', function () {
+      // uncomment below and update the code to test the property fatigueTestType
       //var instance = new Ccfatigue.ExperimentModel();
       //expect(instance).to.be();
     });
 
-    it('should have the property fatigueTestType (base name: "fatigue_test_type")', function () {
-      // uncomment below and update the code to test the property fatigueTestType
+    it('should have the property quasiStaticTestType (base name: "quasi_static_test_type")', function () {
+      // uncomment below and update the code to test the property quasiStaticTestType
+      //var instance = new Ccfatigue.ExperimentModel();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property temperatureTestType (base name: "temperature_test_type")', function () {
+      // uncomment below and update the code to test the property temperatureTestType
       //var instance = new Ccfatigue.ExperimentModel();
       //expect(instance).to.be();
     });
@@ -152,14 +158,20 @@
       //expect(instance).to.be();
     });
 
+    it('should have the property materialTypeSampleType (base name: "material_type_sample_type")', function () {
+      // uncomment below and update the code to test the property materialTypeSampleType
+      //var instance = new Ccfatigue.ExperimentModel();
+      //expect(instance).to.be();
+    });
+
     it('should have the property materialTypeFiberMaterial (base name: "material_type_fiber_material")', function () {
       // uncomment below and update the code to test the property materialTypeFiberMaterial
       //var instance = new Ccfatigue.ExperimentModel();
       //expect(instance).to.be();
     });
 
-    it('should have the property materialTypeFiberGeometry (base name: "material_type_fiber_geometry")', function () {
-      // uncomment below and update the code to test the property materialTypeFiberGeometry
+    it('should have the property materialTypeFiberForm (base name: "material_type_fiber_form")', function () {
+      // uncomment below and update the code to test the property materialTypeFiberForm
       //var instance = new Ccfatigue.ExperimentModel();
       //expect(instance).to.be();
     });
@@ -188,24 +200,6 @@
       //expect(instance).to.be();
     });
 
-    it('should have the property geometryLength (base name: "geometry_length")', function () {
-      // uncomment below and update the code to test the property geometryLength
-      //var instance = new Ccfatigue.ExperimentModel();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property geometryWidth (base name: "geometry_width")', function () {
-      // uncomment below and update the code to test the property geometryWidth
-      //var instance = new Ccfatigue.ExperimentModel();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property geometryThickness (base name: "geometry_thickness")', function () {
-      // uncomment below and update the code to test the property geometryThickness
-      //var instance = new Ccfatigue.ExperimentModel();
-      //expect(instance).to.be();
-    });
-
     it('should have the property laminatesAndAssembliesCuringTime (base name: "laminates_and_assemblies_curing_time")', function () {
       // uncomment below and update the code to test the property laminatesAndAssembliesCuringTime
       //var instance = new Ccfatigue.ExperimentModel();
@@ -224,8 +218,8 @@
       //expect(instance).to.be();
     });
 
-    it('should have the property laminatesAndAssembliesFiberContent (base name: "laminates_and_assemblies_fiber_content")', function () {
-      // uncomment below and update the code to test the property laminatesAndAssembliesFiberContent
+    it('should have the property laminatesAndAssembliesFiberVolumeRatio (base name: "laminates_and_assemblies_fiber_volume_ratio")', function () {
+      // uncomment below and update the code to test the property laminatesAndAssembliesFiberVolumeRatio
       //var instance = new Ccfatigue.ExperimentModel();
       //expect(instance).to.be();
     });
@@ -236,14 +230,8 @@
       //expect(instance).to.be();
     });
 
-    it('should have the property testCondtionsTemperature (base name: "test_condtions_temperature")', function () {
-      // uncomment below and update the code to test the property testCondtionsTemperature
-      //var instance = new Ccfatigue.ExperimentModel();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property testCondtionsHumidity (base name: "test_condtions_humidity")', function () {
-      // uncomment below and update the code to test the property testCondtionsHumidity
+    it('should have the property measurementMeasuringPoints (base name: "measurement_measuring_points")', function () {
+      // uncomment below and update the code to test the property measurementMeasuringPoints
       //var instance = new Ccfatigue.ExperimentModel();
       //expect(instance).to.be();
     });

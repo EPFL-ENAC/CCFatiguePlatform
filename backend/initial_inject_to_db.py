@@ -10,10 +10,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 
-DATA_DIR = os.path.abspath(f"{__file__}/../../Data")
-REAL_EXPERIMENTS_TO_INJECT = [
-    f"{DATA_DIR}/preprocessed/TST_Khalooei_2021-10_FA",
-]
+DATA_DIR = os.path.abspath(f"{__file__}/../../Data/preprocessed")
+EXPERIMENTS_TO_INJECT = glob.glob(f"{DATA_DIR}/TST_*")
+print(f"{EXPERIMENTS_TO_INJECT=}")
 
 
 def inject_exp_from_folder(exp_folder, session):
@@ -27,62 +26,58 @@ def inject_exp_from_folder(exp_folder, session):
         exp = json.load(f)
 
     experiment = Experiment(
-        laboratory=exp["General"]["Laboratory"],
-        researcher=exp["General"]["Researcher"],
-        date=exp["General"]["Date"],
-        experiment_type=exp["General"]["Experiment Type"],
-        fracture=exp["General"].get("Fracture", False),
-        fracture_mode=exp["General"].get("Fracture Mode", None),
-        initial_crack_length=exp["General"].get("Initial Crack length", None),
-        fatigue_test_type=exp["General"].get("Fatigue Test Type", None),
-        measuring_equipment=exp["General"].get("Measuring Equipment", None),
-        reliability_level=exp["General"].get("Reliability Level", None),
-        control_mode=exp["General"].get("Control mode", None),
-        publication_title=exp.get("Publication", {}).get("Title", None),
-        publication_author=exp.get("Publication", {}).get("Author", None),
-        publication_year=exp.get("Publication", {}).get("Year", None),
-        publication_doi=exp.get("Publication", {}).get("DOI", None),
-        publication_images_repository=exp.get("Publication", {}).get(
-            "Images Repository", None
+        laboratory=exp["general"].get("laboratory", None),
+        researcher=exp["general"]["researcher"],
+        date=exp["general"]["date"],
+        experiment_type=exp["general"]["experiment type"],
+        fracture=exp["general"]["fracture"],
+        fracture_mode=exp["general"].get("fracture mode", None),
+        fatigue_test_type=exp["general"].get("fatigue test type", None),
+        quasi_static_test_type=exp["general"].get("quasi-static test type", None),
+        temperature_test_type=exp["general"].get("temperature test type", None),
+        measuring_equipment=exp["general"].get("measuring equipment", None),
+        reliability_level=exp["general"].get("reliability level", None),
+        control_mode=exp["general"].get("control mode", None),
+        publication_title=exp.get("publication", {}).get("title", None),
+        publication_author=exp.get("publication", {}).get("author", None),
+        publication_year=exp.get("publication", {}).get("year", None),
+        publication_doi=exp.get("publication", {}).get("doi", None),
+        publication_images_repository=exp.get("publication", {}).get(
+            "images repository", None
         ),
-        material_type_fiber_material=exp.get("Material Type", {}).get(
-            "Fiber Material", None
+        material_type_sample_type=exp.get("material type", {}).get("sample type", None),
+        material_type_fiber_material=exp.get("material type", {}).get(
+            "fiber material", None
         ),
-        material_type_fiber_geometry=exp.get("Material Type", {}).get(
-            "Fiber Geometry", None
+        material_type_fiber_form=exp.get("material type", {}).get("fiber form", None),
+        material_type_area_density=exp.get("material type", {}).get(
+            "area density", None
         ),
-        material_type_area_density=exp.get("Material Type", {}).get(
-            "Area Density", None
+        material_type_resin=exp.get("material type", {}).get("resin", None),
+        material_type_hardener=exp.get("material type", {}).get("hardener", None),
+        material_type_mixing_ratio=exp.get("material type", {}).get(
+            "mixing ratio", None
         ),
-        material_type_resin=exp.get("Material Type", {}).get("Resin", None),
-        material_type_hardener=exp.get("Material Type", {}).get("Hardener", None),
-        material_type_mixing_ratio=exp.get("Material Type", {}).get(
-            "Mixing ratio", None
-        ),
-        geometry_length=exp["Geometry"]["Length"],
-        geometry_width=exp["Geometry"]["Width"],
-        geometry_thickness=exp["Geometry"]["Thickness"],
         laminates_and_assemblies_curing_time=exp.get(
-            "Laminates and Assemblies", {}
-        ).get("Curing Time", None),
+            "laminates and assemblies", {}
+        ).get("curing time", None),
         laminates_and_assemblies_curing_temperature=exp.get(
-            "Laminates and Assemblies", {}
-        ).get("Curing Temperature", None),
+            "laminates and assemblies", {}
+        ).get("curing temperature", None),
         laminates_and_assemblies_curing_pressure=exp.get(
-            "Laminates and Assemblies", {}
-        ).get("Curing Pressure", None),
-        laminates_and_assemblies_fiber_content=exp.get(
-            "Laminates and Assemblies", {}
-        ).get("Fiber Content", None),
+            "laminates and assemblies", {}
+        ).get("curing pressure", None),
+        laminates_and_assemblies_fiber_volume_ratio=exp.get(
+            "laminates and assemblies", {}
+        ).get("fiber volume ratio", None),
         laminates_and_assemblies_stacking_sequence=exp.get(
-            "Laminates and Assemblies", {}
-        ).get("Stacking Sequence", None),
-        test_condtions_temperature=exp.get("Test condtions", {}).get(
-            "Temperature", None
+            "laminates and assemblies", {}
+        ).get("stacking sequence", None),
+        measurement_measuring_points=exp.get("measurement", {}).get(
+            "measuring points", None
         ),
-        test_condtions_humidity=exp.get("Test condtions", {}).get("Humidity", None),
-        dic_analysis_subset_size=exp.get("DIC Analysis", {}).get("Subset Size", None),
-        dic_analysis_step_size=exp.get("DIC Analysis", {}).get("Step Size", None),
+        dic_analysis_subset_size=exp.get("dic analysis", {}).get("subset size", None),
+        dic_analysis_step_size=exp.get("dic analysis", {}).get("step size", None),
     )
     session.add(experiment)
 
@@ -100,7 +95,7 @@ if __name__ == "__main__":
     Session = sessionmaker(bind=sync_engine)
     session = Session()
 
-    for exp_folder in REAL_EXPERIMENTS_TO_INJECT:
+    for exp_folder in EXPERIMENTS_TO_INJECT:
         inject_exp_from_folder(exp_folder, session)
 
     session.commit()

@@ -22,16 +22,17 @@ class ExperimentModel(OrmModel):
     """
 
     id: int
-    laboratory: str
+    laboratory: Optional[str]
     researcher: str
     date: Optional[str]
     experiment_type: str
 
     fracture: bool
     fracture_mode: Optional[str]
-    initial_crack_length: Optional[float]
 
     fatigue_test_type: Optional[str]
+    quasi_static_test_type: Optional[str]
+    temperature_test_type: Optional[str]
 
     measuring_equipment: Optional[str]
     reliability_level: Optional[float]
@@ -44,25 +45,21 @@ class ExperimentModel(OrmModel):
     publication_doi: Optional[str]
     publication_images_repository: Optional[str]
 
+    material_type_sample_type: Optional[str]
     material_type_fiber_material: Optional[str]
-    material_type_fiber_geometry: Optional[str]
+    material_type_fiber_form: Optional[str]
     material_type_area_density: Optional[float]
     material_type_resin: Optional[str]
     material_type_hardener: Optional[str]
     material_type_mixing_ratio: Optional[str]
 
-    geometry_length: float
-    geometry_width: float
-    geometry_thickness: float
-
     laminates_and_assemblies_curing_time: Optional[float]
     laminates_and_assemblies_curing_temperature: Optional[float]
     laminates_and_assemblies_curing_pressure: Optional[float]
-    laminates_and_assemblies_fiber_content: Optional[float]
+    laminates_and_assemblies_fiber_volume_ratio: Optional[float]
     laminates_and_assemblies_stacking_sequence: Optional[str]
 
-    test_condtions_temperature: Optional[float]
-    test_condtions_humidity: Optional[float]
+    measurement_measuring_points: Optional[int]
 
     dic_analysis_subset_size: Optional[int]
     dic_analysis_step_size: Optional[int]
