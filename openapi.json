@@ -400,19 +400,15 @@
           "laminates_and_assemblies_stacking_sequence"
         ],
         "type": "string",
-        "description": "Enumerate all fields that can be requested as distinct"
+        "description": "\n    Enumerate all fields that can be requested as distinct\n    "
       },
       "ExperimentModel": {
         "title": "ExperimentModel",
         "required": [
           "id",
-          "laboratory",
           "researcher",
           "experiment_type",
-          "fracture",
-          "geometry_length",
-          "geometry_width",
-          "geometry_thickness"
+          "fracture"
         ],
         "type": "object",
         "properties": {
@@ -444,12 +440,16 @@
             "title": "Fracture Mode",
             "type": "string"
           },
-          "initial_crack_length": {
-            "title": "Initial Crack Length",
-            "type": "number"
-          },
           "fatigue_test_type": {
             "title": "Fatigue Test Type",
+            "type": "string"
+          },
+          "quasi_static_test_type": {
+            "title": "Quasi Static Test Type",
+            "type": "string"
+          },
+          "temperature_test_type": {
+            "title": "Temperature Test Type",
             "type": "string"
           },
           "measuring_equipment": {
@@ -484,12 +484,16 @@
             "title": "Publication Images Repository",
             "type": "string"
           },
+          "material_type_sample_type": {
+            "title": "Material Type Sample Type",
+            "type": "string"
+          },
           "material_type_fiber_material": {
             "title": "Material Type Fiber Material",
             "type": "string"
           },
-          "material_type_fiber_geometry": {
-            "title": "Material Type Fiber Geometry",
+          "material_type_fiber_form": {
+            "title": "Material Type Fiber Form",
             "type": "string"
           },
           "material_type_area_density": {
@@ -508,18 +512,6 @@
             "title": "Material Type Mixing Ratio",
             "type": "string"
           },
-          "geometry_length": {
-            "title": "Geometry Length",
-            "type": "number"
-          },
-          "geometry_width": {
-            "title": "Geometry Width",
-            "type": "number"
-          },
-          "geometry_thickness": {
-            "title": "Geometry Thickness",
-            "type": "number"
-          },
           "laminates_and_assemblies_curing_time": {
             "title": "Laminates And Assemblies Curing Time",
             "type": "number"
@@ -532,21 +524,17 @@
             "title": "Laminates And Assemblies Curing Pressure",
             "type": "number"
           },
-          "laminates_and_assemblies_fiber_content": {
-            "title": "Laminates And Assemblies Fiber Content",
+          "laminates_and_assemblies_fiber_volume_ratio": {
+            "title": "Laminates And Assemblies Fiber Volume Ratio",
             "type": "number"
           },
           "laminates_and_assemblies_stacking_sequence": {
             "title": "Laminates And Assemblies Stacking Sequence",
             "type": "string"
           },
-          "test_condtions_temperature": {
-            "title": "Test Condtions Temperature",
-            "type": "number"
-          },
-          "test_condtions_humidity": {
-            "title": "Test Condtions Humidity",
-            "type": "number"
+          "measurement_measuring_points": {
+            "title": "Measurement Measuring Points",
+            "type": "integer"
           },
           "dic_analysis_subset_size": {
             "title": "Dic Analysis Subset Size",
@@ -569,7 +557,8 @@
         "properties": {
           "output": {
             "title": "Output",
-            "type": "string"
+            "type": "array",
+            "items": {}
           },
           "success": {
             "title": "Success",

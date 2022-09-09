@@ -65,6 +65,7 @@ async def get_field_distinct(
             for item in await session.execute(
                 select(Experiment.__dict__[field.value]).distinct()
             )
+            if item[0] is not None
         ]
     )
 
