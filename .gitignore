@@ -31,3 +31,10 @@ node_modules/
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+# Compiled fortran module
+backend/ccfatigue/modules/*.so
+CCFatigue_modules/2_S-NCurves/*.so
+
+# Modules output files
+Data/output/*
