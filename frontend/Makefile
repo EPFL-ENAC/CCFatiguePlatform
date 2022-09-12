@@ -7,5 +7,5 @@ run:
 build:
 	npm run build
 
-generate-api:
+api:
 	npm run generate:backend

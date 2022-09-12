@@ -1,43 +1,46 @@
-install: install_backend install_frontend
+# install* -> install libs localy (without Docker)
+install: install-backend install-frontend
 
-compile: compile_sncurve
-
-build: install compile build_frontend
-
-install_backend:
+install-backend:
 	$(MAKE) -C backend install
 
-install_frontend:
+install-frontend:
 	$(MAKE) -C frontend install
 
-init-db:
-	${MAKE} -C backend init-db
+# generation -> run all auto-generated things 
+generation: api preprocessing
+
+api:
+	$(MAKE) -C backend api
+	$(MAKE) -C frontend api
+
+preprocessing:
+	$(MAKE) -C backend/preprocessing run
+
+
+# dev-* -> run things localy for dev/testing
+dev-database:
+	docker-compose up -d database
+
+dev-backend:
+	$(MAKE) -C backend run
+
+dev-frontend:
+	$(MAKE) -C frontend run
+
+init-database:
+	${MAKE} -C backend init-database
+
+
+# run -> run the whole project on the server (dockerized)
+# can be run on the laptop also ... to final check everything
+run:
+	docker-compose build --parallel --pull
+	docker-compose up --remove-orphans
+
+
+# compile* -> does all Fortran compilation
+compile: compile_sncurve
 
 compile_sncurve:
 	$(MAKE) -C CCFatigue_modules/2_S-NCurves compile
-
-build_frontend:
-	$(MAKE) -C frontend build
-
-generate-api:
-	$(MAKE) -C backend generate-api
-	$(MAKE) -C frontend generate-api
-
-run-preprocessing:
-	$(MAKE) -C backend/preprocessing run
-
-run-db:
-	$(MAKE) -C backend run-db
-
-run-backend:
-	$(MAKE) -C backend run
-
-run-frontend:
-	$(MAKE) -C frontend run
-
-run-database:
-	docker-compose up -d database
-
-deploy-docker:
-	docker-compose build --parallel --pull
-	docker-compose up --remove-orphans
