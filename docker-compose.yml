@@ -44,6 +44,8 @@ services:
       - "traefik.http.routers.backend.middlewares=backend-stripprefix"
       - "traefik.http.middlewares.backend-stripprefix.stripprefix.prefixes=/api"
     restart: unless-stopped
+    volumes:
+      - ./Data:/Data:ro
   database:
     image: postgres:14-alpine
     ports:

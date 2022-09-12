@@ -29,14 +29,14 @@ dev-frontend:
 	$(MAKE) -C frontend run
 
 init-database:
-	${MAKE} -C backend init-database
+	$(MAKE) -C backend init-database
 
 
 # run -> run the whole project on the server (dockerized)
 # can be run on the laptop also ... to final check everything
 run:
 	docker-compose build --parallel --pull
-	docker-compose up --remove-orphans
+	docker-compose up -d --remove-orphans
 
 
 # compile* -> does all Fortran compilation

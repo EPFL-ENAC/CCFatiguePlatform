@@ -5,7 +5,7 @@ RUN apk add --no-cache \
     musl-dev
 RUN pip install poetry
 COPY ./pyproject.toml ./poetry.lock* /app/
-RUN poetry export --output requirements.txt
+RUN poetry export --without-hashes --format=requirements.txt --output requirements.txt
 
 
 FROM python:3.10-slim as fortran-stage
@@ -25,6 +25,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     gcc \
     libpq-dev \
+    tree \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=poetry-stage /app/requirements.txt /app
@@ -33,7 +34,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY --from=fortran-stage /app/ccfatigue/fortran/ /app/ccfatigue/fortran/
 
 COPY ./alembic.ini /app/
+COPY ./init_db.py /app/
 COPY ./alembic /app/alembic
 COPY ./ccfatigue /app/ccfatigue
+COPY ./preprocessing /app/preprocessing
 
 CMD [ "uvicorn", "ccfatigue.main:app", "--host", "0.0.0.0", "--port", "80" ]
