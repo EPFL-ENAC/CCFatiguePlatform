@@ -9,8 +9,7 @@ alembic-upgrade:
 	poetry run dotenv -f ../secrets/.env run alembic upgrade head
 
 init-database:
-	${MAKE} alembic-upgrade
-	poetry run dotenv -f ../secrets/.env run python3 initial_inject_to_db.py
+	poetry run dotenv -f ../secrets/.env run python3 init_db.py
 
 api:
 	poetry run dotenv -f ../secrets/.env run python api.py ../openapi.json
@@ -23,7 +22,7 @@ compile:
 
 compile-win:
 	rm -rf ccfatigue/fortran
-	${MAKE} compile
+	$(MAKE) compile
 	mv ccfatigue/.libs/* ccfatigue/fortran
 	rmdir ccfatigue/.libs
 

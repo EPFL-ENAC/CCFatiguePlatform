@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
+"""
+- Run alembic DB migration
+- Empty the DB from all previous content
+- Inject all Experiments & Tests from Data/preprocessed folder
+"""
 
 import os
 import glob
 import json
 import argparse
-from ccfatigue.models.database import Experiment  # TODO  , Test
+from alembic.command import upgrade
+from alembic.config import Config
+from ccfatigue.models.database import Experiment  # TODO, Test
 from ccfatigue.services.database import __sync_url
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -13,6 +20,22 @@ from sqlalchemy.orm import sessionmaker
 DATA_DIR = os.path.abspath(f"{__file__}/../../Data/preprocessed")
 EXPERIMENTS_TO_INJECT = glob.glob(f"{DATA_DIR}/TST_*")
 print(f"{EXPERIMENTS_TO_INJECT=}")
+
+
+def alembic_upgrade():
+    """
+    Run database migration with alembic
+    https://alembic.sqlalchemy.org/en/latest/api/commands.html
+    """
+    alembic_cfg = Config("alembic.ini")
+    upgrade(alembic_cfg, "head")
+
+
+def empty_database(session):
+    """
+    Empty all database content
+    """
+    session.query(Experiment).delete()
 
 
 def inject_exp_from_folder(exp_folder, session):
@@ -85,17 +108,31 @@ def inject_exp_from_folder(exp_folder, session):
     # TODO
 
 
+def run_init_db():
+    """
+    Init DB
+    - alembic upgrade
+    - empty database
+    - inject experiments in database
+    """
+    alembic_upgrade()
+
+    sync_engine = create_engine(__sync_url, echo=True)
+    Session = sessionmaker(bind=sync_engine)
+    session = Session()
+
+    empty_database(session)
+
+    for exp_folder in EXPERIMENTS_TO_INJECT:
+        inject_exp_from_folder(exp_folder, session)
+
+    session.commit()
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Inject initial data from researcher Data into DB"
     )
     args = parser.parse_args()
 
-    sync_engine = create_engine(__sync_url, echo=True)
-    Session = sessionmaker(bind=sync_engine)
-    session = Session()
-
-    for exp_folder in EXPERIMENTS_TO_INJECT:
-        inject_exp_from_folder(exp_folder, session)
-
-    session.commit()
+    run_init_db()

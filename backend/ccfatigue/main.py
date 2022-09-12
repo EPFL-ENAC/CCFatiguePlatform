@@ -7,6 +7,11 @@ from ccfatigue import __name__, __version__
 from ccfatigue.config import settings
 from ccfatigue.routers import root, experiments, tests, analysis
 
+from init_db import run_init_db
+
+run_init_db()
+
+
 app = FastAPI(
     title=__name__,
     version=__version__,
