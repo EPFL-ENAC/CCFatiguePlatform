@@ -1,8 +1,8 @@
 """initial_tables
 
-Revision ID: 6bc2e2ed205a
-Revises:
-Create Date: 2022-09-09 09:17:13.343134
+Revision ID: eeb89655d0ae
+Revises: 
+Create Date: 2022-09-12 13:25:28.248312
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = "6bc2e2ed205a"
+revision = "eeb89655d0ae"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -106,11 +106,22 @@ def upgrade() -> None:
         "test",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("experiment_id", sa.Integer(), nullable=True),
-        sa.Column("specimen_number", sa.String(), nullable=True),
+        sa.Column("specimen_number", sa.Integer(), nullable=True),
+        sa.Column("specimen_name", sa.String(), nullable=True),
         sa.Column("stress_ratio", sa.Float(), nullable=True),
         sa.Column("maximum_stress", sa.Float(), nullable=True),
-        sa.Column("loading_rate", sa.Float(), nullable=True),
+        sa.Column("frequency", sa.Float(), nullable=True),
         sa.Column("run_out", sa.Boolean(), nullable=True),
+        sa.Column("displacement_controlled_loading_rate", sa.Float(), nullable=True),
+        sa.Column("load_controlled_loading_rate", sa.Float(), nullable=True),
+        sa.Column("length", sa.Float(), nullable=True),
+        sa.Column("width", sa.Float(), nullable=True),
+        sa.Column("thickness", sa.Float(), nullable=True),
+        sa.Column("temperature", sa.Float(), nullable=True),
+        sa.Column("humidity", sa.Float(), nullable=True),
+        sa.Column("initial_crack_length", sa.Float(), nullable=True),
+        sa.Column("x_coordinate_of_measuring_point", sa.Float(), nullable=True),
+        sa.Column("y_coordinate_of_measuring_point", sa.Float(), nullable=True),
         sa.ForeignKeyConstraint(
             ["experiment_id"],
             ["experiment.id"],
