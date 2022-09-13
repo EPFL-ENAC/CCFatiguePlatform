@@ -5,7 +5,7 @@ from fastapi_pagination import add_pagination
 from ccfatigue import __name__, __version__
 
 from ccfatigue.config import settings
-from ccfatigue.routers import root, experiments, tests
+from ccfatigue.routers import root, experiments, tests, analysis
 
 app = FastAPI(
     title=__name__,
@@ -29,4 +29,5 @@ else:
 app.include_router(root.router)
 app.include_router(experiments.router)
 app.include_router(tests.router)
+app.include_router(analysis.router)
 add_pagination(app)

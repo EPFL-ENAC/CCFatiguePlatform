@@ -100,7 +100,10 @@ Please follow the [installation](#installation) instruction and execute the foll
 ```javascript
 var Ccfatigue = require("ccfatigue");
 
-var api = new Ccfatigue.DefaultApi();
+var api = new Ccfatigue.AnalysisApi();
+var methods = [new Ccfatigue.SnCurveMethod()]; // {[SnCurveMethod]}
+var rRatios = [null]; // {[Number]}
+var file = "/path/to/file"; // {File}
 var callback = function (error, data, response) {
   if (error) {
     console.error(error);
@@ -108,7 +111,7 @@ var callback = function (error, data, response) {
     console.log("API called successfully. Returned data: " + data);
   }
 };
-api.getUnitsUnitsGet(callback);
+api.runSnCurveFileAnalysisSnCurveFilePost(methods, rRatios, file, callback);
 ```
 
 ## Documentation for API Endpoints
@@ -117,6 +120,7 @@ All URIs are relative to _http://localhost_
 
 | Class                      | Method                                                                                                                                        | HTTP request                               | Description               |
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ | ------------------------- |
+| _Ccfatigue.AnalysisApi_    | [**runSnCurveFileAnalysisSnCurveFilePost**](docs/AnalysisApi.md#runSnCurveFileAnalysisSnCurveFilePost)                                        | **POST** /analysis/snCurve/file            | Run Sn Curve File         |
 | _Ccfatigue.DefaultApi_     | [**getUnitsUnitsGet**](docs/DefaultApi.md#getUnitsUnitsGet)                                                                                   | **GET** /units                             | Get Units                 |
 | _Ccfatigue.DefaultApi_     | [**rootGet**](docs/DefaultApi.md#rootGet)                                                                                                     | **GET** /                                  | Root                      |
 | _Ccfatigue.ExperimentsApi_ | [**getExperimentsExperimentsGet**](docs/ExperimentsApi.md#getExperimentsExperimentsGet)                                                       | **GET** /experiments                       | Get Experiments           |
@@ -131,9 +135,12 @@ All URIs are relative to _http://localhost_
 - [Ccfatigue.ExperimentFieldNames](docs/ExperimentFieldNames.md)
 - [Ccfatigue.ExperimentModel](docs/ExperimentModel.md)
 - [Ccfatigue.HTTPValidationError](docs/HTTPValidationError.md)
+- [Ccfatigue.LocationInner](docs/LocationInner.md)
 - [Ccfatigue.PageExperimentModel](docs/PageExperimentModel.md)
 - [Ccfatigue.PageTestModel](docs/PageTestModel.md)
 - [Ccfatigue.Plots](docs/Plots.md)
+- [Ccfatigue.SnCurveMethod](docs/SnCurveMethod.md)
+- [Ccfatigue.SnCurveResult](docs/SnCurveResult.md)
 - [Ccfatigue.TestModel](docs/TestModel.md)
 - [Ccfatigue.TestPlot](docs/TestPlot.md)
 - [Ccfatigue.UnitInfo](docs/UnitInfo.md)

@@ -292,6 +292,72 @@
           }
         }
       }
+    },
+    "/analysis/snCurve/file": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run Sn Curve File",
+        "operationId": "run_sn_curve_file_analysis_snCurve_file_post",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/SnCurveMethod"
+              }
+            },
+            "name": "methods",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Rratios",
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "name": "rRatios",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_sn_curve_file_analysis_snCurve_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SnCurveResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -314,6 +380,20 @@
           }
         },
         "description": "App Info"
+      },
+      "Body_run_sn_curve_file_analysis_snCurve_file_post": {
+        "title": "Body_run_sn_curve_file_analysis_snCurve_file_post",
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string",
+            "format": "binary"
+          }
+        }
       },
       "DashboardPlots": {
         "title": "DashboardPlots",
@@ -345,7 +425,7 @@
           "laminates_and_assemblies_stacking_sequence"
         ],
         "type": "string",
-        "description": "Enumerate all fields that can be requested as distinct"
+        "description": "\n    Enumerate all fields that can be requested as distinct\n    "
       },
       "ExperimentModel": {
         "title": "ExperimentModel",
@@ -604,6 +684,37 @@
         },
         "description": "Defines all plots types returned"
       },
+      "SnCurveMethod": {
+        "title": "SnCurveMethod",
+        "enum": [
+          "LinLog",
+          "LogLog",
+          "Sendeckyj",
+          "Whitney"
+        ],
+        "type": "string",
+        "description": "An enumeration."
+      },
+      "SnCurveResult": {
+        "title": "SnCurveResult",
+        "required": [
+          "outputs"
+        ],
+        "type": "object",
+        "properties": {
+          "outputs": {
+            "title": "Outputs",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "format": "binary"
+            }
+          },
+          "plot": {
+            "title": "Plot"
+          }
+        }
+      },
       "TestModel": {
         "title": "TestModel",
         "required": [
@@ -704,7 +815,14 @@
             "title": "Location",
             "type": "array",
             "items": {
-              "type": "string"
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
             }
           },
           "msg": {

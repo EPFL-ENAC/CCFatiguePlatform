@@ -9,7 +9,6 @@
     "generate:backend": "rm -rf src/backend && openapi-generator-cli generate -i ../openapi.json -g javascript -o src/backend && prettier --write src/backend"
   },
   "dependencies": {
-    "@openapitools/openapi-generator-cli": "^2.4.18",
     "core-js": "^3.6.5",
     "downloadjs": "^1.4.7",
     "numeral": "^2.0.6",
@@ -21,6 +20,7 @@
     "vuex": "^3.6.2"
   },
   "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.5.2",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-plugin-router": "~4.5.0",
