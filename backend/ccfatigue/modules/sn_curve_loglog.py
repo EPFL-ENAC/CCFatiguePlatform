@@ -10,8 +10,6 @@ as described in
     DOI: 10.1520/E0739-10R15
 """
 
-from math import log10, sqrt
-import numpy as np
 import pandas as pd
 from pandas._typing import ReadBuffer, WriteBuffer, FilePath
 from itertools import chain

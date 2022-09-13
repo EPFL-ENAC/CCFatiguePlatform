@@ -23,7 +23,7 @@
                   <v-file-input
                     chips
                     show-size
-                    accept=".txt"
+                    accept=".txt,.csv"
                     label="Upload file"
                     v-model="snCurve.file"
                     :disabled="snCurve.loading"
@@ -305,12 +305,8 @@
 <script>
 import InfoButton from "@/components/InfoButton";
 import InfoTooltip from "@/components/InfoTooltip";
-// import Axios from "axios";  //  TODO !
 import download from "downloadjs";
-// import qs from "qs";
-// import * as Bokeh from "bokeh";
-
-const CANCEL = "cancel";
+import * as Bokeh from "bokeh";
 
 export default {
   name: "CCFatigueAnalysis",
@@ -343,7 +339,6 @@ export default {
         rRatios: [-1, 0.1, 10, 0.5],
         outputs: {},
         views: [],
-        // updateCancelTokenSource: Axios.CancelToken.source(),
       },
     };
   },
@@ -359,36 +354,24 @@ export default {
         this.snCurve.selectedRRatios.length > 0 &&
         this.snCurve.file
       ) {
-        const formData = new FormData();
-        formData.append("file", this.snCurve.file);
         this.snCurve.loading = true;
-        this.snCurve.updateCancelTokenSource.cancel(CANCEL);
         this.snCurve.views.forEach((view) => view.remove());
-        // this.snCurve.updateCancelTokenSource = Axios.CancelToken.source();
-        // Axios.post("snCurve/file", formData, {
-        //   params: {
-        //     methods: this.snCurve.selectedMethods,
-        //     rRatios: this.snCurve.selectedRRatios,
-        //   },
-        //   paramsSerializer: (params) =>
-        //     qs.stringify(params, { arrayFormat: "repeat" }),
-        //   headers: { "Content-Type": "multipart/form-data" },
-        //   cancelToken: this.snCurve.updateCancelTokenSource.token,
-        // })
-        //   .then((res) => res.data)
-        //   .then((result) => {
-        //     this.snCurve.outputs = result.outputs;
-        //     return Bokeh.embed.embed_item(result.plot, this.id.bokeh.snCurve);
-        //   })
-        //   .then((views) => {
-        //     this.snCurve.views = views;
-        //     this.snCurve.loading = false;
-        //   })
-        //   .catch((e) => {
-        //     if (e.message !== CANCEL) {
-        //       this.snCurve.loading = false;
-        //     }
-        //   });
+        this.$analysisApi.runSnCurveFileAnalysisSnCurveFilePost(
+          this.snCurve.selectedMethods,
+          this.snCurve.selectedRRatios,
+          this.snCurve.file,
+          (error, data) => {
+            if (error) {
+              this.snCurve.loading = false;
+            } else {
+              this.snCurve.outputs = data.outputs;
+              Bokeh.embed
+                .embed_item(data.plot, this.id.bokeh.snCurve)
+                .then((views) => (this.snCurve.views = views));
+              this.snCurve.loading = false;
+            }
+          }
+        );
       }
     },
     downloadSnCurve() {
