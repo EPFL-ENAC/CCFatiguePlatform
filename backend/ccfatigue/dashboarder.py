@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from ccfatigue import plotter
 from ccfatigue.plotter import DataKey, Line, Plot
 
-DATA_DIRECTORY: str = "../data/"
+DATA_DIRECTORY: str = "../Data/"
 
 INTERVAL: int = 10
 LOOP_SPACING: int = 1000

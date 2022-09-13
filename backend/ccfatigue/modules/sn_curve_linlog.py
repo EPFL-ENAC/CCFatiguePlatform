@@ -2,7 +2,8 @@
 """ CCFatigue - Module 2 - sn_curve_linlog.py
 This code takes in AGG data and outputs SNC data
 
-Translated from https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/2_S-NCurves/S-N-Curve-LinLog.for
+Translated from
+https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/2_S-NCurves/S-N-Curve-LinLog.for
 
 It applies a linear regression on log(number of cycles) and stress ratios
 as described in
@@ -39,7 +40,8 @@ def get_linlog_stress_at_failure(
 ) -> float:
     """
     Calculate stress at failure.
-    Translated from: https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/2_S-NCurves/S-N-Curve-LinLog.for#L397
+    Translated from:
+    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/2_S-NCurves/S-N-Curve-LinLog.for#L397
     Parameters
     ----------
         aa: float
@@ -110,20 +112,20 @@ def get_linlog_lsst(
 
 
 def execute(
-    input_file: FilePath or ReadBuffer,
-    output_json_file: FilePath or WriteBuffer,
-    output_csv_file: FilePath or WriteBuffer,
+    input_file: FilePath | ReadBuffer,
+    output_json_file: FilePath | WriteBuffer,
+    output_csv_file: FilePath | WriteBuffer,
     confidence: int = 95,
 ) -> None:
     """
     Execute the LinLog algorithm
     Parameters
     ----------
-        input_file: FilePath or ReadBuffer
+        input_file: FilePath | ReadBuffer
             AGG input file
-        output_json_file: FilePath or WriteBuffer
+        output_json_file: FilePath | WriteBuffer
             SNC json file
-        output_csv_file: FilePath or WriteBuffer
+        output_csv_file: FilePath | WriteBuffer
             SNC csv file
         confidence: float
             Confidence={95|99}
