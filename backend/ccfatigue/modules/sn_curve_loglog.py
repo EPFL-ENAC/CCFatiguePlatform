@@ -2,7 +2,8 @@
 """ CCFatigue - Module 2 - sn_curve_loglog.py
 This code takes in AGG data and outputs SNC data
 
-Translated from https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/2_S-NCurves/S-N-Curve-LogLog.for
+Translated from
+https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/2_S-NCurves/S-N-Curve-LogLog.for
 
 It applies a linear regression on log(number of cycles) and log(stress ratios)
 as described in
@@ -38,7 +39,8 @@ def get_loglog_stress_at_failure(
 ) -> float:
     """
     Calculate stress at failure.
-    Translated from: https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/2_S-NCurves/S-N-Curve-LinLog.for#L397
+    Translated from:
+    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/2_S-NCurves/S-N-Curve-LinLog.for#L397
     Parameters
     ----------
         aa: float
@@ -109,9 +111,9 @@ def get_loglog_lsst(
 
 
 def execute(
-    input_file: FilePath or ReadBuffer,
-    output_json_file: FilePath or WriteBuffer,
-    output_csv_file: FilePath or WriteBuffer,
+    input_file: FilePath | ReadBuffer,
+    output_json_file: FilePath | WriteBuffer,
+    output_csv_file: FilePath | WriteBuffer,
     reliability_level: float = 50,
     confidence: int = 95,
 ) -> None:
@@ -119,11 +121,11 @@ def execute(
     Execute the LogLog algorithm
     Parameters
     ----------
-        input_file: FilePath or ReadBuffer
+        input_file: FilePath | ReadBuffer
             AGG input file
-        output_json_file: FilePath or WriteBuffer
+        output_json_file: FilePath | WriteBuffer
             SNC json file
-        output_csv_file: FilePath or WriteBuffer
+        output_csv_file: FilePath | WriteBuffer
             SNC csv file
         reliability_level: float
             Reliability level P(N)

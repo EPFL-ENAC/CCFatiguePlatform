@@ -14,7 +14,8 @@ from ccfatigue.modules.astm import Astm
 def equation_ycar(slope: float, intercept: float, stress_parameter: float) -> float:
     """
     Calculate ycar TODO check with Tassos for a meaningful name: estimated_y?
-    Translated from: https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/2_S-NCurves/S-N-Curve-LinLog.for#L314
+    Translated from:
+    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/2_S-NCurves/S-N-Curve-LinLog.for#L314
     Parameters
     ----------
         slope: float
@@ -95,9 +96,9 @@ def stress_at_failure_bounds(
 
 def execute_linlog_loglog(
     use_logarithm: bool,
-    input_file: FilePath or ReadBuffer,
-    output_json_file: FilePath or WriteBuffer,
-    output_csv_file: FilePath or WriteBuffer,
+    input_file: FilePath | ReadBuffer,
+    output_json_file: FilePath | WriteBuffer,
+    output_csv_file: FilePath | WriteBuffer,
     list_cycles_to_failure: list[int],
     get_stress_at_failure,
     get_a_b,
@@ -113,11 +114,11 @@ def execute_linlog_loglog(
     ----------
         use_logarithm: bool
             Use log10(stress_max) if True (LogLog) or stress_max if False (LinLog)
-        input_file: FilePath or ReadBuffer
+        input_file: FilePath | ReadBuffer
             AGG input file
-        output_json_file: FilePath or WriteBuffer
+        output_json_file: FilePath | WriteBuffer
             SNC json file
-        output_csv_file: FilePath or WriteBuffer
+        output_csv_file: FilePath | WriteBuffer
             SNC csv file
         list_cycles_to_failure: list[int]
             List of cycles_to_failure in SNC output

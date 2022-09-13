@@ -48,36 +48,21 @@ def run_python(
         return output_tmp_file.read()
 
 
-def create_dataframe(output: bytes, method: SnCurveMethod) -> DataFrame:
-    if method in [SnCurveMethod.LIN_LOG, SnCurveMethod.LOG_LOG]:
-        widths = [17, 12, 12, 12, 12]
-        columns = [
-            DataKey.R_RATIO,
-            DataKey.N_CYCLES,
-            DataKey.STRESS_PARAM,
-            DataKey.LOW,
-            DataKey.HIGH,
-        ]
-    elif method in [SnCurveMethod.SENDECKYJ, SnCurveMethod.WHITNEY]:
-        widths = [17, 12, 12]
-        columns = [DataKey.R_RATIO, DataKey.N_CYCLES, DataKey.STRESS_PARAM]
-    else:
-        raise ValueError(f"unknown {method.name}")
-    df: DataFrame = pd.read_fwf(io.BytesIO(output), widths=widths, header=None)
-    df.columns = [column.key for column in columns]
+def create_dataframe(output: bytes) -> DataFrame:
+    df: DataFrame = pd.read_csv(io.BytesIO(output))
     return df.fillna("")
 
 
 def create_line(output: bytes, method: SnCurveMethod, r_ratio: float) -> Any:
-    df = create_dataframe(output, method)
+    df = create_dataframe(output)
     round_df = df.round({DataKey.R_RATIO.key: ROUND_DECIMAL})
     selected_df = round_df[round_df[DataKey.R_RATIO.key] == r_ratio]
     n_cycles = selected_df[DataKey.N_CYCLES.key].to_list()
-    stress_param = selected_df[DataKey.STRESS_PARAM.key].to_list()
+    stress_param = selected_df[DataKey.STRESS.key].to_list()
     return Line(
         data={
             DataKey.N_CYCLES: n_cycles,
-            DataKey.STRESS_PARAM: stress_param,
+            DataKey.STRESS: stress_param,
         },
         legend_label=f"{method.value} {r_ratio}",
         color=None,
@@ -92,8 +77,8 @@ def run_sn_curve(
     plot = Plot(
         title="S-N Curves",
         x_axis=DataKey.N_CYCLES,
-        y_axis=DataKey.STRESS_PARAM,
-        tooltips=[DataKey.N_CYCLES, DataKey.STRESS_PARAM],
+        y_axis=DataKey.STRESS,
+        tooltips=[DataKey.N_CYCLES, DataKey.STRESS],
         x_axis_type="log",
     )
     outputs: Dict[SnCurveMethod, bytes] = {}
