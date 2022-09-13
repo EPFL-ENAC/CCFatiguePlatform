@@ -9,7 +9,7 @@ Columns (	50	75	90	95	97.5	99	99.5) correspond to the confidence interval (??)
 
 Rows (indexed 3 to inf) correspond to (??)
 
-Source: STP313_Fittin_straight_lines.pdf, p.6.
+Source: https://www.astm.org/stp313-eb.html, p.6., DOI: 10.1520/STP313-EB
 
 Used by methods: S-N-Curve-LogLog.py
 
@@ -22,7 +22,7 @@ Columns mean (??)
 
 Rows mean (??)
 
-Source: STP313_Fittin_straight_lines.pdf, pp. 20-23, DOI: 10.1520/STP313-EB
+Source: https://www.astm.org/stp313-eb.html, pp. 20-23, DOI: 10.1520/STP313-EB
 
 Used by methods: S-N-Curve-LogLog.py
 
@@ -30,6 +30,6 @@ Used by methods: S-N-Curve-LogLog.py
 ## ASTM STP 734 - Sendeckyj
 Fitting Models to Composite Materials Fatigue Data
 
-Source: STP734_1981.pdf, pp. 245-260, DOI: 10.1520/STP29314S
+Source: https://www.astm.org/stp29314s.html, pp. 245-260, DOI: 10.1520/STP29314S
 
 Used by methods: S-N-Curve-Sendeckyj
