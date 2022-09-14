@@ -109,5 +109,19 @@ class Test(Base):
     temperature = Column(Float)
     humidity = Column(Float)
     initial_crack_length = Column(Float)
-    x_coordinate_of_measuring_point = Column(Float)
-    y_coordinate_of_measuring_point = Column(Float)
+    measuring_points = relationship("Test_Measuring_Point", cascade="all, delete")
+
+
+class Test_Measuring_Point(Base):
+    """
+    Defines how a measuring point is strictured in DB
+    """
+
+    __tablename__ = "test_measuring_point"
+    id = Column(Integer, primary_key=True)
+
+    test_id = Column(Integer, ForeignKey("test.id"))
+    test = relationship("Test", back_populates="measuring_points")
+
+    x_coordinate = Column(Float)
+    y_coordinate = Column(Float)

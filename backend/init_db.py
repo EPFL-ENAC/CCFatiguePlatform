@@ -9,16 +9,20 @@ import os
 import glob
 import json
 import argparse
+import pandas as pd
 from alembic.command import upgrade
 from alembic.config import Config
-from ccfatigue.models.database import Experiment  # TODO, Test
+from ccfatigue.models.database import Experiment, Test
 from ccfatigue.services.database import __sync_url
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 
 DATA_DIR = os.path.abspath(f"{__file__}/../../Data/preprocessed")
-EXPERIMENTS_TO_INJECT = glob.glob(f"{DATA_DIR}/TST_*")
+# EXPERIMENTS_TO_INJECT = glob.glob(f"{DATA_DIR}/TST_*")
+EXPERIMENTS_TO_INJECT = [  # TODO !
+    "/home/sbancal/IT4R/CCFatiguePlatform/Data/preprocessed/TST_Wang_2020-12_QS",
+]
 print(f"{EXPERIMENTS_TO_INJECT=}")
 
 
@@ -105,7 +109,51 @@ def inject_exp_from_folder(exp_folder, session):
     session.add(experiment)
 
     # Test data from CSV
-    # TODO
+    tests_csv_file = f"{exp_folder}/tests.csv"
+    # tests_csv_file = "/home/sbancal/IT4R/CCFatiguePlatform/Data/preprocessed/TST_Wang_2021-11_QS/tests.csv"
+    tests_df = pd.read_csv(
+        tests_csv_file,
+        dtype={
+            "specimen number": "Int64",
+            "specimen name": "str",
+            # "run out": "boolean",
+        },
+        low_memory=False,
+    )
+
+    print(20 * "-")
+    print(tests_df)
+    print(tests_df.dtypes)
+
+    for (_, test_serie) in tests_df.iterrows():
+        # test_serie = list(tests_df.iterrows())[0]
+        print(f"->  {type(test_serie)=}")
+        print(test_serie.get("specimen number", None))
+
+        test = Test(
+            experiment=experiment,
+            specimen_number=test_serie.get("specimen number", default=None),
+            specimen_name=test_serie.get("specimen name", default=None),
+            stress_ratio=test_serie.get("stress ratio", default=None),
+            maximum_stress=test_serie.get("maximum stress", default=None),
+            frequency=test_serie.get("frequency", default=None),
+            run_out=None,  # test_serie.get("run out", default=None),
+            displacement_controlled_loading_rate=test_serie.get(
+                "displacement controlled loading rate", default=None
+            ),
+            load_controlled_loading_rate=test_serie.get(
+                "load controlled loading rate", default=None
+            ),
+            length=test_serie.get("length", default=None),
+            width=test_serie.get("width", default=None),
+            thickness=test_serie.get("thickness", default=None),
+            temperature=test_serie.get("temperature", default=None),
+            humidity=test_serie.get("humidity", default=None),
+            initial_crack_length=test_serie.get("initial crack length", default=None),
+        )
+        session.add(test)
+
+        # TODO measuring_points !
 
 
 def run_init_db():
