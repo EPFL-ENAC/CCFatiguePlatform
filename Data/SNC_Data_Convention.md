@@ -24,8 +24,8 @@ Encoding format: UTF-8
 		"confidence_interval": double, // confidence bounds, usually 5, 95% (rsql) [-]
 		"a": double, // S-N Curve parameter [-]
 		"b": double, // S-N Curve parameter [1/MPa]
-		"lrsq": double, // [?]
-		"fp": double, // Fp Linearity criterion [?]
+		"lrsq": double, // [?], optional
+		"fp": double, // Fp Linearity criterion [?], optional
 	},
 	...
 ]

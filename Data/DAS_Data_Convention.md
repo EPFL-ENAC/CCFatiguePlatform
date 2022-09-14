@@ -11,12 +11,6 @@ with:
 
 - date: `YYYY-MM` (starting month of the experiment)
 
-## Module 5 inputs
-
-- CCInput.txt >
-- Factor.txt > bounds for plot
-- Miner.txt > experimental data for validation (same format as DAS)
-
 ## CLD CSV files standards (column names must be exact) :
 
 Encoding format: UTF-8, Separator: ',' (comma)
