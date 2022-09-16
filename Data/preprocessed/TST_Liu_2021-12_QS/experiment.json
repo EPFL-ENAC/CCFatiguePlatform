@@ -1,0 +1,21 @@
+{
+  "general": {
+    "laboratory": "CCLAB",
+    "researcher": "Lulu Liu",
+    "date": "2021-12",
+    "experiment type": "QS",
+    "fracture": false,
+    "quasi-static test type": "Tensile",
+    "measuring equipment": "MTS 25kN",
+    "control mode": "Load Controlled"
+  },
+  "material type": {
+    "resin": "Epoxy",
+    "mixing ratio": "04:01:00"
+  },
+  "laminates and assemblies": {
+    "curing time": 4.0,
+    "curing temperature": 60.0,
+    "curing pressure": 1.0
+  }
+}

@@ -37,10 +37,10 @@
       "envFile": "${workspaceFolder}/secrets/.env"
     },
     {
-      "name": "backend: initial inject to db",
+      "name": "backend: init db",
       "type": "python",
       "request": "launch",
-      "module": "initial_inject_to_db",
+      "module": "init_db",
       "cwd": "${workspaceFolder}/backend",
       "envFile": "${workspaceFolder}/secrets/.env"
     }

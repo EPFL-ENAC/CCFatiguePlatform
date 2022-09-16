@@ -14,6 +14,7 @@
 import ApiClient from "./ApiClient";
 import AppInfo from "./model/AppInfo";
 import DashboardPlots from "./model/DashboardPlots";
+import ExperimentDataPreprocessed from "./model/ExperimentDataPreprocessed";
 import ExperimentFieldNames from "./model/ExperimentFieldNames";
 import ExperimentModel from "./model/ExperimentModel";
 import HTTPValidationError from "./model/HTTPValidationError";
@@ -79,6 +80,11 @@ export {
    * @property {module:model/DashboardPlots}
    */
   DashboardPlots,
+  /**
+   * The ExperimentDataPreprocessed model constructor.
+   * @property {module:model/ExperimentDataPreprocessed}
+   */
+  ExperimentDataPreprocessed,
   /**
    * The ExperimentFieldNames model constructor.
    * @property {module:model/ExperimentFieldNames}
