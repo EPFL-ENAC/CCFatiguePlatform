@@ -28,7 +28,7 @@
   var instance;
 
   beforeEach(function () {
-    instance = new Ccfatigue.SnCurveResult();
+    instance = new Ccfatigue.EchartLine();
   });
 
   var getProperty = function (object, getter, property) {
@@ -43,22 +43,28 @@
     else object[property] = value;
   };
 
-  describe("SnCurveResult", function () {
-    it("should create an instance of SnCurveResult", function () {
-      // uncomment below and update the code to test SnCurveResult
-      //var instance = new Ccfatigue.SnCurveResult();
-      //expect(instance).to.be.a(Ccfatigue.SnCurveResult);
+  describe("EchartLine", function () {
+    it("should create an instance of EchartLine", function () {
+      // uncomment below and update the code to test EchartLine
+      //var instance = new Ccfatigue.EchartLine();
+      //expect(instance).to.be.a(Ccfatigue.EchartLine);
     });
 
-    it('should have the property outputs (base name: "outputs")', function () {
-      // uncomment below and update the code to test the property outputs
-      //var instance = new Ccfatigue.SnCurveResult();
+    it('should have the property name (base name: "name")', function () {
+      // uncomment below and update the code to test the property name
+      //var instance = new Ccfatigue.EchartLine();
       //expect(instance).to.be();
     });
 
-    it('should have the property lines (base name: "lines")', function () {
-      // uncomment below and update the code to test the property lines
-      //var instance = new Ccfatigue.SnCurveResult();
+    it('should have the property xData (base name: "xData")', function () {
+      // uncomment below and update the code to test the property xData
+      //var instance = new Ccfatigue.EchartLine();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property yData (base name: "yData")', function () {
+      // uncomment below and update the code to test the property yData
+      //var instance = new Ccfatigue.EchartLine();
       //expect(instance).to.be();
     });
   });

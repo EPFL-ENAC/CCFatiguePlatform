@@ -2,7 +2,7 @@
 
 ## Properties
 
-| Name        | Type               | Description | Notes      |
-| ----------- | ------------------ | ----------- | ---------- |
-| **outputs** | **{String: File}** |             |
-| **plot**    | **Object**         |             | [optional] |
+| Name        | Type                              | Description | Notes |
+| ----------- | --------------------------------- | ----------- | ----- |
+| **outputs** | **{String: File}**                |             |
+| **lines**   | [**[EchartLine]**](EchartLine.md) |             |
