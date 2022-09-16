@@ -132,6 +132,7 @@ All URIs are relative to _http://localhost_
 
 - [Ccfatigue.AppInfo](docs/AppInfo.md)
 - [Ccfatigue.DashboardPlots](docs/DashboardPlots.md)
+- [Ccfatigue.ExperimentDataPreprocessed](docs/ExperimentDataPreprocessed.md)
 - [Ccfatigue.ExperimentFieldNames](docs/ExperimentFieldNames.md)
 - [Ccfatigue.ExperimentModel](docs/ExperimentModel.md)
 - [Ccfatigue.HTTPValidationError](docs/HTTPValidationError.md)

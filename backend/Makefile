@@ -6,21 +6,13 @@ lint:
 	poetry run pre-commit run --all-files
 
 alembic-upgrade:
-	poetry run alembic upgrade head
+	poetry run dotenv -f ../secrets/.env run alembic upgrade head
 
-init-db:
-	${MAKE} alembic-upgrade
-	poetry run python3 initial_inject_to_db.py
-
-init-db-with-fake:
-	${MAKE} alembic-upgrade
-	poetry run python3 initial_inject_to_db.py --add-fake-data
+init-database:
+	poetry run dotenv -f ../secrets/.env run python3 init_db.py
 
 api:
-	POSTGRES_PASSWORD="" poetry run python api.py ../openapi.json
-
-run:
-	poetry run uvicorn ccfatigue.main:app --reload
+	poetry run dotenv -f ../secrets/.env run python api.py ../openapi.json
 
 test:
 	poetry run pytest
@@ -30,6 +22,9 @@ compile:
 
 compile-win:
 	rm -rf ccfatigue/fortran
-	${MAKE} compile
+	$(MAKE) compile
 	mv ccfatigue/.libs/* ccfatigue/fortran
 	rmdir ccfatigue/.libs
+
+run:
+	poetry run dotenv -f ../secrets/.env run uvicorn ccfatigue.main:app --reload

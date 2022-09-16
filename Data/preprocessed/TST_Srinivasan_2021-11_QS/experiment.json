@@ -1,0 +1,22 @@
+{
+  "general": {
+    "laboratory": "CCLAB",
+    "researcher": "Dharun Vadugappatty Srinivasan",
+    "date": "2021-11",
+    "experiment type": "QS",
+    "fracture": true,
+    "fracture mode": "Mode I",
+    "quasi-static test type": "Fracture",
+    "measuring equipment": "W+B 50 kN",
+    "control mode": "Displacement Controlled"
+  },
+  "material type": {
+    "resin": "Epoxy",
+    "mixing ratio": "100/34"
+  },
+  "laminates and assemblies": {
+    "curing time": 2.0,
+    "curing temperature": 70.0,
+    "curing pressure": 1.0
+  }
+}

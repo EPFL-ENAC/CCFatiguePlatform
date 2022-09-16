@@ -5,10 +5,7 @@ from dynaconf import Dynaconf, Validator
 
 settings = Dynaconf(
     envvar_prefix=False,
-    settings_files=[
-        "ccfatigue/settings.toml",
-        "ccfatigue/.secrets.toml",
-    ],
+    settings_files=[],
     validators=[
         Validator("cors_enabled", default=False),
         Validator("root_path", default=""),

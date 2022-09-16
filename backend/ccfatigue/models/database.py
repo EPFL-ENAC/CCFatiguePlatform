@@ -15,23 +15,39 @@ class Experiment(Base):
     __tablename__ = "experiment"
     id = Column(Integer, primary_key=True)
 
-    laboratory = Column(String)
+    laboratory = Column(String, default="")
     researcher = Column(String)
     date = Column(String)
-    experiment_type = Column(String)
+    experiment_type = Column(Enum("FA", "QS", "TM", name="experiment_type"))
 
     fracture = Column(Boolean)
     fracture_mode = Column(
-        Enum("Mode I", "Mode II", "Mode III", "Combined", "", name="fracture_mode"),
+        Enum("Mode I", "Mode II", "Mode III", "Mixed-Mode", "", name="fracture_mode"),
         default="",
     )
-    initial_crack_length = Column(Float)
 
     fatigue_test_type = Column(
         Enum("CA", "VA", "BL", "Combined", "", name="fatigue_test_type"),
         default="",
     )
+    quasi_static_test_type = Column(
+        Enum(
+            "Tensile",
+            "Compressive",
+            "Shear",
+            "Bending",
+            "Fracture",
+            "Unspecified",
+            "",
+            name="quasi_static_test_type",
+        ),
+        default="",
+    )
 
+    temperature_test_type = Column(
+        Enum("DMA", "DSC", "FIRE", "Unspecified", "", name="temperature_test_type"),
+        default="",
+    )
     measuring_equipment = Column(String)
     reliability_level = Column(Float)
 
@@ -46,25 +62,21 @@ class Experiment(Base):
     publication_doi = Column(String)
     publication_images_repository = Column(String)
 
+    material_type_sample_type = Column(String)
     material_type_fiber_material = Column(String)
-    material_type_fiber_geometry = Column(String)
+    material_type_fiber_form = Column(String)
     material_type_area_density = Column(Float)
     material_type_resin = Column(String)
     material_type_hardener = Column(String)
     material_type_mixing_ratio = Column(String)
 
-    geometry_length = Column(Float)
-    geometry_width = Column(Float)
-    geometry_thickness = Column(Float)
-
     laminates_and_assemblies_curing_time = Column(Float)
     laminates_and_assemblies_curing_temperature = Column(Float)
     laminates_and_assemblies_curing_pressure = Column(Float)
-    laminates_and_assemblies_fiber_content = Column(Float)
+    laminates_and_assemblies_fiber_volume_ratio = Column(Float)
     laminates_and_assemblies_stacking_sequence = Column(String)
 
-    test_condtions_temperature = Column(Float)
-    test_condtions_humidity = Column(Float)
+    measurement_measuring_points = Column(Integer)
 
     dic_analysis_subset_size = Column(Integer)
     dic_analysis_step_size = Column(Integer)

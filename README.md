@@ -6,12 +6,6 @@ CCFatiguePlatform is an initiative from CCLab that aims to develop a web applica
 
 # Web app: Usage
 
-## Setup & run locally (without CCFatigue modules)
-
-1. run preprocessing according to [Preprocessing/README.md](Preprocessing/README.md)
-2. run backend according to [backend/README.md](backend/README.md)
-3. run frontend according to [frontend/README.md](frontend/README.md)
-
 ## Secrets
 
 ```bash
@@ -21,9 +15,48 @@ POSTGRES_PASSWORD=change-it!
 EOF
 ```
 
+## First time setup
+
+```bash
+make install
+```
+
+## Run Preprocessing
+
+```bash
+make preprocessing
+```
+
+## Re-generate API bindings btw backend and frontend
+
+```bash
+make api
+```
+
+## Run Backend
+
+```bash
+make dev-database
+make dev-backend
+```
+
+First time backend setup/init :
+
+```bash
+make init-database
+```
+
+## Run Frontend
+
+```bash
+make dev-frontend
+```
+
 ## Server provisioning
 
-See https://github.com/EPFL-ENAC/enacit-srv-lin-sysadmin/blob/develop/test/ccfatigue-test/README.md
+```bash
+make run
+```
 
 # App architecture
 
