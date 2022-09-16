@@ -72,17 +72,22 @@ def create_line(output: bytes, method: SnCurveMethod, r_ratio: float) -> Line:
     )
 
 
-def get_echarts_line(
-    output: bytes, method: SnCurveMethod, r_ratio: float
-) -> EchartLine:
+def get_echarts_lines(
+    output: bytes, method: SnCurveMethod, r_ratios: List[float]
+) -> List[EchartLine]:
     df = create_dataframe(output)
     round_df = df.round({DataKey.R_RATIO.key: ROUND_DECIMAL})
-    selected_df = round_df[round_df[DataKey.R_RATIO.key] == r_ratio]
-    n_cycles = selected_df[DataKey.N_CYCLES.key].to_list()
-    stress_param = selected_df[DataKey.STRESS.key].to_list()
-    return EchartLine(
-        xData=n_cycles, yData=stress_param, name=f"{method.value} {r_ratio}"
-    )
+    lines: List[EchartLine] = []
+    for r_ratio in r_ratios:
+        selected_df = round_df[round_df[DataKey.R_RATIO.key] == r_ratio]
+        n_cycles = selected_df[DataKey.N_CYCLES.key].to_list()
+        stress_param = selected_df[DataKey.STRESS.key].to_list()
+        lines.append(
+            EchartLine(
+                xData=n_cycles, yData=stress_param, name=f"{method.value} {r_ratio}"
+            )
+        )
+    return lines
 
 
 def run_sn_curve(
@@ -104,6 +109,5 @@ def run_sn_curve(
                 # FIXME
                 output = run_python(sn_curve_loglog.execute, file)
         outputs[method] = output
-        for r_ratio in r_ratios:
-            lines.append(get_echarts_line(output, method, r_ratio))
+        lines.extend(get_echarts_lines(output, method, r_ratios))
     return SnCurveResult(outputs=outputs, lines=lines)
