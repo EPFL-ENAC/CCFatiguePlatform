@@ -39,6 +39,6 @@ Encoding format: UTF-8, Separator: ',' (comma)
 | ----------------- | ------------------------------- | --------- | ----- | --------- | --------- |
 | stress_ratio      | Stress ratio                    | R         | [-]   | double    | y         |
 | cycles_to_failure | Number of cycles to failure     | N         | [-]   | int       | y         |
-| stress            | Stress at failure (median)      | sigma_max | [MPa] | double    | y         |
+| stress_max        | Max stress                      | sigma_max | [MPa] | double    | y         |
 | stress_lowerbound | Stress at failure (lower bound) | sigma_max | [MPa] | double    |           |
 | stress_upperbound | Stress at failure (upper bound) | sigma_max | [MPa] | double    |           |
