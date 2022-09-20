@@ -74,11 +74,33 @@ class TestModel(OrmModel):
 
     experiment_id: int
 
-    specimen_number: Optional[str]
+    specimen_number: Optional[int]
+    specimen_name: Optional[str]
     stress_ratio: Optional[float]
     maximum_stress: Optional[float]
-    loading_rate: Optional[float]
+    frequency: Optional[float]
     run_out: Optional[bool]
+    displacement_controlled_loading_rate: Optional[float]
+    load_controlled_loading_rate: Optional[float]
+    length: Optional[float]
+    width: Optional[float]
+    thickness: Optional[float]
+    temperature: Optional[float]
+    humidity: Optional[float]
+    initial_crack_length: Optional[float]
+    measuring_points: Optional[list]  # TODO : list of TestModel or just list !?
+
+
+class TestMeasuringPointModel(OrmModel):
+    """
+    Defines how test is seen on the API
+    """
+
+    id: int
+
+    test_id: int
+    x_coordinate = Float
+    y_coordinate = Float
 
 
 class ExperimentFieldNames(str, Enum):
