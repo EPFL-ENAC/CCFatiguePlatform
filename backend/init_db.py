@@ -21,7 +21,7 @@ from sqlalchemy.orm import sessionmaker
 DATA_DIR = os.path.abspath(f"{__file__}/../../Data/preprocessed")
 # EXPERIMENTS_TO_INJECT = glob.glob(f"{DATA_DIR}/TST_*")
 EXPERIMENTS_TO_INJECT = [  # TODO !
-    DATA_DIR + "/TST_Wang_2020-12_QS",
+    DATA_DIR + "/TST_Liu_2020-09_FA",
 ]
 print(f"{EXPERIMENTS_TO_INJECT=}")
 

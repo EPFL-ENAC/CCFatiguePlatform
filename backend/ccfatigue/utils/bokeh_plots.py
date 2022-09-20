@@ -106,14 +106,20 @@ def get_dataframe(
     """
     return extracted DataFrame related to that test from CSV
     """
-    filename = f"measure_{specimen_id:03d}.csv"
     # FIXME researcher_name from a column value
     researcher_name = exp["researcher"].split(" ")[-1]
-    filepath = os.path.join(
-        DATA_DIRECTORY,
-        f"{data_in}_{researcher_name}_{exp['date']}_{exp['experiment_type']}",
-        filename,
-    )
+    if data_in == "HYS":
+        filepath = os.path.join(
+            DATA_DIRECTORY,
+            f"TST_{researcher_name}_{exp['date']}_{exp['experiment_type']}",
+            f"{data_in}_measure_{specimen_id:03d}.csv",
+        )
+    else:
+        filepath = os.path.join(
+            DATA_DIRECTORY,
+            f"{data_in}_{researcher_name}_{exp['date']}_{exp['experiment_type']}",
+            f"measure_{specimen_id:03d}.csv",
+        )
     abspath = os.path.abspath(filepath)
     print(abspath)
     return pd.read_csv(abspath)
@@ -314,31 +320,31 @@ async def generate_tests_dashboard_plots(
     Generate 4 plots displayed in the Tests Dashboard view
     """
     colors = list(palettes.Category10_10)[: len(test_ids)]
-    exp = dict(
-        zip(
-            ("laboratory", "researcher", "experiment_type", "date"),
-            list(
-                await session.execute(
-                    select(
-                        Experiment.laboratory,
-                        Experiment.researcher,
-                        Experiment.experiment_type,
-                        Experiment.date,
-                    ).where(Experiment.id == experiment_id)
-                )  # type: ignore
-            )[0],
-        )
-    )
-    # TODO only one sql request
-    specimen_ids = []
-    for test_id in test_ids:
-        specimen_ids.append(
-            await session.scalar(
-                select(Test.specimen_number)
-                .where(Test.experiment_id == experiment_id)
-                .where(Test.id == test_id)
+    exp = (
+        (
+            await session.execute(
+                select(
+                    Experiment.laboratory,
+                    Experiment.researcher,
+                    Experiment.experiment_type,
+                    Experiment.date,
+                ).where(Experiment.id == experiment_id)
             )
         )
+        .one()
+        ._asdict()
+    )
+    tests = {
+        value[0]: value[1]
+        for value in (
+            await session.execute(
+                select(Test.id, Test.specimen_number)
+                .where(Test.experiment_id == experiment_id)
+                .where(Test.id.in_(test_ids))
+            )
+        ).all()
+    }
+    specimen_ids = [tests[test_id] for test_id in test_ids]
     std_dfs = [get_dataframe("TST", exp, specimen_id) for specimen_id in specimen_ids]
     hyst_dfs = [get_dataframe("HYS", exp, specimen_id) for specimen_id in specimen_ids]
     tests = [
