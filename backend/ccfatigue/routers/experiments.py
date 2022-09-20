@@ -86,12 +86,9 @@ async def get_tests_dashboard_plots(
     then we mascarade test_id field so that it looks like
     to be matching the one asked for.
     """
-    transposed_test_ids = [((test_id - 1) % 10) + 1 for test_id in test_ids]
     dashboard_plots = await generate_tests_dashboard_plots(
-        session, 1, transposed_test_ids
+        session, experiment_id, test_ids
     )
-    for i in range(len(test_ids)):
-        dashboard_plots.tests[i].test_id = test_ids[i]
     return dashboard_plots
 
 
