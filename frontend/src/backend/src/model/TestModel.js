@@ -63,6 +63,12 @@ class TestModel {
       if (data.hasOwnProperty("specimen_number")) {
         obj["specimen_number"] = ApiClient.convertToType(
           data["specimen_number"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("specimen_name")) {
+        obj["specimen_name"] = ApiClient.convertToType(
+          data["specimen_name"],
           "String"
         );
       }
@@ -78,14 +84,47 @@ class TestModel {
           "Number"
         );
       }
-      if (data.hasOwnProperty("loading_rate")) {
-        obj["loading_rate"] = ApiClient.convertToType(
-          data["loading_rate"],
-          "Number"
-        );
+      if (data.hasOwnProperty("frequency")) {
+        obj["frequency"] = ApiClient.convertToType(data["frequency"], "Number");
       }
       if (data.hasOwnProperty("run_out")) {
         obj["run_out"] = ApiClient.convertToType(data["run_out"], "Boolean");
+      }
+      if (data.hasOwnProperty("displacement_controlled_loading_rate")) {
+        obj["displacement_controlled_loading_rate"] = ApiClient.convertToType(
+          data["displacement_controlled_loading_rate"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("load_controlled_loading_rate")) {
+        obj["load_controlled_loading_rate"] = ApiClient.convertToType(
+          data["load_controlled_loading_rate"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("length")) {
+        obj["length"] = ApiClient.convertToType(data["length"], "Number");
+      }
+      if (data.hasOwnProperty("width")) {
+        obj["width"] = ApiClient.convertToType(data["width"], "Number");
+      }
+      if (data.hasOwnProperty("thickness")) {
+        obj["thickness"] = ApiClient.convertToType(data["thickness"], "Number");
+      }
+      if (data.hasOwnProperty("temperature")) {
+        obj["temperature"] = ApiClient.convertToType(
+          data["temperature"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("humidity")) {
+        obj["humidity"] = ApiClient.convertToType(data["humidity"], "Number");
+      }
+      if (data.hasOwnProperty("initial_crack_length")) {
+        obj["initial_crack_length"] = ApiClient.convertToType(
+          data["initial_crack_length"],
+          "Number"
+        );
       }
     }
     return obj;
@@ -103,9 +142,14 @@ TestModel.prototype["id"] = undefined;
 TestModel.prototype["experiment_id"] = undefined;
 
 /**
- * @member {String} specimen_number
+ * @member {Number} specimen_number
  */
 TestModel.prototype["specimen_number"] = undefined;
+
+/**
+ * @member {String} specimen_name
+ */
+TestModel.prototype["specimen_name"] = undefined;
 
 /**
  * @member {Number} stress_ratio
@@ -118,13 +162,53 @@ TestModel.prototype["stress_ratio"] = undefined;
 TestModel.prototype["maximum_stress"] = undefined;
 
 /**
- * @member {Number} loading_rate
+ * @member {Number} frequency
  */
-TestModel.prototype["loading_rate"] = undefined;
+TestModel.prototype["frequency"] = undefined;
 
 /**
  * @member {Boolean} run_out
  */
 TestModel.prototype["run_out"] = undefined;
+
+/**
+ * @member {Number} displacement_controlled_loading_rate
+ */
+TestModel.prototype["displacement_controlled_loading_rate"] = undefined;
+
+/**
+ * @member {Number} load_controlled_loading_rate
+ */
+TestModel.prototype["load_controlled_loading_rate"] = undefined;
+
+/**
+ * @member {Number} length
+ */
+TestModel.prototype["length"] = undefined;
+
+/**
+ * @member {Number} width
+ */
+TestModel.prototype["width"] = undefined;
+
+/**
+ * @member {Number} thickness
+ */
+TestModel.prototype["thickness"] = undefined;
+
+/**
+ * @member {Number} temperature
+ */
+TestModel.prototype["temperature"] = undefined;
+
+/**
+ * @member {Number} humidity
+ */
+TestModel.prototype["humidity"] = undefined;
+
+/**
+ * @member {Number} initial_crack_length
+ */
+TestModel.prototype["initial_crack_length"] = undefined;
 
 export default TestModel;

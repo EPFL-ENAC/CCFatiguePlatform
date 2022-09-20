@@ -829,6 +829,10 @@
           },
           "specimen_number": {
             "title": "Specimen Number",
+            "type": "integer"
+          },
+          "specimen_name": {
+            "title": "Specimen Name",
             "type": "string"
           },
           "stress_ratio": {
@@ -839,13 +843,45 @@
             "title": "Maximum Stress",
             "type": "number"
           },
-          "loading_rate": {
-            "title": "Loading Rate",
+          "frequency": {
+            "title": "Frequency",
             "type": "number"
           },
           "run_out": {
             "title": "Run Out",
             "type": "boolean"
+          },
+          "displacement_controlled_loading_rate": {
+            "title": "Displacement Controlled Loading Rate",
+            "type": "number"
+          },
+          "load_controlled_loading_rate": {
+            "title": "Load Controlled Loading Rate",
+            "type": "number"
+          },
+          "length": {
+            "title": "Length",
+            "type": "number"
+          },
+          "width": {
+            "title": "Width",
+            "type": "number"
+          },
+          "thickness": {
+            "title": "Thickness",
+            "type": "number"
+          },
+          "temperature": {
+            "title": "Temperature",
+            "type": "number"
+          },
+          "humidity": {
+            "title": "Humidity",
+            "type": "number"
+          },
+          "initial_crack_length": {
+            "title": "Initial Crack Length",
+            "type": "number"
           }
         },
         "description": "Defines how test is seen on the API"
