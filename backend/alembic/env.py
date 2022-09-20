@@ -4,7 +4,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-from ccfatigue.services.database import __sync_url
+from ccfatigue.services.database import sync_url
 
 from ccfatigue.models import database
 
@@ -20,7 +20,7 @@ if config.config_file_name is not None:
 
 
 # Inject sqlalchemy.url
-config.set_main_option("sqlalchemy.url", __sync_url)
+config.set_main_option("sqlalchemy.url", sync_url)
 
 
 # add your model's MetaData object here

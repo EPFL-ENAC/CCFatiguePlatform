@@ -12,8 +12,8 @@ import argparse
 import pandas as pd
 from alembic.command import upgrade
 from alembic.config import Config
-from ccfatigue.models.database import Experiment, Test
-from ccfatigue.services.database import __sync_url
+from ccfatigue.models.database import Experiment, Test, Test_Measuring_Point
+from ccfatigue.services.database import sync_url
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -21,7 +21,7 @@ from sqlalchemy.orm import sessionmaker
 DATA_DIR = os.path.abspath(f"{__file__}/../../Data/preprocessed")
 # EXPERIMENTS_TO_INJECT = glob.glob(f"{DATA_DIR}/TST_*")
 EXPERIMENTS_TO_INJECT = [  # TODO !
-    "/home/sbancal/IT4R/CCFatiguePlatform/Data/preprocessed/TST_Wang_2020-12_QS",
+    DATA_DIR + "/TST_Wang_2020-12_QS",
 ]
 print(f"{EXPERIMENTS_TO_INJECT=}")
 
@@ -39,7 +39,13 @@ def empty_database(session):
     """
     Empty all database content
     """
+    session.query(Test_Measuring_Point).delete()
+    session.query(Test).delete()
     session.query(Experiment).delete()
+    session.execute("ALTER SEQUENCE experiment_id_seq RESTART WITH 1")
+    session.execute("ALTER SEQUENCE test_id_seq RESTART WITH 1")
+    session.execute("ALTER SEQUENCE test_measuring_point_id_seq RESTART WITH 1")
+    session.commit()
 
 
 def inject_exp_from_folder(exp_folder, session):
@@ -110,7 +116,8 @@ def inject_exp_from_folder(exp_folder, session):
 
     # Test data from CSV
     tests_csv_file = f"{exp_folder}/tests.csv"
-    # tests_csv_file = "/home/sbancal/IT4R/CCFatiguePlatform/Data/preprocessed/TST_Wang_2021-11_QS/tests.csv"
+    # tests_csv_file =
+    # "/home/sbancal/IT4R/CCFatiguePlatform/Data/preprocessed/TST_Wang_2021-11_QS/tests.csv"
     tests_df = pd.read_csv(
         tests_csv_file,
         dtype={
@@ -165,7 +172,7 @@ def run_init_db():
     """
     alembic_upgrade()
 
-    sync_engine = create_engine(__sync_url, echo=True)
+    sync_engine = create_engine(sync_url, echo=True)
     Session = sessionmaker(bind=sync_engine)
     session = Session()
 
