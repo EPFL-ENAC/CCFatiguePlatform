@@ -68,6 +68,12 @@
       //expect(instance).to.be();
     });
 
+    it('should have the property specimenName (base name: "specimen_name")', function () {
+      // uncomment below and update the code to test the property specimenName
+      //var instance = new Ccfatigue.TestModel();
+      //expect(instance).to.be();
+    });
+
     it('should have the property stressRatio (base name: "stress_ratio")', function () {
       // uncomment below and update the code to test the property stressRatio
       //var instance = new Ccfatigue.TestModel();
@@ -80,14 +86,62 @@
       //expect(instance).to.be();
     });
 
-    it('should have the property loadingRate (base name: "loading_rate")', function () {
-      // uncomment below and update the code to test the property loadingRate
+    it('should have the property frequency (base name: "frequency")', function () {
+      // uncomment below and update the code to test the property frequency
       //var instance = new Ccfatigue.TestModel();
       //expect(instance).to.be();
     });
 
     it('should have the property runOut (base name: "run_out")', function () {
       // uncomment below and update the code to test the property runOut
+      //var instance = new Ccfatigue.TestModel();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property displacementControlledLoadingRate (base name: "displacement_controlled_loading_rate")', function () {
+      // uncomment below and update the code to test the property displacementControlledLoadingRate
+      //var instance = new Ccfatigue.TestModel();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property loadControlledLoadingRate (base name: "load_controlled_loading_rate")', function () {
+      // uncomment below and update the code to test the property loadControlledLoadingRate
+      //var instance = new Ccfatigue.TestModel();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property length (base name: "length")', function () {
+      // uncomment below and update the code to test the property length
+      //var instance = new Ccfatigue.TestModel();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property width (base name: "width")', function () {
+      // uncomment below and update the code to test the property width
+      //var instance = new Ccfatigue.TestModel();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property thickness (base name: "thickness")', function () {
+      // uncomment below and update the code to test the property thickness
+      //var instance = new Ccfatigue.TestModel();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property temperature (base name: "temperature")', function () {
+      // uncomment below and update the code to test the property temperature
+      //var instance = new Ccfatigue.TestModel();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property humidity (base name: "humidity")', function () {
+      // uncomment below and update the code to test the property humidity
+      //var instance = new Ccfatigue.TestModel();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property initialCrackLength (base name: "initial_crack_length")', function () {
+      // uncomment below and update the code to test the property initialCrackLength
       //var instance = new Ccfatigue.TestModel();
       //expect(instance).to.be();
     });
