@@ -26,6 +26,7 @@ simplejson = "^3.17.6"
 xlrd = "^2.0.1"
 openpyxl = "^3.0.10"
 python-dotenv = "^0.21.0"
+deprecation = "^2.1.0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^5.0.4"

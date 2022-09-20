@@ -92,7 +92,13 @@
                 </v-col>
               </v-row>
               <v-row>
-                <div :id="id.bokeh.snCurve" class="bokeh"></div>
+                <log-chart
+                  :aspect-ratio="2"
+                  :series="snCurve.series"
+                  title="S-N Curves"
+                  x-axis-name="Number of cycles"
+                  y-axis-name="Stress"
+                ></log-chart>
               </v-row>
             </v-container>
           </v-card-text>
@@ -306,13 +312,15 @@
 import InfoButton from "@/components/InfoButton";
 import InfoTooltip from "@/components/InfoTooltip";
 import download from "downloadjs";
-import * as Bokeh from "bokeh";
+import LogChart from "@/components/charts/LogChart";
+import { zip } from "lodash";
 
 export default {
   name: "CCFatigueAnalysis",
   components: {
     InfoButton,
     InfoTooltip,
+    LogChart,
   },
   data() {
     return {
@@ -325,11 +333,6 @@ export default {
       ],
       fatigueFailureMethods: ["Fawaz-Ellyin", "Kawai", "ST"],
       dammageSummationMethods: ["Linear", "Piecewise-Linear"],
-      id: {
-        bokeh: {
-          snCurve: "bokeh-sn-curve",
-        },
-      },
       snCurve: {
         file: null,
         loading: false,
@@ -338,7 +341,7 @@ export default {
         selectedRRatios: [],
         rRatios: [-1, 0.1, 10, 0.5],
         outputs: {},
-        views: [],
+        series: [],
       },
     };
   },
@@ -355,21 +358,20 @@ export default {
         this.snCurve.file
       ) {
         this.snCurve.loading = true;
-        this.snCurve.views.forEach((view) => view.remove());
         this.$analysisApi.runSnCurveFileAnalysisSnCurveFilePost(
           this.snCurve.selectedMethods,
           this.snCurve.selectedRRatios,
           this.snCurve.file,
           (error, data) => {
-            if (error) {
-              this.snCurve.loading = false;
-            } else {
+            if (!error) {
               this.snCurve.outputs = data.outputs;
-              Bokeh.embed
-                .embed_item(data.plot, this.id.bokeh.snCurve)
-                .then((views) => (this.snCurve.views = views));
-              this.snCurve.loading = false;
+              this.snCurve.series = data.lines.map((line) => ({
+                type: "line",
+                name: line.name,
+                data: zip(line.xData, line.yData),
+              }));
             }
+            this.snCurve.loading = false;
           }
         );
       }
@@ -386,9 +388,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-div.bokeh {
-  min-height: 250px;
-}
-</style>

@@ -1,4 +1,5 @@
-from datetime import date
+import datetime
+from decimal import Decimal
 from enum import Enum
 from typing import Any, Dict, List
 
@@ -10,7 +11,7 @@ class Experiment(BaseModel):
     laboratory: str
     researcher: str
     type: str
-    date: date
+    date: datetime.date
 
 
 class Experiment_Data_Preprocessed(BaseModel):
@@ -45,6 +46,12 @@ class SnCurveMethod(str, Enum):
     WHITNEY = "Whitney"
 
 
+class EchartLine(BaseModel):
+    name: str
+    xData: List[Decimal]
+    yData: List[Decimal]
+
+
 class SnCurveResult(BaseModel):
     outputs: Dict[SnCurveMethod, bytes]
-    plot: Any
+    lines: List[EchartLine]

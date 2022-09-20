@@ -49,7 +49,9 @@
     },
     "/experiments": {
       "get": {
-        "tags": ["experiments"],
+        "tags": [
+          "experiments"
+        ],
         "summary": "Get Experiments",
         "description": "Get all experiments",
         "operationId": "get_experiments_experiments_get",
@@ -124,7 +126,9 @@
     },
     "/experiments/{field}/distinct": {
       "get": {
-        "tags": ["experiments"],
+        "tags": [
+          "experiments"
+        ],
         "summary": "Get Field Distinct",
         "description": "Get all distinct values for field column, sorted",
         "operationId": "get_field_distinct_experiments__field__distinct_get",
@@ -168,7 +172,9 @@
     },
     "/experiments/tests_dashboard_plots": {
       "get": {
-        "tags": ["experiments"],
+        "tags": [
+          "experiments"
+        ],
         "summary": "Get Tests Dashboard Plots",
         "description": "Return the 4 Bokeh plots used in Test Dashboard\n\nNote: as we don't have real data yet, we hard code things this so it will\nrender the 10 first tests of the experiment 1 (only experiment we have) :\n+ experiment=1\n+ 1<tests_ids<10\nthen we mascarade test_id field so that it looks like\nto be matching the one asked for.",
         "operationId": "get_tests_dashboard_plots_experiments_tests_dashboard_plots_get",
@@ -223,7 +229,9 @@
     },
     "/experiments/data_preprocess_check": {
       "post": {
-        "tags": ["experiments"],
+        "tags": [
+          "experiments"
+        ],
         "summary": "Post Data Preprocess Check",
         "operationId": "post_data_preprocess_check_experiments_data_preprocess_check_post",
         "requestBody": {
@@ -262,7 +270,9 @@
     },
     "/tests": {
       "get": {
-        "tags": ["tests"],
+        "tags": [
+          "tests"
+        ],
         "summary": "Get Tests",
         "description": "Get all tests for specific experiment",
         "operationId": "get_tests_tests_get",
@@ -326,7 +336,9 @@
     },
     "/analysis/snCurve/file": {
       "post": {
-        "tags": ["analysis"],
+        "tags": [
+          "analysis"
+        ],
         "summary": "Run Sn Curve File",
         "operationId": "run_sn_curve_file_analysis_snCurve_file_post",
         "parameters": [
@@ -393,7 +405,10 @@
     "schemas": {
       "AppInfo": {
         "title": "AppInfo",
-        "required": ["name", "version"],
+        "required": [
+          "name",
+          "version"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -407,9 +422,25 @@
         },
         "description": "App Info"
       },
+      "Body_post_data_preprocess_check_experiments_data_preprocess_check_post": {
+        "title": "Body_post_data_preprocess_check_experiments_data_preprocess_check_post",
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
       "Body_run_sn_curve_file_analysis_snCurve_file_post": {
         "title": "Body_run_sn_curve_file_analysis_snCurve_file_post",
-        "required": ["file"],
+        "required": [
+          "file"
+        ],
         "type": "object",
         "properties": {
           "file": {
@@ -421,7 +452,10 @@
       },
       "DashboardPlots": {
         "title": "DashboardPlots",
-        "required": ["tests", "plots"],
+        "required": [
+          "tests",
+          "plots"
+        ],
         "type": "object",
         "properties": {
           "tests": {
@@ -436,6 +470,35 @@
           }
         },
         "description": "Defines data returned to the dashboard"
+      },
+      "EchartLine": {
+        "title": "EchartLine",
+        "required": [
+          "name",
+          "xData",
+          "yData"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "xData": {
+            "title": "Xdata",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "yData": {
+            "title": "Ydata",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        }
       },
       "ExperimentFieldNames": {
         "title": "ExperimentFieldNames",
@@ -595,7 +658,10 @@
       },
       "Experiment_Data_Preprocessed": {
         "title": "Experiment_Data_Preprocessed",
-        "required": ["output", "success"],
+        "required": [
+          "output",
+          "success"
+        ],
         "type": "object",
         "properties": {
           "output": {
@@ -624,7 +690,12 @@
       },
       "Page_ExperimentModel_": {
         "title": "Page[ExperimentModel]",
-        "required": ["items", "total", "page", "size"],
+        "required": [
+          "items",
+          "total",
+          "page",
+          "size"
+        ],
         "type": "object",
         "properties": {
           "items": {
@@ -653,7 +724,12 @@
       },
       "Page_TestModel_": {
         "title": "Page[TestModel]",
-        "required": ["items", "total", "page", "size"],
+        "required": [
+          "items",
+          "total",
+          "page",
+          "size"
+        ],
         "type": "object",
         "properties": {
           "items": {
@@ -701,13 +777,21 @@
       },
       "SnCurveMethod": {
         "title": "SnCurveMethod",
-        "enum": ["LinLog", "LogLog", "Sendeckyj", "Whitney"],
+        "enum": [
+          "LinLog",
+          "LogLog",
+          "Sendeckyj",
+          "Whitney"
+        ],
         "type": "string",
         "description": "An enumeration."
       },
       "SnCurveResult": {
         "title": "SnCurveResult",
-        "required": ["outputs"],
+        "required": [
+          "outputs",
+          "lines"
+        ],
         "type": "object",
         "properties": {
           "outputs": {
@@ -718,14 +802,21 @@
               "format": "binary"
             }
           },
-          "plot": {
-            "title": "Plot"
+          "lines": {
+            "title": "Lines",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EchartLine"
+            }
           }
         }
       },
       "TestModel": {
         "title": "TestModel",
-        "required": ["id", "experiment_id"],
+        "required": [
+          "id",
+          "experiment_id"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -790,7 +881,10 @@
       },
       "UnitInfo": {
         "title": "UnitInfo",
-        "required": ["subject", "unit"],
+        "required": [
+          "subject",
+          "unit"
+        ],
         "type": "object",
         "properties": {
           "subject": {
@@ -806,7 +900,11 @@
       },
       "ValidationError": {
         "title": "ValidationError",
-        "required": ["loc", "msg", "type"],
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
         "type": "object",
         "properties": {
           "loc": {
