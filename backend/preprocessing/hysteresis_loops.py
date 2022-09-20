@@ -44,13 +44,10 @@ def get_stress_strain(df, n_cycles):
     """
     Stress_N = []
     Strain_N = []
-    df0 = np.array(df)
     for k in range(len(n_cycles)):
-        Stress_N.append(
-            [df0[i, 3] for i in range(df0.shape[0]) if df0[i, 1] == n_cycles[k]]
-        )
+        Stress_N.append(list(df[df.Machine_N_cycles == n_cycles[k]].Machine_Load))
         Strain_N.append(
-            [df0[i, 2] for i in range(df0.shape[0]) if df0[i, 1] == n_cycles[k]]
+            list(df[df.Machine_N_cycles == n_cycles[k]].Machine_Displacement)
         )
 
     return Stress_N, Strain_N
@@ -80,7 +77,6 @@ def fill_hyst_df(df, meta_df, hyst_df):
     # NB CYCLES
     ### Extract number of cycles without repeating values in other table, and store number of measurements per cycle
     n_cycles = sorted(set(df.Machine_N_cycles))
-    print(f"{n_cycles=}")
     hyst_df.n_cycles = n_cycles
     # n_measurements = Counter(df.Machine_N_cycles)
     # n_cycles_df = pd.DataFrame(n_cycles)
@@ -104,20 +100,15 @@ def fill_hyst_df(df, meta_df, hyst_df):
     Hysteresis_Area = []
     Stiffness = []
     creep = []
-    n = 0
     Stress_N, Strain_N = get_stress_strain(df, n_cycles)
     for j in range(len(n_cycles)):
         x = Stress_N[j]
         y = Strain_N[j]
-        points = (x, y)
         if j < (len(n_cycles) - 1):
             Hysteresis_Area.append(PolyArea(x, y) * (n_cycles[j + 1] - n_cycles[j]))
         else:
             Hysteresis_Area.append(PolyArea(x, y) * (int(meta_df.N_fail) - n_cycles[j]))
-        print(n_cycles[j])
-        print(meta_df.N_fail)
         if j > 0:
-            print(f"stats.linregress\n{x=}\n{y=}")
             slope, _, _, _, _ = stats.linregress(y, x)
             Stiffness.append(slope)
     hyst_df.hysteresis_area = Hysteresis_Area
@@ -145,27 +136,30 @@ def main():
         for experiment_raw_fp_folder in RAW_EXPERIMENT_FP_FOLDERS:
             experiment_metadata = Experiment(experiment_raw_fp_folder, logger)
             print(f"parsing {experiment_raw_fp_folder}")
-            print(f"{experiment_metadata.exp_meta_meta['measures']}")
             for measures in experiment_metadata.exp_meta_meta["measures"]:
-                logger.info(
-                    f"Read measures {os.path.basename(measures['preprocessed_fp'])}"
-                )
-                with logger.indent:
-                    df = pd.read_csv(measures["preprocessed_fp"])
+                try:
+                    logger.info(
+                        f"Read measures {os.path.basename(measures['preprocessed_fp'])}"
+                    )
+                    with logger.indent:
+                        df = pd.read_csv(measures["preprocessed_fp"])
 
-                hyst_df = pd.DataFrame(
-                    columns=["n_cycles", "hysteresis_area", "stiffness", "creep"]
-                )
+                    hyst_df = pd.DataFrame(
+                        columns=["n_cycles", "hysteresis_area", "stiffness", "creep"]
+                    )
 
-                experiment_metadata.N_fail = 100
-                fill_hyst_df(df, experiment_metadata, hyst_df)
-                hys_fp = "HYS_" + os.path.basename(measures["preprocessed_fp"])
-                hyst_df.to_csv(
-                    os.path.join(
-                        experiment_metadata.exp_meta_meta["preprocessed_folder"], hys_fp
-                    ),
-                    index=False,
-                )
+                    experiment_metadata.N_fail = 100
+                    fill_hyst_df(df, experiment_metadata, hyst_df)
+                    hys_fp = "HYS_" + os.path.basename(measures["preprocessed_fp"])
+                    hyst_df.to_csv(
+                        os.path.join(
+                            experiment_metadata.exp_meta_meta["preprocessed_folder"],
+                            hys_fp,
+                        ),
+                        index=False,
+                    )
+                except:
+                    pass  # missing data to produce HYS -> skip for now
 
 
 if __name__ == "__main__":
