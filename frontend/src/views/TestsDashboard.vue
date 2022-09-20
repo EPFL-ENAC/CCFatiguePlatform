@@ -254,4 +254,7 @@ div.bokeh {
   min-height: 250px;
   height: 25vh;
 }
+div.bk {
+  width: 100%;
+}
 </style>
