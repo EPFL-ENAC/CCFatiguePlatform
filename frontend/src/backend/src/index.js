@@ -14,6 +14,7 @@
 import ApiClient from "./ApiClient";
 import AppInfo from "./model/AppInfo";
 import DashboardPlots from "./model/DashboardPlots";
+import EchartLine from "./model/EchartLine";
 import ExperimentDataPreprocessed from "./model/ExperimentDataPreprocessed";
 import ExperimentFieldNames from "./model/ExperimentFieldNames";
 import ExperimentModel from "./model/ExperimentModel";
@@ -80,6 +81,11 @@ export {
    * @property {module:model/DashboardPlots}
    */
   DashboardPlots,
+  /**
+   * The EchartLine model constructor.
+   * @property {module:model/EchartLine}
+   */
+  EchartLine,
   /**
    * The ExperimentDataPreprocessed model constructor.
    * @property {module:model/ExperimentDataPreprocessed}

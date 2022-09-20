@@ -15,15 +15,14 @@ OUTPUT_DIRECTORY: str = "./output"
 
 class DataKey(Enum):
     CREEP = ("creep", "Creep")
-    HIGH = ("high", "High")
+    HIGH = ("stress_upperbound", "High")
     HYST_AREA = ("hyst_area", "Hysteresis area")
-    LOW = ("low", "Low")
-    N_CYCLES = ("n_cycles", "Number of cycles")
-    R_RATIO = ("r_ratio", "R ratio")
+    LOW = ("stress_lowerbound", "Low")
+    N_CYCLES = ("cycles_to_failure", "Number of cycles")
+    R_RATIO = ("stress_ratio", "R ratio")
     STIFNESS = ("stiffness", "Stiffness")
     STRAIN = ("strain", "Strain")
     STRESS = ("stress", "Stress")
-    STRESS_PARAM = ("stress_parameter", "Maximum Cyclic Stress")
 
     def __init__(self, key: str, label: str):
         self.key = key

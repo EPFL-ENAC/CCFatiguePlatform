@@ -7,6 +7,7 @@ docs/AnalysisApi.md
 docs/AppInfo.md
 docs/DashboardPlots.md
 docs/DefaultApi.md
+docs/EchartLine.md
 docs/ExperimentDataPreprocessed.md
 docs/ExperimentFieldNames.md
 docs/ExperimentModel.md
@@ -34,6 +35,7 @@ src/api/TestsApi.js
 src/index.js
 src/model/AppInfo.js
 src/model/DashboardPlots.js
+src/model/EchartLine.js
 src/model/ExperimentDataPreprocessed.js
 src/model/ExperimentFieldNames.js
 src/model/ExperimentModel.js
@@ -54,6 +56,7 @@ test/api/ExperimentsApi.spec.js
 test/api/TestsApi.spec.js
 test/model/AppInfo.spec.js
 test/model/DashboardPlots.spec.js
+test/model/EchartLine.spec.js
 test/model/ExperimentDataPreprocessed.spec.js
 test/model/ExperimentFieldNames.spec.js
 test/model/ExperimentModel.spec.js

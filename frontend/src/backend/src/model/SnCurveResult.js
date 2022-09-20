@@ -12,6 +12,7 @@
  */
 
 import ApiClient from "../ApiClient";
+import EchartLine from "./EchartLine";
 
 /**
  * The SnCurveResult model module.
@@ -23,9 +24,10 @@ class SnCurveResult {
    * Constructs a new <code>SnCurveResult</code>.
    * @alias module:model/SnCurveResult
    * @param outputs {Object.<String, File>}
+   * @param lines {Array.<module:model/EchartLine>}
    */
-  constructor(outputs) {
-    SnCurveResult.initialize(this, outputs);
+  constructor(outputs, lines) {
+    SnCurveResult.initialize(this, outputs, lines);
   }
 
   /**
@@ -33,8 +35,9 @@ class SnCurveResult {
    * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
    * Only for internal use.
    */
-  static initialize(obj, outputs) {
+  static initialize(obj, outputs, lines) {
     obj["outputs"] = outputs;
+    obj["lines"] = lines;
   }
 
   /**
@@ -53,8 +56,8 @@ class SnCurveResult {
           String: File,
         });
       }
-      if (data.hasOwnProperty("plot")) {
-        obj["plot"] = ApiClient.convertToType(data["plot"], Object);
+      if (data.hasOwnProperty("lines")) {
+        obj["lines"] = ApiClient.convertToType(data["lines"], [EchartLine]);
       }
     }
     return obj;
@@ -67,8 +70,8 @@ class SnCurveResult {
 SnCurveResult.prototype["outputs"] = undefined;
 
 /**
- * @member {Object} plot
+ * @member {Array.<module:model/EchartLine>} lines
  */
-SnCurveResult.prototype["plot"] = undefined;
+SnCurveResult.prototype["lines"] = undefined;
 
 export default SnCurveResult;
