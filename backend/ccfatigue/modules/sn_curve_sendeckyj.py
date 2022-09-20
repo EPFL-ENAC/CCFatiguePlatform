@@ -29,7 +29,7 @@ from scipy import stats
 from itertools import chain
 import ccfatigue.fortran.sendeckyj as sendeckyj  # Fortran optimized functions
 from ccfatigue.modules.astm import Astm
-import ccfatigue.modules.sn_curve_loglog as sn_curve_loglog
+import ccfatigue.modules.sn_curve_utils as sn_curve_utils
 from pandas._typing import FilePath, ReadBuffer, WriteBuffer
 
 
@@ -44,8 +44,6 @@ C_INITIAL_INCREMENT = 0.000001
 S_MIN = 0.001
 S_MAX = 0.5
 S_STEP = 0.0005
-
-CONFIDENCE = 95  # TODO check with Tassos if this should be a parameter (95, 99)
 
 
 def sendeckyj_equation_1(
@@ -66,7 +64,7 @@ def sendeckyj_equation_16(sigma_e: float, g: float) -> float:
     return x
 
 
-def sendeckyj_equation_17(m: int, k: int, sigma_e: float) -> float:
+def sendeckyj_equation_17(m: int, k: int, sigma_e) -> float:
     """Returns G TODO G = ??
     Eq 17 (see ref, p259)
     """
@@ -106,9 +104,11 @@ def execute(
     input_file: Optional[FilePath | ReadBuffer],
     output_json_file: Optional[FilePath | WriteBuffer],
     output_csv_file: Optional[FilePath | WriteBuffer],
+    reliability_level: float = 50,
+    confidence: int = 95,
 ):
 
-    astm = Astm(CONFIDENCE)
+    astm = Astm(confidence)
 
     # Import input file (AGG format)
     samples = pd.read_csv(input_file)
@@ -142,7 +142,7 @@ def execute(
     # snc_output_json_df["stress_ratio"] = df["stress_ratio"].unique()
     # snc_output_json_df.set_index("stress_ratio", inplace=True)
 
-    cycles_to_failure = pd.DataFrame(
+    LIST_CYCLES_TO_FAILURE = pd.DataFrame(
         chain(
             range(1, 1000, 50),
             range(1000, 1001),
@@ -157,7 +157,7 @@ def execute(
         columns=[
             "stress_ratio",
             "cycles_to_failure",
-            "stress_parameter",
+            "stress_max",
             "stress_lowerbound",
             "stress_upperbound",
         ]
@@ -169,29 +169,24 @@ def execute(
             [
                 "stress_ratio_id",
                 "stress_ratio",
-                # "log10_stress_parameter",
-                # "log10_number_of_cycles",
-                # "number_of_cycles",
             ]
         ]
         .groupby(["stress_ratio_id"])
         .mean()
     )
 
-    # Add columns with log10(stress_parameter) and log10(number_of_cycles)
-    samples["log10_stress_parameter"] = np.log10(samples.stress_parameter)
-    samples["log10_number_of_cycles"] = np.log10(samples.number_of_cycles)
+    # Add columns with log10(stress_max) and log10(cycles_to_failure)
+    samples["log10_stress_max"] = np.log10(samples.stress_max)
+    samples["log10_cycles_to_failure"] = np.log10(samples.cycles_to_failure)
 
     # Q
     stress_ratios_df["xb"] = (
-        samples[["stress_ratio_id", "log10_stress_parameter"]]
+        samples[["stress_ratio_id", "log10_stress_max"]]
         .groupby("stress_ratio_id")
         .mean()
     )
     samples["q"] = samples.apply(
-        lambda x: (
-            x.log10_stress_parameter - stress_ratios_df.loc[x.stress_ratio_id].xb
-        )
+        lambda x: (x.log10_stress_max - stress_ratios_df.loc[x.stress_ratio_id].xb)
         ** 2,
         axis=1,
     )
@@ -201,7 +196,7 @@ def execute(
 
     # Calculate A (Eq 4) and B (Eq 5)
     linregress = samples.groupby("stress_ratio_id").apply(
-        lambda x: stats.linregress(x.log10_stress_parameter, x.log10_number_of_cycles)
+        lambda x: stats.linregress(x.log10_stress_max, x.log10_cycles_to_failure)
     )
 
     # Eq 4 and 5
@@ -211,16 +206,16 @@ def execute(
     stress_ratios_df["intercept"] = linregress.apply(lambda x: x[0])
 
     samples["ycar"] = samples.apply(
-        lambda x: sn_curve_loglog.equation_ycar(
+        lambda x: sn_curve_utils.equation_ycar(
             stress_ratios_df.loc[x.stress_ratio_id].slope,
             stress_ratios_df.loc[x.stress_ratio_id].intercept,
-            x.log10_stress_parameter,
+            x.log10_stress_max,
         ),
         axis=1,
     )
 
     # LSSE
-    samples["lsse"] = (samples.log10_number_of_cycles - samples.ycar) ** 2
+    samples["lsse"] = (samples.log10_cycles_to_failure - samples.ycar) ** 2
     stress_ratios_df["lsse"] = (
         samples[["stress_ratio_id", "lsse"]].groupby("stress_ratio_id").sum()
     )
@@ -232,7 +227,7 @@ def execute(
 
     # level
     stress_ratios_df["level"] = (
-        samples[["stress_ratio_id", "stress_level"]]
+        samples[["stress_ratio_id", "stress_cluster_number"]]
         .groupby("stress_ratio_id")
         .nunique()
     )
@@ -270,15 +265,15 @@ def execute(
         censored_data_count = len(
             stress_ratio_sample_df[
                 (
-                    stress_ratio_sample_df.stress_parameter
+                    stress_ratio_sample_df.stress_max
                     != stress_ratio_sample_df.residual_strength
                 )
             ]
         )
 
         residual_strength = stress_ratio_sample_df.residual_strength
-        stress_parameter = stress_ratio_sample_df.stress_parameter
-        number_of_cycles = stress_ratio_sample_df.number_of_cycles
+        stress_max = stress_ratio_sample_df.stress_max
+        cycles_to_failure = stress_ratio_sample_df.cycles_to_failure
 
         counter = 0
 
@@ -291,8 +286,8 @@ def execute(
                     s,
                     c,
                     residual_strength,
-                    stress_parameter,
-                    number_of_cycles,
+                    stress_max,
+                    cycles_to_failure,
                     0,
                 )
 
@@ -340,9 +335,9 @@ def execute(
         # Eq 1
         sigmas_e = stress_ratio_sample_df.apply(
             lambda x: sendeckyj_equation_1(
-                x.stress_parameter,
+                x.stress_max,
                 x.residual_strength,
-                x.number_of_cycles,
+                x.cycles_to_failure,
                 c_star,
                 s_star,
             ),
@@ -357,8 +352,6 @@ def execute(
 
         # Eq 19
         beta = sendeckyj_equation_19(g, data_count, censored_data_count, xs, alpha)
-
-        reliability_level = stress_ratio_sample_df.iloc[0].reliability_level
 
         # Prepare output data
         json_df = pd.DataFrame(
@@ -376,15 +369,15 @@ def execute(
 
         a = -(1 - c_star) / c_star
 
-        stress_parameter = cycles_to_failure.copy()
-        stress_parameter["stress_parameter"] = stress_parameter.apply(
+        stress_max = LIST_CYCLES_TO_FAILURE.copy()
+        stress_max["stress_max"] = stress_max.apply(
             lambda x: tassos_equation(
                 reliability_level, alpha, c_star, s_star, x, a, beta
             )
         )
 
-        stress_bounds = stress_parameter.apply(
-            lambda x: sn_curve_loglog.stress_at_failure_bounds(
+        stress_bounds = stress_max.apply(
+            lambda x: sn_curve_utils.stress_at_failure_bounds(
                 stress_ratio_df.sample_count,
                 stress_ratio_df.q,
                 stress_ratio_df.slope,
@@ -395,12 +388,12 @@ def execute(
             ),
             axis=1,
         )
-        stress_parameter["stress_lowerbound"] = stress_bounds.apply(lambda x: x[0])
-        stress_parameter["stress_upperbound"] = stress_bounds.apply(lambda x: x[1])
+        stress_max["stress_lowerbound"] = stress_bounds.apply(lambda x: x[0])
+        stress_max["stress_upperbound"] = stress_bounds.apply(lambda x: x[1])
 
-        stress_parameter["stress_ratio"] = stress_ratio
+        stress_max["stress_ratio"] = stress_ratio
 
-        snc_output_csv_df = pd.concat([snc_output_csv_df, stress_parameter])
+        snc_output_csv_df = pd.concat([snc_output_csv_df, stress_max])
 
     # Export dataframes to files
     snc_output_json_df.to_json(output_json_file, orient="records")
