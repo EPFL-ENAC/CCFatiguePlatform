@@ -14,6 +14,7 @@ settings = Dynaconf(
         Validator("postgres_user", default="ccfatigue"),
         Validator("postgres_password", must_exist=True),
         Validator("postgres_db", default="ccfatigue"),
+        Validator("data_path", default="../Data"),
     ],
 )
 
