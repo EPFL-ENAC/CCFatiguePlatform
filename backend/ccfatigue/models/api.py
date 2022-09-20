@@ -2,9 +2,16 @@
 API Models
 """
 
+from math import isnan
 from enum import Enum
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from typing import Optional
+
+
+def _change_nan_to_none(v: Optional[float]) -> Optional[float]:
+    if v is not None and isnan(v):
+        return None
+    return v
 
 
 class OrmModel(BaseModel):
@@ -70,6 +77,15 @@ class TestModel(OrmModel):
     Defines how test is seen on the API
     """
 
+    @validator(
+        "stress_ratio",
+        "maximum_stress",
+        "frequency",
+        "displacement_controlled_loading_rate",
+    )
+    def change_nan_to_none(cls, v) -> Optional[float]:
+        return _change_nan_to_none(v)
+
     id: int
 
     experiment_id: int
@@ -88,7 +104,7 @@ class TestModel(OrmModel):
     temperature: Optional[float]
     humidity: Optional[float]
     initial_crack_length: Optional[float]
-    measuring_points: Optional[list]  # TODO : list of TestModel or just list !?
+    # measuring_points: Optional[list]  # TODO : list of TestModel or just list !?
 
 
 class TestMeasuringPointModel(OrmModel):
@@ -99,8 +115,8 @@ class TestMeasuringPointModel(OrmModel):
     id: int
 
     test_id: int
-    x_coordinate = Float
-    y_coordinate = Float
+    x_coordinate = float
+    y_coordinate = float
 
 
 class ExperimentFieldNames(str, Enum):

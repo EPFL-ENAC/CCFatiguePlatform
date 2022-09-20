@@ -7,18 +7,18 @@ license = "to be defined"
 
 [tool.poetry.dependencies]
 python = "~3.10"
-fastapi = "^0.82.0"
+fastapi = "^0.85.0"
 uvicorn = "^0.18.2"
 pydantic = "^1.8.2"
 gunicorn = "^20.1.0"
 dynaconf = "^3.1.7"
 psycopg2 = "^2.9.2"
 asyncpg = "^0.26.0"
-SQLAlchemy = {extras = ["asyncio"], version = "^1.4.27"}
+SQLAlchemy = {extras = ["asyncio"], version = "^1.4.41"}
 alembic = "^1.8.1"
 fastapi-pagination = {extras = ["async_sqlalchemy"], version = "^0.10.0"}
 bokeh = "^2.4.2"
-pandas = "^1.4.4"
+pandas = "^1.5.0"
 numpy = "^1.22.0"
 python-multipart = "^0.0.5"
 scipy = "^1.9.0"

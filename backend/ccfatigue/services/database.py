@@ -16,7 +16,7 @@ __host = settings.postgres_host
 __port = settings.postgres_port
 __user = f"{__username}:{quote_plus(__password)}"
 __socket = f"{__host}:{__port}"
-__sync_url = f"postgresql://{__user}@{__socket}/{__database}"
+sync_url = f"postgresql://{__user}@{__socket}/{__database}"
 __async_url = f"postgresql+asyncpg://{__user}@{__socket}/{__database}"
 
 __async_engine = create_async_engine(__async_url, echo=True)
