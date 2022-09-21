@@ -222,10 +222,6 @@ export default {
         { text: "Laboratory", value: "laboratory" },
         { text: "Experiment Type", value: "experiment_type" },
         { text: "Publication", value: "publication_doi" },
-        { text: "Images", value: "publication_images_repository" },
-        { text: "Length", value: "geometry_length" },
-        { text: "width", value: "geometry_width" },
-        { text: "Thickness", value: "geometry_thickness" },
         { text: "Curing Time", value: "laminates_and_assemblies_curing_time" },
         {
           text: "Curing Temperature",
