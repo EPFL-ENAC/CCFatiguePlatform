@@ -28,7 +28,7 @@
   var instance;
 
   beforeEach(function () {
-    instance = new Ccfatigue.DashboardPlots();
+    instance = new Ccfatigue.HysteresisLoop();
   });
 
   var getProperty = function (object, getter, property) {
@@ -43,22 +43,28 @@
     else object[property] = value;
   };
 
-  describe("DashboardPlots", function () {
-    it("should create an instance of DashboardPlots", function () {
-      // uncomment below and update the code to test DashboardPlots
-      //var instance = new Ccfatigue.DashboardPlots();
-      //expect(instance).to.be.a(Ccfatigue.DashboardPlots);
+  describe("HysteresisLoop", function () {
+    it("should create an instance of HysteresisLoop", function () {
+      // uncomment below and update the code to test HysteresisLoop
+      //var instance = new Ccfatigue.HysteresisLoop();
+      //expect(instance).to.be.a(Ccfatigue.HysteresisLoop);
     });
 
-    it('should have the property tests (base name: "tests")', function () {
-      // uncomment below and update the code to test the property tests
-      //var instance = new Ccfatigue.DashboardPlots();
+    it('should have the property nCycles (base name: "n_cycles")', function () {
+      // uncomment below and update the code to test the property nCycles
+      //var instance = new Ccfatigue.HysteresisLoop();
       //expect(instance).to.be();
     });
 
-    it('should have the property plots (base name: "plots")', function () {
-      // uncomment below and update the code to test the property plots
-      //var instance = new Ccfatigue.DashboardPlots();
+    it('should have the property strain (base name: "strain")', function () {
+      // uncomment below and update the code to test the property strain
+      //var instance = new Ccfatigue.HysteresisLoop();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property stress (base name: "stress")', function () {
+      // uncomment below and update the code to test the property stress
+      //var instance = new Ccfatigue.HysteresisLoop();
       //expect(instance).to.be();
     });
   });

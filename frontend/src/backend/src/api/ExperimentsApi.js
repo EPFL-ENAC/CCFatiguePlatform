@@ -12,11 +12,11 @@
  */
 
 import ApiClient from "../ApiClient";
-import DashboardPlots from "../model/DashboardPlots";
 import ExperimentDataPreprocessed from "../model/ExperimentDataPreprocessed";
 import ExperimentFieldNames from "../model/ExperimentFieldNames";
 import HTTPValidationError from "../model/HTTPValidationError";
 import PageExperimentModel from "../model/PageExperimentModel";
+import TestResult from "../model/TestResult";
 
 /**
  * Experiments service.
@@ -154,31 +154,44 @@ export default class ExperimentsApi {
   }
 
   /**
-   * Get Tests Dashboard Plots
-   * Return the 4 Bokeh plots used in Test Dashboard  Note: as we don't have real data yet, we hard code things this so it will render the 10 first tests of the experiment 1 (only experiment we have) : + experiment=1 + 1<tests_ids<10 then we mascarade test_id field so that it looks like to be matching the one asked for.
-   * @param {Object} opts Optional parameters
-   * @param {Number} opts.experimentId
-   * @param {Array.<Number>} opts.testIds
-   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/DashboardPlots} and HTTP response
+   * Get Test Result
+   * Return test result data
+   * @param {Number} experimentId
+   * @param {Number} testId
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/TestResult} and HTTP response
    */
-  getTestsDashboardPlotsExperimentsTestsDashboardPlotsGetWithHttpInfo(opts) {
-    opts = opts || {};
+  getTestResultExperimentsExperimentIdTestsTestIdGetWithHttpInfo(
+    experimentId,
+    testId
+  ) {
     let postBody = null;
+    // verify the required parameter 'experimentId' is set
+    if (experimentId === undefined || experimentId === null) {
+      throw new Error(
+        "Missing the required parameter 'experimentId' when calling getTestResultExperimentsExperimentIdTestsTestIdGet"
+      );
+    }
+    // verify the required parameter 'testId' is set
+    if (testId === undefined || testId === null) {
+      throw new Error(
+        "Missing the required parameter 'testId' when calling getTestResultExperimentsExperimentIdTestsTestIdGet"
+      );
+    }
 
-    let pathParams = {};
-    let queryParams = {
-      experiment_id: opts["experimentId"],
-      test_ids: this.apiClient.buildCollectionParam(opts["testIds"], "multi"),
+    let pathParams = {
+      experiment_id: experimentId,
+      test_id: testId,
     };
+    let queryParams = {};
     let headerParams = {};
     let formParams = {};
 
     let authNames = [];
     let contentTypes = [];
     let accepts = ["application/json"];
-    let returnType = DashboardPlots;
+    let returnType = TestResult;
     return this.apiClient.callApi(
-      "/experiments/tests_dashboard_plots",
+      "/experiments/{experiment_id}/tests/{test_id}",
       "GET",
       pathParams,
       queryParams,
@@ -194,16 +207,16 @@ export default class ExperimentsApi {
   }
 
   /**
-   * Get Tests Dashboard Plots
-   * Return the 4 Bokeh plots used in Test Dashboard  Note: as we don't have real data yet, we hard code things this so it will render the 10 first tests of the experiment 1 (only experiment we have) : + experiment=1 + 1<tests_ids<10 then we mascarade test_id field so that it looks like to be matching the one asked for.
-   * @param {Object} opts Optional parameters
-   * @param {Number} opts.experimentId
-   * @param {Array.<Number>} opts.testIds
-   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/DashboardPlots}
+   * Get Test Result
+   * Return test result data
+   * @param {Number} experimentId
+   * @param {Number} testId
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/TestResult}
    */
-  getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet(opts) {
-    return this.getTestsDashboardPlotsExperimentsTestsDashboardPlotsGetWithHttpInfo(
-      opts
+  getTestResultExperimentsExperimentIdTestsTestIdGet(experimentId, testId) {
+    return this.getTestResultExperimentsExperimentIdTestsTestIdGetWithHttpInfo(
+      experimentId,
+      testId
     ).then(function (response_and_data) {
       return response_and_data.data;
     });

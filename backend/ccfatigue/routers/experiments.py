@@ -17,12 +17,9 @@ from ccfatigue.services.database import get_session
 from ccfatigue.models.database import Experiment
 from ccfatigue.models.api import ExperimentModel, ExperimentFieldNames
 from ccfatigue.utils.routers import get_where_clauses
-from ccfatigue.utils.bokeh_plots import (
-    generate_tests_dashboard_plots,
-    DashboardPlots,
-)
 from ccfatigue.model import Experiment_Data_Preprocessed
 from preprocessing import tst_data_lib
+from ccfatigue.utils.test_dashboard import TestResult, get_result
 
 router = APIRouter(
     prefix="/experiments",
@@ -70,26 +67,17 @@ async def get_field_distinct(
     )
 
 
-@router.get("/tests_dashboard_plots", response_model=DashboardPlots)
-async def get_tests_dashboard_plots(
+@router.get("/{experiment_id}/tests/{test_id}", response_model=TestResult)
+async def get_test_result(
     session: AsyncSession = Depends(get_session),
-    experiment_id: int = Query(""),
-    test_ids: List[int] = Query([]),
-):
+    experiment_id: int = Path(...),
+    test_id: int = Path(),
+) -> TestResult:
     """
-    Return the 4 Bokeh plots used in Test Dashboard
-
-    Note: as we don't have real data yet, we hard code things this so it will
-    render the 10 first tests of the experiment 1 (only experiment we have) :
-    + experiment=1
-    + 1<tests_ids<10
-    then we mascarade test_id field so that it looks like
-    to be matching the one asked for.
+    Return test result data
     """
-    dashboard_plots = await generate_tests_dashboard_plots(
-        session, experiment_id, test_ids
-    )
-    return dashboard_plots
+    result = await get_result(session, experiment_id, test_id)
+    return result
 
 
 @router.post("/data_preprocess_check", response_model=Experiment_Data_Preprocessed)

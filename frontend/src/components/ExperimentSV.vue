@@ -31,6 +31,7 @@
 
 <script>
 import InfoTooltip from "./InfoTooltip.vue";
+
 export default {
   components: { InfoTooltip },
   name: "ExperimentSV",
@@ -45,7 +46,9 @@ export default {
       type: String,
       default: "",
     },
-    colors: Array,
+    colors: {
+      type: Array,
+    },
     tooltip: String,
   },
   methods: {

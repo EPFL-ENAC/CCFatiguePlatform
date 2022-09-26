@@ -1,166 +1,187 @@
 <template>
   <v-container>
-    <v-skeleton-loader v-if="experiment.loading" type="article" />
-    <div v-else>
-      <v-row>
-        <v-col :cols="12">
-          <experiment-specifications :experiment="experiment.experiment" />
-        </v-col>
-        <v-col :cols="12">
-          <v-card flat>
-            <v-card-title>
-              Test results
-              <v-spacer> </v-spacer>
-              <v-btn @click="goBack">Add test(s)</v-btn>
-            </v-card-title>
-            <v-card-text>
-              <v-container fluid>
-                <v-row>
-                  <v-col cols="10">
-                    <v-row>
-                      <v-col cols="6">
-                        <v-row>
-                          <info-tooltip>
-                            This graph shows a selection of loading/unloading
-                            loops. These loops, also known as hysteresis loops
-                            are important because they provide a visual
-                            representation of what is being plotted in the next
-                            three graphs.
-                          </info-tooltip>
-                          <div
-                            :id="bokehPlotsIds.stressStrain"
-                            class="bokeh"
-                          ></div>
-                        </v-row>
-                      </v-col>
-                      <v-col cols="6">
-                        <v-row>
-                          <info-tooltip>
-                            On this graph, we show the evolution of the
-                            hysteresis area. This value is defined as the area
-                            contained within a hysteresis loop. For visual
-                            representation, it represents the area defined by
-                            each closed loop on the (stress-strain) plane in
-                            graph 1.
-                          </info-tooltip>
-                          <div
-                            :id="bokehPlotsIds.hysteresisArea"
-                            class="bokeh"
-                          ></div>
-                        </v-row>
-                      </v-col>
-                      <v-col cols="6">
-                        <v-row>
-                          <info-tooltip>
-                            Creep is defined as the average deformation during
-                            each loading/unloading cycle. It gives an
-                            understanding of how much deformation occurs at each
-                            cycle.
-                          </info-tooltip>
-                          <div :id="bokehPlotsIds.creep" class="bokeh"></div>
-                        </v-row>
-                      </v-col>
-                      <v-col cols="6">
-                        <v-row>
-                          <info-tooltip>
-                            Stiffness is representative of the resistance an
-                            object opposes to an applied force. On this graph,
-                            we show how this capacity evolves over a fatigue
-                            life cycle.
-                          </info-tooltip>
-                          <div
-                            :id="bokehPlotsIds.stiffness"
-                            class="bokeh"
-                          ></div>
-                        </v-row>
-                      </v-col>
-                    </v-row>
-                  </v-col>
-                  <v-col cols="2">
-                    <v-card>
-                      <v-card-text>
-                        <ul>
-                          <li>
-                            <experiment-s-v
-                              subject="Specimen number"
-                              :values="bokehTests.map((t) => t.specimen_id)"
-                              valueType="bigNumber"
-                              :colors="bokehTests.map((t) => t.color)"
-                            />
-                          </li>
-                          <li>
-                            <experiment-s-v
-                              subject="Stress at failure"
-                              :values="bokehTests.map((t) => '-')"
-                              :colors="bokehTests.map((t) => t.color)"
-                              :unit="units.stress"
-                              tooltip="σ_fail is defined as the stress level that induced failure from the tested specimen and is measured in [MPa]"
-                            />
-                          </li>
-                          <li>
-                            <experiment-s-v
-                              subject="Strain at failure"
-                              :values="bokehTests.map((t) => '-')"
-                              :colors="bokehTests.map((t) => t.color)"
-                              unit="%"
-                              tooltip="ε_fail is defined as the deformation at the time of failure and is measured in [%]"
-                            />
-                          </li>
-                          <li>
-                            <experiment-s-v
-                              subject="N_cycles"
-                              :values="bokehTests.map((t) => '-')"
-                              :colors="bokehTests.map((t) => t.color)"
-                              valueType="bigNumber"
-                              tooltip="defined as the number of cycles to failure [-]"
-                            />
-                          </li>
-                          <li>
-                            <experiment-s-v
-                              subject="R"
-                              :values="bokehTests.map((t) => '-')"
-                              :colors="bokehTests.map((t) => t.color)"
-                              tooltip="defined as the stress ratio (σ_min/σ_max) [-] and has relevance in the context of constant amplitude experiments."
-                            />
-                          </li>
-                          <li>
-                            <experiment-s-v
-                              subject="Total dissipated energy (TDE)"
-                              :values="
-                                bokehTests.map((t) => t.total_dissipated_energy)
-                              "
-                              valueType="bigNumber"
-                              :colors="bokehTests.map((t) => t.color)"
-                              tooltip="defined as the sum of all the hysteresis areas over the course of an experiment. It gives a good measure of the amount of energy that has been dissipated in deformation and heat over the course of an experiment."
-                            />
-                          </li>
-                        </ul>
-                      </v-card-text>
-                    </v-card>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </div>
+    <v-row>
+      <v-col>
+        <experiment-specifications :experiment="experiment.experiment" />
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="auto">
+        <h2>Test results</h2>
+      </v-col>
+      <v-spacer></v-spacer>
+      <v-col cols="auto">
+        <v-btn @click="goBack">Add test(s)</v-btn>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="10">
+        <v-row>
+          <v-col cols="6">
+            <v-card :loading="loading">
+              <v-card-title>
+                Stress - Strain
+                <info-tooltip>
+                  This graph shows a selection of loading/unloading loops. These
+                  loops, also known as hysteresis loops are important because
+                  they provide a visual representation of what is being plotted
+                  in the next three graphs.
+                </info-tooltip>
+              </v-card-title>
+              <v-card-text>
+                <simple-chart
+                  :series="stressStrainSeries"
+                  :aspect-ratio="2"
+                  x-axis-name="Strain"
+                  y-axis-name="Stress"
+                ></simple-chart>
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col cols="6">
+            <v-card :loading="loading">
+              <v-card-title>
+                Hysteresis loop area evolution
+                <info-tooltip>
+                  On this graph, we show the evolution of the hysteresis area.
+                  This value is defined as the area contained within a
+                  hysteresis loop. For visual representation, it represents the
+                  area defined by each closed loop on the (stress-strain) plane
+                  in graph 1.
+                </info-tooltip>
+              </v-card-title>
+              <v-card-text>
+                <simple-chart
+                  :series="hysteresisAreaSeries"
+                  :aspect-ratio="2"
+                  x-axis-name="Number of cycles"
+                  y-axis-name="Hysteresis area"
+                ></simple-chart>
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col cols="6">
+            <v-card :loading="loading">
+              <v-card-title>
+                Creep evolution
+                <info-tooltip>
+                  Creep is defined as the average deformation during each
+                  loading/unloading cycle. It gives an understanding of how much
+                  deformation occurs at each cycle.
+                </info-tooltip>
+              </v-card-title>
+              <v-card-text>
+                <simple-chart
+                  :series="creepSeries"
+                  :aspect-ratio="2"
+                  x-axis-name="Number of cycles"
+                  y-axis-name="Creep"
+                ></simple-chart>
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col cols="6">
+            <v-card :loading="loading">
+              <v-card-title>
+                Stiffness evolution under cyclic loading
+                <info-tooltip>
+                  Stiffness is representative of the resistance an object
+                  opposes to an applied force. On this graph, we show how this
+                  capacity evolves over a fatigue life cycle.
+                </info-tooltip>
+              </v-card-title>
+              <v-card-text>
+                <simple-chart
+                  :series="stiffnessSeries"
+                  :aspect-ratio="2"
+                  x-axis-name="Number of cycles"
+                  y-axis-name="Stiffness"
+                ></simple-chart>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-col>
+      <v-col cols="2">
+        <v-card :loading="loading">
+          <v-card-text>
+            <ul>
+              <li>
+                <experiment-s-v
+                  :colors="colors"
+                  subject="Specimen number"
+                  :values="specimenIds"
+                  valueType="bigNumber"
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  :colors="colors"
+                  subject="Stress at failure"
+                  :values="specimenIds.map((t) => '-')"
+                  :unit="units.stress"
+                  tooltip="σ_fail is defined as the stress level that induced failure from the tested specimen and is measured in [MPa]"
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  :colors="colors"
+                  subject="Strain at failure"
+                  :values="specimenIds.map((t) => '-')"
+                  unit="%"
+                  tooltip="ε_fail is defined as the deformation at the time of failure and is measured in [%]"
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  :colors="colors"
+                  subject="N_cycles"
+                  :values="specimenIds.map((t) => '-')"
+                  valueType="bigNumber"
+                  tooltip="defined as the number of cycles to failure [-]"
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  :colors="colors"
+                  subject="R"
+                  :values="specimenIds.map((t) => '-')"
+                  tooltip="defined as the stress ratio (σ_min/σ_max) [-] and has relevance in the context of constant amplitude experiments."
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  :colors="colors"
+                  subject="Total dissipated energy (TDE)"
+                  :values="totalDissipatedEnergies"
+                  valueType="bigNumber"
+                  tooltip="defined as the sum of all the hysteresis areas over the course of an experiment. It gives a good measure of the amount of energy that has been dissipated in deformation and heat over the course of an experiment."
+                />
+              </li>
+            </ul>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script>
-import * as Bokeh from "bokeh";
 import { mapState } from "vuex";
 import InfoTooltip from "@/components/InfoTooltip";
 import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
-import ExperimentSV from "@/components/ExperimentSV";
+import ExperimentSV from "@/components/ExperimentSV.vue";
+import SimpleChart from "@/components/charts/SimpleChart.vue";
+import { zip } from "lodash";
+import { colorPalette } from "@/utils/style";
 
 export default {
   name: "TestsDashboard",
   components: {
     ExperimentSpecifications,
-    InfoTooltip,
     ExperimentSV,
+    InfoTooltip,
+    SimpleChart,
   },
   props: {
     experimentId: Number,
@@ -171,73 +192,70 @@ export default {
       experiment: "oneExperiment",
       units: "units",
     }),
-    ...mapState("bokehPlots", {
-      bokehLoading: "loading",
-      bokehTests: "tests",
-      bokehPlots: "plots",
-    }),
   },
   data() {
     return {
-      bokehPlotsIds: {
-        stressStrain: "bokeh-stress-strain",
-        creep: "bokeh-creep",
-        hysteresisArea: "bokeh-hysteresis-area",
-        stiffness: "bokeh-stiffness",
-      },
-      bokehPlotsRendered: false,
+      loading: false,
+      colors: colorPalette,
+      stressStrainSeries: [],
+      hysteresisAreaSeries: [],
+      creepSeries: [],
+      stiffnessSeries: [],
+      specimenIds: [],
+      totalDissipatedEnergies: [],
     };
   },
   methods: {
     goBack() {
       this.$router.go(-1);
     },
-    renderBokehPlotsIfGoodTime() {
-      if (
-        !this.experiment.loading &&
-        !this.bokehLoading &&
-        !this.bokehPlotsRendered
-      ) {
-        Bokeh.embed.embed_item(
-          this.bokehPlots.stress_strain,
-          this.bokehPlotsIds.stressStrain
-        );
-        Bokeh.embed.embed_item(this.bokehPlots.creep, this.bokehPlotsIds.creep);
-        Bokeh.embed.embed_item(
-          this.bokehPlots.hysteresis_area,
-          this.bokehPlotsIds.hysteresisArea
-        );
-        Bokeh.embed.embed_item(
-          this.bokehPlots.stiffness,
-          this.bokehPlotsIds.stiffness
-        );
-        this.bokehPlotsRendered = true;
-      }
-    },
   },
   created() {
-    const storeUnwatch1 = this.$store.watch(
-      (state) => state.bokehPlots.loading,
-      () => {
-        if (!this.bokehLoading) {
-          this.renderBokehPlotsIfGoodTime();
-          storeUnwatch1();
-        }
-      }
-    );
-    const storeUnwatch2 = this.$store.watch(
-      (state) => state.experiments.oneExperiment.loading,
-      () => {
-        if (!this.experiment.loading) {
-          this.renderBokehPlotsIfGoodTime();
-          storeUnwatch2();
-        }
-      }
-    );
-    this.$store.dispatch("bokehPlots/fetchBokehPlots", {
-      experimentId: this.experimentId,
-      testIds: this.testIds,
-    });
+    this.loading = true;
+    Promise.all(
+      this.testIds.map((testId) =>
+        this.$experimentsApi.getTestResultExperimentsExperimentIdTestsTestIdGet(
+          this.experimentId,
+          testId
+        )
+      )
+    )
+      .then((dataList) => {
+        this.specimenIds = dataList.map((data) => data.specimen_id);
+        this.totalDissipatedEnergies = dataList.map(
+          (data) => data.total_dissipated_energy
+        );
+        this.stressStrainSeries = [];
+        this.hysteresisAreaSeries = [];
+        this.creepSeries = [];
+        this.stiffnessSeries = [];
+        zip(this.testIds, dataList).forEach(([testId, data]) => {
+          this.stressStrainSeries.push(
+            ...data.hysteresis_loops.map((loop) => ({
+              type: "line",
+              name: `${testId}`,
+              data: zip(loop.strain, loop.stress),
+            }))
+          );
+          this.hysteresisAreaSeries.push({
+            type: "line",
+            name: `${testId}`,
+            data: zip(data.n_cycles, data.hysteresis_area),
+          });
+          this.creepSeries.push({
+            type: "line",
+            name: `${testId}`,
+            data: zip(data.n_cycles, data.creep),
+          });
+          this.stiffnessSeries.push({
+            type: "line",
+            name: `${testId}`,
+            data: zip(data.n_cycles, data.stiffness),
+          });
+        });
+      })
+      .finally(() => (this.loading = false));
+
     this.$store.dispatch("experiments/fetchOneExperimentWithTests", {
       experimentId: this.experimentId,
       pagination: {
@@ -248,13 +266,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-div.bokeh {
-  min-height: 250px;
-  height: 25vh;
-}
-div.bk {
-  width: 100%;
-}
-</style>

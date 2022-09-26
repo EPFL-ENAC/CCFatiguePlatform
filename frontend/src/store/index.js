@@ -9,7 +9,6 @@ import {
 } from "@/backend/src/index";
 import ApiClient from "@/backend/src/ApiClient";
 import experiments from "./experiments";
-import bokehPlots from "./bokehPlots";
 
 Vue.use(Vuex);
 
@@ -22,6 +21,5 @@ Vue.prototype.$analysisApi = new AnalysisApi(apiClient);
 export default new Vuex.Store({
   modules: {
     experiments,
-    bokehPlots,
   },
 });
