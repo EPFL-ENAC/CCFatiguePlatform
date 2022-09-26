@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-""" 
+"""
 
 CCFatigue Platform, Analysis module 1: Cycle Counting
-Method: Rainflow Counting. 
+Method: Rainflow Counting.
 
 Rainflow counting is a method that {Insert description here}.
 

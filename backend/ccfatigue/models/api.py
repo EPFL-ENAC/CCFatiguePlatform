@@ -2,10 +2,11 @@
 API Models
 """
 
-from math import isnan
 from enum import Enum
-from pydantic import BaseModel, validator
+from math import isnan
 from typing import Optional
+
+from pydantic import BaseModel, validator
 
 
 def _change_nan_to_none(v: Optional[float]) -> Optional[float]:

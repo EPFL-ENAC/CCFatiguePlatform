@@ -1,13 +1,15 @@
 import os
+from typing import Dict, List
+
 import numpy as np
 import pandas as pd
-from typing import List, Dict
-from pydantic import BaseModel
 from pandas.core.frame import DataFrame
-from sqlalchemy.future import select
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
-from ccfatigue.models.database import Experiment, Test
+from sqlalchemy.future import select
+
 from ccfatigue.config import settings
+from ccfatigue.models.database import Experiment, Test
 
 DATA_DIRECTORY: str = os.path.join(settings.data_path, "preprocessed")  # type: ignore
 INTERVAL: int = 10

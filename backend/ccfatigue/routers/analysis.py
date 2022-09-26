@@ -3,7 +3,9 @@ Handle /analysis requests
 """
 
 from typing import List
-from fastapi import APIRouter, Query, UploadFile, File
+
+from fastapi import APIRouter, File, Query, UploadFile
+
 from ccfatigue.analyzer import run_sn_curve
 from ccfatigue.model import SnCurveMethod, SnCurveResult
 

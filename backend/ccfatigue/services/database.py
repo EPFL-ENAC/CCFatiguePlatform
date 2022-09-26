@@ -4,10 +4,12 @@ Database Service
 
 from typing import AsyncIterator
 from urllib.parse import quote_plus
-from ccfatigue.config import settings
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+from ccfatigue.config import settings
 
 __username = settings.postgres_user
 __password = settings.postgres_password

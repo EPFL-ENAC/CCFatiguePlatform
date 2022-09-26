@@ -5,18 +5,19 @@
 - Inject all Experiments & Tests from Data/preprocessed folder
 """
 
-import os
+import argparse
 import glob
 import json
-import argparse
+import os
+
 import pandas as pd
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
 from alembic.command import upgrade
 from alembic.config import Config
 from ccfatigue.models.database import Experiment, Test, Test_Measuring_Point
 from ccfatigue.services.database import sync_url
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
 
 DATA_DIR = os.path.abspath(f"{__file__}/../../Data/preprocessed")
 EXPERIMENTS_TO_INJECT = glob.glob(f"{DATA_DIR}/TST_*")

@@ -2,9 +2,10 @@
 Define the model as it is in the DB
 """
 
-from ccfatigue.services.database import Base
-from sqlalchemy import Column, ForeignKey, Integer, Float, String, Boolean, Enum
+from sqlalchemy import Boolean, Column, Enum, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
+
+from ccfatigue.services.database import Base
 
 
 class Experiment(Base):

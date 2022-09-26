@@ -3,13 +3,13 @@ Handle /tests requests
 """
 
 from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi_pagination import Page
-from ccfatigue.services.database import get_session
-from ccfatigue.models.database import Test
-from ccfatigue.models.api import TestModel
-from ccfatigue.utils.fastapi import get_page
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from ccfatigue.models.api import TestModel
+from ccfatigue.models.database import Test
+from ccfatigue.services.database import get_session
+from ccfatigue.utils.fastapi import get_page
 
 router = APIRouter(
     prefix="/tests",

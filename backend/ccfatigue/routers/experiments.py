@@ -3,23 +3,25 @@ Handle /experiments requests
 """
 
 import glob
+import subprocess
 import tempfile
 import zipfile
-import subprocess
-from typing import List, Any, Optional
-from fastapi import APIRouter, Depends, Query, Path, File, UploadFile
+from typing import Any, List, Optional
+
+from fastapi import APIRouter, Depends, File, Path, Query, UploadFile
+from fastapi_pagination import Page
+from fastapi_pagination.ext.async_sqlalchemy import paginate
 from sqlalchemy import and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from fastapi_pagination import Page
-from fastapi_pagination.ext.async_sqlalchemy import paginate
-from ccfatigue.services.database import get_session
-from ccfatigue.models.database import Experiment
-from ccfatigue.models.api import ExperimentModel, ExperimentFieldNames
-from ccfatigue.utils.routers import get_where_clauses
+
 from ccfatigue.model import Experiment_Data_Preprocessed
-from preprocessing import tst_data_lib
+from ccfatigue.models.api import ExperimentFieldNames, ExperimentModel
+from ccfatigue.models.database import Experiment
+from ccfatigue.services.database import get_session
+from ccfatigue.utils.routers import get_where_clauses
 from ccfatigue.utils.test_dashboard import TestResult, get_result
+from preprocessing import tst_data_lib
 
 router = APIRouter(
     prefix="/experiments",
