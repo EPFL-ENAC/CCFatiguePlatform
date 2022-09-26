@@ -2,11 +2,12 @@
 Common tools for TST data preprocessing
 """
 
-import os
-import re
+import copy
 import glob
 import json
-import copy
+import os
+import re
+
 import numpy as np
 import pandas as pd
 

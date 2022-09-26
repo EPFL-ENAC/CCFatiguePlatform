@@ -22,7 +22,10 @@ class Flow:
         self.noc = noc
 
     def __str__(self):
-        return "{:10.4f} {:10.4f} {:10.4f} {:10.4f} {}".format(self.range, self.mean, self.peak1, self.peak2, self.noc)
+        return "{:10.4f} {:10.4f} {:10.4f} {:10.4f} {}".format(
+            self.range, self.mean, self.peak1, self.peak2, self.noc
+        )
+
 
 peak = []
 flows = []
@@ -41,7 +44,7 @@ with open("./input.txt", "r") as inFile:
             x = abs(peak[-1] - peak[-2])
             y = abs(peak[-2] - peak[-3])
             if x < y:
-                break # exit while
+                break  # exit while
 
             _mean = (peak[-2] + peak[-3]) / 2
             _range = y

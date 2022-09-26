@@ -1,6 +1,7 @@
 import os
-import ccfatigue.modules.sn_curve_loglog as sn_curve_loglog
+
 import ccfatigue.modules.sn_curve_linlog as sn_curve_linlog
+import ccfatigue.modules.sn_curve_loglog as sn_curve_loglog
 import ccfatigue.modules.sn_curve_sendeckyj as sn_curve_sendeckyj
 
 SRC_DIR = os.path.dirname(os.path.realpath(__file__))

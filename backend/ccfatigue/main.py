@@ -3,10 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_pagination import add_pagination
 
 from ccfatigue import __name__, __version__
-
 from ccfatigue.config import settings
-from ccfatigue.routers import root, experiments, tests, analysis
-
+from ccfatigue.routers import analysis, experiments, root, tests
 from init_db import run_init_db
 
 run_init_db()

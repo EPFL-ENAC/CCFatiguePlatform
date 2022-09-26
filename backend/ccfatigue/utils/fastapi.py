@@ -1,13 +1,15 @@
 from math import isnan
 from typing import Any, List, Set, TypeVar
-from sqlalchemy.ext.asyncio import AsyncSession
+
 from fastapi_pagination.default import Page
-from ccfatigue.utils.pagination import paginate
 from pydantic.main import BaseModel
-from sqlalchemy.sql.schema import Column
-from ccfatigue.services.database import Base
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.elements import BooleanClauseList, ColumnElement
+from sqlalchemy.sql.schema import Column
+
+from ccfatigue.services.database import Base
+from ccfatigue.utils.pagination import paginate
 
 D = TypeVar("D", bound=Base)  # type: ignore
 M = TypeVar("M", bound=BaseModel)
