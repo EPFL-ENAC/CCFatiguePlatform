@@ -12,7 +12,6 @@
  */
 
 import ApiClient from "../ApiClient";
-import HTTPValidationError from "../model/HTTPValidationError";
 import PageTestModel from "../model/PageTestModel";
 
 /**

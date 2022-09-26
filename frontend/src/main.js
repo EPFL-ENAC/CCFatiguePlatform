@@ -1,11 +1,11 @@
+import numeral from "numeral";
 import Vue from "vue";
+import numFormat from "vue-filter-number-format";
 import App from "./App.vue";
+import "./plugins/pluralize";
+import vuetify from "./plugins/vuetify";
 import router from "./router";
 import store from "./store";
-import vuetify from "./plugins/vuetify";
-import "./plugins/pluralize";
-import numeral from "numeral";
-import numFormat from "vue-filter-number-format";
 
 Vue.config.productionTip = false;
 
