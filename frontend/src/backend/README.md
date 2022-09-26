@@ -104,14 +104,14 @@ var api = new Ccfatigue.AnalysisApi();
 var methods = [new Ccfatigue.SnCurveMethod()]; // {[SnCurveMethod]}
 var rRatios = [null]; // {[Number]}
 var file = "/path/to/file"; // {File}
-var callback = function (error, data, response) {
-  if (error) {
-    console.error(error);
-  } else {
+api.runSnCurveFileAnalysisSnCurveFilePost(methods, rRatios, file).then(
+  function (data) {
     console.log("API called successfully. Returned data: " + data);
+  },
+  function (error) {
+    console.error(error);
   }
-};
-api.runSnCurveFileAnalysisSnCurveFilePost(methods, rRatios, file, callback);
+);
 ```
 
 ## Documentation for API Endpoints

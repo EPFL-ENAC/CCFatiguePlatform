@@ -18,19 +18,15 @@ export default {
   actions: {
     fetchBokehPlots({ commit }, payload) {
       commit("nowWeLoad", payload);
-      this._vm.$experimentsApi.getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet(
-        {
+      this._vm.$experimentsApi
+        .getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet({
           experimentId: payload.experimentId,
           testIds: payload.testIds,
-        },
-        (error, data) => {
-          if (error) {
-            console.error(error);
-          } else {
-            commit("storeBokehPlots", data);
-          }
-        }
-      );
+        })
+        .then(
+          (data) => commit("storeBokehPlots", data),
+          (error) => console.error(error)
+        );
     },
   },
 };

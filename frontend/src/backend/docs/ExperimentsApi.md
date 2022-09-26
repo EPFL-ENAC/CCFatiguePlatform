@@ -29,13 +29,14 @@ let opts = {
   page: 1, // Number |
   size: 50, // Number |
 };
-apiInstance.getExperimentsExperimentsGet(opts, (error, data, response) => {
-  if (error) {
-    console.error(error);
-  } else {
+apiInstance.getExperimentsExperimentsGet(opts).then(
+  (data) => {
     console.log("API called successfully. Returned data: " + data);
+  },
+  (error) => {
+    console.error(error);
   }
-});
+);
 ```
 
 ### Parameters
@@ -75,14 +76,12 @@ import Ccfatigue from "ccfatigue";
 
 let apiInstance = new Ccfatigue.ExperimentsApi();
 let field = new Ccfatigue.ExperimentFieldNames(); // ExperimentFieldNames |
-apiInstance.getFieldDistinctExperimentsFieldDistinctGet(
-  field,
-  (error, data, response) => {
-    if (error) {
-      console.error(error);
-    } else {
-      console.log("API called successfully. Returned data: " + data);
-    }
+apiInstance.getFieldDistinctExperimentsFieldDistinctGet(field).then(
+  (data) => {
+    console.log("API called successfully. Returned data: " + data);
+  },
+  (error) => {
+    console.error(error);
   }
 );
 ```
@@ -124,14 +123,12 @@ let opts = {
   experimentId: 56, // Number |
   testIds: [null], // [Number] |
 };
-apiInstance.getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet(
-  opts,
-  (error, data, response) => {
-    if (error) {
-      console.error(error);
-    } else {
-      console.log("API called successfully. Returned data: " + data);
-    }
+apiInstance.getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet(opts).then(
+  (data) => {
+    console.log("API called successfully. Returned data: " + data);
+  },
+  (error) => {
+    console.error(error);
   }
 );
 ```
@@ -169,16 +166,16 @@ import Ccfatigue from "ccfatigue";
 
 let apiInstance = new Ccfatigue.ExperimentsApi();
 let file = "/path/to/file"; // File |
-apiInstance.postDataPreprocessCheckExperimentsDataPreprocessCheckPost(
-  file,
-  (error, data, response) => {
-    if (error) {
-      console.error(error);
-    } else {
+apiInstance
+  .postDataPreprocessCheckExperimentsDataPreprocessCheckPost(file)
+  .then(
+    (data) => {
       console.log("API called successfully. Returned data: " + data);
+    },
+    (error) => {
+      console.error(error);
     }
-  }
-);
+  );
 ```
 
 ### Parameters
