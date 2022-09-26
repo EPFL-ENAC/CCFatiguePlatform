@@ -33,24 +33,15 @@ export default class TestsApi {
   }
 
   /**
-   * Callback function to receive the result of the getTestsTestsGet operation.
-   * @callback module:api/TestsApi~getTestsTestsGetCallback
-   * @param {String} error Error message, if any.
-   * @param {module:model/PageTestModel} data The data returned by the service call.
-   * @param {String} response The complete HTTP response.
-   */
-
-  /**
    * Get Tests
    * Get all tests for specific experiment
    * @param {Number} experimentId
    * @param {Object} opts Optional parameters
    * @param {Number} opts.page  (default to 1)
    * @param {Number} opts.size  (default to 50)
-   * @param {module:api/TestsApi~getTestsTestsGetCallback} callback The callback function, accepting three arguments: error, data, response
-   * data is of type: {@link module:model/PageTestModel}
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/PageTestModel} and HTTP response
    */
-  getTestsTestsGet(experimentId, opts, callback) {
+  getTestsTestsGetWithHttpInfo(experimentId, opts) {
     opts = opts || {};
     let postBody = null;
     // verify the required parameter 'experimentId' is set
@@ -85,8 +76,24 @@ export default class TestsApi {
       contentTypes,
       accepts,
       returnType,
-      null,
-      callback
+      null
     );
+  }
+
+  /**
+   * Get Tests
+   * Get all tests for specific experiment
+   * @param {Number} experimentId
+   * @param {Object} opts Optional parameters
+   * @param {Number} opts.page  (default to 1)
+   * @param {Number} opts.size  (default to 50)
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/PageTestModel}
+   */
+  getTestsTestsGet(experimentId, opts) {
+    return this.getTestsTestsGetWithHttpInfo(experimentId, opts).then(function (
+      response_and_data
+    ) {
+      return response_and_data.data;
+    });
   }
 }

@@ -358,22 +358,21 @@ export default {
         this.snCurve.file
       ) {
         this.snCurve.loading = true;
-        this.$analysisApi.runSnCurveFileAnalysisSnCurveFilePost(
-          this.snCurve.selectedMethods,
-          this.snCurve.selectedRRatios,
-          this.snCurve.file,
-          (error, data) => {
-            if (!error) {
-              this.snCurve.outputs = data.outputs;
-              this.snCurve.series = data.lines.map((line) => ({
-                type: "line",
-                name: line.name,
-                data: zip(line.xData, line.yData),
-              }));
-            }
-            this.snCurve.loading = false;
-          }
-        );
+        this.$analysisApi
+          .runSnCurveFileAnalysisSnCurveFilePost(
+            this.snCurve.selectedMethods,
+            this.snCurve.selectedRRatios,
+            this.snCurve.file
+          )
+          .then((data) => {
+            this.snCurve.outputs = data.outputs;
+            this.snCurve.series = data.lines.map((line) => ({
+              type: "line",
+              name: line.name,
+              data: zip(line.xData, line.yData),
+            }));
+          })
+          .finally(() => (this.snCurve.loading = false));
       }
     },
     downloadSnCurve() {

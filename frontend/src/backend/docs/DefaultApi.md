@@ -21,13 +21,14 @@ Get All standardized units
 import Ccfatigue from "ccfatigue";
 
 let apiInstance = new Ccfatigue.DefaultApi();
-apiInstance.getUnitsUnitsGet((error, data, response) => {
-  if (error) {
-    console.error(error);
-  } else {
+apiInstance.getUnitsUnitsGet().then(
+  (data) => {
     console.log("API called successfully. Returned data: " + data);
+  },
+  (error) => {
+    console.error(error);
   }
-});
+);
 ```
 
 ### Parameters
@@ -61,13 +62,14 @@ Get AppInfo
 import Ccfatigue from "ccfatigue";
 
 let apiInstance = new Ccfatigue.DefaultApi();
-apiInstance.rootGet((error, data, response) => {
-  if (error) {
-    console.error(error);
-  } else {
+apiInstance.rootGet().then(
+  (data) => {
     console.log("API called successfully. Returned data: " + data);
+  },
+  (error) => {
+    console.error(error);
   }
-});
+);
 ```
 
 ### Parameters
