@@ -13,8 +13,6 @@
 
 import ApiClient from "../ApiClient";
 import ExperimentDataPreprocessed from "../model/ExperimentDataPreprocessed";
-import ExperimentFieldNames from "../model/ExperimentFieldNames";
-import HTTPValidationError from "../model/HTTPValidationError";
 import PageExperimentModel from "../model/PageExperimentModel";
 import TestResult from "../model/TestResult";
 

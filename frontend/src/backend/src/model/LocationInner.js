@@ -11,8 +11,6 @@
  *
  */
 
-import ApiClient from "../ApiClient";
-
 /**
  * The LocationInner model module.
  * @module model/LocationInner

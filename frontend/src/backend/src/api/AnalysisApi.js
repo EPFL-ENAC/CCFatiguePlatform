@@ -12,8 +12,6 @@
  */
 
 import ApiClient from "../ApiClient";
-import HTTPValidationError from "../model/HTTPValidationError";
-import SnCurveMethod from "../model/SnCurveMethod";
 import SnCurveResult from "../model/SnCurveResult";
 
 /**

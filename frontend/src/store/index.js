@@ -1,13 +1,13 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
+import ApiClient from "@/backend/src/ApiClient";
 import {
+  AnalysisApi,
   DefaultApi,
   ExperimentsApi,
   TestsApi,
-  AnalysisApi,
 } from "@/backend/src/index";
-import ApiClient from "@/backend/src/ApiClient";
 import experiments from "./experiments";
 
 Vue.use(Vuex);

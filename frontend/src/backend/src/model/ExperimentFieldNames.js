@@ -10,8 +10,6 @@
  * Do not edit the class manually.
  *
  */
-
-import ApiClient from "../ApiClient";
 /**
  * Enum class ExperimentFieldNames.
  * @enum {}
