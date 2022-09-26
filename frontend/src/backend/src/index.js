@@ -13,20 +13,19 @@
 
 import ApiClient from "./ApiClient";
 import AppInfo from "./model/AppInfo";
-import DashboardPlots from "./model/DashboardPlots";
 import EchartLine from "./model/EchartLine";
 import ExperimentDataPreprocessed from "./model/ExperimentDataPreprocessed";
 import ExperimentFieldNames from "./model/ExperimentFieldNames";
 import ExperimentModel from "./model/ExperimentModel";
 import HTTPValidationError from "./model/HTTPValidationError";
+import HysteresisLoop from "./model/HysteresisLoop";
 import LocationInner from "./model/LocationInner";
 import PageExperimentModel from "./model/PageExperimentModel";
 import PageTestModel from "./model/PageTestModel";
-import Plots from "./model/Plots";
 import SnCurveMethod from "./model/SnCurveMethod";
 import SnCurveResult from "./model/SnCurveResult";
 import TestModel from "./model/TestModel";
-import TestPlot from "./model/TestPlot";
+import TestResult from "./model/TestResult";
 import UnitInfo from "./model/UnitInfo";
 import ValidationError from "./model/ValidationError";
 import AnalysisApi from "./api/AnalysisApi";
@@ -77,11 +76,6 @@ export {
    */
   AppInfo,
   /**
-   * The DashboardPlots model constructor.
-   * @property {module:model/DashboardPlots}
-   */
-  DashboardPlots,
-  /**
    * The EchartLine model constructor.
    * @property {module:model/EchartLine}
    */
@@ -107,6 +101,11 @@ export {
    */
   HTTPValidationError,
   /**
+   * The HysteresisLoop model constructor.
+   * @property {module:model/HysteresisLoop}
+   */
+  HysteresisLoop,
+  /**
    * The LocationInner model constructor.
    * @property {module:model/LocationInner}
    */
@@ -121,11 +120,6 @@ export {
    * @property {module:model/PageTestModel}
    */
   PageTestModel,
-  /**
-   * The Plots model constructor.
-   * @property {module:model/Plots}
-   */
-  Plots,
   /**
    * The SnCurveMethod model constructor.
    * @property {module:model/SnCurveMethod}
@@ -142,10 +136,10 @@ export {
    */
   TestModel,
   /**
-   * The TestPlot model constructor.
-   * @property {module:model/TestPlot}
+   * The TestResult model constructor.
+   * @property {module:model/TestResult}
    */
-  TestPlot,
+  TestResult,
   /**
    * The UnitInfo model constructor.
    * @property {module:model/UnitInfo}
