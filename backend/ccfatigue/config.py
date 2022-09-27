@@ -5,6 +5,7 @@ from dynaconf import Dynaconf, Validator
 
 settings = Dynaconf(
     envvar_prefix=False,
+    load_dotenv=True,
     settings_files=[],
     validators=[
         Validator("cors_enabled", default=False),
