@@ -869,6 +869,11 @@
           "initial_crack_length": {
             "title": "Initial Crack Length",
             "type": "number"
+          },
+          "measuring_points": {
+            "title": "Measuring Points",
+            "type": "array",
+            "items": {}
           }
         },
         "description": "Defines how test is seen on the API"

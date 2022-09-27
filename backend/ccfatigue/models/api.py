@@ -105,7 +105,7 @@ class TestModel(OrmModel):
     temperature: Optional[float]
     humidity: Optional[float]
     initial_crack_length: Optional[float]
-    # measuring_points: Optional[list]  # TODO : list of TestModel or just list !?
+    measuring_points: Optional[list]
 
 
 class TestMeasuringPointModel(OrmModel):
@@ -116,6 +116,7 @@ class TestMeasuringPointModel(OrmModel):
     id: int
 
     test_id: int
+    measuring_point_id = int
     x_coordinate = float
     y_coordinate = float
 
