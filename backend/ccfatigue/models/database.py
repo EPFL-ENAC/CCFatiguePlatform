@@ -124,5 +124,6 @@ class Test_Measuring_Point(Base):
     test_id = Column(Integer, ForeignKey("test.id"))
     test = relationship("Test", back_populates="measuring_points")
 
+    measuring_point_id = Column(Integer)
     x_coordinate = Column(Float)
     y_coordinate = Column(Float)

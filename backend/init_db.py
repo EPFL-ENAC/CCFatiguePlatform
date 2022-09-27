@@ -9,6 +9,7 @@ import argparse
 import glob
 import json
 import os
+import re
 
 import pandas as pd
 from sqlalchemy import create_engine
@@ -21,10 +22,6 @@ from ccfatigue.services.database import sync_url
 
 DATA_DIR = os.path.abspath(f"{__file__}/../../Data/preprocessed")
 EXPERIMENTS_TO_INJECT = glob.glob(f"{DATA_DIR}/TST_*")
-# EXPERIMENTS_TO_INJECT = [  # TODO !
-#     DATA_DIR + "/TST_Wang_2020-12_QS",
-# ]
-# print(f"{EXPERIMENTS_TO_INJECT=}")
 
 
 def alembic_upgrade():
@@ -117,27 +114,16 @@ def inject_exp_from_folder(exp_folder, session):
 
     # Test data from CSV
     tests_csv_file = f"{exp_folder}/tests.csv"
-    # tests_csv_file =
-    # "/home/sbancal/IT4R/CCFatiguePlatform/Data/preprocessed/TST_Wang_2021-11_QS/tests.csv"
     tests_df = pd.read_csv(
         tests_csv_file,
         dtype={
             "specimen number": "Int64",
             "specimen name": "str",
-            # "run out": "boolean",
         },
         low_memory=False,
     )
 
-    print(20 * "-")
-    print(tests_df)
-    print(tests_df.dtypes)
-
     for (_, test_serie) in tests_df.iterrows():
-        # test_serie = list(tests_df.iterrows())[0]
-        print(f"->  {type(test_serie)=}")
-        print(test_serie.get("specimen number", None))
-
         test = Test(
             experiment=experiment,
             specimen_number=test_serie.get("specimen number", default=None),
@@ -161,7 +147,27 @@ def inject_exp_from_folder(exp_folder, session):
         )
         session.add(test)
 
-        # TODO measuring_points !
+        for column in filter(
+            lambda col: col.startswith("x coordinate of measuring point "),
+            tests_df.columns,
+        ):
+            measuring_point_id = re.match(
+                r"x coordinate of measuring point (\d+)$", column
+            ).group(1)
+
+            measuring_point = Test_Measuring_Point(
+                test=test,
+                measuring_point_id=measuring_point_id,
+                x_coordinate=test_serie.get(
+                    f"x coordinate of measuring point {measuring_point_id}",
+                    default=None,
+                ),
+                y_coordinate=test_serie.get(
+                    f"y coordinate of measuring point {measuring_point_id}",
+                    default=None,
+                ),
+            )
+            session.add(measuring_point)
 
 
 def run_init_db():

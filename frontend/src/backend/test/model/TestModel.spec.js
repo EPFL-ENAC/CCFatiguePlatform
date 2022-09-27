@@ -145,5 +145,11 @@
       //var instance = new Ccfatigue.TestModel();
       //expect(instance).to.be();
     });
+
+    it('should have the property measuringPoints (base name: "measuring_points")', function () {
+      // uncomment below and update the code to test the property measuringPoints
+      //var instance = new Ccfatigue.TestModel();
+      //expect(instance).to.be();
+    });
   });
 });
