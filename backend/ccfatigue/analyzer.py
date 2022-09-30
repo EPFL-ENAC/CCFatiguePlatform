@@ -5,15 +5,15 @@ from tempfile import NamedTemporaryFile, SpooledTemporaryFile
 from typing import IO, Callable, Dict, List, Optional
 
 import pandas as pd
-from pandas.core.frame import DataFrame
+from deprecation import deprecated
 from pandas._typing import ReadBuffer, WriteBuffer
+from pandas.core.frame import DataFrame
 
-from ccfatigue.model import EchartLine, SnCurveMethod, SnCurveResult
-from ccfatigue.plotter import DataKey, Line
 import ccfatigue.modules.sn_curve_linlog as sn_curve_linlog
 import ccfatigue.modules.sn_curve_loglog as sn_curve_loglog
 import ccfatigue.modules.sn_curve_sendeckyj as sn_curve_sendeckyj
-from deprecation import deprecated
+from ccfatigue.model import EchartLine, SnCurveMethod, SnCurveResult
+from ccfatigue.plotter import DataKey, Line
 
 ROUND_DECIMAL = 8
 

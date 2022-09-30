@@ -92,13 +92,14 @@
                 </v-col>
               </v-row>
               <v-row>
-                <log-chart
+                <simple-chart
                   :aspect-ratio="2"
                   :series="snCurve.series"
                   title="S-N Curves"
                   x-axis-name="Number of cycles"
                   y-axis-name="Stress"
-                ></log-chart>
+                  x-axis-type="log"
+                ></simple-chart>
               </v-row>
             </v-container>
           </v-card-text>
@@ -312,7 +313,7 @@
 import InfoButton from "@/components/InfoButton";
 import InfoTooltip from "@/components/InfoTooltip";
 import download from "downloadjs";
-import LogChart from "@/components/charts/LogChart";
+import SimpleChart from "@/components/charts/SimpleChart";
 import { zip } from "lodash";
 
 export default {
@@ -320,7 +321,7 @@ export default {
   components: {
     InfoButton,
     InfoTooltip,
-    LogChart,
+    SimpleChart,
   },
   data() {
     return {
@@ -358,22 +359,21 @@ export default {
         this.snCurve.file
       ) {
         this.snCurve.loading = true;
-        this.$analysisApi.runSnCurveFileAnalysisSnCurveFilePost(
-          this.snCurve.selectedMethods,
-          this.snCurve.selectedRRatios,
-          this.snCurve.file,
-          (error, data) => {
-            if (!error) {
-              this.snCurve.outputs = data.outputs;
-              this.snCurve.series = data.lines.map((line) => ({
-                type: "line",
-                name: line.name,
-                data: zip(line.xData, line.yData),
-              }));
-            }
-            this.snCurve.loading = false;
-          }
-        );
+        this.$analysisApi
+          .runSnCurveFileAnalysisSnCurveFilePost(
+            this.snCurve.selectedMethods,
+            this.snCurve.selectedRRatios,
+            this.snCurve.file
+          )
+          .then((data) => {
+            this.snCurve.outputs = data.outputs;
+            this.snCurve.series = data.lines.map((line) => ({
+              type: "line",
+              name: line.name,
+              data: zip(line.xData, line.yData),
+            }));
+          })
+          .finally(() => (this.snCurve.loading = false));
       }
     },
     downloadSnCurve() {

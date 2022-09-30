@@ -12,8 +12,6 @@
  */
 
 import ApiClient from "../ApiClient";
-import HTTPValidationError from "../model/HTTPValidationError";
-import SnCurveMethod from "../model/SnCurveMethod";
 import SnCurveResult from "../model/SnCurveResult";
 
 /**
@@ -34,22 +32,13 @@ export default class AnalysisApi {
   }
 
   /**
-   * Callback function to receive the result of the runSnCurveFileAnalysisSnCurveFilePost operation.
-   * @callback module:api/AnalysisApi~runSnCurveFileAnalysisSnCurveFilePostCallback
-   * @param {String} error Error message, if any.
-   * @param {module:model/SnCurveResult} data The data returned by the service call.
-   * @param {String} response The complete HTTP response.
-   */
-
-  /**
    * Run Sn Curve File
    * @param {Array.<module:model/SnCurveMethod>} methods
    * @param {Array.<Number>} rRatios
    * @param {File} file
-   * @param {module:api/AnalysisApi~runSnCurveFileAnalysisSnCurveFilePostCallback} callback The callback function, accepting three arguments: error, data, response
-   * data is of type: {@link module:model/SnCurveResult}
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/SnCurveResult} and HTTP response
    */
-  runSnCurveFileAnalysisSnCurveFilePost(methods, rRatios, file, callback) {
+  runSnCurveFileAnalysisSnCurveFilePostWithHttpInfo(methods, rRatios, file) {
     let postBody = null;
     // verify the required parameter 'methods' is set
     if (methods === undefined || methods === null) {
@@ -96,8 +85,24 @@ export default class AnalysisApi {
       contentTypes,
       accepts,
       returnType,
-      null,
-      callback
+      null
     );
+  }
+
+  /**
+   * Run Sn Curve File
+   * @param {Array.<module:model/SnCurveMethod>} methods
+   * @param {Array.<Number>} rRatios
+   * @param {File} file
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/SnCurveResult}
+   */
+  runSnCurveFileAnalysisSnCurveFilePost(methods, rRatios, file) {
+    return this.runSnCurveFileAnalysisSnCurveFilePostWithHttpInfo(
+      methods,
+      rRatios,
+      file
+    ).then(function (response_and_data) {
+      return response_and_data.data;
+    });
   }
 }

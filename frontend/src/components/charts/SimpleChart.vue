@@ -20,6 +20,7 @@ import {
 import { LineChart } from "echarts/charts";
 import VChart from "vue-echarts";
 import { merge } from "lodash";
+import { colorPalette } from "@/utils/style";
 
 use([
   CanvasRenderer,
@@ -31,7 +32,7 @@ use([
 ]);
 
 export default {
-  name: "LogChart",
+  name: "SimpleChart",
   components: {
     VChart,
   },
@@ -51,6 +52,13 @@ export default {
     },
     yAxisName: {
       type: String,
+    },
+    xAxisType: {
+      type: String,
+    },
+    color: {
+      type: Array,
+      default: colorPalette,
     },
   },
   data() {
@@ -77,7 +85,7 @@ export default {
           containLabel: true,
         },
         xAxis: {
-          type: "log",
+          type: this.xAxisType,
           name: this.xAxisName,
           nameLocation: "middle",
           nameGap: 26,
@@ -89,13 +97,17 @@ export default {
           name: this.yAxisName,
           nameLocation: "middle",
           nameGap: 50,
+          axisLabel: {
+            fontSize: 10,
+          },
         },
         tooltip: {
           trigger: "axis",
           confine: true,
-          valueFormatter: (value) => value.toFixed(2),
+          valueFormatter: (value) => value?.toFixed(2),
         },
         series: this.series.map((serie) => merge(serie, { showSymbol: false })),
+        color: this.color,
       };
     },
   },

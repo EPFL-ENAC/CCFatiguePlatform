@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-RangePair Counting 
+RangePair Counting
 This file is a translation from fortran Cycle-Counting-Range-Mean.for
 """
 

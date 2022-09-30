@@ -7,7 +7,8 @@ largely inspired by DT in resslabtool
 from decimal import Decimal
 from distutils.util import strtobool
 from typing import Any, List, Optional
-from sqlalchemy import and_, or_, Enum
+
+from sqlalchemy import Enum, and_, or_
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import Boolean, Integer, Numeric, String
 

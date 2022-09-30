@@ -38,6 +38,7 @@ services:
       CORS_ENABLED: "true"
       POSTGRES_HOST: database
       ROOT_PATH: /api
+      DATA_PATH: /Data
     labels:
       - "traefik.http.routers.backend.tls=true"
       - "traefik.http.routers.backend.rule=PathPrefix(`/api`)"

@@ -5,5 +5,5 @@ Everything needed to install and run the backend is documented in the [main READ
 ## Generate a fresh/new alembig revision
 
 ```bash
-poetry run dotenv -f ../secrets/.env run alembic revision --autogenerate -m "initial_tables"
+DOTENV_PATH_FOR_DYNACONF="../secrets/.env" poetry run alembic revision --autogenerate -m "initial_tables"
 ```

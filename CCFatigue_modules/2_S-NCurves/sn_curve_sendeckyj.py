@@ -21,16 +21,17 @@ g: ?? TODO
 
 """
 
-import os
 import math
+import os
+from itertools import chain
+
 import numpy as np
 import pandas as pd
-from scipy import stats
-from itertools import chain
-import sendeckyj  # Fortran optimized functions
-from astm import Astm
 import sn_curve_loglog
+from astm import Astm
+from scipy import stats
 
+import sendeckyj  # Fortran optimized functions
 
 SRC_DIR = os.path.dirname(os.path.realpath(__file__))
 DATA_DIR = os.path.join(SRC_DIR, "..", "..", "Data")

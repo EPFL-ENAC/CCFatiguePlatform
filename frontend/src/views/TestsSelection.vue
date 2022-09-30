@@ -54,10 +54,14 @@ export default {
 
       headers: [
         { text: "Specimen Number", value: "specimen_number" },
+        { text: "Specimen Name", value: "specimen_name" },
         { text: "Stress Ratio", value: "stress_ratio" },
         { text: "Maximum Stress", value: "maximum_stress" },
         { text: "Loading Rate", value: "loading_rate" },
         { text: "Run Out", value: "run_out" },
+        { text: "Length", value: "length" },
+        { text: "Width", value: "width" },
+        { text: "Thickness", value: "thickness" },
       ],
     };
   },

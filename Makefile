@@ -1,5 +1,8 @@
 # install* -> install libs localy (without Docker)
-install: install-backend install-frontend
+install:
+	npm install
+	$(MAKE) install-backend
+	$(MAKE) install-frontend
 
 install-backend:
 	$(MAKE) -C backend install

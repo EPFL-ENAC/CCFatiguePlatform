@@ -5,21 +5,23 @@
 - Inject all Experiments & Tests from Data/preprocessed folder
 """
 
-import os
+import argparse
 import glob
 import json
-import argparse
-from alembic.command import upgrade
-from alembic.config import Config
-from ccfatigue.models.database import Experiment  # TODO, Test
-from ccfatigue.services.database import __sync_url
+import os
+import re
+
+import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from alembic.command import upgrade
+from alembic.config import Config
+from ccfatigue.models.database import Experiment, Test, Test_Measuring_Point
+from ccfatigue.services.database import sync_url
 
 DATA_DIR = os.path.abspath(f"{__file__}/../../Data/preprocessed")
 EXPERIMENTS_TO_INJECT = glob.glob(f"{DATA_DIR}/TST_*")
-print(f"{EXPERIMENTS_TO_INJECT=}")
 
 
 def alembic_upgrade():
@@ -35,7 +37,13 @@ def empty_database(session):
     """
     Empty all database content
     """
+    session.query(Test_Measuring_Point).delete()
+    session.query(Test).delete()
     session.query(Experiment).delete()
+    session.execute("ALTER SEQUENCE experiment_id_seq RESTART WITH 1")
+    session.execute("ALTER SEQUENCE test_id_seq RESTART WITH 1")
+    session.execute("ALTER SEQUENCE test_measuring_point_id_seq RESTART WITH 1")
+    session.commit()
 
 
 def inject_exp_from_folder(exp_folder, session):
@@ -105,7 +113,61 @@ def inject_exp_from_folder(exp_folder, session):
     session.add(experiment)
 
     # Test data from CSV
-    # TODO
+    tests_csv_file = f"{exp_folder}/tests.csv"
+    tests_df = pd.read_csv(
+        tests_csv_file,
+        dtype={
+            "specimen number": "Int64",
+            "specimen name": "str",
+        },
+        low_memory=False,
+    )
+
+    for (_, test_serie) in tests_df.iterrows():
+        test = Test(
+            experiment=experiment,
+            specimen_number=test_serie.get("specimen number", default=None),
+            specimen_name=test_serie.get("specimen name", default=None),
+            stress_ratio=test_serie.get("stress ratio", default=None),
+            maximum_stress=test_serie.get("maximum stress", default=None),
+            frequency=test_serie.get("frequency", default=None),
+            run_out=None,  # test_serie.get("run out", default=None),
+            displacement_controlled_loading_rate=test_serie.get(
+                "displacement controlled loading rate", default=None
+            ),
+            load_controlled_loading_rate=test_serie.get(
+                "load controlled loading rate", default=None
+            ),
+            length=test_serie.get("length", default=None),
+            width=test_serie.get("width", default=None),
+            thickness=test_serie.get("thickness", default=None),
+            temperature=test_serie.get("temperature", default=None),
+            humidity=test_serie.get("humidity", default=None),
+            initial_crack_length=test_serie.get("initial crack length", default=None),
+        )
+        session.add(test)
+
+        for column in filter(
+            lambda col: col.startswith("x coordinate of measuring point "),
+            tests_df.columns,
+        ):
+            measuring_point_id = re.match(
+                r"x coordinate of measuring point (\d+)$", column
+            ).group(1)
+
+            measuring_point = Test_Measuring_Point(
+                test=test,
+                measuring_point_id=measuring_point_id,
+                x_coordinate=test_serie.get(
+                    f"x coordinate of measuring point {measuring_point_id}",
+                    default=None,
+                ),
+                y_coordinate=test_serie.get(
+                    f"y coordinate of measuring point {measuring_point_id}",
+                    default=None,
+                ),
+            )
+            session.add(measuring_point)
 
 
 def run_init_db():
@@ -117,7 +179,7 @@ def run_init_db():
     """
     alembic_upgrade()
 
-    sync_engine = create_engine(__sync_url, echo=True)
+    sync_engine = create_engine(sync_url, echo=True)
     Session = sessionmaker(bind=sync_engine)
     session = Session()
 

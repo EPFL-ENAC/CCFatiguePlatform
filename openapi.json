@@ -170,37 +170,32 @@
         }
       }
     },
-    "/experiments/tests_dashboard_plots": {
+    "/experiments/{experiment_id}/tests/{test_id}": {
       "get": {
         "tags": [
           "experiments"
         ],
-        "summary": "Get Tests Dashboard Plots",
-        "description": "Return the 4 Bokeh plots used in Test Dashboard\n\nNote: as we don't have real data yet, we hard code things this so it will\nrender the 10 first tests of the experiment 1 (only experiment we have) :\n+ experiment=1\n+ 1<tests_ids<10\nthen we mascarade test_id field so that it looks like\nto be matching the one asked for.",
-        "operationId": "get_tests_dashboard_plots_experiments_tests_dashboard_plots_get",
+        "summary": "Get Test Result",
+        "description": "Return test result data",
+        "operationId": "get_test_result_experiments__experiment_id__tests__test_id__get",
         "parameters": [
           {
-            "required": false,
+            "required": true,
             "schema": {
               "title": "Experiment Id",
-              "type": "integer",
-              "default": ""
+              "type": "integer"
             },
             "name": "experiment_id",
-            "in": "query"
+            "in": "path"
           },
           {
-            "required": false,
+            "required": true,
             "schema": {
-              "title": "Test Ids",
-              "type": "array",
-              "items": {
-                "type": "integer"
-              },
-              "default": []
+              "title": "Test Id",
+              "type": "integer"
             },
-            "name": "test_ids",
-            "in": "query"
+            "name": "test_id",
+            "in": "path"
           }
         ],
         "responses": {
@@ -209,7 +204,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DashboardPlots"
+                  "$ref": "#/components/schemas/TestResult"
                 }
               }
             }
@@ -450,27 +445,6 @@
           }
         }
       },
-      "DashboardPlots": {
-        "title": "DashboardPlots",
-        "required": [
-          "tests",
-          "plots"
-        ],
-        "type": "object",
-        "properties": {
-          "tests": {
-            "title": "Tests",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TestPlot"
-            }
-          },
-          "plots": {
-            "$ref": "#/components/schemas/Plots"
-          }
-        },
-        "description": "Defines data returned to the dashboard"
-      },
       "EchartLine": {
         "title": "EchartLine",
         "required": [
@@ -688,6 +662,38 @@
           }
         }
       },
+      "HysteresisLoop": {
+        "title": "HysteresisLoop",
+        "required": [
+          "n_cycles",
+          "strain",
+          "stress"
+        ],
+        "type": "object",
+        "properties": {
+          "n_cycles": {
+            "title": "N Cycles",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "strain": {
+            "title": "Strain",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "stress": {
+            "title": "Stress",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        }
+      },
       "Page_ExperimentModel_": {
         "title": "Page[ExperimentModel]",
         "required": [
@@ -756,25 +762,6 @@
           }
         }
       },
-      "Plots": {
-        "title": "Plots",
-        "type": "object",
-        "properties": {
-          "stress_strain": {
-            "title": "Stress Strain"
-          },
-          "creep": {
-            "title": "Creep"
-          },
-          "hysteresis_area": {
-            "title": "Hysteresis Area"
-          },
-          "stiffness": {
-            "title": "Stiffness"
-          }
-        },
-        "description": "Defines all plots types returned"
-      },
       "SnCurveMethod": {
         "title": "SnCurveMethod",
         "enum": [
@@ -829,6 +816,10 @@
           },
           "specimen_number": {
             "title": "Specimen Number",
+            "type": "integer"
+          },
+          "specimen_name": {
+            "title": "Specimen Name",
             "type": "string"
           },
           "stress_ratio": {
@@ -839,45 +830,111 @@
             "title": "Maximum Stress",
             "type": "number"
           },
-          "loading_rate": {
-            "title": "Loading Rate",
+          "frequency": {
+            "title": "Frequency",
             "type": "number"
           },
           "run_out": {
             "title": "Run Out",
             "type": "boolean"
+          },
+          "displacement_controlled_loading_rate": {
+            "title": "Displacement Controlled Loading Rate",
+            "type": "number"
+          },
+          "load_controlled_loading_rate": {
+            "title": "Load Controlled Loading Rate",
+            "type": "number"
+          },
+          "length": {
+            "title": "Length",
+            "type": "number"
+          },
+          "width": {
+            "title": "Width",
+            "type": "number"
+          },
+          "thickness": {
+            "title": "Thickness",
+            "type": "number"
+          },
+          "temperature": {
+            "title": "Temperature",
+            "type": "number"
+          },
+          "humidity": {
+            "title": "Humidity",
+            "type": "number"
+          },
+          "initial_crack_length": {
+            "title": "Initial Crack Length",
+            "type": "number"
+          },
+          "measuring_points": {
+            "title": "Measuring Points",
+            "type": "array",
+            "items": {}
           }
         },
         "description": "Defines how test is seen on the API"
       },
-      "TestPlot": {
-        "title": "TestPlot",
+      "TestResult": {
+        "title": "TestResult",
         "required": [
-          "test_id",
           "specimen_id",
-          "color",
-          "total_dissipated_energy"
+          "total_dissipated_energy",
+          "hysteresis_loops",
+          "n_cycles",
+          "creep",
+          "hysteresis_area",
+          "stiffness"
         ],
         "type": "object",
         "properties": {
-          "test_id": {
-            "title": "Test Id",
-            "type": "integer"
-          },
           "specimen_id": {
             "title": "Specimen Id",
             "type": "integer"
           },
-          "color": {
-            "title": "Color",
-            "type": "string"
-          },
           "total_dissipated_energy": {
             "title": "Total Dissipated Energy",
             "type": "integer"
+          },
+          "hysteresis_loops": {
+            "title": "Hysteresis Loops",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HysteresisLoop"
+            }
+          },
+          "n_cycles": {
+            "title": "N Cycles",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "creep": {
+            "title": "Creep",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "hysteresis_area": {
+            "title": "Hysteresis Area",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "stiffness": {
+            "title": "Stiffness",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
           }
-        },
-        "description": "Defines Test metadata related to a plot"
+        }
       },
       "UnitInfo": {
         "title": "UnitInfo",
