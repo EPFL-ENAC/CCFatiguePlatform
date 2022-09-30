@@ -4,10 +4,12 @@ This code regroups shared ressources for module 2
 """
 
 from math import log10, sqrt
+
 import numpy as np
 import pandas as pd
-from pandas._typing import ReadBuffer, WriteBuffer, FilePath
+from pandas._typing import FilePath, ReadBuffer, WriteBuffer
 from scipy import stats
+
 from ccfatigue.modules.astm import Astm
 
 

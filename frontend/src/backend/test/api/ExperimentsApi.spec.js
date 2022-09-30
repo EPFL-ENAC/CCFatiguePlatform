@@ -64,10 +64,10 @@
         done();
       });
     });
-    describe("getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet", function () {
-      it("should call getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet successfully", function (done) {
-        //uncomment below and update the code to test getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet
-        //instance.getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet(function(error) {
+    describe("getTestResultExperimentsExperimentIdTestsTestIdGet", function () {
+      it("should call getTestResultExperimentsExperimentIdTestsTestIdGet successfully", function (done) {
+        //uncomment below and update the code to test getTestResultExperimentsExperimentIdTestsTestIdGet
+        //instance.getTestResultExperimentsExperimentIdTestsTestIdGet(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});

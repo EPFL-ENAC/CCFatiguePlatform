@@ -11,12 +11,13 @@ as described in
     DOI: 10.1520/E0739-10R15
 """
 
-from math import log10
-import pandas as pd
-from pandas._typing import ReadBuffer, WriteBuffer, FilePath
 from itertools import chain
-import ccfatigue.modules.sn_curve_utils as sn_curve_utils
+from math import log10
 
+import pandas as pd
+from pandas._typing import FilePath, ReadBuffer, WriteBuffer
+
+import ccfatigue.modules.sn_curve_utils as sn_curve_utils
 
 # Prepare all cycles to failure output (SNC)
 # Refs:

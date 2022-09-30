@@ -7,28 +7,27 @@ license = "to be defined"
 
 [tool.poetry.dependencies]
 python = "~3.10"
-fastapi = "^0.82.0"
+fastapi = "^0.85.0"
 uvicorn = "^0.18.2"
 pydantic = "^1.8.2"
 gunicorn = "^20.1.0"
 dynaconf = "^3.1.7"
 psycopg2 = "^2.9.2"
 asyncpg = "^0.26.0"
-SQLAlchemy = {extras = ["asyncio"], version = "^1.4.27"}
+SQLAlchemy = {extras = ["asyncio"], version = "^1.4.41"}
 alembic = "^1.8.1"
 fastapi-pagination = {extras = ["async_sqlalchemy"], version = "^0.10.0"}
-bokeh = "^2.4.2"
-pandas = "^1.4.4"
+bokeh = "^2.4.3"
+pandas = "^1.5.0"
 numpy = "^1.22.0"
 python-multipart = "^0.0.5"
 scipy = "^1.9.0"
 simplejson = "^3.17.6"
 xlrd = "^2.0.1"
 openpyxl = "^3.0.10"
-python-dotenv = "^0.21.0"
 deprecation = "^2.1.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 flake8 = "^5.0.4"
 black = "^22.6.0"
 pytest = "^7.1.2"
@@ -38,3 +37,6 @@ python-multipart = "^0.0.5"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"

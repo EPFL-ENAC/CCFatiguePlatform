@@ -1,18 +1,17 @@
 install:
 	poetry install
-	poetry run pre-commit install
 
 lint:
 	poetry run pre-commit run --all-files
 
 alembic-upgrade:
-	poetry run dotenv -f ../secrets/.env run alembic upgrade head
+	DOTENV_PATH_FOR_DYNACONF="../secrets/.env" poetry run alembic upgrade head
 
 init-database:
-	poetry run dotenv -f ../secrets/.env run python3 init_db.py
+	DOTENV_PATH_FOR_DYNACONF="../secrets/.env" poetry run python init_db.py
 
 api:
-	poetry run dotenv -f ../secrets/.env run python api.py ../openapi.json
+	DOTENV_PATH_FOR_DYNACONF="../secrets/.env" poetry run python api.py ../openapi.json
 
 test:
 	poetry run pytest
@@ -27,4 +26,4 @@ compile-win:
 	rmdir ccfatigue/.libs
 
 run:
-	poetry run dotenv -f ../secrets/.env run uvicorn ccfatigue.main:app --reload
+	DOTENV_PATH_FOR_DYNACONF="../secrets/.env" poetry run uvicorn ccfatigue.main:app --reload

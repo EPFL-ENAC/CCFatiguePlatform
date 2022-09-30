@@ -25,13 +25,14 @@ let opts = {
   page: 1, // Number |
   size: 50, // Number |
 };
-apiInstance.getTestsTestsGet(experimentId, opts, (error, data, response) => {
-  if (error) {
-    console.error(error);
-  } else {
+apiInstance.getTestsTestsGet(experimentId, opts).then(
+  (data) => {
     console.log("API called successfully. Returned data: " + data);
+  },
+  (error) => {
+    console.error(error);
   }
-});
+);
 ```
 
 ### Parameters

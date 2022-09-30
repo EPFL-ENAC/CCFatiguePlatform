@@ -8,8 +8,9 @@ Harris diagram is described in Tassos red book p. 108 - the original papers are:
     (https://doi.org/10.1016/S0266-3538(97)00121-8)
 """
 
-import os
 import math
+import os
+
 import numpy as np
 import pandas as pd
 from scipy import stats

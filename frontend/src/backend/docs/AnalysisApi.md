@@ -21,16 +21,12 @@ let apiInstance = new Ccfatigue.AnalysisApi();
 let methods = [new Ccfatigue.SnCurveMethod()]; // [SnCurveMethod] |
 let rRatios = [null]; // [Number] |
 let file = "/path/to/file"; // File |
-apiInstance.runSnCurveFileAnalysisSnCurveFilePost(
-  methods,
-  rRatios,
-  file,
-  (error, data, response) => {
-    if (error) {
-      console.error(error);
-    } else {
-      console.log("API called successfully. Returned data: " + data);
-    }
+apiInstance.runSnCurveFileAnalysisSnCurveFilePost(methods, rRatios, file).then(
+  (data) => {
+    console.log("API called successfully. Returned data: " + data);
+  },
+  (error) => {
+    console.error(error);
   }
 );
 ```

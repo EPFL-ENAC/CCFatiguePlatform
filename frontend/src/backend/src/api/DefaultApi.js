@@ -33,20 +33,11 @@ export default class DefaultApi {
   }
 
   /**
-   * Callback function to receive the result of the getUnitsUnitsGet operation.
-   * @callback module:api/DefaultApi~getUnitsUnitsGetCallback
-   * @param {String} error Error message, if any.
-   * @param {Array.<module:model/UnitInfo>} data The data returned by the service call.
-   * @param {String} response The complete HTTP response.
-   */
-
-  /**
    * Get Units
    * Get All standardized units
-   * @param {module:api/DefaultApi~getUnitsUnitsGetCallback} callback The callback function, accepting three arguments: error, data, response
-   * data is of type: {@link Array.<module:model/UnitInfo>}
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link Array.<module:model/UnitInfo>} and HTTP response
    */
-  getUnitsUnitsGet(callback) {
+  getUnitsUnitsGetWithHttpInfo() {
     let postBody = null;
 
     let pathParams = {};
@@ -70,26 +61,29 @@ export default class DefaultApi {
       contentTypes,
       accepts,
       returnType,
-      null,
-      callback
+      null
     );
   }
 
   /**
-   * Callback function to receive the result of the rootGet operation.
-   * @callback module:api/DefaultApi~rootGetCallback
-   * @param {String} error Error message, if any.
-   * @param {module:model/AppInfo} data The data returned by the service call.
-   * @param {String} response The complete HTTP response.
+   * Get Units
+   * Get All standardized units
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link Array.<module:model/UnitInfo>}
    */
+  getUnitsUnitsGet() {
+    return this.getUnitsUnitsGetWithHttpInfo().then(function (
+      response_and_data
+    ) {
+      return response_and_data.data;
+    });
+  }
 
   /**
    * Root
    * Get AppInfo
-   * @param {module:api/DefaultApi~rootGetCallback} callback The callback function, accepting three arguments: error, data, response
-   * data is of type: {@link module:model/AppInfo}
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/AppInfo} and HTTP response
    */
-  rootGet(callback) {
+  rootGetWithHttpInfo() {
     let postBody = null;
 
     let pathParams = {};
@@ -113,8 +107,18 @@ export default class DefaultApi {
       contentTypes,
       accepts,
       returnType,
-      null,
-      callback
+      null
     );
+  }
+
+  /**
+   * Root
+   * Get AppInfo
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/AppInfo}
+   */
+  rootGet() {
+    return this.rootGetWithHttpInfo().then(function (response_and_data) {
+      return response_and_data.data;
+    });
   }
 }

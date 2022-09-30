@@ -52,6 +52,37 @@ make init-database
 make dev-frontend
 ```
 
+## First time setup
+
+```bash
+make install
+```
+
+## Run Preprocessing
+
+```bash
+make run-preprocessing
+```
+
+## Run Backend
+
+```bash
+make dev-database
+make dev-backend
+```
+
+First time backend setup/init :
+
+```bash
+make init-database
+```
+
+## Run Frontend
+
+```bash
+make dev-frontend
+```
+
 ## Server provisioning
 
 ```bash

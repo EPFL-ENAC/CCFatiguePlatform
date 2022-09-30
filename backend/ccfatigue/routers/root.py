@@ -3,7 +3,9 @@ Handle / requests
 """
 
 from typing import List
+
 from fastapi import APIRouter
+
 from ccfatigue import __name__, __version__
 from ccfatigue.models import AppInfo, UnitInfo
 

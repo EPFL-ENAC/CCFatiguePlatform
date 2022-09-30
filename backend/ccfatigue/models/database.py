@@ -2,9 +2,10 @@
 Define the model as it is in the DB
 """
 
-from ccfatigue.services.database import Base
-from sqlalchemy import Column, ForeignKey, Integer, Float, String, Boolean, Enum
+from sqlalchemy import Boolean, Column, Enum, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
+
+from ccfatigue.services.database import Base
 
 
 class Experiment(Base):
@@ -95,8 +96,34 @@ class Test(Base):
     experiment_id = Column(Integer, ForeignKey("experiment.id"))
     experiment = relationship("Experiment", back_populates="tests")
 
-    specimen_number = Column(String)
+    specimen_number = Column(Integer)
+    specimen_name = Column(String)
     stress_ratio = Column(Float)
     maximum_stress = Column(Float)
-    loading_rate = Column(Float)
+    frequency = Column(Float)
     run_out = Column(Boolean)
+    displacement_controlled_loading_rate = Column(Float)
+    load_controlled_loading_rate = Column(Float)
+    length = Column(Float)
+    width = Column(Float)
+    thickness = Column(Float)
+    temperature = Column(Float)
+    humidity = Column(Float)
+    initial_crack_length = Column(Float)
+    measuring_points = relationship("Test_Measuring_Point", cascade="all, delete")
+
+
+class Test_Measuring_Point(Base):
+    """
+    Defines how a measuring point is strictured in DB
+    """
+
+    __tablename__ = "test_measuring_point"
+    id = Column(Integer, primary_key=True)
+
+    test_id = Column(Integer, ForeignKey("test.id"))
+    test = relationship("Test", back_populates="measuring_points")
+
+    measuring_point_id = Column(Integer)
+    x_coordinate = Column(Float)
+    y_coordinate = Column(Float)

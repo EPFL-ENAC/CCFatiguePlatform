@@ -3,25 +3,24 @@ Handle /experiments requests
 """
 
 import glob
+import subprocess
 import tempfile
 import zipfile
-import subprocess
-from typing import List, Any, Optional
-from fastapi import APIRouter, Depends, Query, Path, File, UploadFile
+from typing import Any, List, Optional
+
+from fastapi import APIRouter, Depends, File, Path, Query, UploadFile
+from fastapi_pagination import Page
+from fastapi_pagination.ext.async_sqlalchemy import paginate
 from sqlalchemy import and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from fastapi_pagination import Page
-from fastapi_pagination.ext.async_sqlalchemy import paginate
-from ccfatigue.services.database import get_session
-from ccfatigue.models.database import Experiment
-from ccfatigue.models.api import ExperimentModel, ExperimentFieldNames
-from ccfatigue.utils.routers import get_where_clauses
-from ccfatigue.utils.bokeh_plots import (
-    generate_tests_dashboard_plots,
-    DashboardPlots,
-)
+
 from ccfatigue.model import Experiment_Data_Preprocessed
+from ccfatigue.models.api import ExperimentFieldNames, ExperimentModel
+from ccfatigue.models.database import Experiment
+from ccfatigue.services.database import get_session
+from ccfatigue.utils.routers import get_where_clauses
+from ccfatigue.utils.test_dashboard import TestResult, get_result
 from preprocessing import tst_data_lib
 
 router = APIRouter(
@@ -70,29 +69,17 @@ async def get_field_distinct(
     )
 
 
-@router.get("/tests_dashboard_plots", response_model=DashboardPlots)
-async def get_tests_dashboard_plots(
+@router.get("/{experiment_id}/tests/{test_id}", response_model=TestResult)
+async def get_test_result(
     session: AsyncSession = Depends(get_session),
-    experiment_id: int = Query(""),
-    test_ids: List[int] = Query([]),
-):
+    experiment_id: int = Path(...),
+    test_id: int = Path(),
+) -> TestResult:
     """
-    Return the 4 Bokeh plots used in Test Dashboard
-
-    Note: as we don't have real data yet, we hard code things this so it will
-    render the 10 first tests of the experiment 1 (only experiment we have) :
-    + experiment=1
-    + 1<tests_ids<10
-    then we mascarade test_id field so that it looks like
-    to be matching the one asked for.
+    Return test result data
     """
-    transposed_test_ids = [((test_id - 1) % 10) + 1 for test_id in test_ids]
-    dashboard_plots = await generate_tests_dashboard_plots(
-        session, 1, transposed_test_ids
-    )
-    for i in range(len(test_ids)):
-        dashboard_plots.tests[i].test_id = test_ids[i]
-    return dashboard_plots
+    result = await get_result(session, experiment_id, test_id)
+    return result
 
 
 @router.post("/data_preprocess_check", response_model=Experiment_Data_Preprocessed)

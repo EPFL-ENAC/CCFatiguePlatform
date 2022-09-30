@@ -2,12 +2,12 @@
 
 All URIs are relative to _http://localhost_
 
-| Method                                                                                                                                       | HTTP request                                | Description                |
-| -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | -------------------------- |
-| [**getExperimentsExperimentsGet**](ExperimentsApi.md#getExperimentsExperimentsGet)                                                           | **GET** /experiments                        | Get Experiments            |
-| [**getFieldDistinctExperimentsFieldDistinctGet**](ExperimentsApi.md#getFieldDistinctExperimentsFieldDistinctGet)                             | **GET** /experiments/{field}/distinct       | Get Field Distinct         |
-| [**getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet**](ExperimentsApi.md#getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet)     | **GET** /experiments/tests_dashboard_plots  | Get Tests Dashboard Plots  |
-| [**postDataPreprocessCheckExperimentsDataPreprocessCheckPost**](ExperimentsApi.md#postDataPreprocessCheckExperimentsDataPreprocessCheckPost) | **POST** /experiments/data_preprocess_check | Post Data Preprocess Check |
+| Method                                                                                                                                       | HTTP request                                         | Description                |
+| -------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | -------------------------- |
+| [**getExperimentsExperimentsGet**](ExperimentsApi.md#getExperimentsExperimentsGet)                                                           | **GET** /experiments                                 | Get Experiments            |
+| [**getFieldDistinctExperimentsFieldDistinctGet**](ExperimentsApi.md#getFieldDistinctExperimentsFieldDistinctGet)                             | **GET** /experiments/{field}/distinct                | Get Field Distinct         |
+| [**getTestResultExperimentsExperimentIdTestsTestIdGet**](ExperimentsApi.md#getTestResultExperimentsExperimentIdTestsTestIdGet)               | **GET** /experiments/{experiment_id}/tests/{test_id} | Get Test Result            |
+| [**postDataPreprocessCheckExperimentsDataPreprocessCheckPost**](ExperimentsApi.md#postDataPreprocessCheckExperimentsDataPreprocessCheckPost) | **POST** /experiments/data_preprocess_check          | Post Data Preprocess Check |
 
 ## getExperimentsExperimentsGet
 
@@ -29,13 +29,14 @@ let opts = {
   page: 1, // Number |
   size: 50, // Number |
 };
-apiInstance.getExperimentsExperimentsGet(opts, (error, data, response) => {
-  if (error) {
-    console.error(error);
-  } else {
+apiInstance.getExperimentsExperimentsGet(opts).then(
+  (data) => {
     console.log("API called successfully. Returned data: " + data);
+  },
+  (error) => {
+    console.error(error);
   }
-});
+);
 ```
 
 ### Parameters
@@ -75,14 +76,12 @@ import Ccfatigue from "ccfatigue";
 
 let apiInstance = new Ccfatigue.ExperimentsApi();
 let field = new Ccfatigue.ExperimentFieldNames(); // ExperimentFieldNames |
-apiInstance.getFieldDistinctExperimentsFieldDistinctGet(
-  field,
-  (error, data, response) => {
-    if (error) {
-      console.error(error);
-    } else {
-      console.log("API called successfully. Returned data: " + data);
-    }
+apiInstance.getFieldDistinctExperimentsFieldDistinctGet(field).then(
+  (data) => {
+    console.log("API called successfully. Returned data: " + data);
+  },
+  (error) => {
+    console.error(error);
   }
 );
 ```
@@ -106,13 +105,13 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-## getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet
+## getTestResultExperimentsExperimentIdTestsTestIdGet
 
-> DashboardPlots getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet(opts)
+> TestResult getTestResultExperimentsExperimentIdTestsTestIdGet(experimentId, testId)
 
-Get Tests Dashboard Plots
+Get Test Result
 
-Return the 4 Bokeh plots used in Test Dashboard Note: as we don&#39;t have real data yet, we hard code things this so it will render the 10 first tests of the experiment 1 (only experiment we have) : + experiment&#x3D;1 + 1&lt;tests_ids&lt;10 then we mascarade test_id field so that it looks like to be matching the one asked for.
+Return test result data
 
 ### Example
 
@@ -120,32 +119,30 @@ Return the 4 Bokeh plots used in Test Dashboard Note: as we don&#39;t have real 
 import Ccfatigue from "ccfatigue";
 
 let apiInstance = new Ccfatigue.ExperimentsApi();
-let opts = {
-  experimentId: 56, // Number |
-  testIds: [null], // [Number] |
-};
-apiInstance.getTestsDashboardPlotsExperimentsTestsDashboardPlotsGet(
-  opts,
-  (error, data, response) => {
-    if (error) {
-      console.error(error);
-    } else {
+let experimentId = 56; // Number |
+let testId = 56; // Number |
+apiInstance
+  .getTestResultExperimentsExperimentIdTestsTestIdGet(experimentId, testId)
+  .then(
+    (data) => {
       console.log("API called successfully. Returned data: " + data);
+    },
+    (error) => {
+      console.error(error);
     }
-  }
-);
+  );
 ```
 
 ### Parameters
 
-| Name             | Type                      | Description | Notes      |
-| ---------------- | ------------------------- | ----------- | ---------- |
-| **experimentId** | **Number**                |             | [optional] |
-| **testIds**      | [**[Number]**](Number.md) |             | [optional] |
+| Name             | Type       | Description | Notes |
+| ---------------- | ---------- | ----------- | ----- |
+| **experimentId** | **Number** |             |
+| **testId**       | **Number** |             |
 
 ### Return type
 
-[**DashboardPlots**](DashboardPlots.md)
+[**TestResult**](TestResult.md)
 
 ### Authorization
 
@@ -169,16 +166,16 @@ import Ccfatigue from "ccfatigue";
 
 let apiInstance = new Ccfatigue.ExperimentsApi();
 let file = "/path/to/file"; // File |
-apiInstance.postDataPreprocessCheckExperimentsDataPreprocessCheckPost(
-  file,
-  (error, data, response) => {
-    if (error) {
-      console.error(error);
-    } else {
+apiInstance
+  .postDataPreprocessCheckExperimentsDataPreprocessCheckPost(file)
+  .then(
+    (data) => {
       console.log("API called successfully. Returned data: " + data);
+    },
+    (error) => {
+      console.error(error);
     }
-  }
-);
+  );
 ```
 
 ### Parameters
