@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """ CCFatigue - Module 3 - CLD-Harris.py
-This code takes in SNC data and output CLD data
+This code takes in SNC data and outputs CLD data
 
 Harris diagram is described in Tassos red book p. 108 - the original paper is:
 
@@ -10,133 +10,46 @@ Harris diagram is described in Tassos red book p. 108 - the original paper is:
     (https://doi.org/10.1016/S0266-3538(97)00121-8)
 """
 
-import math
-import os
-
 import numpy as np
 import pandas as pd
+from pandas._typing import ReadCsvBuffer, WriteBuffer, FilePath
 from scipy import stats
+import ccfatigue.modules.harris_utils as harris_utils
 
-SRC_DIR = os.path.dirname(os.path.realpath(__file__))
-DATA_DIR = os.path.join(SRC_DIR, "..", "..", "..", "Data")
-
-INPUT_FILENAME = "SNC_input.csv"
-INPUT_FILE = os.path.join(DATA_DIR, INPUT_FILENAME)
-OUTPUT_CSV_FILENAME = "CLD_Harris.csv"
-OUTPUT_CSV_FILE = os.path.join(DATA_DIR, OUTPUT_CSV_FILENAME)
 
 # staticvalue.txt => constants
-UCS = 27.1
-UTS = 27.7
+# ucs = 27.1
+# UTS = 27.7
 
-BOUNDS_MARGIN = 0.99
+# BOUNDS_MARGIN = 0.99
 
 # Cycles for the isolines (the lines of the CLD)
-CYCLES_COUNT = [10**x for x in range(3, 10)]  # = 1e3, 1e4, ..., 1e9
+CLD_CYCLES_COUNT = [10**x for x in range(3, 10)]  # = 1e3, 1e4, ..., 1e9
 
 
-def calculate_stress_amplitude(stress_ratio: float, max_stress: float) -> float:
+def execute(
+    input_file: FilePath | ReadCsvBuffer,
+    output_csv_file: FilePath | WriteBuffer,
+) -> None:
     """
-    Calculate stress_amplitude (sigma_a) for given stress ratio (R) and max stress
-    Inputs:
-    - stress_ratio (R)
-    - max_stress (sigma_max)
-    Output:
-    - stess amplitude sigma_a
-    """
-    if abs(stress_ratio) > 1:
-        stress_amplitude = (1 - (1 / stress_ratio)) * max_stress / 2
-    else:
-        stress_amplitude = (1 - stress_ratio) * max_stress / 2
-    return stress_amplitude
-
-
-def calculate_stress_mean(stress_ratio: float, max_stress: float) -> float:
-
-    """
-    Calculate mean stress (sigma_mean) for given stress ratio (R) and max stress
-    Src: https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/3_CLD/Harris/CLD-Harris.for#L68
-    - lines 68-74
-    Inputs:
-    - stress_ratio (R)
-    - max_stress (sigma_max)
-    Output:
-    - stress_mean
-        mean stress sigma_mean
-    """
-    if abs(stress_ratio) > 1:
-        stress_mean = (1 - (1 / stress_ratio)) * max_stress / 2
-    else:
-        stress_mean = (1 + stress_ratio) * max_stress / 2
-
-    return stress_mean
-
-
-def bounds_stress_mean(sigma_mean, uts: float, ucs: float, margin: float) -> float:
-    """
-    Apply bounds (uts, ucs) to mean stress (sigma_mean)
-    Src: https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/3_CLD/Harris/CLD-Harris.for#L86
-    - lines 86-95
-    Inputs:
-    - sigma_mean
-    - uts (upper bound)
-    - ucs (lower bound)
-    - margin
-    Output:
-    - mean stress sigma_mean
-    """
-    if sigma_mean > uts:
-        sigma_mean = margin * uts
-    if sigma_mean < -ucs:
-        sigma_mean = margin * -ucs
-
-    return sigma_mean
-
-
-def calculate_fuv(x1_array, x2_array, y_array):
-    """
-    Calculate f, u and v, which are:
-    - f: function of the laminate tensile strength
-    - u: shape of the right (predominatly tensile) wings of bell-shaped curve
-    - v: shape of the left (predominatly compressive) wings of bell-shaped curve
-    Src: https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/3_CLD/Harris/CLD-Harris.for#L109
-    - lines 109-135
-    Inputs:
-    - x1_array: np array of x1, one per stress ratio
-    - x2_array: np array of x2, one per stress ratio
-    - y_array: np array of y, one per stress ratio
-    Outputs:
-    - (f, u, v)
+    Execute the CLD Harris algorithm
+    Parameters
+    ----------
+        input_file: FilePath | ReadBuffer
+            SNC input file
+        output_csv_file: FilePath | WriteBuffer
+            CLD csv file
+    Returns
+    -------
+        None
     """
 
-    # Prepare matrix
-    # x_matrix = np.vstack(x1_array)
-    x_matrix = np.concatenate([np.vstack(x1_array), np.vstack(x2_array)], axis=1)
-    x_matrix = np.insert(x_matrix, 0, 1, axis=1)
-
-    y_matrix = np.vstack(y_array)
-
-    # Computes the transpose product of a matrix
-    xtx = np.dot(x_matrix.T, x_matrix)
-
-    # Computes the generalized inverse of a real matrix
-    invxtx = np.linalg.pinv(xtx)
-
-    # Multiplies two real rectangular matrices, AB.
-    xty = np.dot(x_matrix.T, y_matrix)
-    bet = np.dot(invxtx, xty)
-
-    f = 10 ** bet[0, 0]
-    u = bet[1, 0]
-    v = bet[2, 0]
-
-    return (f, u, v)
-
-
-if __name__ == "__main__":
+    ucs = harris_utils.UCS
+    uts = harris_utils.UTS
+    bounds_margin = harris_utils.BOUNDS_MARGIN
 
     # Import input files (SNC format)
-    SNC_df = pd.read_csv(INPUT_FILE)
+    SNC_df = pd.read_csv(input_file)
 
     # Data are grouped by stress_ratio but one experiment
     # can have two separate groups with same stress_ratio so we need to identify
@@ -162,26 +75,30 @@ if __name__ == "__main__":
 
     # Calculate sigma amplitude
     SNC_df["stress_amplitude"] = SNC_df.apply(
-        lambda x: calculate_stress_amplitude(x.stress_ratio, x.stress_parameter), axis=1
+        lambda x: harris_utils.calculate_stress_amplitude(x.stress_ratio, x.stress_max),
+        axis=1,
     )
 
     # Calculate mean sigma
     SNC_df["stress_mean"] = SNC_df.apply(
-        lambda x: calculate_stress_mean(x.stress_ratio, x.stress_parameter),
+        lambda x: harris_utils.calculate_stress_mean(x.stress_ratio, x.stress_max),
         axis=1,
     )
 
     # Apply bounds to mean sigma (applied to module 3, not to module 5)
     SNC_df["stress_mean"] = SNC_df.apply(
-        lambda x: bounds_stress_mean(x.stress_mean, UTS, UCS, BOUNDS_MARGIN),
+        lambda x: harris_utils.bounds_stress_mean(
+            x.stress_mean,
+            uts,
+            ucs,
+            bounds_margin,
+        ),
         axis=1,
     )
 
-    SNC_df["y"] = SNC_df.apply(lambda x: math.log10(x.stress_amplitude / UTS), axis=1)
-    SNC_df["x1"] = SNC_df.apply(lambda x: math.log10(1 - (x.stress_mean / UTS)), axis=1)
-    SNC_df["x2"] = SNC_df.apply(
-        lambda x: math.log10((UCS / UTS) + (x.stress_mean / UTS)), axis=1
-    )
+    SNC_df["y"] = np.log10(SNC_df.stress_amplitude / uts)
+    SNC_df["x1"] = np.log10(1 - (SNC_df.stress_mean / uts))
+    SNC_df["x2"] = np.log10(ucs / uts + SNC_df.stress_mean / uts)
 
     cycles_df = pd.DataFrame(
         SNC_df.cycles_to_failure.unique(), columns=["cycles_to_failure"]
@@ -194,7 +111,7 @@ if __name__ == "__main__":
 
         cycle_df = SNC_df.loc[SNC_df.cycles_to_failure == cycles_count]
 
-        f, u, v = calculate_fuv(
+        f, u, v = harris_utils.calculate_fuv(
             cycle_df.x1.to_numpy(), cycle_df.x2.to_numpy(), cycle_df.y.to_numpy()
         )
 
@@ -209,19 +126,23 @@ if __name__ == "__main__":
 
     CLD_df = pd.DataFrame()
 
-    for onc in CYCLES_COUNT:
+    for onc in CLD_CYCLES_COUNT:
 
         # Eq 8 p530 ref[1]
-        ff = linregress_f.slope * math.log10(onc) + linregress_f.intercept
-        uu = linregress_u.slope * math.log10(onc) + linregress_u.intercept
-        vv = linregress_v.slope * math.log10(onc) + linregress_v.intercept
+        ff = linregress_f.slope * np.log10(onc) + linregress_f.intercept  # type: ignore # noqa
+        uu = linregress_u.slope * np.log10(onc) + linregress_u.intercept  # type: ignore # noqa
+        vv = linregress_v.slope * np.log10(onc) + linregress_v.intercept  # type: ignore # noqa
 
-        for sm in np.arange(-0.90 * UCS, 0.90 * UTS, 0.90 * (UTS + UCS) / 40):
+        for sm in np.arange(
+            -0.90 * ucs,
+            0.90 * uts,
+            0.90 * (uts + ucs) / 40,
+        ):
 
-            C2 = ff * (1 - sm / UTS) ** uu
-            C3 = ((UCS / UTS) + (sm / UTS)) ** vv
+            C2 = ff * (1 - sm / uts) ** uu
+            C3 = ((ucs / uts) + (sm / uts)) ** vv
 
-            stress_amplitude = C2 * C3 * UTS
+            stress_amplitude = C2 * C3 * uts
             stress_mean = sm
 
             row = pd.DataFrame(
@@ -241,4 +162,4 @@ if __name__ == "__main__":
             )
 
     # Generate output files
-    CLD_df.to_csv(OUTPUT_CSV_FILE, index=False)
+    CLD_df.to_csv(path_or_buf=output_csv_file, index=False)  # type: ignore

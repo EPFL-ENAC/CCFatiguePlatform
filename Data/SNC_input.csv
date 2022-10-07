@@ -1,4 +1,4 @@
-stress_ratio,cycles_to_failure,stress,stress_lowerbound,stress_upperbound
+stress_ratio,cycles_to_failure,stress_max,stress_lowerbound,stress_upperbound
 0.1000000,1.000000,32.90580,30.40634,36.37630
 0.1000000,51.00000,25.07248,23.79429,26.74287
 0.1000000,101.0000,23.91540,22.78930,25.36434

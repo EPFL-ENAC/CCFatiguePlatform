@@ -8,33 +8,15 @@ Harris diagram is described in Tassos red book p. 108 - the original papers are:
     (https://doi.org/10.1016/S0266-3538(97)00121-8)
 """
 
-import os
-import sys
-import math
+# TODO: bounds_stress_mean should not be used according to fortran but
+# without it the code crash when calculating x1 (log(negative value))
+# Issue #121 asks Tassos for EXE and input files to compare results
+
 import numpy as np
 import pandas as pd
+from pandas._typing import ReadCsvBuffer, WriteBuffer, FilePath
 from scipy import stats
-
-SRC_DIR = os.path.dirname(os.path.realpath(__file__))
-DATA_DIR = os.path.join(SRC_DIR, "..", "..", "..", "Data")
-HARRIS_MOD3_DIR = os.path.join(SRC_DIR, "..", "..", "3_CLD", "Harris")
-
-INPUT_SNC_FILENAME = "SNC_date_harris_input.csv"
-INPUT_SNC_FILE = os.path.join(DATA_DIR, INPUT_SNC_FILENAME)
-INPUT_CYC_FILENAME = "CYC_date_harris_ccinput.csv"
-INPUT_CYC_FILE = os.path.join(DATA_DIR, INPUT_CYC_FILENAME)
-
-OUTPUT_CSV_FILENAME = "DAS_harris.csv"
-OUTPUT_CSV_FILE = os.path.join(DATA_DIR, OUTPUT_CSV_FILENAME)
-
-# staticvalue.txt => constants
-UCS = 27.1
-UTS = 27.7
-
-# Factor loop
-FACTOR_START = 1.0
-FACTOR_STOP = 0.9
-FACTOR_STEP = -1.0
+import ccfatigue.modules.harris_utils as harris_utils
 
 
 def calculate_normalized_alternating_stress(
@@ -43,30 +25,58 @@ def calculate_normalized_alternating_stress(
     """
     Calculate the normalized alternating stress component
     Equation 1 p9 Ref [2]
-    Inputs:
-    - f: function of the laminate tensile strength
-    - m: normalized mean stress
-    - c: normalized compression stress
-    - u: shape of the right (predominatly tensile) wings of bell-shaped curve
-    - v: shape of the left (predominatly compressive) wings of bell-shaped curve
-    Outputs:
-    - a: normalized alternating stress component
+    Parameters
+    ----------
+        f
+            function of the laminate tensile strength
+        m
+            normalized mean stress
+        c
+            normalized compression stress
+        u
+            shape of the right (predominatly tensile) wings of bell-shaped curve
+        v
+            shape of the left (predominatly compressive) wings of bell-shaped curve
+    Returns
+    -------
+        a
+            normalized alternating stress component
     """
     a = f * (1 - m) ** u * (c + m) ** v
     return a
 
 
-def calculate_damage(CYC_row, factor):
+def calculate_damage(
+    stress_mean,
+    stress_ratio,
+    n_cycles,
+    factor: float,
+    linregress_f,
+    linregress_u,
+    linregress_v,
+):
     """
-    Calculate damage
-    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/5_DammageSummation/Harris/Miner-Harris.for#L177
-    - lines 177-249
-    Inputs:
-    - CYC_row
-    - factor
-    Outpus:
-    - damage
+    Calculate damage for a specific damage
+    Parameters
+    ----------
+        stress_mean: Series
+            CYC input Dataframe
+        factor: float
+        linregress_f: LinregressResult
+            Slope and intercept for f (function of the laminate tensile strength)
+        linregress_u
+            Slope and intercept for u (shape of the right (predominatly tensile) wings
+            of bell-shaped curve)
+        linregress_v
+            Slope and intercept for v (shape of the left (predominatly compressive)
+            wings of bell-shaped curve)
+    Returns
+    -------
+        damage: Series[]
+            damage for each row of CYC input file
     """
+    # Src: https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/5_DammageSummation/Harris/Miner-Harris.for#L177  # noqa
+    #      lines 177-249
 
     loop_params = [
         (1000, 1),
@@ -77,9 +87,7 @@ def calculate_damage(CYC_row, factor):
         (10e25, 10e12),
     ]
 
-    samp = CYC_row.stress_mean * factor + (1 - CYC_row.stress_ratio) / (
-        1 + CYC_row.stress_ratio
-    )
+    samp = stress_mean * factor + (1 - stress_ratio) / (1 + stress_ratio)
 
     a = 10000
     jj = 1
@@ -87,25 +95,50 @@ def calculate_damage(CYC_row, factor):
     for (max, inc) in loop_params:
         while jj < max and a >= samp:
 
-            f = af * math.log10(jj) + bf
-            u = au * math.log10(jj) + bu
-            v = av * math.log10(jj) + bv
+            f = linregress_f.slope * np.log10(jj) + linregress_f.intercept
+            u = linregress_u.slope * np.log10(jj) + linregress_u.intercept
+            v = linregress_v.slope * np.log10(jj) + linregress_v.intercept
             a = calculate_normalized_alternating_stress(
-                f, CYC_row.stress_mean * factor / UTS, UCS / UTS, u, v
+                f,
+                stress_mean * factor / harris_utils.UTS,
+                harris_utils.UCS / harris_utils.UTS,
+                u,
+                v,
             )
             jj += inc
 
-    damage = CYC_row.n_cycles / jj
+    damage = n_cycles / jj
     return damage
 
 
-if __name__ == "__main__":
+def execute(
+    input_snc_file: FilePath | ReadCsvBuffer,
+    input_cyc_file: FilePath | ReadCsvBuffer,
+    output_csv_file: FilePath | WriteBuffer,
+    factor_start=1.0,
+    factor_stop=0.9,
+    factor_step=-1.0,
+) -> None:
+    """
+    Execute the CLD Harris algorithm
+    Parameters
+    ----------
+        input_snc_file: FilePath | ReadCsvBuffer,
+            SNC input file
+        input_cyc_file: FilePath | ReadCsvBuffer,
+            CYC input file
+        output_csv_file: FilePath | WriteBuffer,
+            DAS utput file
+    Returns
+    -------
+        None
+    """
 
-    sys.path.insert(0, HARRIS_MOD3_DIR)
-    import cld_harris
+    ucs = harris_utils.UCS
+    uts = harris_utils.UTS
 
-    SNC_df = pd.read_csv(INPUT_SNC_FILE)  # Known stress ratios
-    CYC_df = pd.read_csv(INPUT_CYC_FILE)
+    SNC_df = pd.read_csv(input_snc_file)  # Known stress ratios
+    CYC_df = pd.read_csv(input_cyc_file)
 
     # Data are grouped by stress_ratio but one experiment
     # can have two separate groups with same stress_ratio so we need to identify
@@ -131,38 +164,34 @@ if __name__ == "__main__":
 
     # Calculate sigma amplitude
     SNC_df["stress_amplitude"] = SNC_df.apply(
-        lambda x: cld_harris.calculate_stress_amplitude(
-            x.stress_ratio, x.stress_parameter
-        ),
+        lambda x: harris_utils.calculate_stress_amplitude(x.stress_ratio, x.stress_max),
         axis=1,
     )
 
     # Calculate mean sigma
     SNC_df["stress_mean"] = SNC_df.apply(
-        lambda x: cld_harris.calculate_stress_mean(x.stress_ratio, x.stress_parameter),
+        lambda x: harris_utils.calculate_stress_mean(x.stress_ratio, x.stress_max),
         axis=1,
     )
 
-    # Apply bounds to mean sigma (applied to module 3, not to module 5)
+    # TODO should not be applied to module 5 according to code
+    # but cause error if not applied: log10(x < 0)
     SNC_df["stress_mean"] = SNC_df.apply(
-        lambda x: cld_harris.bounds_stress_mean(
-            x.stress_mean, cld_harris.UTS, cld_harris.UCS, cld_harris.BOUNDS_MARGIN
+        lambda x: harris_utils.bounds_stress_mean(
+            x.stress_mean,
+            uts,
+            ucs,
+            harris_utils.BOUNDS_MARGIN,
         ),
         axis=1,
     )
 
-    SNC_df["y"] = SNC_df.apply(
-        lambda x: math.log10(x.stress_amplitude / cld_harris.UTS), axis=1
-    )
-    SNC_df["x1"] = SNC_df.apply(
-        lambda x: math.log10(1 - (x.stress_mean / cld_harris.UTS)), axis=1
-    )
-    SNC_df["x2"] = SNC_df.apply(
-        lambda x: math.log10(
-            (cld_harris.UCS / cld_harris.UTS) + (x.stress_mean / cld_harris.UTS)
-        ),
-        axis=1,
-    )
+    # SNC_df["y"] = SNC_df.apply(lambda x: np.log10(x.stress_amplitude / uts), axis=1)
+    # SNC_df["x1"] = SNC_df.apply(lambda x: np.log10(1 - (x.stress_mean / uts)), axis=1)
+    # SNC_df["x2"] = np.log10(ucs / uts + SNC_df.stress_mean / uts)
+    SNC_df["y"] = np.log10(SNC_df.stress_amplitude / uts)
+    SNC_df["x1"] = np.log10(1 - (SNC_df.stress_mean / uts))
+    SNC_df["x2"] = np.log10(ucs / uts + SNC_df.stress_mean / uts)
 
     cycles_df = pd.DataFrame(
         SNC_df.cycles_to_failure.unique(), columns=["cycles_to_failure"]
@@ -175,7 +204,7 @@ if __name__ == "__main__":
 
         cycle_df = SNC_df.loc[SNC_df.cycles_to_failure == cycles_count]
 
-        f, u, v = cld_harris.calculate_fuv(
+        f, u, v = harris_utils.calculate_fuv(
             cycle_df.x1.to_numpy(), cycle_df.x2.to_numpy(), cycle_df.y.to_numpy()
         )
 
@@ -187,24 +216,36 @@ if __name__ == "__main__":
     linregress_f = stats.linregress(cycles_df.log10_cycles_to_failure, cycles_df.f)
     linregress_u = stats.linregress(cycles_df.log10_cycles_to_failure, cycles_df.u)
     linregress_v = stats.linregress(cycles_df.log10_cycles_to_failure, cycles_df.v)
-    af, bf = linregress_f[1], linregress_f[0]
-    au, bu = linregress_u[1], linregress_u[0]
-    av, bv = linregress_v[1], linregress_v[0]
+    # af, bf = linregress_f.slope, linregress_f.intercept
+    # au, bu = linregress_u.slope, linregress_u.intercept
+    # av, bv = linregress_v.slope, linregress_v.intercept
 
     factors = pd.DataFrame(
-        np.arange(FACTOR_START, FACTOR_STOP, FACTOR_STEP), columns=["factor"]
+        np.arange(factor_start, factor_stop, factor_step),
+        columns=["factor"],
     )
     for factor in factors.factor:
 
-        CYC_df["damage"] = CYC_df.apply(lambda x: calculate_damage(x, factor), axis=1)
+        CYC_df["damage"] = CYC_df.apply(
+            lambda x: calculate_damage(
+                x.stress_mean,
+                x.stress_ratio,
+                x.n_cycles,
+                factor,
+                linregress_f,
+                linregress_u,
+                linregress_v,
+            ),
+            axis=1,
+        )
 
-        CYC_df["stress"] = (CYC_df.stress_mean + CYC_df.stress_amplitude / 2) * factor
+        CYC_df["stress"] = (CYC_df.stress_mean + CYC_df.stress_range / 2) * factor
 
         factors.loc[factors.factor == factor, "damage"] = 1 / CYC_df.damage.sum()
-        factors.loc[factors.factor == factor, "max_stress"] = CYC_df.stress.max()
+        factors.loc[factors.factor == factor, "stress_max"] = CYC_df.stress.max()
 
     # Generate output file
-    factors[["max_stress", "damage"]].to_csv(
-        OUTPUT_CSV_FILE,
+    factors[["stress_max", "damage"]].to_csv(
+        output_csv_file,  # type: ignore
         index=False,
     )
