@@ -1,15 +1,18 @@
 #!/usr/bin/env python
 """ CCFatigue - Module 4 - Fatigue-Failure-FTPF.py
 
-FTPF is described in Tassos red book, in p. 163 - the original papers are 
-https://www.sciencedirect.com/science/article/pii/S0142112398000735?via%3Dihub (https://doi.org/10.1016/S0142-1123(98)00073-5)
-https://www.sciencedirect.com/science/article/pii/S014211230200004X?via%3Dihub (https://doi.org/10.1016/S0142-1123(02)00004-X)
+FTPF is described in Tassos red book, in p. 163 - the original papers are
+[1] https://www.sciencedirect.com/science/article/pii/S0142112398000735?via%3Dihub
+    (https://doi.org/10.1016/S0142-1123(98)00073-5)
+[2] https://www.sciencedirect.com/science/article/pii/S014211230200004X?via%3Dihub
+    (https://doi.org/10.1016/S0142-1123(02)00004-X)
 """
 
-import os
 import math
-import pandas as pd
+import os
 from itertools import chain
+
+import pandas as pd
 
 SRC_DIR = os.path.dirname(os.path.realpath(__file__))
 DATA_DIR = os.path.join(SRC_DIR, "..", "..", "..", "Data")
@@ -27,23 +30,41 @@ INPUT_REFDATA_FILE = os.path.join(DATA_DIR, INPUT_REFDATA_FILENAME)
 # OUTPUT_CSV_FILE = os.path.join(DATA_DIR, OUTPUT_CSV_FILENAME)
 
 
-def get_loglog_stress(a, b, n):
-    return a * n**-b
+def get_loglog_stress(a: float, b: float, cycles_to_failure: float) -> float:
+    """
+    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/FTPF/Fatigue-Failure-FTPF.for#L97
+    Inputs:
+    - a, b: slope parameter
+    - cycles_to_failure
+    Outputs:
+    - Stress
+    """
+    return a * cycles_to_failure**-b
 
 
-def get_linlog_stress(a, b, n):
-    return a + b * n
+def get_linlog_stress(a: float, b: float, cycles_to_failure: float) -> float:
+    """
+    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/FTPF/Fatigue-Failure-FTPF.for#L183
+    Inputs:
+    - a, b: slope parameter
+    - cycles_to_failure
+    Outputs:
+    - Stress
+    """
+    return a + b * cycles_to_failure
 
 
 def get_loglog_sn(
-    x,
-    y,
-    nc,
-    m,
-    mn,
-    s,
-):
-    """TODO"""
+    x: float,
+    y: float,
+    nc: float,
+    m: float,
+    mn: float,
+    s: float,
+) -> float:
+    """
+    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/FTPF/Fatigue-Failure-FTPF.for#L113
+    """
     sn = ((nc / x**2) + (m / y**2) + (mn * ((1 / s**2) - (1 / (x * y))))) ** (
         -0.5
     )
@@ -51,22 +72,26 @@ def get_loglog_sn(
 
 
 def get_linlog_sn(
-    x,
-    y,
-    nc,
-    m,
-    mn,
-    s,
-):
-    """TODO"""
+    x: float,
+    y: float,
+    nc: float,
+    m: float,
+    mn: float,
+    s: float,
+) -> float:
+    """
+    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/FTPF/Fatigue-Failure-FTPF.for#L199
+    """
     sn = ((nc / x**2) + (m / y**2) + (mn * ((1 / s**2) - (1 / (x * y))))) ** (
         -0.5
     )
     return sn
 
 
-def get_ssqr(x, y, tnc, tm, tmn, t):
-    """TODO"""
+def get_ssqr(x: float, y: float, tnc: float, tm: float, tmn: float, t: float) -> float:
+    """
+    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/FTPF/Fatigue-Failure-FTPF.for#L101
+    """
     ssqr = -((tnc / x**2) + (tm / y**2) - (tmn / (x * y)) - (1 / t**2)) / tmn
     return ssqr
 
