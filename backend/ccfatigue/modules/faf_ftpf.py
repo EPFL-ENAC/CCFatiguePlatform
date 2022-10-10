@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-""" CCFatigue - Module 4 - Fatigue-Failure-FTPF.py
+"""
+CCFatigue - Module 4 - Fatigue Failure - faf-ftpf.py
+This code takes in SNC and outputs FAF data
 
 FTPF is described in Tassos red book, in p. 163 - the original papers are
 [1] https://www.sciencedirect.com/science/article/pii/S0142112398000735?via%3Dihub
@@ -9,49 +11,60 @@ FTPF is described in Tassos red book, in p. 163 - the original papers are
 """
 
 import math
-import os
 from itertools import chain
 
+import numpy as np
 import pandas as pd
+from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 
-SRC_DIR = os.path.dirname(os.path.realpath(__file__))
-DATA_DIR = os.path.join(SRC_DIR, "..", "..", "..", "Data")
-
-INPUT_X_JSON_FILENAME = "SNC_inputX.json"
-INPUT_Y_JSON_FILENAME = "SNC_inputY.json"
-INPUT_F_JSON_FILENAME = "SNC_inputF.json"
-INPUT_REFDATA_FILENAME = "SNC_refdata.json"
-INPUT_X_JSON_FILE = os.path.join(DATA_DIR, INPUT_X_JSON_FILENAME)
-INPUT_Y_JSON_FILE = os.path.join(DATA_DIR, INPUT_Y_JSON_FILENAME)
-INPUT_F_JSON_FILE = os.path.join(DATA_DIR, INPUT_F_JSON_FILENAME)
-INPUT_REFDATA_FILE = os.path.join(DATA_DIR, INPUT_REFDATA_FILENAME)
-
-# OUTPUT_CSV_FILENAME = "CLD_PiecewiseLinear.csv"
-# OUTPUT_CSV_FILE = os.path.join(DATA_DIR, OUTPUT_CSV_FILENAME)
+LIST_CYCLES_TO_FAILURE = list(
+    chain(
+        range(1, 1000, 50),
+        range(1000, 1001),
+        range(10000, 2000000, 10000),
+        range(2000000, 20000001, 1000000),
+    )
+)
 
 
-def get_loglog_stress(a: float, b: float, cycles_to_failure: float) -> float:
+def get_loglog_stress(a: float, b: float, cycles_to_failure) -> float:
     """
-    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/FTPF/Fatigue-Failure-FTPF.for#L97
-    Inputs:
-    - a, b: slope parameter
-    - cycles_to_failure
-    Outputs:
-    - Stress
+    Get stress according to a log log slope
+    Parameters
+    ----------
+        a: float
+            slope
+        b: float
+            intercept
+        cycles_to_failure: float
+            Number of cycles to failure (N) [-]
+    Returns
+    -------
+        stress: float
     """
-    return a * cycles_to_failure**-b
+    # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/FTPF/Fatigue-Failure-FTPF.for#L97
+    stress = a * cycles_to_failure**-b
+    return stress
 
 
-def get_linlog_stress(a: float, b: float, cycles_to_failure: float) -> float:
+def get_linlog_stress(a: float, b: float, cycles_to_failure) -> float:
     """
-    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/FTPF/Fatigue-Failure-FTPF.for#L183
-    Inputs:
-    - a, b: slope parameter
-    - cycles_to_failure
-    Outputs:
-    - Stress
+    Get stress according to a lin log slope
+    Parameters
+    ----------
+        a: float
+            slope
+        b: float
+            intercept
+        cycles_to_failure: float
+            Number of cycles to failure (N) [-]
+    Returns
+    -------
+        stress: float
     """
-    return a + b * cycles_to_failure
+    # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/FTPF/Fatigue-Failure-FTPF.for#L183
+    stress = a + b * cycles_to_failure
+    return stress
 
 
 def get_loglog_sn(
@@ -63,8 +76,20 @@ def get_loglog_sn(
     s: float,
 ) -> float:
     """
-    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/FTPF/Fatigue-Failure-FTPF.for#L113
+    Get sn according to a log log slope
+    Parameters
+    ----------
+        x: float
+        y: float
+        nc: float
+        m: float
+        mn: float
+        s: float
+    Returns
+    -------
+        sn: float
     """
+    # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/FTPF/Fatigue-Failure-FTPF.for#L113
     sn = ((nc / x**2) + (m / y**2) + (mn * ((1 / s**2) - (1 / (x * y))))) ** (
         -0.5
     )
@@ -80,8 +105,20 @@ def get_linlog_sn(
     s: float,
 ) -> float:
     """
-    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/FTPF/Fatigue-Failure-FTPF.for#L199
+    Get sn according to a log log slope
+    Parameters
+    ----------
+        x: float
+        y: float
+        nc: float
+        m: float
+        mn: float
+        s: float
+    Returns
+    -------
+        sn: float
     """
+    # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/FTPF/Fatigue-Failure-FTPF.for#L199
     sn = ((nc / x**2) + (m / y**2) + (mn * ((1 / s**2) - (1 / (x * y))))) ** (
         -0.5
     )
@@ -90,100 +127,141 @@ def get_linlog_sn(
 
 def get_ssqr(x: float, y: float, tnc: float, tm: float, tmn: float, t: float) -> float:
     """
-    https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/FTPF/Fatigue-Failure-FTPF.for#L101
+    Parameters
+    ----------
+        x: float
+        y: float
+        tnc: float
+        tm: float
+        tmn: float
+        t: float
+    Returns
+    -------
     """
+    # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/FTPF/Fatigue-Failure-FTPF.for#L101
     ssqr = -((tnc / x**2) + (tm / y**2) - (tmn / (x * y)) - (1 / t**2)) / tmn
     return ssqr
 
 
-if __name__ == "__main__":
-
-    # Import param files
-    SNC_refdata_df = pd.read_json(INPUT_REFDATA_FILE, orient="index")
+def execute(
+    snc_input_x_json_file: FilePath | ReadCsvBuffer,
+    snc_input_y_json_file: FilePath | ReadCsvBuffer,
+    snc_input_f_json_file: FilePath | ReadCsvBuffer,
+    faf_output_csv_file: FilePath | WriteBuffer,
+    faf_output_json_file: FilePath | WriteBuffer,
+    sn_model: str,
+    desirable_angle: float,
+    off_axis_angle: float,
+) -> None:
+    """
+    Execute the CLD Harris algorithm
+    Parameters
+    ----------
+        snc_input_x_json_file: FilePath | ReadCsvBuffer
+            X input (SNC json)
+        snc_input_y_json_file: FilePath | ReadCsvBuffer
+            Y input (SNC json)
+        snc_input_f_json_file: FilePath | ReadCsvBuffer
+            F input (SNC json)
+        faf_output_csv_file: FilePath | WriteBuffer
+            output (FAF CSV)
+        faf_output_json_file: FilePath | WriteBuffer
+            output (FAF json)
+        sn_model: str
+            S-N curve used model [Lin-Log|Log-Log]
+        desirable_angle: float
+            Desirable angle [degrees]
+        off_axis_angle: float
+            Off-axis angle [degrees]
+    Returns
+    -------
+        None
+    """
 
     # Import input files (SNC format)
-    SNC_x_df = pd.read_json(INPUT_X_JSON_FILE, orient="records")
-    SNC_y_df = pd.read_json(INPUT_Y_JSON_FILE, orient="records")
-    SNC_f_df = pd.read_json(INPUT_F_JSON_FILE, orient="records")
+    snc_x_df = pd.read_json(snc_input_x_json_file, orient="records")
+    snc_y_df = pd.read_json(snc_input_y_json_file, orient="records")
+    snc_f_df = pd.read_json(snc_input_f_json_file, orient="records")
 
-    r_x = SNC_x_df.iloc[0].stress_ratio
-    r_y = SNC_y_df.iloc[0].stress_ratio
-    r_f = SNC_f_df.iloc[0].stress_ratio
+    r_x: float = snc_x_df.iloc[0].stress_ratio
+    r_y: float = snc_y_df.iloc[0].stress_ratio
+    r_f: float = snc_f_df.iloc[0].stress_ratio
 
-    a_x = SNC_x_df.iloc[0].A
-    a_y = SNC_y_df.iloc[0].A
-    a_f = SNC_f_df.iloc[0].A
+    a_x: float = snc_x_df.iloc[0].a
+    a_y: float = snc_y_df.iloc[0].a
+    a_f: float = snc_f_df.iloc[0].a
 
-    b_x = SNC_x_df.iloc[0].B
-    b_y = SNC_y_df.iloc[0].B
-    b_f = SNC_f_df.iloc[0].B
+    b_x: float = snc_x_df.iloc[0].b
+    b_y: float = snc_y_df.iloc[0].b
+    b_f: float = snc_f_df.iloc[0].b
 
-    theta = math.radians(
-        SNC_refdata_df.loc["desirable_angle"][0]
-    )  # (DANGLE / 180) * 3.14159265
-    tempangle = math.radians(
-        SNC_refdata_df.loc["off_axis_angle"][0]
-    )  # (THIRDSN / 180) * 3.14159265
+    theta = math.radians(desirable_angle)
+    off_axis_rad = math.radians(off_axis_angle)
 
-    tm = math.sin(tempangle) ** 4
-    tnc = math.cos(tempangle) ** 4
-    tmn = math.sin(tempangle) ** 2 * math.cos(tempangle) ** 2
+    tm = math.sin(off_axis_rad) ** 4
+    tnc = math.cos(off_axis_rad) ** 4
+    tmn = math.sin(off_axis_rad) ** 2 * math.cos(off_axis_rad) ** 2
 
     nc = math.cos(theta) ** 4
     m = math.sin(theta) ** 4
     mn = math.sin(theta) ** 2 * math.cos(theta) ** 2
 
-    stress_ratio = (
-        float(r_x)
-        if math.isclose(
-            (r_x + r_y + r_f) / 3,
-            r_x,
-        )
+    stress_ratio = r_x if r_x == r_y == r_f else 0
+    confidence_interval: float = (
+        snc_x_df.iloc[0].confidence_interval
+        if snc_x_df.iloc[0].confidence_interval
+        == snc_y_df.iloc[0].confidence_interval
+        == snc_f_df.iloc[0].confidence_interval
         else 0
     )
 
-    output_df = pd.DataFrame(
-        chain(
-            range(1, 1000, 50),
-            range(1000, 1001),
-            range(10000, 2000000, 10000),
-            range(2000000, 20000001, 1000000),
-        ),
+    faf_json_df = pd.DataFrame(
+        {"stress_ratio": [stress_ratio], "confidence_interval": [confidence_interval]}
+    )
+
+    faf_csv_df = pd.DataFrame(
+        LIST_CYCLES_TO_FAILURE,
         columns=["cycles_to_failure"],
     )
 
-    output_df["stress_ratio"] = stress_ratio
+    faf_csv_df["stress_ratio"] = stress_ratio
 
-    if SNC_refdata_df.loc["sn_model"][0] == "Log-Log":
+    if sn_model == "Log-Log":
         get_stress = get_loglog_stress
         get_sn = get_loglog_sn
     else:
         get_stress = get_linlog_stress
         get_sn = get_linlog_sn
 
-    output_df["x"] = get_stress(a_x, b_x, output_df.cycles_to_failure)
-    output_df["y"] = get_stress(a_y, b_y, output_df.cycles_to_failure)
+    faf_csv_df["x"] = get_stress(a_x, b_x, faf_csv_df.cycles_to_failure)
+    faf_csv_df["y"] = get_stress(a_y, b_y, faf_csv_df.cycles_to_failure)
 
-    if SNC_refdata_df.loc["off_axis_angle"][0] != 0:
+    if not math.isclose(off_axis_angle, 0):
 
-        output_df["t"] = get_stress(a_f, b_f, output_df.cycles_to_failure)
+        faf_csv_df["t"] = get_stress(a_f, b_f, faf_csv_df.cycles_to_failure)
 
-        output_df["ssqr"] = output_df.apply(
+        faf_csv_df["ssqr"] = faf_csv_df.apply(
             lambda z: get_ssqr(z.x, z.y, tnc, tm, tmn, z.t), axis=1
         )
 
-        # Remove rows where ssqr >= 0
-        output_df.drop(output_df[output_df.ssqr < 0].index, inplace=True)
-        output_df["s"] = output_df.apply(lambda z: 1 / math.sqrt(z.ssqr), axis=1)
+        # Remove rows where ssqr < 0
+        faf_csv_df.drop(faf_csv_df[faf_csv_df.ssqr < 0].index, inplace=True)
+        # output_df["s"] = output_df.apply(lambda z: 1 / math.sqrt(z.ssqr), axis=1)
+        faf_csv_df["s"] = 1 / np.sqrt(faf_csv_df.ssqr)
 
     else:
-        output_df["s"] = get_stress(a_f, b_f, output_df.cycles_to_failure)
+        faf_csv_df["s"] = get_stress(a_f, b_f, faf_csv_df.cycles_to_failure)
 
-    if SNC_refdata_df.loc["off_axis_angle"][0] == 22.5:
-        output_df["s"] = output_df["t"] / 2.2
+    if math.isclose(off_axis_angle, 22.5):
+        faf_csv_df["s"] = faf_csv_df["t"] / 2.2
 
-    output_df["stress_parameter"] = output_df.apply(
+    faf_csv_df["stress_max"] = faf_csv_df.apply(
         lambda z: get_sn(z.x, z.y, nc, m, mn, z.s), axis=1
     )
 
-    pass
+    # Create output files
+    faf_json_df.to_json(faf_output_json_file, orient="records")  # type: ignore
+    faf_csv_df[["stress_ratio", "cycles_to_failure", "stress_max", "s"]].to_csv(
+        faf_output_csv_file,  # type: ignore
+        index=False,
+    )
