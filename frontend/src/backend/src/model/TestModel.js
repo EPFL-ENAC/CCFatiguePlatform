@@ -126,12 +126,6 @@ class TestModel {
           "Number"
         );
       }
-      if (data.hasOwnProperty("measuring_points")) {
-        obj["measuring_points"] = ApiClient.convertToType(
-          data["measuring_points"],
-          [Object]
-        );
-      }
     }
     return obj;
   }
@@ -216,10 +210,5 @@ TestModel.prototype["humidity"] = undefined;
  * @member {Number} initial_crack_length
  */
 TestModel.prototype["initial_crack_length"] = undefined;
-
-/**
- * @member {Array.<Object>} measuring_points
- */
-TestModel.prototype["measuring_points"] = undefined;
 
 export default TestModel;

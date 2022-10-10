@@ -73,6 +73,19 @@ class ExperimentModel(OrmModel):
     dic_analysis_step_size: Optional[int]
 
 
+class TestMeasuringPointModel(OrmModel):
+    """
+    Defines how test is seen on the API
+    """
+
+    id: int
+
+    test_id: int
+    measuring_point_id = int
+    x_coordinate = float
+    y_coordinate = float
+
+
 class TestModel(OrmModel):
     """
     Defines how test is seen on the API
@@ -105,20 +118,7 @@ class TestModel(OrmModel):
     temperature: Optional[float]
     humidity: Optional[float]
     initial_crack_length: Optional[float]
-    measuring_points: Optional[list]
-
-
-class TestMeasuringPointModel(OrmModel):
-    """
-    Defines how test is seen on the API
-    """
-
-    id: int
-
-    test_id: int
-    measuring_point_id = int
-    x_coordinate = float
-    y_coordinate = float
+    # FIXME measuring_points: List[TestMeasuringPointModel]
 
 
 class ExperimentFieldNames(str, Enum):
