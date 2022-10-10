@@ -1,14 +1,25 @@
 import os
 
+import ccfatigue.modules.cld_harris as cld_harris
+import ccfatigue.modules.cyc_range_mean as cyc_range_mean
+import ccfatigue.modules.miner_harris as miner_harris
 import ccfatigue.modules.sn_curve_linlog as sn_curve_linlog
 import ccfatigue.modules.sn_curve_loglog as sn_curve_loglog
 import ccfatigue.modules.sn_curve_sendeckyj as sn_curve_sendeckyj
-import ccfatigue.modules.cld_harris as cld_harris
-import ccfatigue.modules.miner_harris as miner_harris
 
 SRC_DIR = os.path.dirname(os.path.realpath(__file__))
 DATA_DIR = os.path.join(SRC_DIR, "..", "..", "Data")
 OUTPUT_DIR = os.path.join(DATA_DIR, "output")
+
+
+def test_cyc_range_mean():
+    LDS_INPUT_CSV_FILENAME = "LDS_input.csv"
+    CYC_OUTPUT_CSV_FILENAME = "CYC_range_mean.csv"
+    LDS_INPUT_CSV_FILE = os.path.join(DATA_DIR, LDS_INPUT_CSV_FILENAME)
+    CYC_OUTPUT_CSV_FILE = os.path.join(OUTPUT_DIR, CYC_OUTPUT_CSV_FILENAME)
+    print(f"LDS_INPUT_CSV_FILE={os.path.abspath(LDS_INPUT_CSV_FILE)}")
+    print(f"CYC_OUTPUT_CSV_FILE={os.path.abspath(CYC_OUTPUT_CSV_FILE)}")
+    cyc_range_mean.execute(LDS_INPUT_CSV_FILE, CYC_OUTPUT_CSV_FILE)
 
 
 def test_sn_curve_loglog():
