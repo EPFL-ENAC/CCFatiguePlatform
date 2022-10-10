@@ -19,8 +19,8 @@ from ccfatigue.model import Experiment_Data_Preprocessed
 from ccfatigue.models.api import ExperimentFieldNames, ExperimentModel
 from ccfatigue.models.database import Experiment
 from ccfatigue.services.database import get_session
+from ccfatigue.utils.experiment_test import TestResult, get_result
 from ccfatigue.utils.routers import get_where_clauses
-from ccfatigue.utils.test_dashboard import TestResult, get_result
 from preprocessing import tst_data_lib
 
 router = APIRouter(
