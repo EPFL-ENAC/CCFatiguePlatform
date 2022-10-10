@@ -4,7 +4,7 @@ CCFatiguePlatform is an initiative from CCLab that aims to develop a web applica
 
 [Demo](https://ccfatigue-test.epfl.ch/)
 
-# Web app: Usage
+# How to use on your desktop
 
 ## Secrets
 
@@ -21,6 +21,21 @@ EOF
 make install
 ```
 
+## Run Backend
+
+```bash
+make dev-database
+make dev-backend
+```
+
+## Run Frontend
+
+```bash
+make dev-frontend
+```
+
+# Dev tools
+
 ## Run Preprocessing
 
 ```bash
@@ -33,57 +48,7 @@ make preprocessing
 make api
 ```
 
-## Run Backend
-
-```bash
-make dev-database
-make dev-backend
-```
-
-First time backend setup/init :
-
-```bash
-make init-database
-```
-
-## Run Frontend
-
-```bash
-make dev-frontend
-```
-
-## First time setup
-
-```bash
-make install
-```
-
-## Run Preprocessing
-
-```bash
-make run-preprocessing
-```
-
-## Run Backend
-
-```bash
-make dev-database
-make dev-backend
-```
-
-First time backend setup/init :
-
-```bash
-make init-database
-```
-
-## Run Frontend
-
-```bash
-make dev-frontend
-```
-
-## Server provisioning
+# Server provisioning
 
 ```bash
 make run
