@@ -10,6 +10,7 @@ import ccfatigue.modules.sn_curve_sendeckyj as sn_curve_sendeckyj
 SRC_DIR = os.path.dirname(os.path.realpath(__file__))
 DATA_DIR = os.path.join(SRC_DIR, "..", "..", "Data")
 OUTPUT_DIR = os.path.join(DATA_DIR, "output")
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
 def test_cyc_range_mean():
