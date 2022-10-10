@@ -16,4 +16,4 @@ Encoding format: UTF-8, Separator: ',' (comma)
 
 | Variable name | Description | Symbol    | Unit  | Data type | Mandatory |
 | ------------- | ----------- | --------- | ----- | --------- | --------- |
-| stress        | Stress      | sigma_max | [MPa] | double    | y         |
+| stress_max    | Max stress  | sigma_max | [MPa] | double    | y         |
