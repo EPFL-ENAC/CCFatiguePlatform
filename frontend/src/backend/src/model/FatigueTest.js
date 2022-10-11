@@ -15,14 +15,14 @@ import ApiClient from "../ApiClient";
 import HysteresisLoop from "./HysteresisLoop";
 
 /**
- * The TestResult model module.
- * @module model/TestResult
+ * The FatigueTest model module.
+ * @module model/FatigueTest
  * @version 0.1.0
  */
-class TestResult {
+class FatigueTest {
   /**
-   * Constructs a new <code>TestResult</code>.
-   * @alias module:model/TestResult
+   * Constructs a new <code>FatigueTest</code>.
+   * @alias module:model/FatigueTest
    * @param specimenId {Number}
    * @param totalDissipatedEnergy {Number}
    * @param hysteresisLoops {Array.<module:model/HysteresisLoop>}
@@ -40,7 +40,7 @@ class TestResult {
     hysteresisArea,
     stiffness
   ) {
-    TestResult.initialize(
+    FatigueTest.initialize(
       this,
       specimenId,
       totalDissipatedEnergy,
@@ -77,15 +77,15 @@ class TestResult {
   }
 
   /**
-   * Constructs a <code>TestResult</code> from a plain JavaScript object, optionally creating a new instance.
+   * Constructs a <code>FatigueTest</code> from a plain JavaScript object, optionally creating a new instance.
    * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
    * @param {Object} data The plain JavaScript object bearing properties of interest.
-   * @param {module:model/TestResult} obj Optional instance to populate.
-   * @return {module:model/TestResult} The populated <code>TestResult</code> instance.
+   * @param {module:model/FatigueTest} obj Optional instance to populate.
+   * @return {module:model/FatigueTest} The populated <code>FatigueTest</code> instance.
    */
   static constructFromObject(data, obj) {
     if (data) {
-      obj = obj || new TestResult();
+      obj = obj || new FatigueTest();
 
       if (data.hasOwnProperty("specimen_id")) {
         obj["specimen_id"] = ApiClient.convertToType(
@@ -130,36 +130,36 @@ class TestResult {
 /**
  * @member {Number} specimen_id
  */
-TestResult.prototype["specimen_id"] = undefined;
+FatigueTest.prototype["specimen_id"] = undefined;
 
 /**
  * @member {Number} total_dissipated_energy
  */
-TestResult.prototype["total_dissipated_energy"] = undefined;
+FatigueTest.prototype["total_dissipated_energy"] = undefined;
 
 /**
  * @member {Array.<module:model/HysteresisLoop>} hysteresis_loops
  */
-TestResult.prototype["hysteresis_loops"] = undefined;
+FatigueTest.prototype["hysteresis_loops"] = undefined;
 
 /**
  * @member {Array.<Number>} n_cycles
  */
-TestResult.prototype["n_cycles"] = undefined;
+FatigueTest.prototype["n_cycles"] = undefined;
 
 /**
  * @member {Array.<Number>} creep
  */
-TestResult.prototype["creep"] = undefined;
+FatigueTest.prototype["creep"] = undefined;
 
 /**
  * @member {Array.<Number>} hysteresis_area
  */
-TestResult.prototype["hysteresis_area"] = undefined;
+FatigueTest.prototype["hysteresis_area"] = undefined;
 
 /**
  * @member {Array.<Number>} stiffness
  */
-TestResult.prototype["stiffness"] = undefined;
+FatigueTest.prototype["stiffness"] = undefined;
 
-export default TestResult;
+export default FatigueTest;

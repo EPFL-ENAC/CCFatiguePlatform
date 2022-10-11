@@ -13,8 +13,9 @@
 
 import ApiClient from "../ApiClient";
 import ExperimentDataPreprocessed from "../model/ExperimentDataPreprocessed";
+import FatigueTest from "../model/FatigueTest";
 import PageExperimentModel from "../model/PageExperimentModel";
-import TestResult from "../model/TestResult";
+import QuasiStaticTest from "../model/QuasiStaticTest";
 
 /**
  * Experiments service.
@@ -96,6 +97,75 @@ export default class ExperimentsApi {
   }
 
   /**
+   * Get Fatigue Test
+   * Return test result data
+   * @param {Number} experimentId
+   * @param {Number} testId
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/FatigueTest} and HTTP response
+   */
+  getFatigueTestExperimentsExperimentIdFatigueTestIdGetWithHttpInfo(
+    experimentId,
+    testId
+  ) {
+    let postBody = null;
+    // verify the required parameter 'experimentId' is set
+    if (experimentId === undefined || experimentId === null) {
+      throw new Error(
+        "Missing the required parameter 'experimentId' when calling getFatigueTestExperimentsExperimentIdFatigueTestIdGet"
+      );
+    }
+    // verify the required parameter 'testId' is set
+    if (testId === undefined || testId === null) {
+      throw new Error(
+        "Missing the required parameter 'testId' when calling getFatigueTestExperimentsExperimentIdFatigueTestIdGet"
+      );
+    }
+
+    let pathParams = {
+      experiment_id: experimentId,
+      test_id: testId,
+    };
+    let queryParams = {};
+    let headerParams = {};
+    let formParams = {};
+
+    let authNames = [];
+    let contentTypes = [];
+    let accepts = ["application/json"];
+    let returnType = FatigueTest;
+    return this.apiClient.callApi(
+      "/experiments/{experiment_id}/fatigue/{test_id}",
+      "GET",
+      pathParams,
+      queryParams,
+      headerParams,
+      formParams,
+      postBody,
+      authNames,
+      contentTypes,
+      accepts,
+      returnType,
+      null
+    );
+  }
+
+  /**
+   * Get Fatigue Test
+   * Return test result data
+   * @param {Number} experimentId
+   * @param {Number} testId
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/FatigueTest}
+   */
+  getFatigueTestExperimentsExperimentIdFatigueTestIdGet(experimentId, testId) {
+    return this.getFatigueTestExperimentsExperimentIdFatigueTestIdGetWithHttpInfo(
+      experimentId,
+      testId
+    ).then(function (response_and_data) {
+      return response_and_data.data;
+    });
+  }
+
+  /**
    * Get Field Distinct
    * Get all distinct values for field column, sorted
    * @param {module:model/ExperimentFieldNames} field
@@ -152,13 +222,13 @@ export default class ExperimentsApi {
   }
 
   /**
-   * Get Test Result
-   * Return test result data
+   * Get Quasi Static Test
+   * Return quasi static test
    * @param {Number} experimentId
    * @param {Number} testId
-   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/TestResult} and HTTP response
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/QuasiStaticTest} and HTTP response
    */
-  getTestResultExperimentsExperimentIdTestsTestIdGetWithHttpInfo(
+  getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGetWithHttpInfo(
     experimentId,
     testId
   ) {
@@ -166,13 +236,13 @@ export default class ExperimentsApi {
     // verify the required parameter 'experimentId' is set
     if (experimentId === undefined || experimentId === null) {
       throw new Error(
-        "Missing the required parameter 'experimentId' when calling getTestResultExperimentsExperimentIdTestsTestIdGet"
+        "Missing the required parameter 'experimentId' when calling getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGet"
       );
     }
     // verify the required parameter 'testId' is set
     if (testId === undefined || testId === null) {
       throw new Error(
-        "Missing the required parameter 'testId' when calling getTestResultExperimentsExperimentIdTestsTestIdGet"
+        "Missing the required parameter 'testId' when calling getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGet"
       );
     }
 
@@ -187,9 +257,9 @@ export default class ExperimentsApi {
     let authNames = [];
     let contentTypes = [];
     let accepts = ["application/json"];
-    let returnType = TestResult;
+    let returnType = QuasiStaticTest;
     return this.apiClient.callApi(
-      "/experiments/{experiment_id}/tests/{test_id}",
+      "/experiments/{experiment_id}/quasi-static/{test_id}",
       "GET",
       pathParams,
       queryParams,
@@ -205,14 +275,17 @@ export default class ExperimentsApi {
   }
 
   /**
-   * Get Test Result
-   * Return test result data
+   * Get Quasi Static Test
+   * Return quasi static test
    * @param {Number} experimentId
    * @param {Number} testId
-   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/TestResult}
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/QuasiStaticTest}
    */
-  getTestResultExperimentsExperimentIdTestsTestIdGet(experimentId, testId) {
-    return this.getTestResultExperimentsExperimentIdTestsTestIdGetWithHttpInfo(
+  getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGet(
+    experimentId,
+    testId
+  ) {
+    return this.getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGetWithHttpInfo(
       experimentId,
       testId
     ).then(function (response_and_data) {

@@ -8,10 +8,9 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from ccfatigue.config import settings
-from ccfatigue.models.database import Experiment, Test
+from ccfatigue.experiment.common import DATA_DIRECTORY, get_specimen_id
+from ccfatigue.models.database import Experiment
 
-DATA_DIRECTORY: str = os.path.join(settings.data_path, "preprocessed")  # type: ignore
 INTERVAL: int = 10
 LOOP_SPACING: int = 1000
 MAGNITUDE: int = -3
@@ -23,7 +22,7 @@ class HysteresisLoop(BaseModel):
     stress: List[float]
 
 
-class TestResult(BaseModel):
+class FatigueTest(BaseModel):
     specimen_id: int
     total_dissipated_energy: int
     hysteresis_loops: List[HysteresisLoop]
@@ -56,7 +55,6 @@ def get_dataframe(
             f"measure_{specimen_id:03d}.csv",
         )
     abspath = os.path.abspath(filepath)
-    print(abspath)
     return pd.read_csv(abspath)
 
 
@@ -111,11 +109,11 @@ def create_sub_hystloops(df: DataFrame, sub_indexes: List[int]) -> List[Hysteres
     return sub_hystloops
 
 
-async def get_result(
+async def fatigue_test(
     session: AsyncSession,
     experiment_id: int,
     test_id: int,
-) -> TestResult:
+) -> FatigueTest:
     experiment: Dict[str, str] = (
         (
             await session.execute(
@@ -130,15 +128,11 @@ async def get_result(
         .one()  # type: ignore
         ._asdict()
     )
-    specimen_id: int = await session.scalar(
-        select(Test.specimen_number)
-        .where(Test.experiment_id == experiment_id)
-        .where(Test.id == test_id)
-    )  # type: ignore
+    specimen_id = await get_specimen_id(session, experiment_id, test_id)
     std_df = get_dataframe("TST", experiment, specimen_id)
     hyst_df = get_dataframe("HYS", experiment, specimen_id).fillna(value=0)
     hysteresis_loops = create_sub_hystloops(std_df, compute_sub_indexes(hyst_df))
-    return TestResult(
+    return FatigueTest(
         specimen_id=specimen_id,
         total_dissipated_energy=get_total_dissipated_energy(hyst_df),
         hysteresis_loops=hysteresis_loops,

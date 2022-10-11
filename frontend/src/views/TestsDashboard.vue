@@ -14,7 +14,7 @@
         <v-btn @click="goBack">Add test(s)</v-btn>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row v-if="experimentType == 'FA'">
       <v-col cols="10">
         <v-row>
           <v-col cols="6">
@@ -163,6 +163,22 @@
         </v-card>
       </v-col>
     </v-row>
+    <v-row v-else>
+      <v-col cols="6">
+        <v-card :loading="loading">
+          <v-card-title>Crack Load vs Crack Displacement</v-card-title>
+          <v-card-text>
+            <double-chart
+              :series="crackSeries"
+              :aspect-ratio="2"
+              x-axis-name="Crack Displacement"
+              :y1-axis-name="'Crack Load \u23AF\u23AF\u23AF'"
+              :y2-axis-name="'Crack Length \u2022\u2022\u2022'"
+            ></double-chart>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -174,10 +190,12 @@ import ExperimentSV from "@/components/ExperimentSV.vue";
 import SimpleChart from "@/components/charts/SimpleChart.vue";
 import { zip } from "lodash";
 import { colorPalette } from "@/utils/style";
+import DoubleChart from "@/components/charts/DoubleChart.vue";
 
 export default {
   name: "TestsDashboard",
   components: {
+    DoubleChart,
     ExperimentSpecifications,
     ExperimentSV,
     InfoTooltip,
@@ -192,17 +210,106 @@ export default {
       experiment: "oneExperiment",
       units: "units",
     }),
+    experimentType: function () {
+      return this.experiment.experiment.experiment_type;
+    },
+  },
+  watch: {
+    experimentType: function (val) {
+      switch (val) {
+        case "FA":
+          this.loading = true;
+          Promise.all(
+            this.testIds.map((testId) =>
+              this.$experimentsApi.getFatigueTestExperimentsExperimentIdFatigueTestIdGet(
+                this.experimentId,
+                testId
+              )
+            )
+          )
+            .then((dataList) => {
+              this.specimenIds = dataList.map((data) => data.specimen_id);
+              this.totalDissipatedEnergies = dataList.map(
+                (data) => data.total_dissipated_energy
+              );
+              this.stressStrainSeries = [];
+              this.hysteresisAreaSeries = [];
+              this.creepSeries = [];
+              this.stiffnessSeries = [];
+              zip(this.testIds, dataList).forEach(([testId, data]) => {
+                this.stressStrainSeries.push(
+                  ...data.hysteresis_loops.map((loop) => ({
+                    type: "line",
+                    name: `${testId}`,
+                    data: zip(loop.strain, loop.stress),
+                  }))
+                );
+                this.hysteresisAreaSeries.push({
+                  type: "line",
+                  name: `${testId}`,
+                  data: zip(data.n_cycles, data.hysteresis_area),
+                });
+                this.creepSeries.push({
+                  type: "line",
+                  name: `${testId}`,
+                  data: zip(data.n_cycles, data.creep),
+                });
+                this.stiffnessSeries.push({
+                  type: "line",
+                  name: `${testId}`,
+                  data: zip(data.n_cycles, data.stiffness),
+                });
+              });
+            })
+            .finally(() => (this.loading = false));
+          break;
+        case "QS":
+          this.loading = true;
+          Promise.all(
+            this.testIds.map((testId) =>
+              this.$experimentsApi.getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGet(
+                this.experimentId,
+                testId
+              )
+            )
+          )
+            .then((dataList) => {
+              this.crackSeries = [];
+              zip(this.testIds, dataList).forEach(([testId, data]) => {
+                this.crackSeries.push({
+                  type: "line",
+                  name: `${testId}`,
+                  data: zip(data.crack_displacement, data.crack_load),
+                });
+                this.crackSeries.push({
+                  type: "scatter",
+                  name: `${testId}`,
+                  yAxisIndex: 1,
+                  symbolSize: 6,
+                  data: zip(data.crack_displacement, data.crack_length),
+                });
+              });
+            })
+            .finally(() => (this.loading = false));
+          break;
+        default:
+          throw new Error(`unknown experiment type ${val}`);
+      }
+    },
   },
   data() {
     return {
       loading: false,
       colors: colorPalette,
+      // FA
       stressStrainSeries: [],
       hysteresisAreaSeries: [],
       creepSeries: [],
       stiffnessSeries: [],
       specimenIds: [],
       totalDissipatedEnergies: [],
+      // QS
+      crackSeries: [],
     };
   },
   methods: {
@@ -211,51 +318,6 @@ export default {
     },
   },
   created() {
-    this.loading = true;
-    Promise.all(
-      this.testIds.map((testId) =>
-        this.$experimentsApi.getTestResultExperimentsExperimentIdTestsTestIdGet(
-          this.experimentId,
-          testId
-        )
-      )
-    )
-      .then((dataList) => {
-        this.specimenIds = dataList.map((data) => data.specimen_id);
-        this.totalDissipatedEnergies = dataList.map(
-          (data) => data.total_dissipated_energy
-        );
-        this.stressStrainSeries = [];
-        this.hysteresisAreaSeries = [];
-        this.creepSeries = [];
-        this.stiffnessSeries = [];
-        zip(this.testIds, dataList).forEach(([testId, data]) => {
-          this.stressStrainSeries.push(
-            ...data.hysteresis_loops.map((loop) => ({
-              type: "line",
-              name: `${testId}`,
-              data: zip(loop.strain, loop.stress),
-            }))
-          );
-          this.hysteresisAreaSeries.push({
-            type: "line",
-            name: `${testId}`,
-            data: zip(data.n_cycles, data.hysteresis_area),
-          });
-          this.creepSeries.push({
-            type: "line",
-            name: `${testId}`,
-            data: zip(data.n_cycles, data.creep),
-          });
-          this.stiffnessSeries.push({
-            type: "line",
-            name: `${testId}`,
-            data: zip(data.n_cycles, data.stiffness),
-          });
-        });
-      })
-      .finally(() => (this.loading = false));
-
     this.$store.dispatch("experiments/fetchOneExperimentWithTests", {
       experimentId: this.experimentId,
       pagination: {

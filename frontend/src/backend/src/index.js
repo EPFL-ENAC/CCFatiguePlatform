@@ -21,15 +21,16 @@ import EchartLine from "./model/EchartLine";
 import ExperimentDataPreprocessed from "./model/ExperimentDataPreprocessed";
 import ExperimentFieldNames from "./model/ExperimentFieldNames";
 import ExperimentModel from "./model/ExperimentModel";
+import FatigueTest from "./model/FatigueTest";
 import HTTPValidationError from "./model/HTTPValidationError";
 import HysteresisLoop from "./model/HysteresisLoop";
 import LocationInner from "./model/LocationInner";
 import PageExperimentModel from "./model/PageExperimentModel";
 import PageTestModel from "./model/PageTestModel";
+import QuasiStaticTest from "./model/QuasiStaticTest";
 import SnCurveMethod from "./model/SnCurveMethod";
 import SnCurveResult from "./model/SnCurveResult";
 import TestModel from "./model/TestModel";
-import TestResult from "./model/TestResult";
 import UnitInfo from "./model/UnitInfo";
 import ValidationError from "./model/ValidationError";
 
@@ -92,6 +93,11 @@ export {
    */
   ExperimentModel,
   /**
+   * The FatigueTest model constructor.
+   * @property {module:model/FatigueTest}
+   */
+  FatigueTest,
+  /**
    * The HTTPValidationError model constructor.
    * @property {module:model/HTTPValidationError}
    */
@@ -117,6 +123,11 @@ export {
    */
   PageTestModel,
   /**
+   * The QuasiStaticTest model constructor.
+   * @property {module:model/QuasiStaticTest}
+   */
+  QuasiStaticTest,
+  /**
    * The SnCurveMethod model constructor.
    * @property {module:model/SnCurveMethod}
    */
@@ -131,11 +142,6 @@ export {
    * @property {module:model/TestModel}
    */
   TestModel,
-  /**
-   * The TestResult model constructor.
-   * @property {module:model/TestResult}
-   */
-  TestResult,
   /**
    * The UnitInfo model constructor.
    * @property {module:model/UnitInfo}
