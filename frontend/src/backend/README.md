@@ -118,16 +118,17 @@ api.runSnCurveFileAnalysisSnCurveFilePost(methods, rRatios, file).then(
 
 All URIs are relative to _http://localhost_
 
-| Class                      | Method                                                                                                                                            | HTTP request                                         | Description                |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | -------------------------- |
-| _Ccfatigue.AnalysisApi_    | [**runSnCurveFileAnalysisSnCurveFilePost**](docs/AnalysisApi.md#runSnCurveFileAnalysisSnCurveFilePost)                                            | **POST** /analysis/snCurve/file                      | Run Sn Curve File          |
-| _Ccfatigue.DefaultApi_     | [**getUnitsUnitsGet**](docs/DefaultApi.md#getUnitsUnitsGet)                                                                                       | **GET** /units                                       | Get Units                  |
-| _Ccfatigue.DefaultApi_     | [**rootGet**](docs/DefaultApi.md#rootGet)                                                                                                         | **GET** /                                            | Root                       |
-| _Ccfatigue.ExperimentsApi_ | [**getExperimentsExperimentsGet**](docs/ExperimentsApi.md#getExperimentsExperimentsGet)                                                           | **GET** /experiments                                 | Get Experiments            |
-| _Ccfatigue.ExperimentsApi_ | [**getFieldDistinctExperimentsFieldDistinctGet**](docs/ExperimentsApi.md#getFieldDistinctExperimentsFieldDistinctGet)                             | **GET** /experiments/{field}/distinct                | Get Field Distinct         |
-| _Ccfatigue.ExperimentsApi_ | [**getTestResultExperimentsExperimentIdTestsTestIdGet**](docs/ExperimentsApi.md#getTestResultExperimentsExperimentIdTestsTestIdGet)               | **GET** /experiments/{experiment_id}/tests/{test_id} | Get Test Result            |
-| _Ccfatigue.ExperimentsApi_ | [**postDataPreprocessCheckExperimentsDataPreprocessCheckPost**](docs/ExperimentsApi.md#postDataPreprocessCheckExperimentsDataPreprocessCheckPost) | **POST** /experiments/data_preprocess_check          | Post Data Preprocess Check |
-| _Ccfatigue.TestsApi_       | [**getTestsTestsGet**](docs/TestsApi.md#getTestsTestsGet)                                                                                         | **GET** /tests                                       | Get Tests                  |
+| Class                      | Method                                                                                                                                                    | HTTP request                                                | Description                |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | -------------------------- |
+| _Ccfatigue.AnalysisApi_    | [**runSnCurveFileAnalysisSnCurveFilePost**](docs/AnalysisApi.md#runSnCurveFileAnalysisSnCurveFilePost)                                                    | **POST** /analysis/snCurve/file                             | Run Sn Curve File          |
+| _Ccfatigue.DefaultApi_     | [**getUnitsUnitsGet**](docs/DefaultApi.md#getUnitsUnitsGet)                                                                                               | **GET** /units                                              | Get Units                  |
+| _Ccfatigue.DefaultApi_     | [**rootGet**](docs/DefaultApi.md#rootGet)                                                                                                                 | **GET** /                                                   | Root                       |
+| _Ccfatigue.ExperimentsApi_ | [**getExperimentsExperimentsGet**](docs/ExperimentsApi.md#getExperimentsExperimentsGet)                                                                   | **GET** /experiments                                        | Get Experiments            |
+| _Ccfatigue.ExperimentsApi_ | [**getFatigueTestExperimentsExperimentIdFatigueTestIdGet**](docs/ExperimentsApi.md#getFatigueTestExperimentsExperimentIdFatigueTestIdGet)                 | **GET** /experiments/{experiment_id}/fatigue/{test_id}      | Get Fatigue Test           |
+| _Ccfatigue.ExperimentsApi_ | [**getFieldDistinctExperimentsFieldDistinctGet**](docs/ExperimentsApi.md#getFieldDistinctExperimentsFieldDistinctGet)                                     | **GET** /experiments/{field}/distinct                       | Get Field Distinct         |
+| _Ccfatigue.ExperimentsApi_ | [**getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGet**](docs/ExperimentsApi.md#getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGet) | **GET** /experiments/{experiment_id}/quasi-static/{test_id} | Get Quasi Static Test      |
+| _Ccfatigue.ExperimentsApi_ | [**postDataPreprocessCheckExperimentsDataPreprocessCheckPost**](docs/ExperimentsApi.md#postDataPreprocessCheckExperimentsDataPreprocessCheckPost)         | **POST** /experiments/data_preprocess_check                 | Post Data Preprocess Check |
+| _Ccfatigue.TestsApi_       | [**getTestsTestsGet**](docs/TestsApi.md#getTestsTestsGet)                                                                                                 | **GET** /tests                                              | Get Tests                  |
 
 ## Documentation for Models
 
@@ -136,15 +137,16 @@ All URIs are relative to _http://localhost_
 - [Ccfatigue.ExperimentDataPreprocessed](docs/ExperimentDataPreprocessed.md)
 - [Ccfatigue.ExperimentFieldNames](docs/ExperimentFieldNames.md)
 - [Ccfatigue.ExperimentModel](docs/ExperimentModel.md)
+- [Ccfatigue.FatigueTest](docs/FatigueTest.md)
 - [Ccfatigue.HTTPValidationError](docs/HTTPValidationError.md)
 - [Ccfatigue.HysteresisLoop](docs/HysteresisLoop.md)
 - [Ccfatigue.LocationInner](docs/LocationInner.md)
 - [Ccfatigue.PageExperimentModel](docs/PageExperimentModel.md)
 - [Ccfatigue.PageTestModel](docs/PageTestModel.md)
+- [Ccfatigue.QuasiStaticTest](docs/QuasiStaticTest.md)
 - [Ccfatigue.SnCurveMethod](docs/SnCurveMethod.md)
 - [Ccfatigue.SnCurveResult](docs/SnCurveResult.md)
 - [Ccfatigue.TestModel](docs/TestModel.md)
-- [Ccfatigue.TestResult](docs/TestResult.md)
 - [Ccfatigue.UnitInfo](docs/UnitInfo.md)
 - [Ccfatigue.ValidationError](docs/ValidationError.md)
 

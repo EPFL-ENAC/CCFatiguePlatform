@@ -17,7 +17,7 @@ import {
   TitleComponent,
   TooltipComponent,
 } from "echarts/components";
-import { LineChart } from "echarts/charts";
+import { LineChart, ScatterChart } from "echarts/charts";
 import VChart from "vue-echarts";
 import { merge } from "lodash";
 import { colorPalette } from "@/utils/style";
@@ -25,6 +25,7 @@ import { colorPalette } from "@/utils/style";
 use([
   CanvasRenderer,
   LineChart,
+  ScatterChart,
   GridComponent,
   LegendComponent,
   TitleComponent,
@@ -50,7 +51,10 @@ export default {
     xAxisName: {
       type: String,
     },
-    yAxisName: {
+    y1AxisName: {
+      type: String,
+    },
+    y2AxisName: {
       type: String,
     },
     xAxisType: {
@@ -89,18 +93,34 @@ export default {
           name: this.xAxisName,
           nameLocation: "middle",
           nameGap: 26,
+          min: "dataMin",
+          max: "dataMax",
           axisLabel: {
             fontSize: 10,
           },
         },
-        yAxis: {
-          name: this.yAxisName,
-          nameLocation: "middle",
-          nameGap: 50,
-          axisLabel: {
-            fontSize: 10,
+        yAxis: [
+          {
+            name: this.y1AxisName,
+            nameLocation: "middle",
+            nameGap: 30,
+            min: "dataMin",
+            max: "dataMax",
+            axisLabel: {
+              fontSize: 10,
+            },
           },
-        },
+          {
+            name: this.y2AxisName,
+            nameLocation: "middle",
+            nameGap: 30,
+            min: "dataMin",
+            max: "dataMax",
+            axisLabel: {
+              fontSize: 10,
+            },
+          },
+        ],
         tooltip: {
           trigger: "axis",
           confine: true,
