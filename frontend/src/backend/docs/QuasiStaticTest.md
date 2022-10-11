@@ -2,8 +2,10 @@
 
 ## Properties
 
-| Name                  | Type         | Description | Notes |
-| --------------------- | ------------ | ----------- | ----- |
-| **crackDisplacement** | **[Number]** |             |
-| **crackLoad**         | **[Number]** |             |
-| **crackLength**       | **[Number]** |             |
+| Name                    | Type         | Description | Notes |
+| ----------------------- | ------------ | ----------- | ----- |
+| **machineDisplacement** | **[Number]** |             |
+| **machineLoad**         | **[Number]** |             |
+| **crackDisplacement**   | **[Number]** |             |
+| **crackLoad**           | **[Number]** |             |
+| **crackLength**         | **[Number]** |             |

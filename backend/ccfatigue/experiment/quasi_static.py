@@ -12,6 +12,8 @@ from ccfatigue.models.database import Experiment
 
 
 class QuasiStaticTest(BaseModel):
+    machine_displacement: List[float]
+    machine_load: List[float]
     crack_displacement: List[float]
     crack_load: List[float]
     crack_length: List[float]
@@ -54,9 +56,13 @@ async def quasi_static_test(
         ._asdict()
     )
     specimen_id = await get_specimen_id(session, experiment_id, test_id)
-    df = get_dataframe(experiment, specimen_id).dropna()
+    df = get_dataframe(experiment, specimen_id)
+    machine_df = df[["Machine_Displacement", "Machine_Load"]].dropna()
+    crack_df = df[["Crack_Displacement", "Crack_Load", "Crack_length"]].dropna()
     return QuasiStaticTest(
-        crack_displacement=df["Crack_Displacement"].to_list(),
-        crack_load=df["Crack_Load"].to_list(),
-        crack_length=df["Crack_length"].to_list(),
+        machine_displacement=machine_df["Machine_Displacement"].to_list(),
+        machine_load=machine_df["Machine_Load"].to_list(),
+        crack_displacement=crack_df["Crack_Displacement"].to_list(),
+        crack_load=crack_df["Crack_Load"].to_list(),
+        crack_length=crack_df["Crack_length"].to_list(),
     )
