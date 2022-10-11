@@ -164,7 +164,7 @@
       </v-col>
     </v-row>
     <v-row v-else>
-      <v-col cols="6">
+      <v-col cols="6" v-if="crackSeries.length > 0">
         <v-card :loading="loading">
           <v-card-title>Crack Load vs Crack Displacement</v-card-title>
           <v-card-text>
@@ -178,7 +178,7 @@
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="6">
+      <v-col cols="6" v-if="loadDisplacementSeries.length > 0">
         <v-card :loading="loading">
           <v-card-title>Load vs Displacement</v-card-title>
           <v-card-text>
@@ -187,6 +187,24 @@
               :aspect-ratio="2"
               x-axis-name="Machine Displacement"
               y-axis-name="Machine Load"
+            ></simple-chart>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col cols="6" v-if="strainStressSeries.length > 0">
+        <v-card :loading="loading">
+          <v-card-title>Load vs Displacement</v-card-title>
+          <v-card-text>
+            <v-select
+              v-model="strainOption"
+              :items="strainOptions"
+              label="Strain"
+            ></v-select>
+            <simple-chart
+              :series="strainStressSeries"
+              :aspect-ratio="2"
+              x-axis-name="Strain"
+              y-axis-name="Stress"
             ></simple-chart>
           </v-card-text>
         </v-card>
@@ -225,6 +243,16 @@ export default {
     }),
     experimentType: function () {
       return this.experiment.experiment.experiment_type;
+    },
+    strainStressSeries: function () {
+      return this.testIds.map((testId) => ({
+        type: "line",
+        name: `${testId}`,
+        data: zip(
+          this.strainData[testId][this.strainOption],
+          this.stressData[testId]
+        ),
+      }));
     },
   },
   watch: {
@@ -282,25 +310,54 @@ export default {
           )
             .then((dataList) => {
               this.crackSeries = [];
+              this.loadDisplacementSeries = [];
+              this.stressStrainSeries = [];
+              this.strainData = {};
+              this.strainOptions = [];
               zip(this.testIds, dataList).forEach(([testId, data]) => {
-                this.crackSeries.push({
-                  type: "line",
-                  name: `${testId}`,
-                  data: zip(data.crack_displacement, data.crack_load),
-                });
-                this.crackSeries.push({
-                  type: "scatter",
-                  name: `${testId}`,
-                  yAxisIndex: 1,
-                  symbolSize: 6,
-                  data: zip(data.crack_displacement, data.crack_length),
-                });
-                this.loadDisplacementSeries.push({
-                  type: "line",
-                  name: `${testId}`,
-                  data: zip(data.machine_displacement, data.machine_load),
-                });
+                if (
+                  data.crack_displacement.length > 0 &&
+                  data.crack_load.length > 0 &&
+                  data.crack_length.length > 0
+                ) {
+                  this.crackSeries.push({
+                    type: "line",
+                    name: `${testId}`,
+                    data: zip(data.crack_displacement, data.crack_load),
+                  });
+                  this.crackSeries.push({
+                    type: "scatter",
+                    name: `${testId}`,
+                    yAxisIndex: 1,
+                    symbolSize: 6,
+                    data: zip(data.crack_displacement, data.crack_length),
+                  });
+                }
+                if (
+                  data.machine_displacement.length > 0 &&
+                  data.machine_load.length > 0
+                ) {
+                  this.loadDisplacementSeries.push({
+                    type: "line",
+                    name: `${testId}`,
+                    data: zip(data.machine_displacement, data.machine_load),
+                  });
+                }
+                if (
+                  Object.keys(data.strain).length > 0 &&
+                  data.stress.length > 0
+                ) {
+                  this.strainOptions = [
+                    ...new Set([
+                      ...this.strainOptions,
+                      ...Object.keys(data.strain),
+                    ]),
+                  ];
+                  this.strainData[testId] = data.strain;
+                  this.stressData[testId] = data.stress;
+                }
               });
+              this.strainOption = this.strainOptions[0];
             })
             .finally(() => (this.loading = false));
           break;
@@ -323,6 +380,10 @@ export default {
       // QS
       crackSeries: [],
       loadDisplacementSeries: [],
+      strainData: {},
+      strainOptions: [],
+      strainOption: "",
+      stressData: {},
     };
   },
   methods: {
