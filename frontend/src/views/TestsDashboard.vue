@@ -178,6 +178,19 @@
           </v-card-text>
         </v-card>
       </v-col>
+      <v-col cols="6">
+        <v-card :loading="loading">
+          <v-card-title>Load vs Displacement</v-card-title>
+          <v-card-text>
+            <simple-chart
+              :series="loadDisplacementSeries"
+              :aspect-ratio="2"
+              x-axis-name="Machine Displacement"
+              y-axis-name="Machine Load"
+            ></simple-chart>
+          </v-card-text>
+        </v-card>
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -288,6 +301,11 @@ export default {
                   symbolSize: 6,
                   data: zip(data.crack_displacement, data.crack_length),
                 });
+                this.loadDisplacementSeries.push({
+                  type: "line",
+                  name: `${testId}`,
+                  data: zip(data.machine_displacement, data.machine_load),
+                });
               });
             })
             .finally(() => (this.loading = false));
@@ -310,6 +328,7 @@ export default {
       totalDissipatedEnergies: [],
       // QS
       crackSeries: [],
+      loadDisplacementSeries: [],
     };
   },
   methods: {

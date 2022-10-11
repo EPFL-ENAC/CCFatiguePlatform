@@ -89,6 +89,8 @@ export default {
           name: this.xAxisName,
           nameLocation: "middle",
           nameGap: 26,
+          min: "dataMin",
+          max: "dataMax",
           axisLabel: {
             fontSize: 10,
           },
@@ -97,6 +99,8 @@ export default {
           name: this.yAxisName,
           nameLocation: "middle",
           nameGap: 50,
+          min: "dataMin",
+          max: "dataMax",
           axisLabel: {
             fontSize: 10,
           },

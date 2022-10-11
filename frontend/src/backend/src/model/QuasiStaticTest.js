@@ -22,12 +22,27 @@ class QuasiStaticTest {
   /**
    * Constructs a new <code>QuasiStaticTest</code>.
    * @alias module:model/QuasiStaticTest
+   * @param machineDisplacement {Array.<Number>}
+   * @param machineLoad {Array.<Number>}
    * @param crackDisplacement {Array.<Number>}
    * @param crackLoad {Array.<Number>}
    * @param crackLength {Array.<Number>}
    */
-  constructor(crackDisplacement, crackLoad, crackLength) {
-    QuasiStaticTest.initialize(this, crackDisplacement, crackLoad, crackLength);
+  constructor(
+    machineDisplacement,
+    machineLoad,
+    crackDisplacement,
+    crackLoad,
+    crackLength
+  ) {
+    QuasiStaticTest.initialize(
+      this,
+      machineDisplacement,
+      machineLoad,
+      crackDisplacement,
+      crackLoad,
+      crackLength
+    );
   }
 
   /**
@@ -35,7 +50,16 @@ class QuasiStaticTest {
    * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
    * Only for internal use.
    */
-  static initialize(obj, crackDisplacement, crackLoad, crackLength) {
+  static initialize(
+    obj,
+    machineDisplacement,
+    machineLoad,
+    crackDisplacement,
+    crackLoad,
+    crackLength
+  ) {
+    obj["machine_displacement"] = machineDisplacement;
+    obj["machine_load"] = machineLoad;
     obj["crack_displacement"] = crackDisplacement;
     obj["crack_load"] = crackLoad;
     obj["crack_length"] = crackLength;
@@ -52,6 +76,17 @@ class QuasiStaticTest {
     if (data) {
       obj = obj || new QuasiStaticTest();
 
+      if (data.hasOwnProperty("machine_displacement")) {
+        obj["machine_displacement"] = ApiClient.convertToType(
+          data["machine_displacement"],
+          ["Number"]
+        );
+      }
+      if (data.hasOwnProperty("machine_load")) {
+        obj["machine_load"] = ApiClient.convertToType(data["machine_load"], [
+          "Number",
+        ]);
+      }
       if (data.hasOwnProperty("crack_displacement")) {
         obj["crack_displacement"] = ApiClient.convertToType(
           data["crack_displacement"],
@@ -72,6 +107,16 @@ class QuasiStaticTest {
     return obj;
   }
 }
+
+/**
+ * @member {Array.<Number>} machine_displacement
+ */
+QuasiStaticTest.prototype["machine_displacement"] = undefined;
+
+/**
+ * @member {Array.<Number>} machine_load
+ */
+QuasiStaticTest.prototype["machine_load"] = undefined;
 
 /**
  * @member {Array.<Number>} crack_displacement

@@ -50,6 +50,18 @@
       //expect(instance).to.be.a(Ccfatigue.QuasiStaticTest);
     });
 
+    it('should have the property machineDisplacement (base name: "machine_displacement")', function () {
+      // uncomment below and update the code to test the property machineDisplacement
+      //var instance = new Ccfatigue.QuasiStaticTest();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property machineLoad (base name: "machine_load")', function () {
+      // uncomment below and update the code to test the property machineLoad
+      //var instance = new Ccfatigue.QuasiStaticTest();
+      //expect(instance).to.be();
+    });
+
     it('should have the property crackDisplacement (base name: "crack_displacement")', function () {
       // uncomment below and update the code to test the property crackDisplacement
       //var instance = new Ccfatigue.QuasiStaticTest();

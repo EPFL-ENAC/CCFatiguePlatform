@@ -875,12 +875,28 @@
       "QuasiStaticTest": {
         "title": "QuasiStaticTest",
         "required": [
+          "machine_displacement",
+          "machine_load",
           "crack_displacement",
           "crack_load",
           "crack_length"
         ],
         "type": "object",
         "properties": {
+          "machine_displacement": {
+            "title": "Machine Displacement",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "machine_load": {
+            "title": "Machine Load",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
           "crack_displacement": {
             "title": "Crack Displacement",
             "type": "array",
