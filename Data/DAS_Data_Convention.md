@@ -11,7 +11,7 @@ with:
 
 - date: `YYYY-MM` (starting month of the experiment)
 
-## CLD CSV files standards (column names must be exact) :
+## DAS CSV files standards (column names must be exact) :
 
 Encoding format: UTF-8, Separator: ',' (comma)
 
