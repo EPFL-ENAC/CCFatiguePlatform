@@ -71,15 +71,9 @@ def compute_sub_indexes(df: DataFrame) -> List[int]:
     """
     Compute subset of index used for plotting curves
     """
-    n_cycles_max = np.max(df.n_cycles)
-
-    sub_index_intermediate = np.geomspace(
-        start=LOOP_SPACING, stop=n_cycles_max, num=INTERVAL
-    )
-    sub_index = np.round(sub_index_intermediate, MAGNITUDE)
-    sub_index[0] = 1
-
-    return sub_index.tolist()
+    unique_n_cycles = np.unique(df.n_cycles)
+    indexes = np.linspace(0, unique_n_cycles.size - 1, 10).astype(int)
+    return unique_n_cycles[indexes]
 
 
 def create_sub_hystloops(df: DataFrame, sub_indexes: List[int]) -> List[HysteresisLoop]:
