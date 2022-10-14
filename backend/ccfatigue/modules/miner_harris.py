@@ -14,8 +14,9 @@ Harris diagram is described in Tassos red book p. 108 - the original papers are:
 
 import numpy as np
 import pandas as pd
-from pandas._typing import ReadCsvBuffer, WriteBuffer, FilePath
+from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 from scipy import stats
+
 import ccfatigue.modules.harris_utils as harris_utils
 
 
