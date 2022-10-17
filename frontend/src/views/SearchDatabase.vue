@@ -221,20 +221,10 @@ export default {
       headers: [
         { text: "Laboratory", value: "laboratory" },
         { text: "Experiment Type", value: "experiment_type" },
+        { text: "Researcher", value: "researcher" },
+        { text: "Date", value: "date" },
+        { text: "Fracture", value: "fracture" },
         { text: "Publication", value: "publication_doi" },
-        { text: "Curing Time", value: "laminates_and_assemblies_curing_time" },
-        {
-          text: "Curing Temperature",
-          value: "laminates_and_assemblies_curing_temperature",
-        },
-        {
-          text: "Curing Pressure",
-          value: "laminates_and_assemblies_curing_pressure",
-        },
-        {
-          text: "Stacking Sequence",
-          value: "laminates_and_assemblies_stacking_sequence",
-        },
       ],
       experimentSelected: [],
     };
