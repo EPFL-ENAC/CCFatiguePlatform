@@ -15,6 +15,10 @@ EXPERIMENTS_FOLDER = os.path.abspath(f"{__file__}/../../../Data")
 RAW_EXPERIMENT_FP_FOLDERS = sorted(
     filter(lambda fp: os.path.isdir(fp), glob.glob(f"{EXPERIMENTS_FOLDER}/raw/TST_*"))
 )
+XLS_TEMPLATE_URL = (
+    "https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop"
+    "/Data/TST_Data_Template.xls"
+)
 
 
 class NotAnExperimentFolder(Exception):
@@ -1239,10 +1243,19 @@ class Experiment:
                                 )
 
                 # Look for type specific mandatory columns
-                experiment_type = Experiment.__get_val_at(
-                    self.experiment, "general>experiment type"
-                )
-                fracture = Experiment.__get_val_at(self.experiment, "general>fracture")
+                try:
+                    experiment_type = Experiment.__get_val_at(
+                        self.experiment, "general>experiment type"
+                    )
+                    fracture = Experiment.__get_val_at(
+                        self.experiment, "general>fracture"
+                    )
+                except KeyError:
+                    self.logger.error(
+                        "XLS file seems broken. Please double check it follows "
+                        f"template provided here: {XLS_TEMPLATE_URL}"
+                    )
+                    return
                 for mandatory_cols_pattern in MANDATORY_TEST_TYPE_SPECIFIC[
                     (experiment_type, fracture)
                 ]:
