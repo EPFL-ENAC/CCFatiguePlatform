@@ -28,7 +28,7 @@
   var instance;
 
   beforeEach(function () {
-    instance = new Ccfatigue.TestResult();
+    instance = new Ccfatigue.FatigueTest();
   });
 
   var getProperty = function (object, getter, property) {
@@ -43,52 +43,52 @@
     else object[property] = value;
   };
 
-  describe("TestResult", function () {
-    it("should create an instance of TestResult", function () {
-      // uncomment below and update the code to test TestResult
-      //var instance = new Ccfatigue.TestResult();
-      //expect(instance).to.be.a(Ccfatigue.TestResult);
+  describe("FatigueTest", function () {
+    it("should create an instance of FatigueTest", function () {
+      // uncomment below and update the code to test FatigueTest
+      //var instance = new Ccfatigue.FatigueTest();
+      //expect(instance).to.be.a(Ccfatigue.FatigueTest);
     });
 
     it('should have the property specimenId (base name: "specimen_id")', function () {
       // uncomment below and update the code to test the property specimenId
-      //var instance = new Ccfatigue.TestResult();
+      //var instance = new Ccfatigue.FatigueTest();
       //expect(instance).to.be();
     });
 
     it('should have the property totalDissipatedEnergy (base name: "total_dissipated_energy")', function () {
       // uncomment below and update the code to test the property totalDissipatedEnergy
-      //var instance = new Ccfatigue.TestResult();
+      //var instance = new Ccfatigue.FatigueTest();
       //expect(instance).to.be();
     });
 
     it('should have the property hysteresisLoops (base name: "hysteresis_loops")', function () {
       // uncomment below and update the code to test the property hysteresisLoops
-      //var instance = new Ccfatigue.TestResult();
+      //var instance = new Ccfatigue.FatigueTest();
       //expect(instance).to.be();
     });
 
     it('should have the property nCycles (base name: "n_cycles")', function () {
       // uncomment below and update the code to test the property nCycles
-      //var instance = new Ccfatigue.TestResult();
+      //var instance = new Ccfatigue.FatigueTest();
       //expect(instance).to.be();
     });
 
     it('should have the property creep (base name: "creep")', function () {
       // uncomment below and update the code to test the property creep
-      //var instance = new Ccfatigue.TestResult();
+      //var instance = new Ccfatigue.FatigueTest();
       //expect(instance).to.be();
     });
 
     it('should have the property hysteresisArea (base name: "hysteresis_area")', function () {
       // uncomment below and update the code to test the property hysteresisArea
-      //var instance = new Ccfatigue.TestResult();
+      //var instance = new Ccfatigue.FatigueTest();
       //expect(instance).to.be();
     });
 
     it('should have the property stiffness (base name: "stiffness")', function () {
       // uncomment below and update the code to test the property stiffness
-      //var instance = new Ccfatigue.TestResult();
+      //var instance = new Ccfatigue.FatigueTest();
       //expect(instance).to.be();
     });
   });

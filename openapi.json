@@ -170,14 +170,14 @@
         }
       }
     },
-    "/experiments/{experiment_id}/tests/{test_id}": {
+    "/experiments/{experiment_id}/fatigue/{test_id}": {
       "get": {
         "tags": [
           "experiments"
         ],
-        "summary": "Get Test Result",
+        "summary": "Get Fatigue Test",
         "description": "Return test result data",
-        "operationId": "get_test_result_experiments__experiment_id__tests__test_id__get",
+        "operationId": "get_fatigue_test_experiments__experiment_id__fatigue__test_id__get",
         "parameters": [
           {
             "required": true,
@@ -204,7 +204,59 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TestResult"
+                  "$ref": "#/components/schemas/FatigueTest"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/experiments/{experiment_id}/quasi-static/{test_id}": {
+      "get": {
+        "tags": [
+          "experiments"
+        ],
+        "summary": "Get Quasi Static Test",
+        "description": "Return quasi static test",
+        "operationId": "get_quasi_static_test_experiments__experiment_id__quasi_static__test_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Experiment Id",
+              "type": "integer"
+            },
+            "name": "experiment_id",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Test Id",
+              "type": "integer"
+            },
+            "name": "test_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuasiStaticTest"
                 }
               }
             }
@@ -649,6 +701,64 @@
           }
         }
       },
+      "FatigueTest": {
+        "title": "FatigueTest",
+        "required": [
+          "specimen_id",
+          "total_dissipated_energy",
+          "hysteresis_loops",
+          "n_cycles",
+          "creep",
+          "hysteresis_area",
+          "stiffness"
+        ],
+        "type": "object",
+        "properties": {
+          "specimen_id": {
+            "title": "Specimen Id",
+            "type": "integer"
+          },
+          "total_dissipated_energy": {
+            "title": "Total Dissipated Energy",
+            "type": "integer"
+          },
+          "hysteresis_loops": {
+            "title": "Hysteresis Loops",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HysteresisLoop"
+            }
+          },
+          "n_cycles": {
+            "title": "N Cycles",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "creep": {
+            "title": "Creep",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "hysteresis_area": {
+            "title": "Hysteresis Area",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "stiffness": {
+            "title": "Stiffness",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        }
+      },
       "HTTPValidationError": {
         "title": "HTTPValidationError",
         "type": "object",
@@ -762,6 +872,54 @@
           }
         }
       },
+      "QuasiStaticTest": {
+        "title": "QuasiStaticTest",
+        "required": [
+          "machine_displacement",
+          "machine_load",
+          "crack_displacement",
+          "crack_load",
+          "crack_length"
+        ],
+        "type": "object",
+        "properties": {
+          "machine_displacement": {
+            "title": "Machine Displacement",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "machine_load": {
+            "title": "Machine Load",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "crack_displacement": {
+            "title": "Crack Displacement",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "crack_load": {
+            "title": "Crack Load",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "crack_length": {
+            "title": "Crack Length",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        }
+      },
       "SnCurveMethod": {
         "title": "SnCurveMethod",
         "enum": [
@@ -872,64 +1030,6 @@
           }
         },
         "description": "Defines how test is seen on the API"
-      },
-      "TestResult": {
-        "title": "TestResult",
-        "required": [
-          "specimen_id",
-          "total_dissipated_energy",
-          "hysteresis_loops",
-          "n_cycles",
-          "creep",
-          "hysteresis_area",
-          "stiffness"
-        ],
-        "type": "object",
-        "properties": {
-          "specimen_id": {
-            "title": "Specimen Id",
-            "type": "integer"
-          },
-          "total_dissipated_energy": {
-            "title": "Total Dissipated Energy",
-            "type": "integer"
-          },
-          "hysteresis_loops": {
-            "title": "Hysteresis Loops",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/HysteresisLoop"
-            }
-          },
-          "n_cycles": {
-            "title": "N Cycles",
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          },
-          "creep": {
-            "title": "Creep",
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          },
-          "hysteresis_area": {
-            "title": "Hysteresis Area",
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          },
-          "stiffness": {
-            "title": "Stiffness",
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          }
-        }
       },
       "UnitInfo": {
         "title": "UnitInfo",
