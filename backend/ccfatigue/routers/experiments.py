@@ -15,11 +15,12 @@ from sqlalchemy import and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from ccfatigue.experiment.fatigue import FatigueTest, fatigue_test
+from ccfatigue.experiment.quasi_static import QuasiStaticTest, quasi_static_test
 from ccfatigue.model import Experiment_Data_Preprocessed
 from ccfatigue.models.api import ExperimentFieldNames, ExperimentModel
 from ccfatigue.models.database import Experiment
 from ccfatigue.services.database import get_session
-from ccfatigue.utils.experiment_test import TestResult, get_result
 from ccfatigue.utils.routers import get_where_clauses
 from preprocessing import tst_data_lib
 
@@ -63,22 +64,35 @@ async def get_field_distinct(
             item[0]
             for item in await session.execute(
                 select(Experiment.__dict__[field.value]).distinct()
-            )
+            )  # type: ignore
             if item[0] is not None
         ]
     )
 
 
-@router.get("/{experiment_id}/tests/{test_id}", response_model=TestResult)
-async def get_test_result(
+@router.get("/{experiment_id}/fatigue/{test_id}", response_model=FatigueTest)
+async def get_fatigue_test(
     session: AsyncSession = Depends(get_session),
     experiment_id: int = Path(...),
     test_id: int = Path(),
-) -> TestResult:
+) -> FatigueTest:
     """
     Return test result data
     """
-    result = await get_result(session, experiment_id, test_id)
+    result = await fatigue_test(session, experiment_id, test_id)
+    return result
+
+
+@router.get("/{experiment_id}/quasi-static/{test_id}", response_model=QuasiStaticTest)
+async def get_quasi_static_test(
+    session: AsyncSession = Depends(get_session),
+    experiment_id: int = Path(...),
+    test_id: int = Path(),
+) -> QuasiStaticTest:
+    """
+    Return quasi static test
+    """
+    result = await quasi_static_test(session, experiment_id, test_id)
     return result
 
 

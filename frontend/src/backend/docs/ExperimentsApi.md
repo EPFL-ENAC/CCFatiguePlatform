@@ -2,12 +2,13 @@
 
 All URIs are relative to _http://localhost_
 
-| Method                                                                                                                                       | HTTP request                                         | Description                |
-| -------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | -------------------------- |
-| [**getExperimentsExperimentsGet**](ExperimentsApi.md#getExperimentsExperimentsGet)                                                           | **GET** /experiments                                 | Get Experiments            |
-| [**getFieldDistinctExperimentsFieldDistinctGet**](ExperimentsApi.md#getFieldDistinctExperimentsFieldDistinctGet)                             | **GET** /experiments/{field}/distinct                | Get Field Distinct         |
-| [**getTestResultExperimentsExperimentIdTestsTestIdGet**](ExperimentsApi.md#getTestResultExperimentsExperimentIdTestsTestIdGet)               | **GET** /experiments/{experiment_id}/tests/{test_id} | Get Test Result            |
-| [**postDataPreprocessCheckExperimentsDataPreprocessCheckPost**](ExperimentsApi.md#postDataPreprocessCheckExperimentsDataPreprocessCheckPost) | **POST** /experiments/data_preprocess_check          | Post Data Preprocess Check |
+| Method                                                                                                                                               | HTTP request                                                | Description                |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | -------------------------- |
+| [**getExperimentsExperimentsGet**](ExperimentsApi.md#getExperimentsExperimentsGet)                                                                   | **GET** /experiments                                        | Get Experiments            |
+| [**getFatigueTestExperimentsExperimentIdFatigueTestIdGet**](ExperimentsApi.md#getFatigueTestExperimentsExperimentIdFatigueTestIdGet)                 | **GET** /experiments/{experiment_id}/fatigue/{test_id}      | Get Fatigue Test           |
+| [**getFieldDistinctExperimentsFieldDistinctGet**](ExperimentsApi.md#getFieldDistinctExperimentsFieldDistinctGet)                                     | **GET** /experiments/{field}/distinct                       | Get Field Distinct         |
+| [**getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGet**](ExperimentsApi.md#getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGet) | **GET** /experiments/{experiment_id}/quasi-static/{test_id} | Get Quasi Static Test      |
+| [**postDataPreprocessCheckExperimentsDataPreprocessCheckPost**](ExperimentsApi.md#postDataPreprocessCheckExperimentsDataPreprocessCheckPost)         | **POST** /experiments/data_preprocess_check                 | Post Data Preprocess Check |
 
 ## getExperimentsExperimentsGet
 
@@ -51,6 +52,54 @@ apiInstance.getExperimentsExperimentsGet(opts).then(
 ### Return type
 
 [**PageExperimentModel**](PageExperimentModel.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+## getFatigueTestExperimentsExperimentIdFatigueTestIdGet
+
+> FatigueTest getFatigueTestExperimentsExperimentIdFatigueTestIdGet(experimentId, testId)
+
+Get Fatigue Test
+
+Return test result data
+
+### Example
+
+```javascript
+import Ccfatigue from "ccfatigue";
+
+let apiInstance = new Ccfatigue.ExperimentsApi();
+let experimentId = 56; // Number |
+let testId = 56; // Number |
+apiInstance
+  .getFatigueTestExperimentsExperimentIdFatigueTestIdGet(experimentId, testId)
+  .then(
+    (data) => {
+      console.log("API called successfully. Returned data: " + data);
+    },
+    (error) => {
+      console.error(error);
+    }
+  );
+```
+
+### Parameters
+
+| Name             | Type       | Description | Notes |
+| ---------------- | ---------- | ----------- | ----- |
+| **experimentId** | **Number** |             |
+| **testId**       | **Number** |             |
+
+### Return type
+
+[**FatigueTest**](FatigueTest.md)
 
 ### Authorization
 
@@ -105,13 +154,13 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-## getTestResultExperimentsExperimentIdTestsTestIdGet
+## getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGet
 
-> TestResult getTestResultExperimentsExperimentIdTestsTestIdGet(experimentId, testId)
+> QuasiStaticTest getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGet(experimentId, testId)
 
-Get Test Result
+Get Quasi Static Test
 
-Return test result data
+Return quasi static test
 
 ### Example
 
@@ -122,7 +171,10 @@ let apiInstance = new Ccfatigue.ExperimentsApi();
 let experimentId = 56; // Number |
 let testId = 56; // Number |
 apiInstance
-  .getTestResultExperimentsExperimentIdTestsTestIdGet(experimentId, testId)
+  .getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGet(
+    experimentId,
+    testId
+  )
   .then(
     (data) => {
       console.log("API called successfully. Returned data: " + data);
@@ -142,7 +194,7 @@ apiInstance
 
 ### Return type
 
-[**TestResult**](TestResult.md)
+[**QuasiStaticTest**](QuasiStaticTest.md)
 
 ### Authorization
 

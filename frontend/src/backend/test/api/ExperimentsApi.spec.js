@@ -54,6 +54,16 @@
         done();
       });
     });
+    describe("getFatigueTestExperimentsExperimentIdFatigueTestIdGet", function () {
+      it("should call getFatigueTestExperimentsExperimentIdFatigueTestIdGet successfully", function (done) {
+        //uncomment below and update the code to test getFatigueTestExperimentsExperimentIdFatigueTestIdGet
+        //instance.getFatigueTestExperimentsExperimentIdFatigueTestIdGet(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
     describe("getFieldDistinctExperimentsFieldDistinctGet", function () {
       it("should call getFieldDistinctExperimentsFieldDistinctGet successfully", function (done) {
         //uncomment below and update the code to test getFieldDistinctExperimentsFieldDistinctGet
@@ -64,10 +74,10 @@
         done();
       });
     });
-    describe("getTestResultExperimentsExperimentIdTestsTestIdGet", function () {
-      it("should call getTestResultExperimentsExperimentIdTestsTestIdGet successfully", function (done) {
-        //uncomment below and update the code to test getTestResultExperimentsExperimentIdTestsTestIdGet
-        //instance.getTestResultExperimentsExperimentIdTestsTestIdGet(function(error) {
+    describe("getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGet", function () {
+      it("should call getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGet successfully", function (done) {
+        //uncomment below and update the code to test getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGet
+        //instance.getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGet(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});

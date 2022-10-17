@@ -1,4 +1,4 @@
-# Ccfatigue.TestResult
+# Ccfatigue.FatigueTest
 
 ## Properties
 
