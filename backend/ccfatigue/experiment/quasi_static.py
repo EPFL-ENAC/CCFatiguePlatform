@@ -89,22 +89,24 @@ async def quasi_static_test(
     crack_df = (
         df[["Crack_Displacement", "Crack_Load", "Crack_length"]].dropna()
         if fracture
+        and {"Crack_Displacement", "Crack_Load", "Crack_length"}.issubset(df.columns)
         else pd.DataFrame(columns=["Crack_Displacement", "Crack_Load", "Crack_length"])
     )
     strain_stress_df = pd.DataFrame(columns=["Stress"])
     strain: Dict[str, List[float]] = {}
     if not fracture:
         test = get_test_metadata(experiment, specimen_id)
-        area = test["width"] * test["thickness"]
+        if "width" in test and "thickness" in test:
+            area = test["width"] * test["thickness"]
 
-        if "exx--1" in df.columns:
-            strain["exx--1"] = df["exx--1"].to_list()
-        if "eyy--1" in df.columns:
-            strain["eyy--1"] = df["eyy--1"].to_list()
-        if "exy--1" in df.columns:
-            strain["exy--1"] = df["exy--1"].to_list()
+            if "exx--1" in df.columns:
+                strain["exx--1"] = df["exx--1"].to_list()
+            if "eyy--1" in df.columns:
+                strain["eyy--1"] = df["eyy--1"].to_list()
+            if "exy--1" in df.columns:
+                strain["exy--1"] = df["exy--1"].to_list()
 
-        strain_stress_df["Stress"] = df["MD_Load--1"] / area
+            strain_stress_df["Stress"] = df["MD_Load--1"].dropna() / area
     return QuasiStaticTest(
         machine_displacement=machine_df["Machine_Displacement"].to_list(),
         machine_load=machine_df["Machine_Load"].to_list(),
