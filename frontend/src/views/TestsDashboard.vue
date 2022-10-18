@@ -245,14 +245,16 @@ export default {
       return this.experiment.experiment.experiment_type;
     },
     strainStressSeries: function () {
-      return this.testIds.map((testId) => ({
-        type: "line",
-        name: `${testId}`,
-        data: zip(
-          this.strainData[testId][this.strainOption],
-          this.stressData[testId]
-        ),
-      }));
+      return this.testIds
+        .map((testId) => ({
+          type: "line",
+          name: `${testId}`,
+          data: zip(
+            this.strainOption ? this.strainData[testId][this.strainOption] : [],
+            this.stressData[testId]
+          ),
+        }))
+        .filter((line) => line.data.length > 0);
     },
   },
   watch: {
@@ -382,7 +384,7 @@ export default {
       loadDisplacementSeries: [],
       strainData: {},
       strainOptions: [],
-      strainOption: "",
+      strainOption: null,
       stressData: {},
     };
   },
