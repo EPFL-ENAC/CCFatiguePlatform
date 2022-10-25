@@ -446,6 +446,59 @@
           }
         }
       }
+    },
+    "/analysis/cycleCounting/file": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run Cycle Counting File",
+        "operationId": "run_cycle_counting_file_analysis_cycleCounting_file_post",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CycleCountingMethod"
+            },
+            "name": "method",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_cycle_counting_file_analysis_cycleCounting_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Run Cycle Counting File Analysis Cyclecounting File Post",
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -483,6 +536,20 @@
           }
         }
       },
+      "Body_run_cycle_counting_file_analysis_cycleCounting_file_post": {
+        "title": "Body_run_cycle_counting_file_analysis_cycleCounting_file_post",
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
       "Body_run_sn_curve_file_analysis_snCurve_file_post": {
         "title": "Body_run_sn_curve_file_analysis_snCurve_file_post",
         "required": [
@@ -496,6 +563,14 @@
             "format": "binary"
           }
         }
+      },
+      "CycleCountingMethod": {
+        "title": "CycleCountingMethod",
+        "enum": [
+          "RangeMean"
+        ],
+        "type": "string",
+        "description": "An enumeration."
       },
       "EchartLine": {
         "title": "EchartLine",

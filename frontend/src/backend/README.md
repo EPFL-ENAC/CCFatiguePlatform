@@ -101,10 +101,9 @@ Please follow the [installation](#installation) instruction and execute the foll
 var Ccfatigue = require("ccfatigue");
 
 var api = new Ccfatigue.AnalysisApi();
-var methods = [new Ccfatigue.SnCurveMethod()]; // {[SnCurveMethod]}
-var rRatios = [null]; // {[Number]}
+var method = new Ccfatigue.CycleCountingMethod(); // {CycleCountingMethod}
 var file = "/path/to/file"; // {File}
-api.runSnCurveFileAnalysisSnCurveFilePost(methods, rRatios, file).then(
+api.runCycleCountingFileAnalysisCycleCountingFilePost(method, file).then(
   function (data) {
     console.log("API called successfully. Returned data: " + data);
   },
@@ -120,6 +119,7 @@ All URIs are relative to _http://localhost_
 
 | Class                      | Method                                                                                                                                                    | HTTP request                                                | Description                |
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | -------------------------- |
+| _Ccfatigue.AnalysisApi_    | [**runCycleCountingFileAnalysisCycleCountingFilePost**](docs/AnalysisApi.md#runCycleCountingFileAnalysisCycleCountingFilePost)                            | **POST** /analysis/cycleCounting/file                       | Run Cycle Counting File    |
 | _Ccfatigue.AnalysisApi_    | [**runSnCurveFileAnalysisSnCurveFilePost**](docs/AnalysisApi.md#runSnCurveFileAnalysisSnCurveFilePost)                                                    | **POST** /analysis/snCurve/file                             | Run Sn Curve File          |
 | _Ccfatigue.DefaultApi_     | [**getUnitsUnitsGet**](docs/DefaultApi.md#getUnitsUnitsGet)                                                                                               | **GET** /units                                              | Get Units                  |
 | _Ccfatigue.DefaultApi_     | [**rootGet**](docs/DefaultApi.md#rootGet)                                                                                                                 | **GET** /                                                   | Root                       |
@@ -133,6 +133,7 @@ All URIs are relative to _http://localhost_
 ## Documentation for Models
 
 - [Ccfatigue.AppInfo](docs/AppInfo.md)
+- [Ccfatigue.CycleCountingMethod](docs/CycleCountingMethod.md)
 - [Ccfatigue.EchartLine](docs/EchartLine.md)
 - [Ccfatigue.ExperimentDataPreprocessed](docs/ExperimentDataPreprocessed.md)
 - [Ccfatigue.ExperimentFieldNames](docs/ExperimentFieldNames.md)
