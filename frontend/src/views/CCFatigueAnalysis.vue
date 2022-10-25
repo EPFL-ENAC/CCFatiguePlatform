@@ -3,117 +3,11 @@
     <p>- not implemented yet -</p>
     <v-row>
       <v-col cols="6">
-        <v-card :loading="snCurve.loading">
-          <v-card-title>
-            S-N Curve
-            <v-spacer />
-            <info-tooltip>
-              This module plots curves on the (Stress - Number of cycles) plane.
-              The curves are associated with 4 different methods (Lin-Log,
-              Log-Log, Sendeckyj, Whitney) and can be considered as constitutive
-              laws for fatigue life predictions. On the graphs we also plot the
-              individual results gathered over the tests with inputs (Cycles to
-              failure - Stress at failure)
-            </info-tooltip>
-          </v-card-title>
-          <v-card-subtitle>
-            <v-container>
-              <v-row align="center">
-                <v-col>
-                  <v-file-input
-                    chips
-                    show-size
-                    accept=".txt,.csv"
-                    label="Upload file"
-                    v-model="snCurve.file"
-                    :disabled="snCurve.loading"
-                    @change="updateSnCurve"
-                    color="secondary"
-                  >
-                    <template v-slot:append>
-                      <info-tooltip>
-                        The data required as input for this module takes the
-                        form of a csv file containing 6 columns and as many rows
-                        as there were testings in the experiment. The columns
-                        are populated as follows:
-                        <ul>
-                          <li>Stress ratio (R) [-]</li>
-                          <li>Reliability level (input parameter)</li>
-                          <li>Stress level no. (estimated)</li>
-                          <li>Stress parameter [MPa]</li>
-                          <li>Number of cycles</li>
-                          <li>Residual strength [MPa]</li>
-                        </ul>
-                        <p>
-                          If a sample doesn't break under loading, we call it a
-                          test run off and the value for residual strength is
-                          obtained by means of a quasi static loading up to
-                          breaking. If the sample doesn't break, residual
-                          strength takes the same value as the stress parameter.
-                        </p>
-                      </info-tooltip>
-                    </template>
-                  </v-file-input>
-                </v-col>
-                <v-col>
-                  <v-btn disabled>Browse from Fatigue DB</v-btn>
-                </v-col>
-              </v-row>
-            </v-container>
-          </v-card-subtitle>
-          <v-card-text v-if="snCurveHasInput">
-            <v-container>
-              <v-row>
-                <v-col>
-                  <v-select
-                    label="select S-N curve method(s)"
-                    :items="snCurve.methods"
-                    v-model="snCurve.selectedMethods"
-                    chips
-                    multiple
-                    :disabled="snCurve.loading"
-                    @change="updateSnCurve"
-                    color="secondary"
-                  >
-                  </v-select>
-                </v-col>
-                <v-col>
-                  <v-select
-                    label="select R ratio"
-                    :items="snCurve.rRatios"
-                    v-model="snCurve.selectedRRatios"
-                    chips
-                    multiple
-                    :disabled="snCurve.loading"
-                    @change="updateSnCurve"
-                    color="secondary"
-                  >
-                  </v-select>
-                </v-col>
-              </v-row>
-              <v-row>
-                <simple-chart
-                  :aspect-ratio="2"
-                  :series="snCurve.series"
-                  title="S-N Curves"
-                  x-axis-name="Number of cycles"
-                  y-axis-name="Stress"
-                  x-axis-type="log"
-                ></simple-chart>
-              </v-row>
-            </v-container>
-          </v-card-text>
-          <v-card-actions v-if="snCurveHasInput" class="justify-end">
-            <v-btn
-              v-on:click="downloadSnCurve"
-              :disabled="snCurve.loading && snCurve.output"
-            >
-              Download
-            </v-btn>
-          </v-card-actions>
-        </v-card>
+        <cycle-counting></cycle-counting>
       </v-col>
-
+      <v-col cols="6">
+        <sn-curve></sn-curve>
+      </v-col>
       <v-col cols="6">
         <v-card>
           <v-card-title>
@@ -311,17 +205,15 @@
 
 <script>
 import InfoButton from "@/components/InfoButton";
-import InfoTooltip from "@/components/InfoTooltip";
-import download from "downloadjs";
-import SimpleChart from "@/components/charts/SimpleChart";
-import { zip } from "lodash";
+import SnCurve from "@/components/analysis/SnCurve.vue";
+import CycleCounting from "@/components/analysis/CycleCounting.vue";
 
 export default {
   name: "CCFatigueAnalysis",
   components: {
+    CycleCounting,
     InfoButton,
-    InfoTooltip,
-    SimpleChart,
+    SnCurve,
   },
   data() {
     return {
@@ -334,57 +226,7 @@ export default {
       ],
       fatigueFailureMethods: ["Fawaz-Ellyin", "Kawai", "ST"],
       dammageSummationMethods: ["Linear", "Piecewise-Linear"],
-      snCurve: {
-        file: null,
-        loading: false,
-        selectedMethods: [],
-        methods: ["LinLog", "LogLog", "Sendeckyj", "Whitney"],
-        selectedRRatios: [],
-        rRatios: [-1, 0.1, 10, 0.5],
-        outputs: {},
-        series: [],
-      },
     };
-  },
-  computed: {
-    snCurveHasInput: function () {
-      return this.snCurve.file;
-    },
-  },
-  methods: {
-    updateSnCurve() {
-      if (
-        this.snCurve.selectedMethods.length > 0 &&
-        this.snCurve.selectedRRatios.length > 0 &&
-        this.snCurve.file
-      ) {
-        this.snCurve.loading = true;
-        this.$analysisApi
-          .runSnCurveFileAnalysisSnCurveFilePost(
-            this.snCurve.selectedMethods,
-            this.snCurve.selectedRRatios,
-            this.snCurve.file
-          )
-          .then((data) => {
-            this.snCurve.outputs = data.outputs;
-            this.snCurve.series = data.lines.map((line) => ({
-              type: "line",
-              name: line.name,
-              data: zip(line.xData, line.yData),
-            }));
-          })
-          .finally(() => (this.snCurve.loading = false));
-      }
-    },
-    downloadSnCurve() {
-      for (const [key, value] of Object.entries(this.snCurve.outputs)) {
-        download(
-          value,
-          `sn-curve-${key.toLowerCase()}-output.txt`,
-          "text/plain"
-        );
-      }
-    },
   },
 };
 </script>

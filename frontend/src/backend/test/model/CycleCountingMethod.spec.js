@@ -27,9 +27,7 @@
 
   var instance;
 
-  beforeEach(function () {
-    instance = new Ccfatigue.AnalysisApi();
-  });
+  beforeEach(function () {});
 
   var getProperty = function (object, getter, property) {
     // Use getter method if present; otherwise, get the property directly.
@@ -43,26 +41,11 @@
     else object[property] = value;
   };
 
-  describe("AnalysisApi", function () {
-    describe("runCycleCountingFileAnalysisCycleCountingFilePost", function () {
-      it("should call runCycleCountingFileAnalysisCycleCountingFilePost successfully", function (done) {
-        //uncomment below and update the code to test runCycleCountingFileAnalysisCycleCountingFilePost
-        //instance.runCycleCountingFileAnalysisCycleCountingFilePost(function(error) {
-        //  if (error) throw error;
-        //expect().to.be();
-        //});
-        done();
-      });
-    });
-    describe("runSnCurveFileAnalysisSnCurveFilePost", function () {
-      it("should call runSnCurveFileAnalysisSnCurveFilePost successfully", function (done) {
-        //uncomment below and update the code to test runSnCurveFileAnalysisSnCurveFilePost
-        //instance.runSnCurveFileAnalysisSnCurveFilePost(function(error) {
-        //  if (error) throw error;
-        //expect().to.be();
-        //});
-        done();
-      });
+  describe("CycleCountingMethod", function () {
+    it("should create an instance of CycleCountingMethod", function () {
+      // uncomment below and update the code to test CycleCountingMethod
+      //var instance = new Ccfatigue.CycleCountingMethod();
+      //expect(instance).to.be.a(Ccfatigue.CycleCountingMethod);
     });
   });
 });

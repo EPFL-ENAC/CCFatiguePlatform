@@ -4,10 +4,11 @@ This code regroups shared ressources for module 2
 """
 
 from math import log10, sqrt
+from typing import Optional
 
 import numpy as np
 import pandas as pd
-from pandas._typing import FilePath, ReadBuffer, WriteBuffer
+from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 from scipy import stats
 
 from ccfatigue.modules.astm import Astm
@@ -98,8 +99,8 @@ def stress_at_failure_bounds(
 
 def execute_linlog_loglog(
     use_logarithm: bool,
-    input_file: FilePath | ReadBuffer,
-    output_json_file: FilePath | WriteBuffer,
+    input_file: FilePath | ReadCsvBuffer,
+    output_json_file: Optional[FilePath | WriteBuffer],
     output_csv_file: FilePath | WriteBuffer,
     list_cycles_to_failure: list[int],
     get_stress_at_failure,

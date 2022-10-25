@@ -12,9 +12,10 @@ as described in
 """
 
 from itertools import chain
+from typing import Optional
 
 import pandas as pd
-from pandas._typing import FilePath, ReadBuffer, WriteBuffer
+from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 
 import ccfatigue.modules.sn_curve_utils as sn_curve_utils
 
@@ -112,8 +113,8 @@ def get_loglog_lsst(
 
 
 def execute(
-    input_file: FilePath | ReadBuffer,
-    output_json_file: FilePath | WriteBuffer,
+    input_file: FilePath | ReadCsvBuffer,
+    output_json_file: Optional[FilePath | WriteBuffer],
     output_csv_file: FilePath | WriteBuffer,
     reliability_level: float = 50,
     confidence: int = 95,

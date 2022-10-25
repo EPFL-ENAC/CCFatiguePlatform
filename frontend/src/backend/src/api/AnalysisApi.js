@@ -32,6 +32,71 @@ export default class AnalysisApi {
   }
 
   /**
+   * Run Cycle Counting File
+   * @param {module:model/CycleCountingMethod} method
+   * @param {File} file
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link File} and HTTP response
+   */
+  runCycleCountingFileAnalysisCycleCountingFilePostWithHttpInfo(method, file) {
+    let postBody = null;
+    // verify the required parameter 'method' is set
+    if (method === undefined || method === null) {
+      throw new Error(
+        "Missing the required parameter 'method' when calling runCycleCountingFileAnalysisCycleCountingFilePost"
+      );
+    }
+    // verify the required parameter 'file' is set
+    if (file === undefined || file === null) {
+      throw new Error(
+        "Missing the required parameter 'file' when calling runCycleCountingFileAnalysisCycleCountingFilePost"
+      );
+    }
+
+    let pathParams = {};
+    let queryParams = {
+      method: method,
+    };
+    let headerParams = {};
+    let formParams = {
+      file: file,
+    };
+
+    let authNames = [];
+    let contentTypes = ["multipart/form-data"];
+    let accepts = ["application/json"];
+    let returnType = File;
+    return this.apiClient.callApi(
+      "/analysis/cycleCounting/file",
+      "POST",
+      pathParams,
+      queryParams,
+      headerParams,
+      formParams,
+      postBody,
+      authNames,
+      contentTypes,
+      accepts,
+      returnType,
+      null
+    );
+  }
+
+  /**
+   * Run Cycle Counting File
+   * @param {module:model/CycleCountingMethod} method
+   * @param {File} file
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link File}
+   */
+  runCycleCountingFileAnalysisCycleCountingFilePost(method, file) {
+    return this.runCycleCountingFileAnalysisCycleCountingFilePostWithHttpInfo(
+      method,
+      file
+    ).then(function (response_and_data) {
+      return response_and_data.data;
+    });
+  }
+
+  /**
    * Run Sn Curve File
    * @param {Array.<module:model/SnCurveMethod>} methods
    * @param {Array.<Number>} rRatios

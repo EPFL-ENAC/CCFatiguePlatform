@@ -17,6 +17,7 @@ import ExperimentsApi from "./api/ExperimentsApi";
 import TestsApi from "./api/TestsApi";
 import ApiClient from "./ApiClient";
 import AppInfo from "./model/AppInfo";
+import CycleCountingMethod from "./model/CycleCountingMethod";
 import EchartLine from "./model/EchartLine";
 import ExperimentDataPreprocessed from "./model/ExperimentDataPreprocessed";
 import ExperimentFieldNames from "./model/ExperimentFieldNames";
@@ -72,6 +73,11 @@ export {
    * @property {module:model/AppInfo}
    */
   AppInfo,
+  /**
+   * The CycleCountingMethod model constructor.
+   * @property {module:model/CycleCountingMethod}
+   */
+  CycleCountingMethod,
   /**
    * The EchartLine model constructor.
    * @property {module:model/EchartLine}
