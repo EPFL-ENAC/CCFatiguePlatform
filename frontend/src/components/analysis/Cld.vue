@@ -76,6 +76,9 @@
 <script>
 import InfoTooltip from "@/components/InfoTooltip";
 import download from "downloadjs";
+import CldMethod from "@/backend/model/CldMethod";
+
+const methods = Object.values(new CldMethod());
 
 export default {
   name: "Cld",
@@ -87,8 +90,8 @@ export default {
       file: null,
       loading: false,
       output: null,
-      methods: ["Harris"],
-      method: "Harris",
+      methods: methods,
+      method: methods[0],
       errorMessages: null,
     };
   },

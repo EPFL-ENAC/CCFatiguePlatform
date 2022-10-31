@@ -105,6 +105,9 @@ import InfoTooltip from "@/components/InfoTooltip";
 import download from "downloadjs";
 import { zip } from "lodash";
 import SimpleChart from "@/components/charts/SimpleChart";
+import SnCurveMethod from "@/backend/model/SnCurveMethod";
+
+const methods = Object.values(new SnCurveMethod());
 
 export default {
   name: "SnCurve",
@@ -117,7 +120,7 @@ export default {
       file: null,
       loading: false,
       selectedMethods: [],
-      methods: ["LinLog", "LogLog", "Sendeckyj", "Whitney"],
+      methods: methods,
       selectedRRatios: [],
       rRatios: [-1, 0.1, 10, 0.5],
       outputs: {},

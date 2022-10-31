@@ -50,6 +50,15 @@
             @change="updateOutput"
           ></v-file-input>
         </v-col>
+        <v-col>
+          <v-select
+            v-model="method"
+            :items="methods"
+            label="Select Method"
+            :disabled="loading"
+            @change="updateOutput"
+          ></v-select>
+        </v-col>
       </v-row>
     </v-card-subtitle>
     <v-card-text>
@@ -66,6 +75,9 @@
 <script>
 import InfoTooltip from "@/components/InfoTooltip";
 import download from "downloadjs";
+import DamageSummationMethod from "@/backend/model/DamageSummationMethod";
+
+const methods = Object.values(new DamageSummationMethod());
 
 export default {
   name: "DamageSummation",
@@ -78,8 +90,8 @@ export default {
       cycFile: null,
       loading: false,
       output: null,
-      methods: ["Harris"],
-      method: "Harris",
+      methods: methods,
+      method: methods[0],
       errorMessages: null,
     };
   },

@@ -45,6 +45,9 @@
 <script>
 import InfoTooltip from "@/components/InfoTooltip";
 import download from "downloadjs";
+import CycleCountingMethod from "@/backend/model/CycleCountingMethod";
+
+const methods = Object.values(new CycleCountingMethod());
 
 export default {
   name: "CycleCounting",
@@ -56,8 +59,8 @@ export default {
       file: null,
       loading: false,
       output: null,
-      methods: ["RangeMean"],
-      method: "RangeMean",
+      methods: methods,
+      method: methods[0],
       errorMessages: null,
     };
   },

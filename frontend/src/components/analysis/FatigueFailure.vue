@@ -156,6 +156,9 @@
 <script>
 import InfoTooltip from "@/components/InfoTooltip";
 import download from "downloadjs";
+import FatigueFailureMethod from "@/backend/model/FatigueFailureMethod";
+
+const methods = Object.values(new FatigueFailureMethod());
 
 export default {
   name: "FatigueFailure",
@@ -169,8 +172,8 @@ export default {
       fFile: null,
       loading: false,
       output: null,
-      methods: ["FTPT"],
-      method: "FTPT",
+      methods: methods,
+      method: methods[0],
       snModels: ["Lin-Log", "Log-Log"],
       snModel: "Log-Log",
       desirableAngle: 30,
