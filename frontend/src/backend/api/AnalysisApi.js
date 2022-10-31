@@ -37,18 +37,18 @@ export default class AnalysisApi {
    * @param {File} file
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link File} and HTTP response
    */
-  runCldFileAnalysisCldFilePostWithHttpInfo(method, file) {
+  runCldFileWithHttpInfo(method, file) {
     let postBody = null;
     // verify the required parameter 'method' is set
     if (method === undefined || method === null) {
       throw new Error(
-        "Missing the required parameter 'method' when calling runCldFileAnalysisCldFilePost"
+        "Missing the required parameter 'method' when calling runCldFile"
       );
     }
     // verify the required parameter 'file' is set
     if (file === undefined || file === null) {
       throw new Error(
-        "Missing the required parameter 'file' when calling runCldFileAnalysisCldFilePost"
+        "Missing the required parameter 'file' when calling runCldFile"
       );
     }
 
@@ -87,12 +87,12 @@ export default class AnalysisApi {
    * @param {File} file
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link File}
    */
-  runCldFileAnalysisCldFilePost(method, file) {
-    return this.runCldFileAnalysisCldFilePostWithHttpInfo(method, file).then(
-      function (response_and_data) {
-        return response_and_data.data;
-      }
-    );
+  runCldFile(method, file) {
+    return this.runCldFileWithHttpInfo(method, file).then(function (
+      response_and_data
+    ) {
+      return response_and_data.data;
+    });
   }
 
   /**
@@ -101,18 +101,18 @@ export default class AnalysisApi {
    * @param {File} file
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link File} and HTTP response
    */
-  runCycleCountingFileAnalysisCycleCountingFilePostWithHttpInfo(method, file) {
+  runCycleCountingFileWithHttpInfo(method, file) {
     let postBody = null;
     // verify the required parameter 'method' is set
     if (method === undefined || method === null) {
       throw new Error(
-        "Missing the required parameter 'method' when calling runCycleCountingFileAnalysisCycleCountingFilePost"
+        "Missing the required parameter 'method' when calling runCycleCountingFile"
       );
     }
     // verify the required parameter 'file' is set
     if (file === undefined || file === null) {
       throw new Error(
-        "Missing the required parameter 'file' when calling runCycleCountingFileAnalysisCycleCountingFilePost"
+        "Missing the required parameter 'file' when calling runCycleCountingFile"
       );
     }
 
@@ -151,11 +151,10 @@ export default class AnalysisApi {
    * @param {File} file
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link File}
    */
-  runCycleCountingFileAnalysisCycleCountingFilePost(method, file) {
-    return this.runCycleCountingFileAnalysisCycleCountingFilePostWithHttpInfo(
-      method,
-      file
-    ).then(function (response_and_data) {
+  runCycleCountingFile(method, file) {
+    return this.runCycleCountingFileWithHttpInfo(method, file).then(function (
+      response_and_data
+    ) {
       return response_and_data.data;
     });
   }
@@ -167,28 +166,24 @@ export default class AnalysisApi {
    * @param {File} cycFile
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link File} and HTTP response
    */
-  runDamageSummationFileAnalysisDamageSummationFilePostWithHttpInfo(
-    method,
-    sncFile,
-    cycFile
-  ) {
+  runDamageSummationFileWithHttpInfo(method, sncFile, cycFile) {
     let postBody = null;
     // verify the required parameter 'method' is set
     if (method === undefined || method === null) {
       throw new Error(
-        "Missing the required parameter 'method' when calling runDamageSummationFileAnalysisDamageSummationFilePost"
+        "Missing the required parameter 'method' when calling runDamageSummationFile"
       );
     }
     // verify the required parameter 'sncFile' is set
     if (sncFile === undefined || sncFile === null) {
       throw new Error(
-        "Missing the required parameter 'sncFile' when calling runDamageSummationFileAnalysisDamageSummationFilePost"
+        "Missing the required parameter 'sncFile' when calling runDamageSummationFile"
       );
     }
     // verify the required parameter 'cycFile' is set
     if (cycFile === undefined || cycFile === null) {
       throw new Error(
-        "Missing the required parameter 'cycFile' when calling runDamageSummationFileAnalysisDamageSummationFilePost"
+        "Missing the required parameter 'cycFile' when calling runDamageSummationFile"
       );
     }
 
@@ -229,12 +224,8 @@ export default class AnalysisApi {
    * @param {File} cycFile
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link File}
    */
-  runDamageSummationFileAnalysisDamageSummationFilePost(
-    method,
-    sncFile,
-    cycFile
-  ) {
-    return this.runDamageSummationFileAnalysisDamageSummationFilePostWithHttpInfo(
+  runDamageSummationFile(method, sncFile, cycFile) {
+    return this.runDamageSummationFileWithHttpInfo(
       method,
       sncFile,
       cycFile
@@ -254,7 +245,7 @@ export default class AnalysisApi {
    * @param {File} fFile
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link File} and HTTP response
    */
-  runFatigueFailureFileAnalysisFatigueFailureFilePostWithHttpInfo(
+  runFatigueFailureFileWithHttpInfo(
     method,
     snModel,
     desirableAngle,
@@ -267,43 +258,43 @@ export default class AnalysisApi {
     // verify the required parameter 'method' is set
     if (method === undefined || method === null) {
       throw new Error(
-        "Missing the required parameter 'method' when calling runFatigueFailureFileAnalysisFatigueFailureFilePost"
+        "Missing the required parameter 'method' when calling runFatigueFailureFile"
       );
     }
     // verify the required parameter 'snModel' is set
     if (snModel === undefined || snModel === null) {
       throw new Error(
-        "Missing the required parameter 'snModel' when calling runFatigueFailureFileAnalysisFatigueFailureFilePost"
+        "Missing the required parameter 'snModel' when calling runFatigueFailureFile"
       );
     }
     // verify the required parameter 'desirableAngle' is set
     if (desirableAngle === undefined || desirableAngle === null) {
       throw new Error(
-        "Missing the required parameter 'desirableAngle' when calling runFatigueFailureFileAnalysisFatigueFailureFilePost"
+        "Missing the required parameter 'desirableAngle' when calling runFatigueFailureFile"
       );
     }
     // verify the required parameter 'offAxisAngle' is set
     if (offAxisAngle === undefined || offAxisAngle === null) {
       throw new Error(
-        "Missing the required parameter 'offAxisAngle' when calling runFatigueFailureFileAnalysisFatigueFailureFilePost"
+        "Missing the required parameter 'offAxisAngle' when calling runFatigueFailureFile"
       );
     }
     // verify the required parameter 'xFile' is set
     if (xFile === undefined || xFile === null) {
       throw new Error(
-        "Missing the required parameter 'xFile' when calling runFatigueFailureFileAnalysisFatigueFailureFilePost"
+        "Missing the required parameter 'xFile' when calling runFatigueFailureFile"
       );
     }
     // verify the required parameter 'yFile' is set
     if (yFile === undefined || yFile === null) {
       throw new Error(
-        "Missing the required parameter 'yFile' when calling runFatigueFailureFileAnalysisFatigueFailureFilePost"
+        "Missing the required parameter 'yFile' when calling runFatigueFailureFile"
       );
     }
     // verify the required parameter 'fFile' is set
     if (fFile === undefined || fFile === null) {
       throw new Error(
-        "Missing the required parameter 'fFile' when calling runFatigueFailureFileAnalysisFatigueFailureFilePost"
+        "Missing the required parameter 'fFile' when calling runFatigueFailureFile"
       );
     }
 
@@ -352,7 +343,7 @@ export default class AnalysisApi {
    * @param {File} fFile
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link File}
    */
-  runFatigueFailureFileAnalysisFatigueFailureFilePost(
+  runFatigueFailureFile(
     method,
     snModel,
     desirableAngle,
@@ -361,7 +352,7 @@ export default class AnalysisApi {
     yFile,
     fFile
   ) {
-    return this.runFatigueFailureFileAnalysisFatigueFailureFilePostWithHttpInfo(
+    return this.runFatigueFailureFileWithHttpInfo(
       method,
       snModel,
       desirableAngle,
@@ -381,24 +372,24 @@ export default class AnalysisApi {
    * @param {File} file
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/SnCurveResult} and HTTP response
    */
-  runSnCurveFileAnalysisSnCurveFilePostWithHttpInfo(methods, rRatios, file) {
+  runSnCurveFileWithHttpInfo(methods, rRatios, file) {
     let postBody = null;
     // verify the required parameter 'methods' is set
     if (methods === undefined || methods === null) {
       throw new Error(
-        "Missing the required parameter 'methods' when calling runSnCurveFileAnalysisSnCurveFilePost"
+        "Missing the required parameter 'methods' when calling runSnCurveFile"
       );
     }
     // verify the required parameter 'rRatios' is set
     if (rRatios === undefined || rRatios === null) {
       throw new Error(
-        "Missing the required parameter 'rRatios' when calling runSnCurveFileAnalysisSnCurveFilePost"
+        "Missing the required parameter 'rRatios' when calling runSnCurveFile"
       );
     }
     // verify the required parameter 'file' is set
     if (file === undefined || file === null) {
       throw new Error(
-        "Missing the required parameter 'file' when calling runSnCurveFileAnalysisSnCurveFilePost"
+        "Missing the required parameter 'file' when calling runSnCurveFile"
       );
     }
 
@@ -439,13 +430,11 @@ export default class AnalysisApi {
    * @param {File} file
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/SnCurveResult}
    */
-  runSnCurveFileAnalysisSnCurveFilePost(methods, rRatios, file) {
-    return this.runSnCurveFileAnalysisSnCurveFilePostWithHttpInfo(
-      methods,
-      rRatios,
-      file
-    ).then(function (response_and_data) {
-      return response_and_data.data;
-    });
+  runSnCurveFile(methods, rRatios, file) {
+    return this.runSnCurveFileWithHttpInfo(methods, rRatios, file).then(
+      function (response_and_data) {
+        return response_and_data.data;
+      }
+    );
   }
 }

@@ -102,7 +102,7 @@ export default {
       if (this.file && this.method) {
         this.loading = true;
         this.$analysisApi
-          .runCldFileAnalysisCldFilePost(this.method, this.file)
+          .runCldFile(this.method, this.file)
           .then((data) => {
             this.output = data;
             this.errorMessages = null;

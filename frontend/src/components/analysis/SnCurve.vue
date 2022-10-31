@@ -138,11 +138,7 @@ export default {
       ) {
         this.loading = true;
         this.$analysisApi
-          .runSnCurveFileAnalysisSnCurveFilePost(
-            this.selectedMethods,
-            this.selectedRRatios,
-            this.file
-          )
+          .runSnCurveFile(this.selectedMethods, this.selectedRRatios, this.file)
           .then((data) => {
             this.outputs = data.outputs;
             this.series = data.lines.map((line) => ({

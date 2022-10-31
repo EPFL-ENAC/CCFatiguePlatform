@@ -93,11 +93,7 @@ export default {
       if (this.hasInput) {
         this.loading = true;
         this.$analysisApi
-          .runDamageSummationFileAnalysisDamageSummationFilePost(
-            this.method,
-            this.sncFile,
-            this.cycFile
-          )
+          .runDamageSummationFile(this.method, this.sncFile, this.cycFile)
           .then((data) => {
             this.output = data;
             this.errorMessages = null;
