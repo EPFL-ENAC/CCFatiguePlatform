@@ -121,7 +121,7 @@ export default {
   actions: {
     fetchUnits({ commit, state }) {
       if (Object.keys(state.units).length === 0) {
-        this._vm.$defaultApi.getUnitsUnitsGet().then(
+        this._vm.$defaultApi.getUnits().then(
           (data) => commit("storeUnits", data),
           (error) => console.error(error)
         );
@@ -130,13 +130,13 @@ export default {
     fetchOneExperimentWithTests({ commit, state }, payload) {
       commit("nowWeLoadOneExperiment", payload);
       this._vm.$experimentsApi
-        .getExperimentsExperimentsGet({ query: `id:${payload.experimentId}` })
+        .getExperiments({ query: `id:${payload.experimentId}` })
         .then(
           (data) => commit("storeOneExperiment", data),
           (error) => console.error(error)
         );
       this._vm.$testsApi
-        .getTestsTestsGet(payload.experimentId, {
+        .getTests(payload.experimentId, {
           page: state.oneExperiment.pagination.page,
           size: state.oneExperiment.pagination.size,
         })
@@ -208,36 +208,28 @@ export default {
         query: queryElements.join(";"),
         textSearch: payload.filters.textSearch,
       };
-      this._vm.$experimentsApi.getExperimentsExperimentsGet(opts).then(
+      this._vm.$experimentsApi.getExperiments(opts).then(
         (data) => commit("storeFilteredExperiments", data),
         (error) => console.error(error)
       );
     },
     fetchAllFiltersValues({ commit }) {
+      this._vm.$experimentsApi.getFieldDistinct("fracture_mode").then(
+        (data) => commit("storeAllFractureMode", data),
+        (error) => console.error(error)
+      );
       this._vm.$experimentsApi
-        .getFieldDistinctExperimentsFieldDistinctGet("fracture_mode")
-        .then(
-          (data) => commit("storeAllFractureMode", data),
-          (error) => console.error(error)
-        );
-      this._vm.$experimentsApi
-        .getFieldDistinctExperimentsFieldDistinctGet(
-          "material_type_fiber_material"
-        )
+        .getFieldDistinct("material_type_fiber_material")
         .then(
           (data) => commit("storeAllMaterialTypeFiberMaterial", data),
           (error) => console.error(error)
         );
+      this._vm.$experimentsApi.getFieldDistinct("material_type_resin").then(
+        (data) => commit("storeAllMaterialTypeResin", data),
+        (error) => console.error(error)
+      );
       this._vm.$experimentsApi
-        .getFieldDistinctExperimentsFieldDistinctGet("material_type_resin")
-        .then(
-          (data) => commit("storeAllMaterialTypeResin", data),
-          (error) => console.error(error)
-        );
-      this._vm.$experimentsApi
-        .getFieldDistinctExperimentsFieldDistinctGet(
-          "laminates_and_assemblies_stacking_sequence"
-        )
+        .getFieldDistinct("laminates_and_assemblies_stacking_sequence")
         .then(
           (data) =>
             commit("storeAllLaminatesAndAssembliesStackingSequence", data),

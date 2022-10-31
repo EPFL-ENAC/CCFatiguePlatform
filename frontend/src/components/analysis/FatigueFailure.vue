@@ -188,7 +188,7 @@ export default {
       if (this.hasInput) {
         this.loading = true;
         this.$analysisApi
-          .runFatigueFailureFileAnalysisFatigueFailureFilePost(
+          .runFatigueFailureFile(
             this.method,
             this.snModel,
             this.desirableAngle,

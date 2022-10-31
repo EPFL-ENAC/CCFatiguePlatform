@@ -71,10 +71,7 @@ export default {
       if (this.file && this.method) {
         this.loading = true;
         this.$analysisApi
-          .runCycleCountingFileAnalysisCycleCountingFilePost(
-            this.method,
-            this.file
-          )
+          .runCycleCountingFile(this.method, this.file)
           .then((data) => {
             this.output = data;
             this.errorMessages = null;
