@@ -32,6 +32,70 @@ export default class AnalysisApi {
   }
 
   /**
+   * Run Cld File
+   * @param {module:model/CldMethod} method
+   * @param {File} file
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link File} and HTTP response
+   */
+  runCldFileAnalysisCldFilePostWithHttpInfo(method, file) {
+    let postBody = null;
+    // verify the required parameter 'method' is set
+    if (method === undefined || method === null) {
+      throw new Error(
+        "Missing the required parameter 'method' when calling runCldFileAnalysisCldFilePost"
+      );
+    }
+    // verify the required parameter 'file' is set
+    if (file === undefined || file === null) {
+      throw new Error(
+        "Missing the required parameter 'file' when calling runCldFileAnalysisCldFilePost"
+      );
+    }
+
+    let pathParams = {};
+    let queryParams = {
+      method: method,
+    };
+    let headerParams = {};
+    let formParams = {
+      file: file,
+    };
+
+    let authNames = [];
+    let contentTypes = ["multipart/form-data"];
+    let accepts = ["application/json"];
+    let returnType = File;
+    return this.apiClient.callApi(
+      "/analysis/cld/file",
+      "POST",
+      pathParams,
+      queryParams,
+      headerParams,
+      formParams,
+      postBody,
+      authNames,
+      contentTypes,
+      accepts,
+      returnType,
+      null
+    );
+  }
+
+  /**
+   * Run Cld File
+   * @param {module:model/CldMethod} method
+   * @param {File} file
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link File}
+   */
+  runCldFileAnalysisCldFilePost(method, file) {
+    return this.runCldFileAnalysisCldFilePostWithHttpInfo(method, file).then(
+      function (response_and_data) {
+        return response_and_data.data;
+      }
+    );
+  }
+
+  /**
    * Run Cycle Counting File
    * @param {module:model/CycleCountingMethod} method
    * @param {File} file
@@ -91,6 +155,220 @@ export default class AnalysisApi {
     return this.runCycleCountingFileAnalysisCycleCountingFilePostWithHttpInfo(
       method,
       file
+    ).then(function (response_and_data) {
+      return response_and_data.data;
+    });
+  }
+
+  /**
+   * Run Damage Summation File
+   * @param {module:model/DamageSummationMethod} method
+   * @param {File} sncFile
+   * @param {File} cycFile
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link File} and HTTP response
+   */
+  runDamageSummationFileAnalysisDamageSummationFilePostWithHttpInfo(
+    method,
+    sncFile,
+    cycFile
+  ) {
+    let postBody = null;
+    // verify the required parameter 'method' is set
+    if (method === undefined || method === null) {
+      throw new Error(
+        "Missing the required parameter 'method' when calling runDamageSummationFileAnalysisDamageSummationFilePost"
+      );
+    }
+    // verify the required parameter 'sncFile' is set
+    if (sncFile === undefined || sncFile === null) {
+      throw new Error(
+        "Missing the required parameter 'sncFile' when calling runDamageSummationFileAnalysisDamageSummationFilePost"
+      );
+    }
+    // verify the required parameter 'cycFile' is set
+    if (cycFile === undefined || cycFile === null) {
+      throw new Error(
+        "Missing the required parameter 'cycFile' when calling runDamageSummationFileAnalysisDamageSummationFilePost"
+      );
+    }
+
+    let pathParams = {};
+    let queryParams = {
+      method: method,
+    };
+    let headerParams = {};
+    let formParams = {
+      sncFile: sncFile,
+      cycFile: cycFile,
+    };
+
+    let authNames = [];
+    let contentTypes = ["multipart/form-data"];
+    let accepts = ["application/json"];
+    let returnType = File;
+    return this.apiClient.callApi(
+      "/analysis/damageSummation/file",
+      "POST",
+      pathParams,
+      queryParams,
+      headerParams,
+      formParams,
+      postBody,
+      authNames,
+      contentTypes,
+      accepts,
+      returnType,
+      null
+    );
+  }
+
+  /**
+   * Run Damage Summation File
+   * @param {module:model/DamageSummationMethod} method
+   * @param {File} sncFile
+   * @param {File} cycFile
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link File}
+   */
+  runDamageSummationFileAnalysisDamageSummationFilePost(
+    method,
+    sncFile,
+    cycFile
+  ) {
+    return this.runDamageSummationFileAnalysisDamageSummationFilePostWithHttpInfo(
+      method,
+      sncFile,
+      cycFile
+    ).then(function (response_and_data) {
+      return response_and_data.data;
+    });
+  }
+
+  /**
+   * Run Fatigue Failure File
+   * @param {module:model/FatigueFailureMethod} method
+   * @param {module:model/SnModel} snModel
+   * @param {Number} desirableAngle
+   * @param {Number} offAxisAngle
+   * @param {File} xFile
+   * @param {File} yFile
+   * @param {File} fFile
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link File} and HTTP response
+   */
+  runFatigueFailureFileAnalysisFatigueFailureFilePostWithHttpInfo(
+    method,
+    snModel,
+    desirableAngle,
+    offAxisAngle,
+    xFile,
+    yFile,
+    fFile
+  ) {
+    let postBody = null;
+    // verify the required parameter 'method' is set
+    if (method === undefined || method === null) {
+      throw new Error(
+        "Missing the required parameter 'method' when calling runFatigueFailureFileAnalysisFatigueFailureFilePost"
+      );
+    }
+    // verify the required parameter 'snModel' is set
+    if (snModel === undefined || snModel === null) {
+      throw new Error(
+        "Missing the required parameter 'snModel' when calling runFatigueFailureFileAnalysisFatigueFailureFilePost"
+      );
+    }
+    // verify the required parameter 'desirableAngle' is set
+    if (desirableAngle === undefined || desirableAngle === null) {
+      throw new Error(
+        "Missing the required parameter 'desirableAngle' when calling runFatigueFailureFileAnalysisFatigueFailureFilePost"
+      );
+    }
+    // verify the required parameter 'offAxisAngle' is set
+    if (offAxisAngle === undefined || offAxisAngle === null) {
+      throw new Error(
+        "Missing the required parameter 'offAxisAngle' when calling runFatigueFailureFileAnalysisFatigueFailureFilePost"
+      );
+    }
+    // verify the required parameter 'xFile' is set
+    if (xFile === undefined || xFile === null) {
+      throw new Error(
+        "Missing the required parameter 'xFile' when calling runFatigueFailureFileAnalysisFatigueFailureFilePost"
+      );
+    }
+    // verify the required parameter 'yFile' is set
+    if (yFile === undefined || yFile === null) {
+      throw new Error(
+        "Missing the required parameter 'yFile' when calling runFatigueFailureFileAnalysisFatigueFailureFilePost"
+      );
+    }
+    // verify the required parameter 'fFile' is set
+    if (fFile === undefined || fFile === null) {
+      throw new Error(
+        "Missing the required parameter 'fFile' when calling runFatigueFailureFileAnalysisFatigueFailureFilePost"
+      );
+    }
+
+    let pathParams = {};
+    let queryParams = {
+      method: method,
+      snModel: snModel,
+      desirableAngle: desirableAngle,
+      offAxisAngle: offAxisAngle,
+    };
+    let headerParams = {};
+    let formParams = {
+      xFile: xFile,
+      yFile: yFile,
+      fFile: fFile,
+    };
+
+    let authNames = [];
+    let contentTypes = ["multipart/form-data"];
+    let accepts = ["application/json"];
+    let returnType = File;
+    return this.apiClient.callApi(
+      "/analysis/fatigueFailure/file",
+      "POST",
+      pathParams,
+      queryParams,
+      headerParams,
+      formParams,
+      postBody,
+      authNames,
+      contentTypes,
+      accepts,
+      returnType,
+      null
+    );
+  }
+
+  /**
+   * Run Fatigue Failure File
+   * @param {module:model/FatigueFailureMethod} method
+   * @param {module:model/SnModel} snModel
+   * @param {Number} desirableAngle
+   * @param {Number} offAxisAngle
+   * @param {File} xFile
+   * @param {File} yFile
+   * @param {File} fFile
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link File}
+   */
+  runFatigueFailureFileAnalysisFatigueFailureFilePost(
+    method,
+    snModel,
+    desirableAngle,
+    offAxisAngle,
+    xFile,
+    yFile,
+    fFile
+  ) {
+    return this.runFatigueFailureFileAnalysisFatigueFailureFilePostWithHttpInfo(
+      method,
+      snModel,
+      desirableAngle,
+      offAxisAngle,
+      xFile,
+      yFile,
+      fFile
     ).then(function (response_and_data) {
       return response_and_data.data;
     });

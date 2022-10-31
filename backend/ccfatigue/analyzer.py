@@ -9,16 +9,23 @@ from deprecation import deprecated
 from pandas._typing import ReadCsvBuffer, WriteBuffer
 from pandas.core.frame import DataFrame
 
+import ccfatigue.modules.cld_harris as cld_harris
 import ccfatigue.modules.cyc_range_mean as cyc_range_mean
+import ccfatigue.modules.faf_ftpf as faf_ftpf
+import ccfatigue.modules.miner_harris as miner_harris
 import ccfatigue.modules.sn_curve_linlog as sn_curve_linlog
 import ccfatigue.modules.sn_curve_loglog as sn_curve_loglog
 import ccfatigue.modules.sn_curve_sendeckyj as sn_curve_sendeckyj
 from ccfatigue.model import (
+    CldMethod,
     CycleCountingMethod,
+    DamageSummationMethod,
     EchartLine,
+    FatigueFailureMethod,
     SnCurveMethod,
     SnCurveResult,
 )
+from ccfatigue.modules.faf_ftpf import SnModel
 from ccfatigue.plotter import DataKey, Line
 
 ROUND_DECIMAL = 8
@@ -50,6 +57,36 @@ def run_python(
         print(f"executing -> {output_tmp_file.name}")
         input_file.seek(0)
         execute(input_file, output_tmp_file)
+        output_tmp_file.seek(0)
+        return output_tmp_file.read()
+
+
+def run_python_2(
+    execute: Callable[[ReadCsvBuffer, ReadCsvBuffer, WriteBuffer], None],
+    input_file_1: SpooledTemporaryFile[bytes] | IO,
+    input_file_2: SpooledTemporaryFile[bytes] | IO,
+) -> bytes:
+    with NamedTemporaryFile() as output_tmp_file:
+        print(f"executing -> {output_tmp_file.name}")
+        input_file_1.seek(0)
+        input_file_2.seek(0)
+        execute(input_file_1, input_file_2, output_tmp_file)
+        output_tmp_file.seek(0)
+        return output_tmp_file.read()
+
+
+def run_python_3(
+    execute: Callable[[ReadCsvBuffer, ReadCsvBuffer, ReadCsvBuffer, WriteBuffer], None],
+    input_file_1: SpooledTemporaryFile[bytes] | IO,
+    input_file_2: SpooledTemporaryFile[bytes] | IO,
+    input_file_3: SpooledTemporaryFile[bytes] | IO,
+) -> bytes:
+    with NamedTemporaryFile() as output_tmp_file:
+        print(f"executing -> {output_tmp_file.name}")
+        input_file_1.seek(0)
+        input_file_2.seek(0)
+        input_file_3.seek(0)
+        execute(input_file_1, input_file_2, input_file_3, output_tmp_file)
         output_tmp_file.seek(0)
         return output_tmp_file.read()
 
@@ -140,6 +177,73 @@ def run_cycle_counting(
             output = run_python(
                 lambda input, csv_output: cyc_range_mean.execute(input, csv_output),
                 file,
+            )
+        case _:
+            raise Exception(f"unknown method {method}")
+    return output
+
+
+def run_cld(
+    file: SpooledTemporaryFile[bytes] | IO,
+    method: CldMethod,
+) -> bytes:
+    match method:
+        case CldMethod.HARRIS:
+            output = run_python(
+                lambda input, csv_output: cld_harris.execute(input, csv_output),
+                file,
+            )
+        case _:
+            raise Exception(f"unknown method {method}")
+    return output
+
+
+def run_fatigue_failure(
+    x_file: SpooledTemporaryFile[bytes] | IO,
+    y_file: SpooledTemporaryFile[bytes] | IO,
+    f_file: SpooledTemporaryFile[bytes] | IO,
+    method: FatigueFailureMethod,
+    snModel: SnModel,
+    desirable_angle: float,
+    off_axis_angle: float,
+) -> bytes:
+    match method:
+        case FatigueFailureMethod.FTPT:
+            output = run_python_3(
+                lambda x_input, y_input, f_input, csv_output: faf_ftpf.execute(
+                    x_input,
+                    y_input,
+                    f_input,
+                    csv_output,
+                    None,
+                    snModel,
+                    desirable_angle,
+                    off_axis_angle,
+                ),
+                x_file,
+                y_file,
+                f_file,
+            )
+        case _:
+            raise Exception(f"unknown method {method}")
+    return output
+
+
+def run_damage_summation(
+    snc_file: SpooledTemporaryFile[bytes] | IO,
+    cyc_file: SpooledTemporaryFile[bytes] | IO,
+    method: DamageSummationMethod,
+) -> bytes:
+    match method:
+        case DamageSummationMethod.HARRIS:
+            output = run_python_2(
+                lambda snc_input, cyc_input, csv_output: miner_harris.execute(
+                    snc_input,
+                    cyc_input,
+                    csv_output,
+                ),
+                snc_file,
+                cyc_file,
             )
         case _:
             raise Exception(f"unknown method {method}")

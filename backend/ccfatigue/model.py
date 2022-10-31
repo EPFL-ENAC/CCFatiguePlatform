@@ -59,3 +59,15 @@ class SnCurveResult(BaseModel):
 
 class CycleCountingMethod(str, Enum):
     RANGE_MEAN = "RangeMean"
+
+
+class CldMethod(str, Enum):
+    HARRIS = "Harris"
+
+
+class FatigueFailureMethod(str, Enum):
+    FTPT = "FTPT"
+
+
+class DamageSummationMethod(str, Enum):
+    HARRIS = "Harris"

@@ -44,10 +44,40 @@
   };
 
   describe("AnalysisApi", function () {
+    describe("runCldFileAnalysisCldFilePost", function () {
+      it("should call runCldFileAnalysisCldFilePost successfully", function (done) {
+        //uncomment below and update the code to test runCldFileAnalysisCldFilePost
+        //instance.runCldFileAnalysisCldFilePost(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
     describe("runCycleCountingFileAnalysisCycleCountingFilePost", function () {
       it("should call runCycleCountingFileAnalysisCycleCountingFilePost successfully", function (done) {
         //uncomment below and update the code to test runCycleCountingFileAnalysisCycleCountingFilePost
         //instance.runCycleCountingFileAnalysisCycleCountingFilePost(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
+    describe("runDamageSummationFileAnalysisDamageSummationFilePost", function () {
+      it("should call runDamageSummationFileAnalysisDamageSummationFilePost successfully", function (done) {
+        //uncomment below and update the code to test runDamageSummationFileAnalysisDamageSummationFilePost
+        //instance.runDamageSummationFileAnalysisDamageSummationFilePost(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
+    describe("runFatigueFailureFileAnalysisFatigueFailureFilePost", function () {
+      it("should call runFatigueFailureFileAnalysisFatigueFailureFilePost successfully", function (done) {
+        //uncomment below and update the code to test runFatigueFailureFileAnalysisFatigueFailureFilePost
+        //instance.runFatigueFailureFileAnalysisFatigueFailureFilePost(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});
