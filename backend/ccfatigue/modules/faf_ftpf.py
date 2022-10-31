@@ -11,11 +11,19 @@ FTPF is described in Tassos red book, in p. 163 - the original papers are
 """
 
 import math
+from enum import Enum
 from itertools import chain
+from typing import Optional
 
 import numpy as np
 import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
+
+
+class SnModel(str, Enum):
+    LIN_LOG = "Lin-Log"
+    LOG_LOG = "Log-Log"
+
 
 LIST_CYCLES_TO_FAILURE = list(
     chain(
@@ -148,8 +156,8 @@ def execute(
     snc_input_y_json_file: FilePath | ReadCsvBuffer,
     snc_input_f_json_file: FilePath | ReadCsvBuffer,
     faf_output_csv_file: FilePath | WriteBuffer,
-    faf_output_json_file: FilePath | WriteBuffer,
-    sn_model: str,
+    faf_output_json_file: Optional[FilePath | WriteBuffer],
+    sn_model: SnModel,
     desirable_angle: float,
     off_axis_angle: float,
 ) -> None:
@@ -167,7 +175,7 @@ def execute(
             output (FAF CSV)
         faf_output_json_file: FilePath | WriteBuffer
             output (FAF json)
-        sn_model: str
+        sn_model: SnModel
             S-N curve used model [Lin-Log|Log-Log]
         desirable_angle: float
             Desirable angle [degrees]
@@ -226,7 +234,7 @@ def execute(
 
     faf_csv_df["stress_ratio"] = stress_ratio
 
-    if sn_model == "Log-Log":
+    if sn_model == SnModel.LOG_LOG:
         get_stress = get_loglog_stress
         get_sn = get_loglog_sn
     else:

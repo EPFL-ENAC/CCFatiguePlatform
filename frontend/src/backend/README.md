@@ -101,9 +101,9 @@ Please follow the [installation](#installation) instruction and execute the foll
 var Ccfatigue = require("ccfatigue");
 
 var api = new Ccfatigue.AnalysisApi();
-var method = new Ccfatigue.CycleCountingMethod(); // {CycleCountingMethod}
+var method = new Ccfatigue.CldMethod(); // {CldMethod}
 var file = "/path/to/file"; // {File}
-api.runCycleCountingFileAnalysisCycleCountingFilePost(method, file).then(
+api.runCldFileAnalysisCldFilePost(method, file).then(
   function (data) {
     console.log("API called successfully. Returned data: " + data);
   },
@@ -119,7 +119,10 @@ All URIs are relative to _http://localhost_
 
 | Class                      | Method                                                                                                                                                    | HTTP request                                                | Description                |
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | -------------------------- |
+| _Ccfatigue.AnalysisApi_    | [**runCldFileAnalysisCldFilePost**](docs/AnalysisApi.md#runCldFileAnalysisCldFilePost)                                                                    | **POST** /analysis/cld/file                                 | Run Cld File               |
 | _Ccfatigue.AnalysisApi_    | [**runCycleCountingFileAnalysisCycleCountingFilePost**](docs/AnalysisApi.md#runCycleCountingFileAnalysisCycleCountingFilePost)                            | **POST** /analysis/cycleCounting/file                       | Run Cycle Counting File    |
+| _Ccfatigue.AnalysisApi_    | [**runDamageSummationFileAnalysisDamageSummationFilePost**](docs/AnalysisApi.md#runDamageSummationFileAnalysisDamageSummationFilePost)                    | **POST** /analysis/damageSummation/file                     | Run Damage Summation File  |
+| _Ccfatigue.AnalysisApi_    | [**runFatigueFailureFileAnalysisFatigueFailureFilePost**](docs/AnalysisApi.md#runFatigueFailureFileAnalysisFatigueFailureFilePost)                        | **POST** /analysis/fatigueFailure/file                      | Run Fatigue Failure File   |
 | _Ccfatigue.AnalysisApi_    | [**runSnCurveFileAnalysisSnCurveFilePost**](docs/AnalysisApi.md#runSnCurveFileAnalysisSnCurveFilePost)                                                    | **POST** /analysis/snCurve/file                             | Run Sn Curve File          |
 | _Ccfatigue.DefaultApi_     | [**getUnitsUnitsGet**](docs/DefaultApi.md#getUnitsUnitsGet)                                                                                               | **GET** /units                                              | Get Units                  |
 | _Ccfatigue.DefaultApi_     | [**rootGet**](docs/DefaultApi.md#rootGet)                                                                                                                 | **GET** /                                                   | Root                       |
@@ -133,11 +136,14 @@ All URIs are relative to _http://localhost_
 ## Documentation for Models
 
 - [Ccfatigue.AppInfo](docs/AppInfo.md)
+- [Ccfatigue.CldMethod](docs/CldMethod.md)
 - [Ccfatigue.CycleCountingMethod](docs/CycleCountingMethod.md)
+- [Ccfatigue.DamageSummationMethod](docs/DamageSummationMethod.md)
 - [Ccfatigue.EchartLine](docs/EchartLine.md)
 - [Ccfatigue.ExperimentDataPreprocessed](docs/ExperimentDataPreprocessed.md)
 - [Ccfatigue.ExperimentFieldNames](docs/ExperimentFieldNames.md)
 - [Ccfatigue.ExperimentModel](docs/ExperimentModel.md)
+- [Ccfatigue.FatigueFailureMethod](docs/FatigueFailureMethod.md)
 - [Ccfatigue.FatigueTest](docs/FatigueTest.md)
 - [Ccfatigue.HTTPValidationError](docs/HTTPValidationError.md)
 - [Ccfatigue.HysteresisLoop](docs/HysteresisLoop.md)
@@ -147,6 +153,7 @@ All URIs are relative to _http://localhost_
 - [Ccfatigue.QuasiStaticTest](docs/QuasiStaticTest.md)
 - [Ccfatigue.SnCurveMethod](docs/SnCurveMethod.md)
 - [Ccfatigue.SnCurveResult](docs/SnCurveResult.md)
+- [Ccfatigue.SnModel](docs/SnModel.md)
 - [Ccfatigue.TestModel](docs/TestModel.md)
 - [Ccfatigue.UnitInfo](docs/UnitInfo.md)
 - [Ccfatigue.ValidationError](docs/ValidationError.md)

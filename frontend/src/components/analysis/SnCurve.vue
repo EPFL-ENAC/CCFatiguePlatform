@@ -23,7 +23,6 @@
             v-model="file"
             :disabled="loading"
             @change="updateOutput"
-            color="secondary"
           >
             <template v-slot:append>
               <info-tooltip>
@@ -66,7 +65,6 @@
             multiple
             :disabled="loading"
             @change="updateOutput"
-            color="secondary"
           >
           </v-select>
         </v-col>
@@ -79,7 +77,6 @@
             multiple
             :disabled="loading"
             @change="updateOutput"
-            color="secondary"
           >
           </v-select>
         </v-col>

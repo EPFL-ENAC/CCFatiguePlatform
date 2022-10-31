@@ -17,11 +17,14 @@ import ExperimentsApi from "./api/ExperimentsApi";
 import TestsApi from "./api/TestsApi";
 import ApiClient from "./ApiClient";
 import AppInfo from "./model/AppInfo";
+import CldMethod from "./model/CldMethod";
 import CycleCountingMethod from "./model/CycleCountingMethod";
+import DamageSummationMethod from "./model/DamageSummationMethod";
 import EchartLine from "./model/EchartLine";
 import ExperimentDataPreprocessed from "./model/ExperimentDataPreprocessed";
 import ExperimentFieldNames from "./model/ExperimentFieldNames";
 import ExperimentModel from "./model/ExperimentModel";
+import FatigueFailureMethod from "./model/FatigueFailureMethod";
 import FatigueTest from "./model/FatigueTest";
 import HTTPValidationError from "./model/HTTPValidationError";
 import HysteresisLoop from "./model/HysteresisLoop";
@@ -31,6 +34,7 @@ import PageTestModel from "./model/PageTestModel";
 import QuasiStaticTest from "./model/QuasiStaticTest";
 import SnCurveMethod from "./model/SnCurveMethod";
 import SnCurveResult from "./model/SnCurveResult";
+import SnModel from "./model/SnModel";
 import TestModel from "./model/TestModel";
 import UnitInfo from "./model/UnitInfo";
 import ValidationError from "./model/ValidationError";
@@ -74,10 +78,20 @@ export {
    */
   AppInfo,
   /**
+   * The CldMethod model constructor.
+   * @property {module:model/CldMethod}
+   */
+  CldMethod,
+  /**
    * The CycleCountingMethod model constructor.
    * @property {module:model/CycleCountingMethod}
    */
   CycleCountingMethod,
+  /**
+   * The DamageSummationMethod model constructor.
+   * @property {module:model/DamageSummationMethod}
+   */
+  DamageSummationMethod,
   /**
    * The EchartLine model constructor.
    * @property {module:model/EchartLine}
@@ -98,6 +112,11 @@ export {
    * @property {module:model/ExperimentModel}
    */
   ExperimentModel,
+  /**
+   * The FatigueFailureMethod model constructor.
+   * @property {module:model/FatigueFailureMethod}
+   */
+  FatigueFailureMethod,
   /**
    * The FatigueTest model constructor.
    * @property {module:model/FatigueTest}
@@ -143,6 +162,11 @@ export {
    * @property {module:model/SnCurveResult}
    */
   SnCurveResult,
+  /**
+   * The SnModel model constructor.
+   * @property {module:model/SnModel}
+   */
+  SnModel,
   /**
    * The TestModel model constructor.
    * @property {module:model/TestModel}
