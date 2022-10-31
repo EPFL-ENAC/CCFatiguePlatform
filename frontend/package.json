@@ -6,7 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "generate:backend": "rm -rf src/backend && openapi-generator-cli generate -i ../openapi.json -g javascript -o src/backend --additional-properties=usePromises=true && prettier --write src/backend",
+    "generate:backend": "rm -rf src/backend && openapi-generator-cli generate && rm -rf src/backend/docs src/backend/test && prettier --write src/backend",
     "prettier": "prettier --write src"
   },
   "dependencies": {

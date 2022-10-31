@@ -1,3 +1,10 @@
+import {
+  AnalysisApi,
+  ApiClient,
+  DefaultApi,
+  ExperimentsApi,
+  TestsApi,
+} from "@/backend/index";
 import numeral from "numeral";
 import Vue from "vue";
 import numFormat from "vue-filter-number-format";
@@ -32,6 +39,12 @@ numeral.register("locale", "fr-CH", {
 numeral.locale("fr-CH");
 
 Vue.filter("numFormat", numFormat(numeral));
+
+const apiClient = new ApiClient(process.env.VUE_APP_API_URL);
+Vue.prototype.$experimentsApi = new ExperimentsApi(apiClient);
+Vue.prototype.$testsApi = new TestsApi(apiClient);
+Vue.prototype.$defaultApi = new DefaultApi(apiClient);
+Vue.prototype.$analysisApi = new AnalysisApi(apiClient);
 
 new Vue({
   router,
