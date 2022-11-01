@@ -28,7 +28,7 @@ class QuasiStaticTest {
    * @param crackLoad {Array.<Number>}
    * @param crackLength {Array.<Number>}
    * @param strain {Object.<String, Array.<Number>>}
-   * @param stress {Array.<Number>}
+   * @param stress {Object.<String, Array.<Number>>}
    */
   constructor(
     machineDisplacement,
@@ -119,7 +119,9 @@ class QuasiStaticTest {
         });
       }
       if (data.hasOwnProperty("stress")) {
-        obj["stress"] = ApiClient.convertToType(data["stress"], ["Number"]);
+        obj["stress"] = ApiClient.convertToType(data["stress"], {
+          String: ["Number"],
+        });
       }
     }
     return obj;
@@ -157,7 +159,7 @@ QuasiStaticTest.prototype["crack_length"] = undefined;
 QuasiStaticTest.prototype["strain"] = undefined;
 
 /**
- * @member {Array.<Number>} stress
+ * @member {Object.<String, Array.<Number>>} stress
  */
 QuasiStaticTest.prototype["stress"] = undefined;
 
