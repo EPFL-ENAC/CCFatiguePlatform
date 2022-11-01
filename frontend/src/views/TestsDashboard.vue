@@ -191,15 +191,31 @@
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="6" v-if="strainStressSeries.length > 0">
+      <v-col
+        cols="6"
+        v-if="strainOptions.length > 0 && stressOptions.length > 0"
+      >
         <v-card :loading="loading">
-          <v-card-title>Load vs Displacement</v-card-title>
+          <v-card-title>Strain vs Stress</v-card-title>
           <v-card-text>
-            <v-select
-              v-model="strainOption"
-              :items="strainOptions"
-              label="Strain"
-            ></v-select>
+            <v-row>
+              <v-col>
+                <v-select
+                  v-model="strainOption"
+                  :disabled="strainOptions.length < 2"
+                  :items="strainOptions"
+                  label="Strain"
+                ></v-select>
+              </v-col>
+              <v-col>
+                <v-select
+                  v-model="stressOption"
+                  :disabled="stressOptions.length < 2"
+                  :items="stressOptions"
+                  label="Stress"
+                ></v-select>
+              </v-col>
+            </v-row>
             <simple-chart
               :series="strainStressSeries"
               :aspect-ratio="2"
@@ -251,7 +267,7 @@ export default {
           name: `${testId}`,
           data: zip(
             this.strainOption ? this.strainData[testId][this.strainOption] : [],
-            this.stressData[testId]
+            this.stressOption ? this.stressData[testId][this.stressOption] : []
           ),
         }))
         .filter((line) => line.data.length > 0);
@@ -315,7 +331,9 @@ export default {
               this.loadDisplacementSeries = [];
               this.stressStrainSeries = [];
               this.strainData = {};
-              this.strainOptions = [];
+              this.stressData = {};
+              const strainOptions = new Set();
+              const stressOptions = new Set();
               zip(this.testIds, dataList).forEach(([testId, data]) => {
                 if (
                   data.crack_displacement.length > 0 &&
@@ -347,19 +365,22 @@ export default {
                 }
                 if (
                   Object.keys(data.strain).length > 0 &&
-                  data.stress.length > 0
+                  Object.keys(data.stress).length > 0
                 ) {
-                  this.strainOptions = [
-                    ...new Set([
-                      ...this.strainOptions,
-                      ...Object.keys(data.strain),
-                    ]),
-                  ];
+                  Object.keys(data.strain).forEach((item) =>
+                    strainOptions.add(item)
+                  );
+                  Object.keys(data.stress).forEach((item) =>
+                    stressOptions.add(item)
+                  );
                   this.strainData[testId] = data.strain;
                   this.stressData[testId] = data.stress;
                 }
               });
+              this.strainOptions = [...strainOptions];
+              this.stressOptions = [...stressOptions];
               this.strainOption = this.strainOptions[0];
+              this.stressOption = this.stressOptions[0];
             })
             .finally(() => (this.loading = false));
           break;

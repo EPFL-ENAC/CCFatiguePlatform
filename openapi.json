@@ -1276,9 +1276,12 @@
           },
           "stress": {
             "title": "Stress",
-            "type": "array",
-            "items": {
-              "type": "number"
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
             }
           }
         }

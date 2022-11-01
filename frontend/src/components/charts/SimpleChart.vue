@@ -92,7 +92,13 @@ export default {
           min: "dataMin",
           max: "dataMax",
           axisLabel: {
-            fontSize: 10,
+            formatter: function (value) {
+              return value.toLocaleString(undefined, {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 4,
+              });
+            },
+            hideOverlap: true,
           },
         },
         yAxis: {
@@ -102,7 +108,13 @@ export default {
           min: "dataMin",
           max: "dataMax",
           axisLabel: {
-            fontSize: 10,
+            formatter: function (value) {
+              return value.toLocaleString(undefined, {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 4,
+              });
+            },
+            hideOverlap: true,
           },
         },
         tooltip: {
