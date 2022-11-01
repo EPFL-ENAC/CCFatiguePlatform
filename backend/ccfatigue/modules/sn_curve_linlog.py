@@ -13,6 +13,7 @@ as described in
 
 from itertools import chain
 from math import log10
+from typing import Optional
 
 import pandas as pd
 from pandas._typing import FilePath, ReadBuffer, WriteBuffer
@@ -114,7 +115,7 @@ def get_linlog_lsst(
 
 def execute(
     input_file: FilePath | ReadBuffer,
-    output_json_file: FilePath | WriteBuffer,
+    output_json_file: Optional[FilePath | WriteBuffer],
     output_csv_file: FilePath | WriteBuffer,
     confidence: int = 95,
 ) -> None:

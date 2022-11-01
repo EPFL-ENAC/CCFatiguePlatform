@@ -9,7 +9,7 @@
       "get": {
         "summary": "Root",
         "description": "Get AppInfo",
-        "operationId": "root__get",
+        "operationId": "root",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -28,7 +28,7 @@
       "get": {
         "summary": "Get Units",
         "description": "Get All standardized units",
-        "operationId": "get_units_units_get",
+        "operationId": "get_units",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -54,7 +54,7 @@
         ],
         "summary": "Get Experiments",
         "description": "Get all experiments",
-        "operationId": "get_experiments_experiments_get",
+        "operationId": "get_experiments",
         "parameters": [
           {
             "required": false,
@@ -131,7 +131,7 @@
         ],
         "summary": "Get Field Distinct",
         "description": "Get all distinct values for field column, sorted",
-        "operationId": "get_field_distinct_experiments__field__distinct_get",
+        "operationId": "get_field_distinct",
         "parameters": [
           {
             "required": true,
@@ -177,7 +177,7 @@
         ],
         "summary": "Get Fatigue Test",
         "description": "Return test result data",
-        "operationId": "get_fatigue_test_experiments__experiment_id__fatigue__test_id__get",
+        "operationId": "get_fatigue_test",
         "parameters": [
           {
             "required": true,
@@ -229,7 +229,7 @@
         ],
         "summary": "Get Quasi Static Test",
         "description": "Return quasi static test",
-        "operationId": "get_quasi_static_test_experiments__experiment_id__quasi_static__test_id__get",
+        "operationId": "get_quasi_static_test",
         "parameters": [
           {
             "required": true,
@@ -280,7 +280,7 @@
           "experiments"
         ],
         "summary": "Post Data Preprocess Check",
-        "operationId": "post_data_preprocess_check_experiments_data_preprocess_check_post",
+        "operationId": "post_data_preprocess_check",
         "requestBody": {
           "content": {
             "multipart/form-data": {
@@ -322,7 +322,7 @@
         ],
         "summary": "Get Tests",
         "description": "Get all tests for specific experiment",
-        "operationId": "get_tests_tests_get",
+        "operationId": "get_tests",
         "parameters": [
           {
             "required": true,
@@ -381,13 +381,66 @@
         }
       }
     },
+    "/analysis/cycleCounting/file": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run Cycle Counting File",
+        "operationId": "run_cycle_counting_file",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CycleCountingMethod"
+            },
+            "name": "method",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_cycle_counting_file_analysis_cycleCounting_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Run Cycle Counting File Analysis Cyclecounting File Post",
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/analysis/snCurve/file": {
       "post": {
         "tags": [
           "analysis"
         ],
         "summary": "Run Sn Curve File",
-        "operationId": "run_sn_curve_file_analysis_snCurve_file_post",
+        "operationId": "run_sn_curve_file",
         "parameters": [
           {
             "required": true,
@@ -446,6 +499,191 @@
           }
         }
       }
+    },
+    "/analysis/cld/file": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run Cld File",
+        "operationId": "run_cld_file",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CldMethod"
+            },
+            "name": "method",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_cld_file_analysis_cld_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Run Cld File Analysis Cld File Post",
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analysis/fatigueFailure/file": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run Fatigue Failure File",
+        "operationId": "run_fatigue_failure_file",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/FatigueFailureMethod"
+            },
+            "name": "method",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/SnModel"
+            },
+            "name": "snModel",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Desirableangle",
+              "type": "number"
+            },
+            "name": "desirableAngle",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Offaxisangle",
+              "type": "number"
+            },
+            "name": "offAxisAngle",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_fatigue_failure_file_analysis_fatigueFailure_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Run Fatigue Failure File Analysis Fatiguefailure File Post",
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analysis/damageSummation/file": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run Damage Summation File",
+        "operationId": "run_damage_summation_file",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/DamageSummationMethod"
+            },
+            "name": "method",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_damage_summation_file_analysis_damageSummation_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Run Damage Summation File Analysis Damagesummation File Post",
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -483,6 +721,80 @@
           }
         }
       },
+      "Body_run_cld_file_analysis_cld_file_post": {
+        "title": "Body_run_cld_file_analysis_cld_file_post",
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "Body_run_cycle_counting_file_analysis_cycleCounting_file_post": {
+        "title": "Body_run_cycle_counting_file_analysis_cycleCounting_file_post",
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "Body_run_damage_summation_file_analysis_damageSummation_file_post": {
+        "title": "Body_run_damage_summation_file_analysis_damageSummation_file_post",
+        "required": [
+          "sncFile",
+          "cycFile"
+        ],
+        "type": "object",
+        "properties": {
+          "sncFile": {
+            "title": "Sncfile",
+            "type": "string",
+            "format": "binary"
+          },
+          "cycFile": {
+            "title": "Cycfile",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "Body_run_fatigue_failure_file_analysis_fatigueFailure_file_post": {
+        "title": "Body_run_fatigue_failure_file_analysis_fatigueFailure_file_post",
+        "required": [
+          "xFile",
+          "yFile",
+          "fFile"
+        ],
+        "type": "object",
+        "properties": {
+          "xFile": {
+            "title": "Xfile",
+            "type": "string",
+            "format": "binary"
+          },
+          "yFile": {
+            "title": "Yfile",
+            "type": "string",
+            "format": "binary"
+          },
+          "fFile": {
+            "title": "Ffile",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
       "Body_run_sn_curve_file_analysis_snCurve_file_post": {
         "title": "Body_run_sn_curve_file_analysis_snCurve_file_post",
         "required": [
@@ -496,6 +808,30 @@
             "format": "binary"
           }
         }
+      },
+      "CldMethod": {
+        "title": "CldMethod",
+        "enum": [
+          "Harris"
+        ],
+        "type": "string",
+        "description": "An enumeration."
+      },
+      "CycleCountingMethod": {
+        "title": "CycleCountingMethod",
+        "enum": [
+          "RangeMean"
+        ],
+        "type": "string",
+        "description": "An enumeration."
+      },
+      "DamageSummationMethod": {
+        "title": "DamageSummationMethod",
+        "enum": [
+          "Harris"
+        ],
+        "type": "string",
+        "description": "An enumeration."
       },
       "EchartLine": {
         "title": "EchartLine",
@@ -700,6 +1036,14 @@
             "type": "boolean"
           }
         }
+      },
+      "FatigueFailureMethod": {
+        "title": "FatigueFailureMethod",
+        "enum": [
+          "FTPT"
+        ],
+        "type": "string",
+        "description": "An enumeration."
       },
       "FatigueTest": {
         "title": "FatigueTest",
@@ -955,6 +1299,15 @@
             }
           }
         }
+      },
+      "SnModel": {
+        "title": "SnModel",
+        "enum": [
+          "Lin-Log",
+          "Log-Log"
+        ],
+        "type": "string",
+        "description": "An enumeration."
       },
       "TestModel": {
         "title": "TestModel",

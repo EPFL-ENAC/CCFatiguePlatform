@@ -44,7 +44,7 @@ export default class ExperimentsApi {
    * @param {Number} opts.size  (default to 50)
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/PageExperimentModel} and HTTP response
    */
-  getExperimentsExperimentsGetWithHttpInfo(opts) {
+  getExperimentsWithHttpInfo(opts) {
     opts = opts || {};
     let postBody = null;
 
@@ -88,8 +88,8 @@ export default class ExperimentsApi {
    * @param {Number} opts.size  (default to 50)
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/PageExperimentModel}
    */
-  getExperimentsExperimentsGet(opts) {
-    return this.getExperimentsExperimentsGetWithHttpInfo(opts).then(function (
+  getExperiments(opts) {
+    return this.getExperimentsWithHttpInfo(opts).then(function (
       response_and_data
     ) {
       return response_and_data.data;
@@ -103,21 +103,18 @@ export default class ExperimentsApi {
    * @param {Number} testId
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/FatigueTest} and HTTP response
    */
-  getFatigueTestExperimentsExperimentIdFatigueTestIdGetWithHttpInfo(
-    experimentId,
-    testId
-  ) {
+  getFatigueTestWithHttpInfo(experimentId, testId) {
     let postBody = null;
     // verify the required parameter 'experimentId' is set
     if (experimentId === undefined || experimentId === null) {
       throw new Error(
-        "Missing the required parameter 'experimentId' when calling getFatigueTestExperimentsExperimentIdFatigueTestIdGet"
+        "Missing the required parameter 'experimentId' when calling getFatigueTest"
       );
     }
     // verify the required parameter 'testId' is set
     if (testId === undefined || testId === null) {
       throw new Error(
-        "Missing the required parameter 'testId' when calling getFatigueTestExperimentsExperimentIdFatigueTestIdGet"
+        "Missing the required parameter 'testId' when calling getFatigueTest"
       );
     }
 
@@ -156,11 +153,10 @@ export default class ExperimentsApi {
    * @param {Number} testId
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/FatigueTest}
    */
-  getFatigueTestExperimentsExperimentIdFatigueTestIdGet(experimentId, testId) {
-    return this.getFatigueTestExperimentsExperimentIdFatigueTestIdGetWithHttpInfo(
-      experimentId,
-      testId
-    ).then(function (response_and_data) {
+  getFatigueTest(experimentId, testId) {
+    return this.getFatigueTestWithHttpInfo(experimentId, testId).then(function (
+      response_and_data
+    ) {
       return response_and_data.data;
     });
   }
@@ -171,12 +167,12 @@ export default class ExperimentsApi {
    * @param {module:model/ExperimentFieldNames} field
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link Array.<String>} and HTTP response
    */
-  getFieldDistinctExperimentsFieldDistinctGetWithHttpInfo(field) {
+  getFieldDistinctWithHttpInfo(field) {
     let postBody = null;
     // verify the required parameter 'field' is set
     if (field === undefined || field === null) {
       throw new Error(
-        "Missing the required parameter 'field' when calling getFieldDistinctExperimentsFieldDistinctGet"
+        "Missing the required parameter 'field' when calling getFieldDistinct"
       );
     }
 
@@ -213,10 +209,10 @@ export default class ExperimentsApi {
    * @param {module:model/ExperimentFieldNames} field
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link Array.<String>}
    */
-  getFieldDistinctExperimentsFieldDistinctGet(field) {
-    return this.getFieldDistinctExperimentsFieldDistinctGetWithHttpInfo(
-      field
-    ).then(function (response_and_data) {
+  getFieldDistinct(field) {
+    return this.getFieldDistinctWithHttpInfo(field).then(function (
+      response_and_data
+    ) {
       return response_and_data.data;
     });
   }
@@ -228,21 +224,18 @@ export default class ExperimentsApi {
    * @param {Number} testId
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/QuasiStaticTest} and HTTP response
    */
-  getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGetWithHttpInfo(
-    experimentId,
-    testId
-  ) {
+  getQuasiStaticTestWithHttpInfo(experimentId, testId) {
     let postBody = null;
     // verify the required parameter 'experimentId' is set
     if (experimentId === undefined || experimentId === null) {
       throw new Error(
-        "Missing the required parameter 'experimentId' when calling getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGet"
+        "Missing the required parameter 'experimentId' when calling getQuasiStaticTest"
       );
     }
     // verify the required parameter 'testId' is set
     if (testId === undefined || testId === null) {
       throw new Error(
-        "Missing the required parameter 'testId' when calling getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGet"
+        "Missing the required parameter 'testId' when calling getQuasiStaticTest"
       );
     }
 
@@ -281,16 +274,12 @@ export default class ExperimentsApi {
    * @param {Number} testId
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/QuasiStaticTest}
    */
-  getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGet(
-    experimentId,
-    testId
-  ) {
-    return this.getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGetWithHttpInfo(
-      experimentId,
-      testId
-    ).then(function (response_and_data) {
-      return response_and_data.data;
-    });
+  getQuasiStaticTest(experimentId, testId) {
+    return this.getQuasiStaticTestWithHttpInfo(experimentId, testId).then(
+      function (response_and_data) {
+        return response_and_data.data;
+      }
+    );
   }
 
   /**
@@ -298,12 +287,12 @@ export default class ExperimentsApi {
    * @param {File} file
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/ExperimentDataPreprocessed} and HTTP response
    */
-  postDataPreprocessCheckExperimentsDataPreprocessCheckPostWithHttpInfo(file) {
+  postDataPreprocessCheckWithHttpInfo(file) {
     let postBody = null;
     // verify the required parameter 'file' is set
     if (file === undefined || file === null) {
       throw new Error(
-        "Missing the required parameter 'file' when calling postDataPreprocessCheckExperimentsDataPreprocessCheckPost"
+        "Missing the required parameter 'file' when calling postDataPreprocessCheck"
       );
     }
 
@@ -339,10 +328,10 @@ export default class ExperimentsApi {
    * @param {File} file
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/ExperimentDataPreprocessed}
    */
-  postDataPreprocessCheckExperimentsDataPreprocessCheckPost(file) {
-    return this.postDataPreprocessCheckExperimentsDataPreprocessCheckPostWithHttpInfo(
-      file
-    ).then(function (response_and_data) {
+  postDataPreprocessCheck(file) {
+    return this.postDataPreprocessCheckWithHttpInfo(file).then(function (
+      response_and_data
+    ) {
       return response_and_data.data;
     });
   }

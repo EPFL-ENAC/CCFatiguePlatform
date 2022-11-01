@@ -37,7 +37,7 @@ export default class DefaultApi {
    * Get All standardized units
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link Array.<module:model/UnitInfo>} and HTTP response
    */
-  getUnitsUnitsGetWithHttpInfo() {
+  getUnitsWithHttpInfo() {
     let postBody = null;
 
     let pathParams = {};
@@ -70,10 +70,8 @@ export default class DefaultApi {
    * Get All standardized units
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link Array.<module:model/UnitInfo>}
    */
-  getUnitsUnitsGet() {
-    return this.getUnitsUnitsGetWithHttpInfo().then(function (
-      response_and_data
-    ) {
+  getUnits() {
+    return this.getUnitsWithHttpInfo().then(function (response_and_data) {
       return response_and_data.data;
     });
   }
@@ -83,7 +81,7 @@ export default class DefaultApi {
    * Get AppInfo
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/AppInfo} and HTTP response
    */
-  rootGetWithHttpInfo() {
+  rootWithHttpInfo() {
     let postBody = null;
 
     let pathParams = {};
@@ -116,8 +114,8 @@ export default class DefaultApi {
    * Get AppInfo
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/AppInfo}
    */
-  rootGet() {
-    return this.rootGetWithHttpInfo().then(function (response_and_data) {
+  root() {
+    return this.rootWithHttpInfo().then(function (response_and_data) {
       return response_and_data.data;
     });
   }
