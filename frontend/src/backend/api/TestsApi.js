@@ -40,13 +40,13 @@ export default class TestsApi {
    * @param {Number} opts.size  (default to 50)
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/PageTestModel} and HTTP response
    */
-  getTestsTestsGetWithHttpInfo(experimentId, opts) {
+  getTestsWithHttpInfo(experimentId, opts) {
     opts = opts || {};
     let postBody = null;
     // verify the required parameter 'experimentId' is set
     if (experimentId === undefined || experimentId === null) {
       throw new Error(
-        "Missing the required parameter 'experimentId' when calling getTestsTestsGet"
+        "Missing the required parameter 'experimentId' when calling getTests"
       );
     }
 
@@ -88,8 +88,8 @@ export default class TestsApi {
    * @param {Number} opts.size  (default to 50)
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/PageTestModel}
    */
-  getTestsTestsGet(experimentId, opts) {
-    return this.getTestsTestsGetWithHttpInfo(experimentId, opts).then(function (
+  getTests(experimentId, opts) {
+    return this.getTestsWithHttpInfo(experimentId, opts).then(function (
       response_and_data
     ) {
       return response_and_data.data;

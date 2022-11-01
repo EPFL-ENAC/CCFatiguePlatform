@@ -234,10 +234,7 @@ export default {
           this.loading = true;
           Promise.all(
             this.testIds.map((testId) =>
-              this.$experimentsApi.getFatigueTestExperimentsExperimentIdFatigueTestIdGet(
-                this.experimentId,
-                testId
-              )
+              this.$experimentsApi.getFatigueTest(this.experimentId, testId)
             )
           )
             .then((dataList) => {
@@ -280,10 +277,7 @@ export default {
           this.loading = true;
           Promise.all(
             this.testIds.map((testId) =>
-              this.$experimentsApi.getQuasiStaticTestExperimentsExperimentIdQuasiStaticTestIdGet(
-                this.experimentId,
-                testId
-              )
+              this.$experimentsApi.getQuasiStaticTest(this.experimentId, testId)
             )
           )
             .then((dataList) => {

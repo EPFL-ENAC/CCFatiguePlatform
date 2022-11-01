@@ -1,6 +1,8 @@
 from math import isnan
 from typing import Any, List, Set, TypeVar
 
+from fastapi import FastAPI
+from fastapi.routing import APIRoute
 from fastapi_pagination.default import Page
 from pydantic.main import BaseModel
 from sqlalchemy import select
@@ -39,3 +41,15 @@ async def get_page(
         __get_non_nan,
     )
     return page
+
+
+def use_route_names_as_operation_ids(app: FastAPI) -> None:
+    """
+    Simplify operation IDs so that generated API clients have simpler function
+    names.
+    Should be called only after all routes have been added.
+    https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/#openapi-operationid
+    """
+    for route in app.routes:
+        if isinstance(route, APIRoute):
+            route.operation_id = route.name
