@@ -1223,7 +1223,9 @@
           "machine_load",
           "crack_displacement",
           "crack_load",
-          "crack_length"
+          "crack_length",
+          "strain",
+          "stress"
         ],
         "type": "object",
         "properties": {
@@ -1260,6 +1262,26 @@
             "type": "array",
             "items": {
               "type": "number"
+            }
+          },
+          "strain": {
+            "title": "Strain",
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          },
+          "stress": {
+            "title": "Stress",
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
             }
           }
         }

@@ -27,13 +27,17 @@ class QuasiStaticTest {
    * @param crackDisplacement {Array.<Number>}
    * @param crackLoad {Array.<Number>}
    * @param crackLength {Array.<Number>}
+   * @param strain {Object.<String, Array.<Number>>}
+   * @param stress {Object.<String, Array.<Number>>}
    */
   constructor(
     machineDisplacement,
     machineLoad,
     crackDisplacement,
     crackLoad,
-    crackLength
+    crackLength,
+    strain,
+    stress
   ) {
     QuasiStaticTest.initialize(
       this,
@@ -41,7 +45,9 @@ class QuasiStaticTest {
       machineLoad,
       crackDisplacement,
       crackLoad,
-      crackLength
+      crackLength,
+      strain,
+      stress
     );
   }
 
@@ -56,13 +62,17 @@ class QuasiStaticTest {
     machineLoad,
     crackDisplacement,
     crackLoad,
-    crackLength
+    crackLength,
+    strain,
+    stress
   ) {
     obj["machine_displacement"] = machineDisplacement;
     obj["machine_load"] = machineLoad;
     obj["crack_displacement"] = crackDisplacement;
     obj["crack_load"] = crackLoad;
     obj["crack_length"] = crackLength;
+    obj["strain"] = strain;
+    obj["stress"] = stress;
   }
 
   /**
@@ -103,6 +113,16 @@ class QuasiStaticTest {
           "Number",
         ]);
       }
+      if (data.hasOwnProperty("strain")) {
+        obj["strain"] = ApiClient.convertToType(data["strain"], {
+          String: ["Number"],
+        });
+      }
+      if (data.hasOwnProperty("stress")) {
+        obj["stress"] = ApiClient.convertToType(data["stress"], {
+          String: ["Number"],
+        });
+      }
     }
     return obj;
   }
@@ -132,5 +152,15 @@ QuasiStaticTest.prototype["crack_load"] = undefined;
  * @member {Array.<Number>} crack_length
  */
 QuasiStaticTest.prototype["crack_length"] = undefined;
+
+/**
+ * @member {Object.<String, Array.<Number>>} strain
+ */
+QuasiStaticTest.prototype["strain"] = undefined;
+
+/**
+ * @member {Object.<String, Array.<Number>>} stress
+ */
+QuasiStaticTest.prototype["stress"] = undefined;
 
 export default QuasiStaticTest;
