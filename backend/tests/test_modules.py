@@ -79,7 +79,7 @@ def test_cld_harris() -> None:
     OUTPUT_CSV_FILE = os.path.join(OUTPUT_DIR, OUTPUT_CSV_FILENAME)
     print(f"INPUT_FILE={os.path.abspath(INPUT_FILE)}")
     print(f"OUTPUT_CSV_FILE={os.path.abspath(OUTPUT_CSV_FILE)}")
-    cld_harris.execute(INPUT_FILE, OUTPUT_CSV_FILE)
+    cld_harris.execute(INPUT_FILE, OUTPUT_CSV_FILE, 27.1, 27.7)
 
 
 # Module 4 - Fatigue failture
@@ -102,7 +102,7 @@ def test_faf_ftpf():
         snc_input_f_json_file=SNC_INPUT_F_JSON_FILE,
         faf_output_csv_file=FAF_OUTPUT_CSV_FILE,
         faf_output_json_file=FAF_OUTPUT_JSON_FILE,
-        sn_model="Log-Log",
+        sn_model=faf_ftpf.SnModel.LOG_LOG,
         desirable_angle=30,
         off_axis_angle=160,
     )
@@ -113,7 +113,7 @@ def test_faf_ftpf():
 
 def test_miner_harris() -> None:
     INPUT_SNC_FILENAME = "SNC_input2.csv"
-    INPUT_CYC_FILENAME = "CYC_ccinput.csv"
+    INPUT_CYC_FILENAME = "CYC_ccinput2.csv"
     OUTPUT_CSV_FILENAME = "DAS_harris.csv"
     INPUT_SNC_FILE = os.path.join(DATA_DIR, INPUT_SNC_FILENAME)
     INPUT_CYC_FILE = os.path.join(DATA_DIR, INPUT_CYC_FILENAME)
@@ -121,4 +121,6 @@ def test_miner_harris() -> None:
     print(f"INPUT_SNC_FILE={os.path.abspath(INPUT_SNC_FILE)}")
     print(f"INPUT_CYC_FILE={os.path.abspath(INPUT_CYC_FILE)}")
     print(f"OUTPUT_CSV_FILE={os.path.abspath(OUTPUT_CSV_FILE)}")
-    miner_harris.execute(INPUT_SNC_FILE, INPUT_CYC_FILE, OUTPUT_CSV_FILE)
+    miner_harris.execute(
+        INPUT_SNC_FILE, INPUT_CYC_FILE, OUTPUT_CSV_FILE, 367.2, 416.5, 1.4, 0.4, -0.1
+    )

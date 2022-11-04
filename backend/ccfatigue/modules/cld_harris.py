@@ -64,22 +64,26 @@ def cld_add_row(
 def execute(
     input_file: FilePath | ReadCsvBuffer,
     output_csv_file: FilePath | WriteBuffer,
+    ucs: float,
+    uts: float,
 ) -> None:
     """
     Execute the CLD Harris algorithm
     Parameters
     ----------
-        input_file: FilePath | ReadBuffer
+        input_file
             SNC input file
-        output_csv_file: FilePath | WriteBuffer
+        output_csv_file
             CLD csv file
+        ucs
+            Ultimate compressive stress
+        uts
+            Ultimate tensile stress
     Returns
     -------
         None
     """
 
-    ucs = harris_utils.UCS
-    uts = harris_utils.UTS
     bounds_margin = harris_utils.BOUNDS_MARGIN
 
     # Import input files (SNC format)
