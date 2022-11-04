@@ -73,9 +73,9 @@
 </template>
 
 <script>
+import DamageSummationMethod from "@/backend/model/DamageSummationMethod";
 import InfoTooltip from "@/components/InfoTooltip";
 import download from "downloadjs";
-import DamageSummationMethod from "@/backend/model/DamageSummationMethod";
 
 const methods = Object.values(new DamageSummationMethod());
 

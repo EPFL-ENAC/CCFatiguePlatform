@@ -34,8 +34,8 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
 import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
+import { mapState } from "vuex";
 export default {
   name: "TestsSelection",
   components: {

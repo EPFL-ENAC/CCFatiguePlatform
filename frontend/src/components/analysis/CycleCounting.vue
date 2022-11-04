@@ -43,9 +43,9 @@
 </template>
 
 <script>
+import CycleCountingMethod from "@/backend/model/CycleCountingMethod";
 import InfoTooltip from "@/components/InfoTooltip";
 import download from "downloadjs";
-import CycleCountingMethod from "@/backend/model/CycleCountingMethod";
 
 const methods = Object.values(new CycleCountingMethod());
 

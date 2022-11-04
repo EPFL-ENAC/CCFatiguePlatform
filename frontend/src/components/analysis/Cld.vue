@@ -74,9 +74,9 @@
 </template>
 
 <script>
+import CldMethod from "@/backend/model/CldMethod";
 import InfoTooltip from "@/components/InfoTooltip";
 import download from "downloadjs";
-import CldMethod from "@/backend/model/CldMethod";
 
 const methods = Object.values(new CldMethod());
 

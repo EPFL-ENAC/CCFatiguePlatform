@@ -146,8 +146,8 @@
 <script>
 import { mapState } from "vuex";
 
-import InfoButton from "@/components/InfoButton";
 import ExperimentSV from "@/components/ExperimentSV";
+import InfoButton from "@/components/InfoButton";
 
 export default {
   name: "ExperimentSpecifications",

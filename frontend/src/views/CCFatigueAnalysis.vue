@@ -22,11 +22,11 @@
 </template>
 
 <script>
-import SnCurve from "@/components/analysis/SnCurve.vue";
-import CycleCounting from "@/components/analysis/CycleCounting.vue";
 import Cld from "@/components/analysis/Cld.vue";
-import FatigueFailure from "@/components/analysis/FatigueFailure.vue";
+import CycleCounting from "@/components/analysis/CycleCounting.vue";
 import DamageSummation from "@/components/analysis/DamageSummation.vue";
+import FatigueFailure from "@/components/analysis/FatigueFailure.vue";
+import SnCurve from "@/components/analysis/SnCurve.vue";
 
 export default {
   name: "CCFatigueAnalysis",
