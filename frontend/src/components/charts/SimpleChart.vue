@@ -9,18 +9,18 @@
 </template>
 
 <script>
-import { use } from "echarts/core";
-import { CanvasRenderer } from "echarts/renderers";
+import { colorPalette } from "@/utils/style";
+import { LineChart } from "echarts/charts";
 import {
   GridComponent,
   LegendComponent,
   TitleComponent,
   TooltipComponent,
 } from "echarts/components";
-import { LineChart } from "echarts/charts";
-import VChart from "vue-echarts";
+import { use } from "echarts/core";
+import { CanvasRenderer } from "echarts/renderers";
 import { merge } from "lodash";
-import { colorPalette } from "@/utils/style";
+import VChart from "vue-echarts";
 
 use([
   CanvasRenderer,

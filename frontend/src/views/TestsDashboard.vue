@@ -230,14 +230,14 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-import InfoTooltip from "@/components/InfoTooltip";
+import DoubleChart from "@/components/charts/DoubleChart.vue";
+import SimpleChart from "@/components/charts/SimpleChart.vue";
 import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
 import ExperimentSV from "@/components/ExperimentSV.vue";
-import SimpleChart from "@/components/charts/SimpleChart.vue";
-import { zip } from "lodash";
+import InfoTooltip from "@/components/InfoTooltip";
 import { colorPalette } from "@/utils/style";
-import DoubleChart from "@/components/charts/DoubleChart.vue";
+import { zip } from "lodash";
+import { mapState } from "vuex";
 
 export default {
   name: "TestsDashboard",

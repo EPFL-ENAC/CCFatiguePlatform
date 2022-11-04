@@ -101,11 +101,11 @@
 </template>
 
 <script>
+import SnCurveMethod from "@/backend/model/SnCurveMethod";
+import SimpleChart from "@/components/charts/SimpleChart";
 import InfoTooltip from "@/components/InfoTooltip";
 import download from "downloadjs";
 import { zip } from "lodash";
-import SimpleChart from "@/components/charts/SimpleChart";
-import SnCurveMethod from "@/backend/model/SnCurveMethod";
 
 const methods = Object.values(new SnCurveMethod());
 

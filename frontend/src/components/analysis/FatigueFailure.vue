@@ -154,9 +154,9 @@
 </template>
 
 <script>
+import FatigueFailureMethod from "@/backend/model/FatigueFailureMethod";
 import InfoTooltip from "@/components/InfoTooltip";
 import download from "downloadjs";
-import FatigueFailureMethod from "@/backend/model/FatigueFailureMethod";
 
 const methods = Object.values(new FatigueFailureMethod());
 
