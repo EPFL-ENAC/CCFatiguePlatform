@@ -15,8 +15,8 @@
         </span>
 
         <span
-          v-else-if="valueType === 'PublicationsLinks'"
           v-for="(pub, index) in value"
+          v-else-if="valueType === 'PublicationsLinks'"
           :key="index"
         >
           <a :href="pub.DOI" target="_blank">{{ pub.Title }}</a>
@@ -33,11 +33,11 @@
 import InfoTooltip from "./InfoTooltip.vue";
 
 export default {
-  components: { InfoTooltip },
   name: "ExperimentSV",
+  components: { InfoTooltip },
   props: {
-    subject: String,
-    values: Array,
+    subject: { type: String, default: "" },
+    values: { type: Array, default: () => [] },
     valueType: {
       type: String,
       default: "string",
@@ -46,10 +46,8 @@ export default {
       type: String,
       default: "",
     },
-    colors: {
-      type: Array,
-    },
-    tooltip: String,
+    colors: { type: Array, default: () => [] },
+    tooltip: { type: String, default: "" },
   },
   methods: {
     getStyle(i) {

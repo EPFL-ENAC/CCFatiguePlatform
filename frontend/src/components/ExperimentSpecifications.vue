@@ -3,9 +3,7 @@
     <v-card-title>
       Experiment specifications (metadata)
       <info-button>
-        <template v-slot:title>
-          Experiment specifications metadata info
-        </template>
+        <template #title> Experiment specifications metadata info </template>
         The metadata are the set of information that define all the test
         parameters, they also allow us to uniquely define each test.
       </info-button>
@@ -151,12 +149,12 @@ import InfoButton from "@/components/InfoButton";
 
 export default {
   name: "ExperimentSpecifications",
-  props: {
-    experiment: Object,
-  },
   components: {
     InfoButton,
     ExperimentSV,
+  },
+  props: {
+    experiment: { type: Object, required: true },
   },
   computed: {
     readyToDisplay() {

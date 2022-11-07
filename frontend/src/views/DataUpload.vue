@@ -4,15 +4,15 @@
       <v-card-title>Dataset checker</v-card-title>
       <v-card-text>
         <v-file-input
+          v-model="experimentZip.file"
           chips
           show-size
           accept=".zip"
           label="Upload experiment ZIP"
-          v-model="experimentZip.file"
           :disabled="experimentZip.loading"
           :loading="experimentZip.loading"
-          @change="changeExperimentZip"
           color="secondary"
+          @change="changeExperimentZip"
         />
         <template v-if="experimentCheckResult.success !== null">
           <template v-if="experimentCheckResult.success">
@@ -85,6 +85,18 @@ export default {
       },
     };
   },
+  computed: {
+    countWarnings() {
+      return this.experimentCheckResult.output.filter(
+        (linesEntry) => linesEntry.prefix === "Warning: "
+      ).length;
+    },
+    countErrors() {
+      return this.experimentCheckResult.output.filter(
+        (linesEntry) => linesEntry.prefix === "ERROR: "
+      ).length;
+    },
+  },
   methods: {
     changeExperimentZip() {
       this.experimentCheckResult = {
@@ -128,18 +140,6 @@ export default {
           console.log("Error", { error });
         });
       return true;
-    },
-  },
-  computed: {
-    countWarnings() {
-      return this.experimentCheckResult.output.filter(
-        (linesEntry) => linesEntry.prefix === "Warning: "
-      ).length;
-    },
-    countErrors() {
-      return this.experimentCheckResult.output.filter(
-        (linesEntry) => linesEntry.prefix === "ERROR: "
-      ).length;
     },
   },
 };

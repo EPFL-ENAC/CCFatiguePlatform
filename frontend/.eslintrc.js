@@ -4,9 +4,13 @@ module.exports = {
     node: true,
   },
   ignorePatterns: ["backend"],
-  extends: ["plugin:vue/essential", "eslint:recommended", "@vue/prettier"],
+  extends: [
+    "plugin:vue/recommended",
+    "eslint:recommended",
+    "plugin:prettier/recommended",
+  ],
   parserOptions: {
-    parser: "babel-eslint",
+    ecmaVersion: 2020,
   },
   rules: {
     "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",

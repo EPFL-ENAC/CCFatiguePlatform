@@ -14,7 +14,7 @@
         item-key="id"
         @click:row="rowClick"
       >
-        <template v-slot:no-data>No test for this experiment</template>
+        <template #no-data>No test for this experiment</template>
       </v-data-table>
 
       <v-container>
@@ -22,8 +22,8 @@
           <v-btn class="ma-2" @click="goBack"> Back </v-btn>
           <v-btn
             class="ma-2"
+            :disabled="testsSelected.length === 0"
             @click="goToTestsDashboard"
-            :disabled="this.testsSelected.length === 0"
           >
             View tests Dashboard
           </v-btn>
@@ -42,7 +42,7 @@ export default {
     ExperimentSpecifications,
   },
   props: {
-    experimentId: Number,
+    experimentId: { type: Number, required: true },
   },
   data() {
     return {
@@ -78,6 +78,9 @@ export default {
       deep: true,
     },
   },
+  created() {
+    this.fetchOneExperimentWithTests();
+  },
   methods: {
     rowClick(_item, row) {
       row.select(!row.isSelected);
@@ -103,9 +106,6 @@ export default {
         },
       });
     },
-  },
-  created() {
-    this.fetchOneExperimentWithTests();
   },
 };
 </script>

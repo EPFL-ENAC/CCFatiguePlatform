@@ -17,7 +17,7 @@
             label="Upload file"
             @change="updateOutput"
           >
-            <template v-slot:append>
+            <template #append>
               <info-tooltip>TODO</info-tooltip>
             </template>
           </v-file-input>
@@ -35,7 +35,7 @@
       </v-row>
     </v-card-subtitle>
     <v-card-actions v-if="hasInput" class="justify-end">
-      <v-btn v-on:click="downloadOutput" :disabled="loading && output != null">
+      <v-btn :disabled="loading && output != null" @click="downloadOutput">
         Download
       </v-btn>
     </v-card-actions>
