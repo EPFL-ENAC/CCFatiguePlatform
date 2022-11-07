@@ -111,7 +111,7 @@
                   :colors="colors"
                   subject="Specimen number"
                   :values="specimenIds"
-                  valueType="bigNumber"
+                  value-type="bigNumber"
                 />
               </li>
               <li>
@@ -137,7 +137,7 @@
                   :colors="colors"
                   subject="N_cycles"
                   :values="specimenIds.map((t) => '-')"
-                  valueType="bigNumber"
+                  value-type="bigNumber"
                   tooltip="defined as the number of cycles to failure [-]"
                 />
               </li>
@@ -154,7 +154,7 @@
                   :colors="colors"
                   subject="Total dissipated energy (TDE)"
                   :values="totalDissipatedEnergies"
-                  valueType="bigNumber"
+                  value-type="bigNumber"
                   tooltip="defined as the sum of all the hysteresis areas over the course of an experiment. It gives a good measure of the amount of energy that has been dissipated in deformation and heat over the course of an experiment."
                 />
               </li>
@@ -164,7 +164,7 @@
       </v-col>
     </v-row>
     <v-row v-else>
-      <v-col cols="6" v-if="crackSeries.length > 0">
+      <v-col v-if="crackSeries.length > 0" cols="6">
         <v-card :loading="loading">
           <v-card-title>Crack Load vs Crack Displacement</v-card-title>
           <v-card-text>
@@ -178,7 +178,7 @@
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="6" v-if="loadDisplacementSeries.length > 0">
+      <v-col v-if="loadDisplacementSeries.length > 0" cols="6">
         <v-card :loading="loading">
           <v-card-title>Load vs Displacement</v-card-title>
           <v-card-text>
@@ -192,8 +192,8 @@
         </v-card>
       </v-col>
       <v-col
-        cols="6"
         v-if="strainOptions.length > 0 && stressOptions.length > 0"
+        cols="6"
       >
         <v-card :loading="loading">
           <v-card-title>Strain vs Stress</v-card-title>
@@ -249,8 +249,28 @@ export default {
     SimpleChart,
   },
   props: {
-    experimentId: Number,
+    experimentId: { type: Number, required: true },
     testIds: Array[Number],
+  },
+  data() {
+    return {
+      loading: false,
+      colors: colorPalette,
+      // FA
+      stressStrainSeries: [],
+      hysteresisAreaSeries: [],
+      creepSeries: [],
+      stiffnessSeries: [],
+      specimenIds: [],
+      totalDissipatedEnergies: [],
+      // QS
+      crackSeries: [],
+      loadDisplacementSeries: [],
+      strainData: {},
+      strainOptions: [],
+      strainOption: null,
+      stressData: {},
+    };
   },
   computed: {
     ...mapState("experiments", {
@@ -389,31 +409,6 @@ export default {
       }
     },
   },
-  data() {
-    return {
-      loading: false,
-      colors: colorPalette,
-      // FA
-      stressStrainSeries: [],
-      hysteresisAreaSeries: [],
-      creepSeries: [],
-      stiffnessSeries: [],
-      specimenIds: [],
-      totalDissipatedEnergies: [],
-      // QS
-      crackSeries: [],
-      loadDisplacementSeries: [],
-      strainData: {},
-      strainOptions: [],
-      strainOption: null,
-      stressData: {},
-    };
-  },
-  methods: {
-    goBack() {
-      this.$router.go(-1);
-    },
-  },
   created() {
     this.$store.dispatch("experiments/fetchOneExperimentWithTests", {
       experimentId: this.experimentId,
@@ -422,6 +417,11 @@ export default {
         size: 20,
       },
     });
+  },
+  methods: {
+    goBack() {
+      this.$router.go(-1);
+    },
   },
 };
 </script>

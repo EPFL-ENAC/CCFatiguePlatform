@@ -13,10 +13,10 @@
 
 <script>
 export default {
-  name: "Disclaimer",
+  name: "DisclaimerComponent",
   props: {
-    title: String,
-    details: String,
+    title: { type: String, default: "" },
+    details: { type: String, default: "" },
     icon: { type: String, default: "mdi-information-outline" },
     color: { type: String, default: "grey darken-4" },
     timeout: { type: Number, default: 4000 },

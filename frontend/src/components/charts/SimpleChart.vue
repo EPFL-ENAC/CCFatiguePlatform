@@ -37,29 +37,13 @@ export default {
     VChart,
   },
   props: {
-    aspectRatio: {
-      type: Number,
-      default: 1,
-    },
-    series: {
-      type: Array,
-    },
-    title: {
-      type: String,
-    },
-    xAxisName: {
-      type: String,
-    },
-    yAxisName: {
-      type: String,
-    },
-    xAxisType: {
-      type: String,
-    },
-    color: {
-      type: Array,
-      default: () => colorPalette,
-    },
+    aspectRatio: { type: Number, default: 1 },
+    series: { type: Array, default: () => [] },
+    title: { type: String, default: "" },
+    xAxisName: { type: String, default: "" },
+    yAxisName: { type: String, default: "" },
+    xAxisType: { type: String, default: "" },
+    color: { type: Array, default: () => colorPalette },
   },
   data() {
     return {
