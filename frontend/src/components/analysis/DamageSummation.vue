@@ -23,7 +23,7 @@
             label="SNC file"
             @change="updateOutput"
           >
-            <template v-slot:append>
+            <template #append>
               <info-tooltip>
                 The data used as input for this method is slightly different
                 than that of the previous modules. As damage summation deals
@@ -65,7 +65,7 @@
       <v-img src="/img/results_dashboard4.png"></v-img>
     </v-card-text>
     <v-card-actions v-if="hasInput" class="justify-end">
-      <v-btn v-on:click="downloadOutput" :disabled="loading && output != null">
+      <v-btn :disabled="loading && output != null" @click="downloadOutput">
         Download
       </v-btn>
     </v-card-actions>
@@ -73,9 +73,9 @@
 </template>
 
 <script>
+import DamageSummationMethod from "@/backend/model/DamageSummationMethod";
 import InfoTooltip from "@/components/InfoTooltip";
 import download from "downloadjs";
-import DamageSummationMethod from "@/backend/model/DamageSummationMethod";
 
 const methods = Object.values(new DamageSummationMethod());
 

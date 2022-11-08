@@ -16,15 +16,15 @@
       <v-row align="center">
         <v-col>
           <v-file-input
+            v-model="file"
             chips
             show-size
             accept=".txt,.csv"
             label="Upload file"
-            v-model="file"
             :disabled="loading"
             @change="updateOutput"
           >
-            <template v-slot:append>
+            <template #append>
               <info-tooltip>
                 The data required as input for this module takes the form of a
                 csv file containing 6 columns and as many rows as there were
@@ -58,9 +58,9 @@
       <v-row>
         <v-col>
           <v-select
+            v-model="selectedMethods"
             label="select S-N curve method(s)"
             :items="methods"
-            v-model="selectedMethods"
             chips
             multiple
             :disabled="loading"
@@ -70,9 +70,9 @@
         </v-col>
         <v-col>
           <v-select
+            v-model="selectedRRatios"
             label="select R ratio"
             :items="rRatios"
-            v-model="selectedRRatios"
             chips
             multiple
             :disabled="loading"
@@ -93,7 +93,7 @@
       </v-row>
     </v-card-text>
     <v-card-actions v-if="hasInput" class="justify-end">
-      <v-btn v-on:click="downloadOutput" :disabled="loading && output">
+      <v-btn :disabled="loading && output" @click="downloadOutput">
         Download
       </v-btn>
     </v-card-actions>
@@ -101,11 +101,11 @@
 </template>
 
 <script>
+import SnCurveMethod from "@/backend/model/SnCurveMethod";
+import SimpleChart from "@/components/charts/SimpleChart";
 import InfoTooltip from "@/components/InfoTooltip";
 import download from "downloadjs";
 import { zip } from "lodash";
-import SimpleChart from "@/components/charts/SimpleChart";
-import SnCurveMethod from "@/backend/model/SnCurveMethod";
 
 const methods = Object.values(new SnCurveMethod());
 

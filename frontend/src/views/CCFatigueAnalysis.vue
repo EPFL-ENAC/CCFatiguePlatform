@@ -9,7 +9,7 @@
         <sn-curve></sn-curve>
       </v-col>
       <v-col cols="6">
-        <cld></cld>
+        <cld-analysis></cld-analysis>
       </v-col>
       <v-col cols="6">
         <fatigue-failure></fatigue-failure>
@@ -22,16 +22,16 @@
 </template>
 
 <script>
-import SnCurve from "@/components/analysis/SnCurve.vue";
+import CldAnalysis from "@/components/analysis/CldAnalysis.vue";
 import CycleCounting from "@/components/analysis/CycleCounting.vue";
-import Cld from "@/components/analysis/Cld.vue";
-import FatigueFailure from "@/components/analysis/FatigueFailure.vue";
 import DamageSummation from "@/components/analysis/DamageSummation.vue";
+import FatigueFailure from "@/components/analysis/FatigueFailure.vue";
+import SnCurve from "@/components/analysis/SnCurve.vue";
 
 export default {
   name: "CCFatigueAnalysis",
   components: {
-    Cld,
+    CldAnalysis,
     CycleCounting,
     DamageSummation,
     FatigueFailure,

@@ -1,9 +1,10 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Home from "../views/Home.vue";
 // route level code-splitting
 // this generates a separate chunk (name.[hash].js) for each route
 // which is lazy-loaded when the route is visited.
+const HomeView = () =>
+  import(/* webpackChunkName: "home" */ "../views/HomeView.vue");
 const SearchDatabase = () =>
   import(/* webpackChunkName: "search" */ "../views/SearchDatabase.vue");
 const TestsSelection = () =>
@@ -20,8 +21,8 @@ const CCFatigueAnalysis = () =>
   import(
     /* webpackChunkName: "ccfatigue_analysis" */ "../views/CCFatigueAnalysis.vue"
   );
-const About = () =>
-  import(/* webpackChunkName: "about" */ "../views/About.vue");
+const AboutView = () =>
+  import(/* webpackChunkName: "about" */ "../views/AboutView.vue");
 
 Vue.use(VueRouter);
 
@@ -34,7 +35,7 @@ const routes = [
   {
     path: "/home",
     name: "Home",
-    component: Home,
+    component: HomeView,
   },
   {
     path: "/fatigue_database",
@@ -83,7 +84,7 @@ const routes = [
   {
     path: "/about",
     name: "About",
-    component: About,
+    component: AboutView,
   },
 ];
 

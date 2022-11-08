@@ -9,18 +9,18 @@
 </template>
 
 <script>
-import { use } from "echarts/core";
-import { CanvasRenderer } from "echarts/renderers";
+import { colorPalette } from "@/utils/style";
+import { LineChart, ScatterChart } from "echarts/charts";
 import {
   GridComponent,
   LegendComponent,
   TitleComponent,
   TooltipComponent,
 } from "echarts/components";
-import { LineChart, ScatterChart } from "echarts/charts";
-import VChart from "vue-echarts";
+import { use } from "echarts/core";
+import { CanvasRenderer } from "echarts/renderers";
 import { merge } from "lodash";
-import { colorPalette } from "@/utils/style";
+import VChart from "vue-echarts";
 
 use([
   CanvasRenderer,
@@ -38,32 +38,14 @@ export default {
     VChart,
   },
   props: {
-    aspectRatio: {
-      type: Number,
-      default: 1,
-    },
-    series: {
-      type: Array,
-    },
-    title: {
-      type: String,
-    },
-    xAxisName: {
-      type: String,
-    },
-    y1AxisName: {
-      type: String,
-    },
-    y2AxisName: {
-      type: String,
-    },
-    xAxisType: {
-      type: String,
-    },
-    color: {
-      type: Array,
-      default: () => colorPalette,
-    },
+    aspectRatio: { type: Number, default: 1 },
+    series: { type: Array, default: () => [] },
+    title: { type: String, default: "" },
+    xAxisName: { type: String, default: "" },
+    y1AxisName: { type: String, default: "" },
+    y2AxisName: { type: String, default: "" },
+    xAxisType: { type: String, default: "" },
+    color: { type: Array, default: () => colorPalette },
   },
   data() {
     return {
