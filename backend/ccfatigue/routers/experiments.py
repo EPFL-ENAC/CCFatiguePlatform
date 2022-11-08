@@ -40,8 +40,8 @@ async def get_experiments(
     Get all experiments
     """
     query_where_clauses: List[Any] = get_where_clauses(query, Experiment)
-    text_search_where_clauses: List[Any] = get_where_clauses(
-        f"%{text_search}%", Experiment
+    text_search_where_clauses: List[Any] = (
+        get_where_clauses(f"%{text_search}%", Experiment) if text_search else []
     )
     return await paginate(
         session,

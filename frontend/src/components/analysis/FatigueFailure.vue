@@ -21,7 +21,7 @@
             label="X file"
             @change="updateOutput"
           >
-            <template v-slot:append>
+            <template #append>
               <info-tooltip>
                 <p>
                   The data type selection box allows us to enter static, fatigue
@@ -146,7 +146,7 @@
       <v-img src="/img/results_dashboard3.png"></v-img>
     </v-card-text>
     <v-card-actions v-if="hasInput" class="justify-end">
-      <v-btn v-on:click="downloadOutput" :disabled="loading && output != null">
+      <v-btn :disabled="loading && output != null" @click="downloadOutput">
         Download
       </v-btn>
     </v-card-actions>
@@ -154,9 +154,9 @@
 </template>
 
 <script>
+import FatigueFailureMethod from "@/backend/model/FatigueFailureMethod";
 import InfoTooltip from "@/components/InfoTooltip";
 import download from "downloadjs";
-import FatigueFailureMethod from "@/backend/model/FatigueFailureMethod";
 
 const methods = Object.values(new FatigueFailureMethod());
 

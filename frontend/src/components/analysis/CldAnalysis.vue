@@ -22,7 +22,7 @@
             label="Upload file"
             @change="updateOutput"
           >
-            <template v-slot:append>
+            <template #append>
               <info-tooltip>
                 The data required as input is a csv file with 3 distinct
                 columns:
@@ -66,7 +66,7 @@
       <v-img src="/img/results_dashboard2.png"></v-img>
     </v-card-text>
     <v-card-actions v-if="hasInput" class="justify-end">
-      <v-btn v-on:click="downloadOutput" :disabled="loading && output != null">
+      <v-btn :disabled="loading && output != null" @click="downloadOutput">
         Download
       </v-btn>
     </v-card-actions>
@@ -74,14 +74,14 @@
 </template>
 
 <script>
+import CldMethod from "@/backend/model/CldMethod";
 import InfoTooltip from "@/components/InfoTooltip";
 import download from "downloadjs";
-import CldMethod from "@/backend/model/CldMethod";
 
 const methods = Object.values(new CldMethod());
 
 export default {
-  name: "Cld",
+  name: "CldAnalysis",
   components: {
     InfoTooltip,
   },

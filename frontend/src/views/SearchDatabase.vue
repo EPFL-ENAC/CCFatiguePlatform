@@ -139,20 +139,20 @@
               'items-per-page-options': [5, 10, 15, 20, 40],
             }"
             item-key="id"
-            @click:row="rowClick"
             single-select
+            @click:row="rowClick"
           >
-            <template v-slot:no-data>No experiment in database</template>
+            <template #no-data>No experiment in database</template>
           </v-data-table>
           <v-container>
             <v-row justify="center">
               <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
+                <template #activator="{ on, attrs }">
                   <v-btn
                     class="ma-2"
                     :disabled="experimentSelected.length === 0"
-                    @click="downloadRawFiles"
                     v-bind="attrs"
+                    @click="downloadRawFiles"
                     v-on="on"
                   >
                     Download raw files
@@ -168,12 +168,12 @@
                 View tests results
               </v-btn>
               <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
+                <template #activator="{ on, attrs }">
                   <v-btn
                     class="ma-2"
                     :disabled="experimentSelected.length === 0"
-                    @click="analyseExperiment"
                     v-bind="attrs"
+                    @click="analyseExperiment"
                     v-on="on"
                   >
                     Analyse experiment
@@ -239,10 +239,6 @@ export default {
         "allLaminatesAndAssembliesStackingSequence",
     }),
   },
-  created() {
-    this.$store.dispatch("experiments/fetchAllFiltersValues");
-    this.fetchExperiments();
-  },
   watch: {
     options: {
       handler() {
@@ -250,6 +246,10 @@ export default {
       },
       deep: true,
     },
+  },
+  created() {
+    this.$store.dispatch("experiments/fetchAllFiltersValues");
+    this.fetchExperiments();
   },
   methods: {
     rowClick(_item, row) {

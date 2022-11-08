@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-card flat>
-      <v-card-title> About </v-card-title>
+      <v-card-title>About</v-card-title>
       <v-card-text>
         <p class="text-justify">
           CCFatiguePlatform is an initiative from CCLab at EPFL that aims to
@@ -53,7 +53,7 @@
 
 <script>
 export default {
-  name: "About",
+  name: "AboutView",
   data() {
     return {
       units: [
