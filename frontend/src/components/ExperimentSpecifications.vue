@@ -112,7 +112,7 @@
             </li>
             <li>
               <experiment-s-v
-                subject="Mixing ration"
+                subject="Mixing ratio"
                 :values="[experiment.material_type_mixing_ratio]"
               />
             </li>
