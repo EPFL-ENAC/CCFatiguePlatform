@@ -58,6 +58,9 @@ make run
 
 ![flowchart_CCFATIGUE.png](flowchart_CCFATIGUE.png)
 
+# Original analysis fortran modules
+The modules have been removed from the project but can be viewed [here](https://github.com/EPFL-ENAC/CCFatiguePlatform/tree/cde13599121bceb95d579adfe3e56056ba622d60/CCFatigue_modules).
+
 # License
 
 MIT
