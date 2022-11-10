@@ -30,9 +30,9 @@ import pandas as pd
 from pandas._typing import FilePath, ReadBuffer, WriteBuffer
 from scipy import stats
 
-import ccfatigue.fortran.sendeckyj as sendeckyj  # Fortran optimized functions
-import ccfatigue.modules.sn_curve_utils as sn_curve_utils
-from ccfatigue.modules.astm import Astm
+import ccfatigue.analysis.fortran.sendeckyj as sendeckyj  # Fortran optimized functions
+import ccfatigue.analysis.sn_curve_utils as sn_curve_utils
+from ccfatigue.analysis.astm import Astm
 
 # C is a measure of the extent of the "flat" region on the S-N curve at high
 #  applied cyclic stress levels (see ref, p 248)

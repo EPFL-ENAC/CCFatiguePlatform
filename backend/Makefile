@@ -17,12 +17,12 @@ test:
 	poetry run pytest
 
 compile:
-	poetry run python -m numpy.f2py -c fortran/sendeckyj.f -m ccfatigue.fortran.sendeckyj
+	poetry run python -m numpy.f2py -c ccfatigue/analysis/fortran/sendeckyj.f -m ccfatigue.analysis.fortran.sendeckyj
 
 compile-win:
-	rm -rf ccfatigue/fortran
+	rm -rf ccfatigue/analysis/fortran/*.so
 	$(MAKE) compile
-	mv ccfatigue/.libs/* ccfatigue/fortran
+	mv ccfatigue/.libs/* ccfatigue/analysis/fortran
 	rmdir ccfatigue/.libs
 
 run:
