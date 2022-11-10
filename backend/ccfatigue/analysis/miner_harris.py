@@ -15,7 +15,7 @@ import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 from scipy import optimize, stats
 
-import ccfatigue.modules.harris_utils as harris_utils
+import ccfatigue.analysis.harris_utils as harris_utils
 
 DEFAULT_UCS = 367.2
 DEFAULT_UTS = 416.5

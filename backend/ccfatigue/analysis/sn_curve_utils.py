@@ -11,7 +11,7 @@ import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 from scipy import stats
 
-from ccfatigue.modules.astm import Astm
+from ccfatigue.analysis.astm import Astm
 
 
 def equation_ycar(slope: float, intercept: float, stress_parameter: float) -> float:

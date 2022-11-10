@@ -17,7 +17,7 @@ from typing import Optional
 import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 
-import ccfatigue.modules.sn_curve_utils as sn_curve_utils
+import ccfatigue.analysis.sn_curve_utils as sn_curve_utils
 
 # Prepare all cycles to failure output (SNC)
 # Refs:
