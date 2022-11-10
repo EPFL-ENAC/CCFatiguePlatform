@@ -32,8 +32,8 @@
                 <simple-chart
                   :series="stressStrainSeries"
                   :aspect-ratio="2"
-                  x-axis-name="Strain"
-                  y-axis-name="Stress"
+                  x-axis-name="Strain [-]"
+                  y-axis-name="Stress [MPa]"
                 ></simple-chart>
               </v-card-text>
             </v-card>
@@ -54,8 +54,8 @@
                 <simple-chart
                   :series="hysteresisAreaSeries"
                   :aspect-ratio="2"
-                  x-axis-name="Number of cycles"
-                  y-axis-name="Hysteresis area"
+                  x-axis-name="Number of cycles [-]"
+                  y-axis-name="Hysteresis area [N/mm²]"
                 ></simple-chart>
               </v-card-text>
             </v-card>
@@ -74,8 +74,8 @@
                 <simple-chart
                   :series="creepSeries"
                   :aspect-ratio="2"
-                  x-axis-name="Number of cycles"
-                  y-axis-name="Creep"
+                  x-axis-name="Number of cycles [-]"
+                  y-axis-name="Creep [-]"
                 ></simple-chart>
               </v-card-text>
             </v-card>
@@ -94,8 +94,8 @@
                 <simple-chart
                   :series="stiffnessSeries"
                   :aspect-ratio="2"
-                  x-axis-name="Number of cycles"
-                  y-axis-name="Stiffness"
+                  x-axis-name="Number of cycles [-]"
+                  y-axis-name="Stiffness [N/mm²]"
                 ></simple-chart>
               </v-card-text>
             </v-card>
@@ -171,9 +171,9 @@
             <double-chart
               :series="crackSeries"
               :aspect-ratio="2"
-              x-axis-name="Crack Displacement"
-              :y1-axis-name="'Crack Load \u23AF\u23AF\u23AF'"
-              :y2-axis-name="'Crack Length \u2022\u2022\u2022'"
+              x-axis-name="Crack Displacement [mm]"
+              :y1-axis-name="'Crack Load ⎯⎯⎯ [N]'"
+              :y2-axis-name="'Crack Length ••• [mm]'"
             ></double-chart>
           </v-card-text>
         </v-card>
@@ -185,8 +185,8 @@
             <simple-chart
               :series="loadDisplacementSeries"
               :aspect-ratio="2"
-              x-axis-name="Machine Displacement"
-              y-axis-name="Machine Load"
+              x-axis-name="Machine Displacement [mm]"
+              y-axis-name="Machine Load [N]"
             ></simple-chart>
           </v-card-text>
         </v-card>
@@ -219,8 +219,8 @@
             <simple-chart
               :series="strainStressSeries"
               :aspect-ratio="2"
-              x-axis-name="Strain"
-              y-axis-name="Stress"
+              x-axis-name="Strain [-]"
+              y-axis-name="Stress [MPa]"
             ></simple-chart>
           </v-card-text>
         </v-card>
