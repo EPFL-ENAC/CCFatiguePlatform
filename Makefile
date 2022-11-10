@@ -3,6 +3,7 @@ install:
 	npm install
 	$(MAKE) install-backend
 	$(MAKE) install-frontend
+	$(MAKE) compile
 
 install-backend:
 	$(MAKE) -C backend install
@@ -43,7 +44,5 @@ run:
 
 
 # compile* -> does all Fortran compilation
-compile: compile_sncurve
-
-compile_sncurve:
-	$(MAKE) -C CCFatigue_modules/2_S-NCurves compile
+compile:
+	$(MAKE) -C backend compile
