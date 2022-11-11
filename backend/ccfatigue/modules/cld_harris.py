@@ -17,11 +17,8 @@ from scipy import stats
 
 import ccfatigue.modules.harris_utils as harris_utils
 
-# staticvalue.txt => constants
-# ucs = 27.1
-# UTS = 27.7
-
-# BOUNDS_MARGIN = 0.99
+DEFAULT_UCS = 27.1
+DEFAULT_UTS = 27.7
 
 # Cycles for the isolines (the lines of the CLD)
 CLD_CYCLES_COUNT = [10**x for x in range(3, 10)]  # = 1e3, 1e4, ..., 1e9
@@ -64,22 +61,26 @@ def cld_add_row(
 def execute(
     input_file: FilePath | ReadCsvBuffer,
     output_csv_file: FilePath | WriteBuffer,
+    ucs: float = DEFAULT_UCS,
+    uts: float = DEFAULT_UTS,
 ) -> None:
     """
     Execute the CLD Harris algorithm
     Parameters
     ----------
-        input_file: FilePath | ReadBuffer
+        input_file
             SNC input file
-        output_csv_file: FilePath | WriteBuffer
+        output_csv_file
             CLD csv file
+        ucs
+            Ultimate compressive stress
+        uts
+            Ultimate tensile stress
     Returns
     -------
         None
     """
 
-    ucs = harris_utils.UCS
-    uts = harris_utils.UTS
     bounds_margin = harris_utils.BOUNDS_MARGIN
 
     # Import input files (SNC format)
