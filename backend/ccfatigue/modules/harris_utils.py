@@ -5,10 +5,6 @@ Common code for cld_harris.py and miner_harris.py
 
 import numpy as np
 
-# staticvalue.txt => constants
-UCS = 27.1
-UTS = 27.7
-
 BOUNDS_MARGIN = 0.99
 
 # # Cycles for the isolines (the lines of the CLD)
