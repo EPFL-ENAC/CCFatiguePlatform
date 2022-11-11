@@ -17,6 +17,12 @@ from scipy import optimize, stats
 
 import ccfatigue.modules.harris_utils as harris_utils
 
+DEFAULT_UCS = 367.2
+DEFAULT_UTS = 416.5
+DEFAULT_FACTOR_START = 1.4
+DEFAULT_FACTOR_STOP = 0.4
+DEFAULT_FACTOR_STEP = -0.1
+
 
 def get_normalized_stress_amplitude(m: float, c: float, f: float, u: float, v: float):
     """
@@ -185,11 +191,11 @@ def execute(
     input_snc_file: FilePath | ReadCsvBuffer,
     input_cyc_file: FilePath | ReadCsvBuffer,
     output_csv_file: FilePath | WriteBuffer,
-    ucs: float,
-    uts: float,
-    factor_start=1.0,
-    factor_stop=0.9,
-    factor_step=-1.0,
+    ucs: float = DEFAULT_UCS,
+    uts: float = DEFAULT_UTS,
+    factor_start: float = DEFAULT_FACTOR_START,
+    factor_stop: float = DEFAULT_FACTOR_STOP,
+    factor_step: float = DEFAULT_FACTOR_STEP,
 ) -> None:
     """
     Execute the CLD Harris algorithm
