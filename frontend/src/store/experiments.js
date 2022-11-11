@@ -123,6 +123,7 @@ export default {
       if (Object.keys(state.units).length === 0) {
         this._vm.$defaultApi.getUnits().then(
           (data) => commit("storeUnits", data),
+          // eslint-disable-next-line no-console
           (error) => console.error(error)
         );
       }
@@ -133,6 +134,7 @@ export default {
         .getExperiments({ query: `id:${payload.experimentId}` })
         .then(
           (data) => commit("storeOneExperiment", data),
+          // eslint-disable-next-line no-console
           (error) => console.error(error)
         );
       this._vm.$testsApi
@@ -142,6 +144,7 @@ export default {
         })
         .then(
           (data) => commit("storeOneExperimentTests", data),
+          // eslint-disable-next-line no-console
           (error) => console.error(error)
         );
     },
@@ -210,22 +213,26 @@ export default {
       };
       this._vm.$experimentsApi.getExperiments(opts).then(
         (data) => commit("storeFilteredExperiments", data),
+        // eslint-disable-next-line no-console
         (error) => console.error(error)
       );
     },
     fetchAllFiltersValues({ commit }) {
       this._vm.$experimentsApi.getFieldDistinct("fracture_mode").then(
         (data) => commit("storeAllFractureMode", data),
+        // eslint-disable-next-line no-console
         (error) => console.error(error)
       );
       this._vm.$experimentsApi
         .getFieldDistinct("material_type_fiber_material")
         .then(
           (data) => commit("storeAllMaterialTypeFiberMaterial", data),
+          // eslint-disable-next-line no-console
           (error) => console.error(error)
         );
       this._vm.$experimentsApi.getFieldDistinct("material_type_resin").then(
         (data) => commit("storeAllMaterialTypeResin", data),
+        // eslint-disable-next-line no-console
         (error) => console.error(error)
       );
       this._vm.$experimentsApi
@@ -233,6 +240,7 @@ export default {
         .then(
           (data) =>
             commit("storeAllLaminatesAndAssembliesStackingSequence", data),
+          // eslint-disable-next-line no-console
           (error) => console.error(error)
         );
     },

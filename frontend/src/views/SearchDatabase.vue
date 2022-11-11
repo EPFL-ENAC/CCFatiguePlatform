@@ -287,9 +287,7 @@ export default {
       });
     },
     downloadRawFiles() {
-      console.log(
-        `Download Raw files for experiment ${this.experimentSelected[0].id} : not implemented yet.`
-      );
+      // Download Raw files for experiment ${this.experimentSelected[0].id} : not implemented yet.
     },
     viewTestsSelection() {
       this.$router.push({
@@ -298,9 +296,7 @@ export default {
       });
     },
     analyseExperiment() {
-      console.log(
-        `Analyse experiment ${this.experimentSelected[0].id} : not implemented yet.`
-      );
+      // Analyse experiment ${this.experimentSelected[0].id} : not implemented yet.
     },
   },
 };

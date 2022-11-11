@@ -137,6 +137,7 @@ export default {
           this.experimentZip.loading = false;
         })
         .catch((error) => {
+          // eslint-disable-next-line no-console
           console.log("Error", { error });
         });
       return true;
