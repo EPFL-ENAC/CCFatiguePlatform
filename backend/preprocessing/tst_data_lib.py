@@ -769,11 +769,11 @@ class Experiment:
             # Check mandatory columns
             for col_constraint in (
                 {
-                    "path": "specimen number",
+                    "paths": ("specimen number",),
                     "mandatory": True,
                 },
                 {
-                    "path": "stress ratio",
+                    "paths": ("stress ratio",),
                     "mandatory": Experiment.__get_val_at(
                         self.experiment, "general>experiment type", ""
                     )
@@ -781,7 +781,7 @@ class Experiment:
                     "mandatory_condition": "when experiment type is 'FA'",
                 },
                 {
-                    "path": "maximum stress",
+                    "paths": ("maximum stress",),
                     "mandatory": Experiment.__get_val_at(
                         self.experiment, "general>experiment type", ""
                     )
@@ -789,7 +789,11 @@ class Experiment:
                     "mandatory_condition": "when experiment type is 'FA'",
                 },
                 {
-                    "path": "frequency",
+                    "paths": (
+                        "frequency",
+                        "displacement controlled loading rate",
+                        "load controlled loading rate",
+                    ),
                     "mandatory": Experiment.__get_val_at(
                         self.experiment, "general>experiment type", ""
                     )
@@ -797,7 +801,7 @@ class Experiment:
                     "mandatory_condition": "when experiment type is 'FA'",
                 },
                 {
-                    "path": "run out",
+                    "paths": ("run out",),
                     "mandatory": Experiment.__get_val_at(
                         self.experiment, "general>experiment type", ""
                     )
@@ -805,15 +809,16 @@ class Experiment:
                     "mandatory_condition": "when experiment type is 'FA'",
                 },
             ):
-                if (
-                    col_constraint["mandatory"]
-                    and col_constraint["path"] not in self.tests.columns
-                ):
-                    self.logger.error(
-                        "missing mandatory column "
-                        f"{col_constraint.get('mandatory_condition', '')}: "
-                        f"{col_constraint['path']}"
+                if col_constraint["mandatory"]:
+                    found = any(
+                        path in self.tests.columns for path in col_constraint["paths"]
                     )
+                    if not found:
+                        self.logger.error(
+                            "missing mandatory column "
+                            f"{col_constraint.get('mandatory_condition', '')}: "
+                            f"{col_constraint['paths']}"
+                        )
 
             # Type check
             for col_constraint in (
