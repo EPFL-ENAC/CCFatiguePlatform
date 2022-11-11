@@ -404,6 +404,8 @@ export default {
             })
             .finally(() => (this.loading = false));
           break;
+        case undefined:
+          break;
         default:
           throw new Error(`unknown experiment type ${val}`);
       }
