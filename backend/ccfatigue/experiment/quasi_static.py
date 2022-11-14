@@ -1,6 +1,6 @@
 import os
 from re import Pattern, search
-from typing import Dict, List
+from typing import Callable, Dict, List
 
 import pandas as pd
 from pandas import DataFrame
@@ -13,11 +13,11 @@ from ccfatigue.models.database import Experiment
 
 
 class QuasiStaticTest(BaseModel):
-    machine_displacement: List[float]
-    machine_load: List[float]
     crack_displacement: List[float]
     crack_load: List[float]
     crack_length: List[float]
+    displacement: Dict[str, List[float]]
+    load: Dict[str, List[float]]
     strain: Dict[str, List[float]]
     stress: Dict[str, List[float]]
 
@@ -63,6 +63,18 @@ def filter_regex(values: List[str], pattern: str | Pattern[str]) -> List[str]:
     return list(filter(lambda value: search(pattern, value), values))
 
 
+def filter_columns(
+    df: DataFrame,
+    column_list: List[str],
+    pattern: str | Pattern[str],
+    fn: Callable[[float], float] = lambda value: value,
+) -> Dict[str, List[float]]:
+    columns = filter_regex(column_list, pattern)
+    selected_df = df[columns].dropna()
+    mapped_df = selected_df.apply(fn)
+    return {column: mapped_df[column].to_list() for column in columns}
+
+
 async def quasi_static_test(
     session: AsyncSession,
     experiment_id: int,
@@ -85,11 +97,11 @@ async def quasi_static_test(
     specimen_id = await get_specimen_id(session, experiment_id, test_id)
     df = get_dataframe(experiment, specimen_id)
     column_list = df.columns.to_list()
-    machine_df = (
-        df[["Machine_Displacement", "Machine_Load"]].dropna()
-        if {"Machine_Displacement", "Machine_Load"}.issubset(df.columns)
-        else pd.DataFrame(columns=["Machine_Displacement", "Machine_Load"])
+
+    displacement = filter_columns(
+        df, column_list, r"^(Machine_Displacement|MD_Displacement--\d+|u--\d+|v--\d+)$"
     )
+    load = filter_columns(df, column_list, r"^(Machine_Load|MD_Load--\d+)$")
 
     fracture = experiment["fracture"]
     crack_df = (
@@ -103,24 +115,20 @@ async def quasi_static_test(
     if not fracture:
         test = get_test_metadata(experiment, specimen_id)
         if "width" in test and "thickness" in test:
+            strain = filter_columns(df, column_list, r"^(exx--\d+|eyy--\d+|exy--\d+)$")
             area = test["width"] * test["thickness"]
-
-            strain_columns = filter_regex(
-                column_list, r"^(exx--\d+|eyy--\d+|exy--\d+)$"
+            stress = filter_columns(
+                df,
+                column_list,
+                r"^(MD_Load--\d+|Machine_Load)$",
+                lambda value: value / area,
             )
-            strain = {column: df[column].to_list() for column in strain_columns}
-
-            load_columns = filter_regex(column_list, r"^(MD_Load--\d+|Machine_Load)$")
-            stress = {
-                column: (df[column].dropna() / area).to_list()
-                for column in load_columns
-            }
     return QuasiStaticTest(
-        machine_displacement=machine_df["Machine_Displacement"].to_list(),
-        machine_load=machine_df["Machine_Load"].to_list(),
         crack_displacement=crack_df["Crack_Displacement"].to_list(),
         crack_load=crack_df["Crack_Load"].to_list(),
         crack_length=crack_df["Crack_length"].to_list(),
+        displacement=displacement,
+        load=load,
         strain=strain,
         stress=stress,
     )

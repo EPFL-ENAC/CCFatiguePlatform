@@ -22,30 +22,30 @@ class QuasiStaticTest {
   /**
    * Constructs a new <code>QuasiStaticTest</code>.
    * @alias module:model/QuasiStaticTest
-   * @param machineDisplacement {Array.<Number>}
-   * @param machineLoad {Array.<Number>}
    * @param crackDisplacement {Array.<Number>}
    * @param crackLoad {Array.<Number>}
    * @param crackLength {Array.<Number>}
+   * @param displacement {Object.<String, Array.<Number>>}
+   * @param load {Object.<String, Array.<Number>>}
    * @param strain {Object.<String, Array.<Number>>}
    * @param stress {Object.<String, Array.<Number>>}
    */
   constructor(
-    machineDisplacement,
-    machineLoad,
     crackDisplacement,
     crackLoad,
     crackLength,
+    displacement,
+    load,
     strain,
     stress
   ) {
     QuasiStaticTest.initialize(
       this,
-      machineDisplacement,
-      machineLoad,
       crackDisplacement,
       crackLoad,
       crackLength,
+      displacement,
+      load,
       strain,
       stress
     );
@@ -58,19 +58,19 @@ class QuasiStaticTest {
    */
   static initialize(
     obj,
-    machineDisplacement,
-    machineLoad,
     crackDisplacement,
     crackLoad,
     crackLength,
+    displacement,
+    load,
     strain,
     stress
   ) {
-    obj["machine_displacement"] = machineDisplacement;
-    obj["machine_load"] = machineLoad;
     obj["crack_displacement"] = crackDisplacement;
     obj["crack_load"] = crackLoad;
     obj["crack_length"] = crackLength;
+    obj["displacement"] = displacement;
+    obj["load"] = load;
     obj["strain"] = strain;
     obj["stress"] = stress;
   }
@@ -86,17 +86,6 @@ class QuasiStaticTest {
     if (data) {
       obj = obj || new QuasiStaticTest();
 
-      if (data.hasOwnProperty("machine_displacement")) {
-        obj["machine_displacement"] = ApiClient.convertToType(
-          data["machine_displacement"],
-          ["Number"]
-        );
-      }
-      if (data.hasOwnProperty("machine_load")) {
-        obj["machine_load"] = ApiClient.convertToType(data["machine_load"], [
-          "Number",
-        ]);
-      }
       if (data.hasOwnProperty("crack_displacement")) {
         obj["crack_displacement"] = ApiClient.convertToType(
           data["crack_displacement"],
@@ -112,6 +101,16 @@ class QuasiStaticTest {
         obj["crack_length"] = ApiClient.convertToType(data["crack_length"], [
           "Number",
         ]);
+      }
+      if (data.hasOwnProperty("displacement")) {
+        obj["displacement"] = ApiClient.convertToType(data["displacement"], {
+          String: ["Number"],
+        });
+      }
+      if (data.hasOwnProperty("load")) {
+        obj["load"] = ApiClient.convertToType(data["load"], {
+          String: ["Number"],
+        });
       }
       if (data.hasOwnProperty("strain")) {
         obj["strain"] = ApiClient.convertToType(data["strain"], {
@@ -129,16 +128,6 @@ class QuasiStaticTest {
 }
 
 /**
- * @member {Array.<Number>} machine_displacement
- */
-QuasiStaticTest.prototype["machine_displacement"] = undefined;
-
-/**
- * @member {Array.<Number>} machine_load
- */
-QuasiStaticTest.prototype["machine_load"] = undefined;
-
-/**
  * @member {Array.<Number>} crack_displacement
  */
 QuasiStaticTest.prototype["crack_displacement"] = undefined;
@@ -152,6 +141,16 @@ QuasiStaticTest.prototype["crack_load"] = undefined;
  * @member {Array.<Number>} crack_length
  */
 QuasiStaticTest.prototype["crack_length"] = undefined;
+
+/**
+ * @member {Object.<String, Array.<Number>>} displacement
+ */
+QuasiStaticTest.prototype["displacement"] = undefined;
+
+/**
+ * @member {Object.<String, Array.<Number>>} load
+ */
+QuasiStaticTest.prototype["load"] = undefined;
 
 /**
  * @member {Object.<String, Array.<Number>>} strain

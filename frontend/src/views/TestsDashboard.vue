@@ -182,6 +182,24 @@
         <v-card :loading="loading">
           <v-card-title>Load vs Displacement</v-card-title>
           <v-card-text>
+            <v-row>
+              <v-col>
+                <v-select
+                  v-model="loadOption"
+                  :disabled="loadOptions.length < 2"
+                  :items="loadOptions"
+                  label="Load"
+                ></v-select>
+              </v-col>
+              <v-col>
+                <v-select
+                  v-model="displacementOption"
+                  :disabled="displacementOptions.length < 2"
+                  :items="displacementOptions"
+                  label="Displacement"
+                ></v-select>
+              </v-col>
+            </v-row>
             <simple-chart
               :series="loadDisplacementSeries"
               :aspect-ratio="2"
@@ -265,11 +283,18 @@ export default {
       totalDissipatedEnergies: [],
       // QS
       crackSeries: [],
-      loadDisplacementSeries: [],
+      loadData: {},
+      loadOption: null,
+      loadOptions: [],
+      displacementData: {},
+      displacementOption: null,
+      displacementOptions: [],
       strainData: {},
-      strainOptions: [],
       strainOption: null,
+      strainOptions: [],
       stressData: {},
+      stressOption: null,
+      stressOptions: [],
     };
   },
   computed: {
@@ -279,6 +304,18 @@ export default {
     }),
     experimentType: function () {
       return this.experiment.experiment.experiment_type;
+    },
+    loadDisplacementSeries: function () {
+      return this.testIds.map((testId) => ({
+        type: "line",
+        name: `${testId}`,
+        data: zip(
+          this.loadOption ? this.loadData[testId][this.loadOption] : [],
+          this.displacementOption
+            ? this.displacementData[testId][this.displacementOption]
+            : []
+        ),
+      }));
     },
     strainStressSeries: function () {
       return this.testIds
@@ -348,10 +385,12 @@ export default {
           )
             .then((dataList) => {
               this.crackSeries = [];
-              this.loadDisplacementSeries = [];
-              this.stressStrainSeries = [];
+              this.loadData = {};
+              this.displacementData = {};
               this.strainData = {};
               this.stressData = {};
+              const loadOptions = new Set();
+              const displacementOptions = new Set();
               const strainOptions = new Set();
               const stressOptions = new Set();
               zip(this.testIds, dataList).forEach(([testId, data]) => {
@@ -374,14 +413,17 @@ export default {
                   });
                 }
                 if (
-                  data.machine_displacement.length > 0 &&
-                  data.machine_load.length > 0
+                  Object.keys(data.load).length > 0 &&
+                  Object.keys(data.displacement).length > 0
                 ) {
-                  this.loadDisplacementSeries.push({
-                    type: "line",
-                    name: `${testId}`,
-                    data: zip(data.machine_displacement, data.machine_load),
-                  });
+                  Object.keys(data.load).forEach((item) =>
+                    loadOptions.add(item)
+                  );
+                  Object.keys(data.displacement).forEach((item) =>
+                    displacementOptions.add(item)
+                  );
+                  this.loadData[testId] = data.load;
+                  this.displacementData[testId] = data.displacement;
                 }
                 if (
                   Object.keys(data.strain).length > 0 &&
@@ -397,9 +439,13 @@ export default {
                   this.stressData[testId] = data.stress;
                 }
               });
-              this.strainOptions = [...strainOptions];
-              this.stressOptions = [...stressOptions];
+              this.loadOptions = Array.from(loadOptions);
+              this.loadOption = this.loadOptions[0];
+              this.displacementOptions = Array.from(displacementOptions);
+              this.displacementOption = this.displacementOptions[0];
+              this.strainOptions = Array.from(strainOptions);
               this.strainOption = this.strainOptions[0];
+              this.stressOptions = Array.from(stressOptions);
               this.stressOption = this.stressOptions[0];
             })
             .finally(() => (this.loading = false));
