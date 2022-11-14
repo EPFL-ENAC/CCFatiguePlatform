@@ -808,6 +808,32 @@ class Experiment:
                     == "FA",
                     "mandatory_condition": "when experiment type is 'FA'",
                 },
+                {
+                    "paths": ("width",),
+                    "mandatory": Experiment.__get_val_at(
+                        self.experiment, "general>experiment type", ""
+                    )
+                    == "FA"
+                    and not Experiment.__get_val_at(
+                        self.experiment, "general>fracture", False
+                    ),
+                    "mandatory_condition": (
+                        "when experiment type is 'FA' and no fracture"
+                    ),
+                },
+                {
+                    "paths": ("thickness",),
+                    "mandatory": Experiment.__get_val_at(
+                        self.experiment, "general>experiment type", ""
+                    )
+                    == "FA"
+                    and not Experiment.__get_val_at(
+                        self.experiment, "general>fracture", False
+                    ),
+                    "mandatory_condition": (
+                        "when experiment type is 'FA' and no fracture"
+                    ),
+                },
             ):
                 if col_constraint["mandatory"]:
                     found = any(
