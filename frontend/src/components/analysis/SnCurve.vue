@@ -155,11 +155,7 @@ export default {
     },
     downloadOutput() {
       for (const [key, value] of Object.entries(this.outputs)) {
-        download(
-          value,
-          `sn-curve-${key.toLowerCase()}-output.txt`,
-          "text/plain"
-        );
+        download(value, `sn-curve-${key.toLowerCase()}-output.csv`, "text/csv");
       }
     },
   },
