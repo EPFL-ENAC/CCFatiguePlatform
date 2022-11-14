@@ -72,131 +72,157 @@ import ValidationError from "./model/ValidationError";
  */
 export {
   ApiClient,
+
   /**
    * The AppInfo model constructor.
    * @property {module:model/AppInfo}
    */
   AppInfo,
+
   /**
    * The CldMethod model constructor.
    * @property {module:model/CldMethod}
    */
   CldMethod,
+
   /**
    * The CycleCountingMethod model constructor.
    * @property {module:model/CycleCountingMethod}
    */
   CycleCountingMethod,
+
   /**
    * The DamageSummationMethod model constructor.
    * @property {module:model/DamageSummationMethod}
    */
   DamageSummationMethod,
+
   /**
    * The EchartLine model constructor.
    * @property {module:model/EchartLine}
    */
   EchartLine,
+
   /**
    * The ExperimentDataPreprocessed model constructor.
    * @property {module:model/ExperimentDataPreprocessed}
    */
   ExperimentDataPreprocessed,
+
   /**
    * The ExperimentFieldNames model constructor.
    * @property {module:model/ExperimentFieldNames}
    */
   ExperimentFieldNames,
+
   /**
    * The ExperimentModel model constructor.
    * @property {module:model/ExperimentModel}
    */
   ExperimentModel,
+
   /**
    * The FatigueFailureMethod model constructor.
    * @property {module:model/FatigueFailureMethod}
    */
   FatigueFailureMethod,
+
   /**
    * The FatigueTest model constructor.
    * @property {module:model/FatigueTest}
    */
   FatigueTest,
+
   /**
    * The HTTPValidationError model constructor.
    * @property {module:model/HTTPValidationError}
    */
   HTTPValidationError,
+
   /**
    * The HysteresisLoop model constructor.
    * @property {module:model/HysteresisLoop}
    */
   HysteresisLoop,
+
   /**
    * The LocationInner model constructor.
    * @property {module:model/LocationInner}
    */
   LocationInner,
+
   /**
    * The PageExperimentModel model constructor.
    * @property {module:model/PageExperimentModel}
    */
   PageExperimentModel,
+
   /**
    * The PageTestModel model constructor.
    * @property {module:model/PageTestModel}
    */
   PageTestModel,
+
   /**
    * The QuasiStaticTest model constructor.
    * @property {module:model/QuasiStaticTest}
    */
   QuasiStaticTest,
+
   /**
    * The SnCurveMethod model constructor.
    * @property {module:model/SnCurveMethod}
    */
   SnCurveMethod,
+
   /**
    * The SnCurveResult model constructor.
    * @property {module:model/SnCurveResult}
    */
   SnCurveResult,
+
   /**
    * The SnModel model constructor.
    * @property {module:model/SnModel}
    */
   SnModel,
+
   /**
    * The TestModel model constructor.
    * @property {module:model/TestModel}
    */
   TestModel,
+
   /**
    * The UnitInfo model constructor.
    * @property {module:model/UnitInfo}
    */
   UnitInfo,
+
   /**
    * The ValidationError model constructor.
    * @property {module:model/ValidationError}
    */
   ValidationError,
+
   /**
    * The AnalysisApi service constructor.
    * @property {module:api/AnalysisApi}
    */
   AnalysisApi,
+
   /**
    * The DefaultApi service constructor.
    * @property {module:api/DefaultApi}
    */
   DefaultApi,
+
   /**
    * The ExperimentsApi service constructor.
    * @property {module:api/ExperimentsApi}
    */
   ExperimentsApi,
+
   /**
    * The TestsApi service constructor.
    * @property {module:api/TestsApi}
