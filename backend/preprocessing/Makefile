@@ -1,3 +1,3 @@
 run:
-	poetry run python3 tst_preprocessing.py --save
-	poetry run python3 hysteresis_loops.py
+	poetry run python tst_preprocessing.py --save
+	poetry run python hysteresis_loops.py
