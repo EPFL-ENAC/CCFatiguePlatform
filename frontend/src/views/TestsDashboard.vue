@@ -144,6 +144,14 @@
               <li>
                 <experiment-s-v
                   :colors="colors"
+                  subject="Run out"
+                  :values="runOuts"
+                  tooltip="TODO [TODO]"
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  :colors="colors"
                   subject="R"
                   :values="specimenIds.map((t) => '-')"
                   tooltip="defined as the stress ratio (σ_min/σ_max) [-] and has relevance in the context of constant amplitude experiments."
@@ -284,6 +292,7 @@ export default {
       stiffnessSeries: [],
       specimenIds: [],
       totalDissipatedEnergies: [],
+      runOuts: [],
       // QS
       crackSeries: [],
       loadData: {},
@@ -348,6 +357,7 @@ export default {
               this.totalDissipatedEnergies = dataList.map(
                 (data) => data.total_dissipated_energy
               );
+              this.runOuts = dataList.map((data) => data.run_out);
               this.stressStrainSeries = [];
               this.hysteresisAreaSeries = [];
               this.creepSeries = [];

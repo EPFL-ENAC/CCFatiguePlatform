@@ -8,8 +8,8 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from ccfatigue.experiment.common import DATA_DIRECTORY, get_specimen_id
-from ccfatigue.models.database import Experiment
+from ccfatigue.experiment.common import DATA_DIRECTORY, get_test_fields
+from ccfatigue.models.database import Experiment, Test
 
 INTERVAL: int = 10
 LOOP_SPACING: int = 1000
@@ -25,6 +25,7 @@ class HysteresisLoop(BaseModel):
 class FatigueTest(BaseModel):
     specimen_id: int
     total_dissipated_energy: int
+    run_out: bool
     hysteresis_loops: List[HysteresisLoop]
     n_cycles: List[float]
     creep: List[float]
@@ -128,12 +129,17 @@ async def fatigue_test(
         .one()  # type: ignore
         ._asdict()
     )
-    specimen_id = await get_specimen_id(session, experiment_id, test_id)
-    std_df = get_dataframe("TST", experiment, specimen_id)
-    hyst_df = get_dataframe("HYS", experiment, specimen_id).fillna(value=0)
+    test_meta = await get_test_fields(
+        session, experiment_id, test_id, (Test.specimen_number, Test.run_out)
+    )
+    std_df = get_dataframe("TST", experiment, test_meta["specimen_number"])
+    hyst_df = get_dataframe("HYS", experiment, test_meta["specimen_number"]).fillna(
+        value=0
+    )
     hysteresis_loops = create_sub_hystloops(std_df, compute_sub_indexes(hyst_df))
     return FatigueTest(
-        specimen_id=specimen_id,
+        specimen_id=test_meta["specimen_number"],
+        run_out=test_meta["run_out"],
         total_dissipated_energy=get_total_dissipated_energy(hyst_df),
         hysteresis_loops=hysteresis_loops,
         n_cycles=hyst_df["n_cycles"].to_list(),

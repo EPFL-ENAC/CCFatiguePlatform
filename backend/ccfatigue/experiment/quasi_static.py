@@ -8,8 +8,8 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from ccfatigue.experiment.common import DATA_DIRECTORY, get_specimen_id
-from ccfatigue.models.database import Experiment
+from ccfatigue.experiment.common import DATA_DIRECTORY, get_test_fields
+from ccfatigue.models.database import Experiment, Test
 
 
 class QuasiStaticTest(BaseModel):
@@ -94,8 +94,11 @@ async def quasi_static_test(
         .one()  # type: ignore
         ._asdict()
     )
-    specimen_id = await get_specimen_id(session, experiment_id, test_id)
-    df = get_dataframe(experiment, specimen_id)
+
+    test_meta = await get_test_fields(
+        session, experiment_id, test_id, (Test.specimen_number,)
+    )
+    df = get_dataframe(experiment, test_meta["specimen_number"])
     column_list = df.columns.to_list()
 
     displacement = filter_columns(
@@ -113,7 +116,7 @@ async def quasi_static_test(
     strain: Dict[str, List[float]] = {}
     stress: Dict[str, List[float]] = {}
     if not fracture:
-        test = get_test_metadata(experiment, specimen_id)
+        test = get_test_metadata(experiment, test_meta["specimen_number"])
         if "width" in test and "thickness" in test:
             strain = filter_columns(df, column_list, r"^(exx--\d+|eyy--\d+|exy--\d+)$")
             area = test["width"] * test["thickness"]
