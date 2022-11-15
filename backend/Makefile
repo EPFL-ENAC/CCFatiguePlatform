@@ -20,9 +20,9 @@ compile:
 	poetry run python -m numpy.f2py -c ccfatigue/analysis/fortran/sendeckyj.f -m ccfatigue.analysis.fortran.sendeckyj
 
 compile-win:
-	rm -rf ccfatigue/analysis/fortran/*.so
+	rm -rf ccfatigue/analysis/fortran/*.dll
 	$(MAKE) compile
-	mv ccfatigue/.libs/* ccfatigue/analysis/fortran
+	mv ccfatigue/.libs/*.dll ccfatigue/analysis/fortran
 	rmdir ccfatigue/.libs
 
 run:
