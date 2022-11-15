@@ -51,6 +51,21 @@ def inject_exp_from_folder(exp_folder, session):
     Inject Experiment + Test described in a dedicated folder
     Test is not yet implemented.
     """
+
+    def to_bool_or_none(val):
+        """
+        return bool or None
+        """
+        if val is False or val is True:
+            return val
+        elif type(val) == str:
+            if val.lower().startswith("y"):
+                return True
+            elif val.lower().startswith("n"):
+                return False
+        else:
+            return None
+
     # Experiment loaded from JSON
     json_file = glob.glob(f"{exp_folder}/*.json")[0]
     with open(json_file, "r") as f:
@@ -131,7 +146,7 @@ def inject_exp_from_folder(exp_folder, session):
             stress_ratio=test_serie.get("stress ratio", default=None),
             maximum_stress=test_serie.get("maximum stress", default=None),
             frequency=test_serie.get("frequency", default=None),
-            run_out=None,  # test_serie.get("run out", default=None),
+            run_out=to_bool_or_none(test_serie.get("run out", default=None)),
             displacement_controlled_loading_rate=test_serie.get(
                 "displacement controlled loading rate", default=None
             ),

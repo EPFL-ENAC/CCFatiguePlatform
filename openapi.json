@@ -1050,6 +1050,7 @@
         "required": [
           "specimen_id",
           "total_dissipated_energy",
+          "run_out",
           "hysteresis_loops",
           "n_cycles",
           "creep",
@@ -1065,6 +1066,10 @@
           "total_dissipated_energy": {
             "title": "Total Dissipated Energy",
             "type": "integer"
+          },
+          "run_out": {
+            "title": "Run Out",
+            "type": "boolean"
           },
           "hysteresis_loops": {
             "title": "Hysteresis Loops",
