@@ -1,12 +1,12 @@
 import os
 
-import ccfatigue.modules.cld_harris as cld_harris
-import ccfatigue.modules.cyc_range_mean as cyc_range_mean
-import ccfatigue.modules.faf_ftpf as faf_ftpf
-import ccfatigue.modules.miner_harris as miner_harris
-import ccfatigue.modules.sn_curve_linlog as sn_curve_linlog
-import ccfatigue.modules.sn_curve_loglog as sn_curve_loglog
-import ccfatigue.modules.sn_curve_sendeckyj as sn_curve_sendeckyj
+import ccfatigue_main.analysis.cld_harris as cld_harris
+import ccfatigue_main.analysis.cyc_range_mean as cyc_range_mean
+import ccfatigue_main.analysis.faf_ftpf as faf_ftpf
+import ccfatigue_main.analysis.miner_harris as miner_harris
+import ccfatigue_main.analysis.sn_curve_linlog as sn_curve_linlog
+import ccfatigue_main.analysis.sn_curve_loglog as sn_curve_loglog
+import ccfatigue_main.analysis.sn_curve_sendeckyj as sn_curve_sendeckyj
 
 SRC_DIR = os.path.dirname(os.path.realpath(__file__))
 DATA_DIR = os.path.join(SRC_DIR, "..", "..", "Data")
