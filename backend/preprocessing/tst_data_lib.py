@@ -197,7 +197,7 @@ class Experiment:
                     os.path.join(
                         self.exp_meta_meta["preprocessed_folder"],
                         "measure_"
-                        + re.search(r"([0-9]+).csv", filename).group(1)
+                        + f'{int(re.search(r"([0-9]+).csv", filename).group(1)):03d}'
                         + ".csv",
                     )
                 ),
