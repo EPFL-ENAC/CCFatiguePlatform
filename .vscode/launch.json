@@ -21,7 +21,10 @@
       "type": "python",
       "request": "launch",
       "module": "uvicorn",
-      "args": ["ccfatigue.main:app", "--reload"],
+      "args": [
+        "ccfatigue.main:app",
+        "--reload"
+      ],
       "jinja": true,
       "cwd": "${workspaceFolder}/backend",
       "envFile": "${workspaceFolder}/secrets/.env",
@@ -32,7 +35,10 @@
       "type": "python",
       "request": "launch",
       "module": "alembic",
-      "args": ["upgrade", "head"],
+      "args": [
+        "upgrade",
+        "head"
+      ],
       "cwd": "${workspaceFolder}/backend",
       "envFile": "${workspaceFolder}/secrets/.env"
     },
@@ -43,6 +49,23 @@
       "module": "init_db",
       "cwd": "${workspaceFolder}/backend",
       "envFile": "${workspaceFolder}/secrets/.env"
+    },
+    {
+      "name": "backend: preprocessing",
+      "type": "python",
+      "request": "launch",
+      "module": "tst_preprocessing",
+      "args": [
+        "--save",
+      ],
+      "cwd": "${workspaceFolder}/backend/preprocessing",
+    },
+    {
+      "name": "backend: preprocessing hys",
+      "type": "python",
+      "request": "launch",
+      "module": "hysteresis_loops",
+      "cwd": "${workspaceFolder}/backend/preprocessing",
     }
   ]
 }

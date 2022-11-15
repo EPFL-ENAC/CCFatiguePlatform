@@ -153,7 +153,9 @@ def main():
                     # The value that is calculated is invalid
                     hyst_df = hyst_df[:-1]
                     hys_fp = "HYS_" + os.path.basename(measures["preprocessed_fp"])
-                    hyst_df.to_csv(
+                    hyst_df.round(
+                        {"hysteresis_area": 5, "stiffness": 10, "creep": 10}
+                    ).to_csv(
                         os.path.join(
                             experiment_metadata.exp_meta_meta["preprocessed_folder"],
                             hys_fp,
