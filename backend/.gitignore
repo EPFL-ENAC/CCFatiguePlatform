@@ -3,3 +3,4 @@ output/
 
 # generated python modules from fortran code with f2py
 ccfatigue/analysis/fortran/*.so
+ccfatigue/analysis/fortran/*.dll
