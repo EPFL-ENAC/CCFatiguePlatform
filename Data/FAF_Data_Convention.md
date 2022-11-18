@@ -1,5 +1,7 @@
 # FAF Standard Data format
+
 FAF Data corresponds to the output of Fatigue failure module.
+
 ## File naming conventions
 
 - Files: `FAF_{Researcher's lastname}_{Date}.json`
@@ -33,8 +35,8 @@ Encoding format: UTF-8
 
 Encoding format: UTF-8, Separator: ',' (comma)
 
-| Variable name     | Description                 | Symbol    | Unit  | Data type | Mandatory |
-| ----------------- | --------------------------- | --------- | ----- | --------- | --------- |
-| stress_ratio      | Stress ratio                | R         | [-]   | double    | y         |
-| cycles_to_failure | Number of cycles to failure | N         | [-]   | int       | y         |
-| stress_max        | Max stress                  | sigma_max | [MPa] | double    | y         |
+| Variable name     | Description                 | Symbol    | Unit    | Data type | Mandatory |
+| ----------------- | --------------------------- | --------- | ------- | --------- | --------- |
+| stress_ratio      | Stress ratio                | R         | `[-]`   | double    | y         |
+| cycles_to_failure | Number of cycles to failure | N         | `[-]`   | int       | y         |
+| stress_max        | Max stress                  | sigma_max | `[MPa]` | double    | y         |
