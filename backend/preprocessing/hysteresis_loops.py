@@ -70,14 +70,6 @@ def fill_hyst_df(df, meta_df, hyst_df):
 
     """
 
-    # NB CYCLES
-    # Extract number of cycles without repeating values in other table,
-    # and store number of measurements per cycle
-    n_cycles = sorted(set(df.Machine_N_cycles))
-    hyst_df.n_cycles = n_cycles
-    # n_measurements = Counter(df.Machine_N_cycles)
-    # n_cycles_df = pd.DataFrame(n_cycles)
-
     # HYSTERESIS & STIFFNESS
     # Definition of polyarea function
     def PolyArea(x, y):
@@ -95,17 +87,28 @@ def fill_hyst_df(df, meta_df, hyst_df):
         """
         return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
 
+    # NB CYCLES
+    # Extract number of cycles without repeating values in other table,
+    # and store number of measurements per cycle
+    if len(df[df["Machine_N_cycles"].notnull()]) > 0:
+        n_cycles = np.sort(df["Machine_N_cycles"].unique())
+    else:
+        n_cycles = np.sort(df["MD_N_cycles--1"].unique())
+
+    hyst_df.n_cycles = n_cycles
+    n_fail = np.max(n_cycles)
+
     Hysteresis_Area = []
     Stiffness = []
     creep = []
     Stress_N, Strain_N = get_stress_strain(df, n_cycles)
-    for j in range(len(n_cycles)):
+    for j in range(n_cycles.size):
         x = Stress_N[j]
         y = Strain_N[j]
         if j < (len(n_cycles) - 1):
             Hysteresis_Area.append(PolyArea(x, y) * (n_cycles[j + 1] - n_cycles[j]))
         else:
-            Hysteresis_Area.append(PolyArea(x, y) * (int(meta_df.N_fail) - n_cycles[j]))
+            Hysteresis_Area.append(PolyArea(x, y) * (n_fail - n_cycles[j]))
         if j > 0:
             slope, _, _, _, _ = stats.linregress(y, x)
             Stiffness.append(slope)
@@ -114,15 +117,10 @@ def fill_hyst_df(df, meta_df, hyst_df):
 
     # CREEP
     # Creep computation
-    # Stress_max = [np.max(Stress_N[i]) for i in range(1,len(n_cycles))]
-    # Stress_min = [np.min(Stress_N[i]) for i in range(1,len(n_cycles))]
-    Strain_max = [np.max(Strain_N[i]) for i in range(1, len(n_cycles))]
-    Strain_min = [np.min(Strain_N[i]) for i in range(1, len(n_cycles))]
+    Strain_max = [np.max(Strain_N[i]) for i in range(1, n_cycles.size)]
+    Strain_min = [np.min(Strain_N[i]) for i in range(1, n_cycles.size)]
 
-    for i in range(len(n_cycles) - 1):
-        # dStress = Stress_max[i]-Stress_min[i]
-        # dStrain = Strain_max[i]-Strain_min[i]
-        # Stiffness.append(dStress/dStrain)
+    for i in range(n_cycles.size - 1):
         creep.append((Strain_max[i] + Strain_min[i]) / 2)
     creep.insert(0, np.nan)
     hyst_df.stiffness = Stiffness
@@ -132,6 +130,8 @@ def fill_hyst_df(df, meta_df, hyst_df):
 def main():
     with Logger(None) as logger:
         for experiment_raw_fp_folder in RAW_EXPERIMENT_FP_FOLDERS:
+            if not experiment_raw_fp_folder.endswith("_FA"):
+                continue
             experiment_metadata = Experiment(experiment_raw_fp_folder, logger)
             print(f"parsing {experiment_raw_fp_folder}")
             for measures in experiment_metadata.exp_meta_meta["measures"]:
@@ -146,8 +146,6 @@ def main():
                         columns=["n_cycles", "hysteresis_area", "stiffness", "creep"]
                     )
 
-                    # TODO https://github.com/EPFL-ENAC/CCFatiguePlatform/issues/136
-                    experiment_metadata.N_fail = 100
                     fill_hyst_df(df, experiment_metadata, hyst_df)
                     # Drop last line
                     # The value that is calculated is invalid
