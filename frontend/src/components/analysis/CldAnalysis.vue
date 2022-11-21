@@ -62,8 +62,13 @@
         </v-col>
       </v-row>
     </v-card-subtitle>
-    <v-card-text>
-      <v-img src="/img/results_dashboard2.png"></v-img>
+    <v-card-text v-if="series.length > 0">
+      <simple-chart
+        :aspect-ratio="2"
+        :series="series"
+        x-axis-name="stress_mean"
+        y-axis-name="stress_amplitude"
+      ></simple-chart>
     </v-card-text>
     <v-card-actions v-if="hasInput" class="justify-end">
       <v-btn :disabled="loading && output != null" @click="downloadOutput">
@@ -75,8 +80,11 @@
 
 <script>
 import CldMethod from "@/backend/model/CldMethod";
+import SimpleChart from "@/components/charts/SimpleChart";
 import InfoTooltip from "@/components/InfoTooltip";
+import { parserConfig } from "@/utils/papaparse";
 import download from "downloadjs";
+import { parse } from "papaparse";
 
 const methods = Object.values(new CldMethod());
 
@@ -84,6 +92,7 @@ export default {
   name: "CldAnalysis",
   components: {
     InfoTooltip,
+    SimpleChart,
   },
   data() {
     return {
@@ -92,6 +101,7 @@ export default {
       output: null,
       methods: methods,
       method: methods[0],
+      series: [],
       errorMessages: null,
     };
   },
@@ -108,10 +118,22 @@ export default {
           .runCldFile(this.method, this.file)
           .then((data) => {
             this.output = data;
+            const results = parse(data, parserConfig);
+            this.series = [
+              {
+                type: "line",
+                name: this.method,
+                data: results.data.map((item) => [
+                  item.stress_mean,
+                  item.stress_amplitude,
+                ]),
+              },
+            ];
             this.errorMessages = null;
           })
           .catch(() => {
             this.file = null;
+            this.series = [];
             this.errorMessages = "Invalid input";
           })
           .finally(() => (this.loading = false));
@@ -119,7 +141,7 @@ export default {
     },
     downloadOutput() {
       if (this.output) {
-        download(this.output, `cld-${this.method}-output.txt`, "text/plain");
+        download(this.output, `cld-${this.method}-output.csv`, "text/csv");
       }
     },
   },

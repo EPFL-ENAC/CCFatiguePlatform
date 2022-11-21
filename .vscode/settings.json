@@ -2,7 +2,8 @@
   "editor.formatOnSave": true,
   "python.analysis.stubPath": "${workspaceFolder}/backend/",
   "python.analysis.extraPaths": [
-    "${workspaceFolder}/backend/.venv/Lib/site-packages"
+    "${workspaceFolder}/backend/.venv/Lib/site-packages",
+    "${workspaceFolder}/backend/preprocessing"
   ],
   "python.analysis.typeCheckingMode": "basic",
   "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv",

@@ -908,7 +908,8 @@ class Experiment:
         self.logger.info("Save tests preprocessed")
         with self.logger.indent:
             self.tests.to_csv(
-                self.exp_meta_meta["preprocessed_tests_csv_fp"], index=False
+                self.exp_meta_meta["preprocessed_tests_csv_fp"],
+                index=False,
             )
             self.logger.info(
                 "saved "
@@ -1290,7 +1291,10 @@ class Experiment:
         self.logger.info("Save measures")
         for measures in self.measures_list:
             with self.logger.indent:
-                measures["df"].to_csv(measures["preprocessed_fp"], index=False)
+                measures["df"].round(13).to_csv(
+                    measures["preprocessed_fp"],
+                    index=False,
+                )
                 self.logger.info(
                     f"saved to {os.path.basename(measures['preprocessed_fp'])}"
                 )

@@ -61,8 +61,13 @@
         </v-col>
       </v-row>
     </v-card-subtitle>
-    <v-card-text>
-      <v-img src="/img/results_dashboard4.png"></v-img>
+    <v-card-text v-if="series.length > 0">
+      <simple-chart
+        :aspect-ratio="2"
+        :series="series"
+        x-axis-name="damage"
+        y-axis-name="stress_max"
+      ></simple-chart>
     </v-card-text>
     <v-card-actions v-if="hasInput" class="justify-end">
       <v-btn :disabled="loading && output != null" @click="downloadOutput">
@@ -74,8 +79,11 @@
 
 <script>
 import DamageSummationMethod from "@/backend/model/DamageSummationMethod";
+import SimpleChart from "@/components/charts/SimpleChart";
 import InfoTooltip from "@/components/InfoTooltip";
+import { parserConfig } from "@/utils/papaparse";
 import download from "downloadjs";
+import { parse } from "papaparse";
 
 const methods = Object.values(new DamageSummationMethod());
 
@@ -83,6 +91,7 @@ export default {
   name: "DamageSummation",
   components: {
     InfoTooltip,
+    SimpleChart,
   },
   data() {
     return {
@@ -92,6 +101,7 @@ export default {
       output: null,
       methods: methods,
       method: methods[0],
+      series: [],
       errorMessages: null,
     };
   },
@@ -108,9 +118,21 @@ export default {
           .runDamageSummationFile(this.method, this.sncFile, this.cycFile)
           .then((data) => {
             this.output = data;
+            const results = parse(data, parserConfig);
+            this.series = [
+              {
+                type: "line",
+                name: this.method,
+                data: results.data.map((item) => [
+                  item.damage,
+                  item.stress_max,
+                ]),
+              },
+            ];
             this.errorMessages = null;
           })
           .catch(() => {
+            this.series = [];
             this.errorMessages = "Invalid input";
           })
           .finally(() => (this.loading = false));
@@ -120,8 +142,8 @@ export default {
       if (this.output) {
         download(
           this.output,
-          `damage-summation-${this.method}-output.txt`,
-          "text/plain"
+          `damage-summation-${this.method}-output.csv`,
+          "text/csv"
         );
       }
     },
