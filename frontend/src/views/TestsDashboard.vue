@@ -178,7 +178,10 @@
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col v-if="loadDisplacementSeries.length > 0" cols="6">
+      <v-col
+        v-if="loadOptions.length > 0 && displacementOptions.length > 0"
+        cols="6"
+      >
         <v-card :loading="loading">
           <v-card-title>Load vs Displacement</v-card-title>
           <v-card-text>
