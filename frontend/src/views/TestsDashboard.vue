@@ -118,7 +118,7 @@
                 <experiment-s-v
                   :colors="colors"
                   subject="Stress at failure"
-                  :values="specimenIds.map((t) => '-')"
+                  :values="stressAtFailure"
                   :unit="units.stress"
                   tooltip="σ_fail is defined as the stress level that induced failure from the tested specimen and is measured in [MPa]"
                 />
@@ -127,7 +127,7 @@
                 <experiment-s-v
                   :colors="colors"
                   subject="Strain at failure"
-                  :values="specimenIds.map((t) => '-')"
+                  :values="strainAtFailure"
                   unit="%"
                   tooltip="ε_fail is defined as the deformation at the time of failure and is measured in [%]"
                 />
@@ -135,8 +135,8 @@
               <li>
                 <experiment-s-v
                   :colors="colors"
-                  subject="N_cycles"
-                  :values="specimenIds.map((t) => '-')"
+                  subject="cycle at failure"
+                  :values="cycleAtFailure"
                   value-type="bigNumber"
                   tooltip="defined as the number of cycles to failure [-]"
                 />
@@ -146,7 +146,7 @@
                   :colors="colors"
                   subject="Run out"
                   :values="runOuts"
-                  tooltip="TODO [TODO]"
+                  tooltip="no fatigue failure"
                 />
               </li>
               <li>
@@ -286,6 +286,9 @@ export default {
       loading: false,
       colors: colorPalette,
       // FA
+      cycleAtFailure: [],
+      stressAtFailure: [],
+      strainAtFailure: [],
       stressStrainSeries: [],
       hysteresisAreaSeries: [],
       creepSeries: [],
@@ -353,6 +356,13 @@ export default {
             )
           )
             .then((dataList) => {
+              this.cycleAtFailure = dataList.map((data) => data.n_fail);
+              this.stressAtFailure = dataList.map(
+                (data) => data.stress_at_failure
+              );
+              this.strainAtFailure = dataList.map(
+                (data) => data.strain_at_failure
+              );
               this.specimenIds = dataList.map((data) => data.specimen_id);
               this.totalDissipatedEnergies = dataList.map(
                 (data) => data.total_dissipated_energy

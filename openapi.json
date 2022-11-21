@@ -1055,7 +1055,10 @@
           "n_cycles",
           "creep",
           "hysteresis_area",
-          "stiffness"
+          "stiffness",
+          "stress_at_failure",
+          "strain_at_failure",
+          "n_fail"
         ],
         "type": "object",
         "properties": {
@@ -1105,6 +1108,18 @@
             "items": {
               "type": "number"
             }
+          },
+          "stress_at_failure": {
+            "title": "Stress At Failure",
+            "type": "number"
+          },
+          "strain_at_failure": {
+            "title": "Strain At Failure",
+            "type": "number"
+          },
+          "n_fail": {
+            "title": "N Fail",
+            "type": "integer"
           }
         }
       },
