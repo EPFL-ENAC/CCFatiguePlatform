@@ -31,8 +31,8 @@ from pandas._typing import FilePath, ReadBuffer, WriteBuffer
 from scipy import stats
 
 import ccfatigue.analysis.fortran.sendeckyj as sendeckyj  # Fortran optimized functions
-import ccfatigue.analysis.sn_curve_utils as sn_curve_utils
-from ccfatigue.analysis.astm import Astm
+import ccfatigue.analysis.utils.snc as snc
+from ccfatigue.analysis.utils.astm import Astm
 
 # C is a measure of the extent of the "flat" region on the S-N curve at high
 #  applied cyclic stress levels (see ref, p 248)
@@ -207,7 +207,7 @@ def execute(
     stress_ratios_df["intercept"] = linregress.apply(lambda x: x[0])
 
     samples["ycar"] = samples.apply(
-        lambda x: sn_curve_utils.equation_ycar(
+        lambda x: snc.equation_ycar(
             stress_ratios_df.loc[x.stress_ratio_id].slope,
             stress_ratios_df.loc[x.stress_ratio_id].intercept,
             x.log10_stress_max,
@@ -378,7 +378,7 @@ def execute(
         )
 
         stress_bounds = stress_max.apply(
-            lambda x: sn_curve_utils.stress_at_failure_bounds(
+            lambda x: snc.stress_at_failure_bounds(
                 stress_ratio_df.sample_count,
                 stress_ratio_df.q,
                 stress_ratio_df.slope,

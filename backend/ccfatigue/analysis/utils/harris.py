@@ -1,14 +1,11 @@
 #!/usr/bin/env python
-""" CCFatigue - Modules 3 + 5 harris_utils.py
-Common code for cld_harris.py and miner_harris.py
+"""
+Shared ressources for Harris analysis modules (cld_harris.py and das_harris.py)
 """
 
 import numpy as np
 
 BOUNDS_MARGIN = 0.99
-
-# # Cycles for the isolines (the lines of the CLD)
-# CYCLES_COUNT = [10**x for x in range(3, 10)]  # = 1e3, 1e4, ..., 1e9
 
 
 def calculate_stress_mean(stress_ratio: float, stress_max: float) -> float:
