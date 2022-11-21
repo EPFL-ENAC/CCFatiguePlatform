@@ -1,4 +1,5 @@
 import os
+from operator import itemgetter
 from typing import Dict, List
 
 import numpy as np
@@ -10,6 +11,7 @@ from sqlalchemy.future import select
 
 from ccfatigue.experiment.common import DATA_DIRECTORY, get_test_fields
 from ccfatigue.models.database import Experiment, Test
+from preprocessing.hysteresis_loops import process_hysteresis
 
 INTERVAL: int = 10
 LOOP_SPACING: int = 1000
@@ -31,6 +33,9 @@ class FatigueTest(BaseModel):
     creep: List[float]
     hysteresis_area: List[float]
     stiffness: List[float]
+    stress_at_failure: float
+    strain_at_failure: float
+    n_fail: int
 
 
 def get_dataframe(
@@ -137,6 +142,9 @@ async def fatigue_test(
         value=0
     )
     hysteresis_loops = create_sub_hystloops(std_df, compute_sub_indexes(hyst_df))
+    (stress_at_failure, strain_at_failure, n_fail) = itemgetter(
+        "stress_at_failure", "strain_at_failure", "n_fail"
+    )(process_hysteresis(std_df))
     return FatigueTest(
         specimen_id=test_meta["specimen_number"],
         run_out=test_meta["run_out"],
@@ -146,4 +154,7 @@ async def fatigue_test(
         creep=hyst_df["creep"].to_list(),
         hysteresis_area=hyst_df["hysteresis_area"].to_list(),
         stiffness=hyst_df["stiffness"].to_list(),
+        stress_at_failure=stress_at_failure,
+        strain_at_failure=strain_at_failure,
+        n_fail=n_fail,
     )

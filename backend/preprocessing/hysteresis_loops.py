@@ -11,7 +11,8 @@ import os
 import numpy as np
 import pandas as pd
 from scipy import stats
-from tst_data_lib import RAW_EXPERIMENT_FP_FOLDERS, Experiment, Logger
+
+from preprocessing.tst_data_lib import RAW_EXPERIMENT_FP_FOLDERS, Experiment, Logger
 
 
 def get_stress_strain(df, n_cycles):
@@ -41,15 +42,18 @@ def get_stress_strain(df, n_cycles):
     return Stress_N, Strain_N
 
 
-def fill_hyst_df(df, meta_df, hyst_df):
+def process_hysteresis(df):
 
     """
     Arguments:
         df: dataframe with raw data in standard format
-        meta_df: metadata information contained in JSON file
-        hyst_df: initialized dataframe with four columns generated with create_hyst_df()
 
-    Returns: Void
+    Returns: {
+        "hyst_df": hyst_df,
+        "stress_at_failure": stress_at_failure,
+        "strain_at_failure": strain_at_failure,
+        "n_fail": n_fail,
+    }
 
     Description:
         This function does all the computations on the hysteresis loops allowing to
@@ -87,6 +91,10 @@ def fill_hyst_df(df, meta_df, hyst_df):
         """
         return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
 
+    hyst_df = pd.DataFrame(
+        columns=["n_cycles", "hysteresis_area", "stiffness", "creep"]
+    )
+
     # NB CYCLES
     # Extract number of cycles without repeating values in other table,
     # and store number of measurements per cycle
@@ -102,6 +110,8 @@ def fill_hyst_df(df, meta_df, hyst_df):
     Stiffness = []
     creep = []
     Stress_N, Strain_N = get_stress_strain(df, n_cycles)
+    stress_at_failure = max(Stress_N[-1])
+    strain_at_failure = max(Strain_N[-1])
     for j in range(n_cycles.size):
         x = Stress_N[j]
         y = Strain_N[j]
@@ -125,6 +135,12 @@ def fill_hyst_df(df, meta_df, hyst_df):
     creep.insert(0, np.nan)
     hyst_df.stiffness = Stiffness
     hyst_df.creep = creep
+    return {
+        "hyst_df": hyst_df,
+        "stress_at_failure": stress_at_failure,
+        "strain_at_failure": strain_at_failure,
+        "n_fail": n_fail,
+    }
 
 
 def main():
@@ -142,11 +158,7 @@ def main():
                     with logger.indent:
                         df = pd.read_csv(measures["preprocessed_fp"])
 
-                    hyst_df = pd.DataFrame(
-                        columns=["n_cycles", "hysteresis_area", "stiffness", "creep"]
-                    )
-
-                    fill_hyst_df(df, experiment_metadata, hyst_df)
+                    hyst_df = process_hysteresis(df)["hyst_df"]
                     # Drop last line
                     # The value that is calculated is invalid
                     hyst_df = hyst_df[:-1]

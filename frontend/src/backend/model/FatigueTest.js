@@ -31,6 +31,9 @@ class FatigueTest {
    * @param creep {Array.<Number>}
    * @param hysteresisArea {Array.<Number>}
    * @param stiffness {Array.<Number>}
+   * @param stressAtFailure {Number}
+   * @param strainAtFailure {Number}
+   * @param nFail {Number}
    */
   constructor(
     specimenId,
@@ -40,7 +43,10 @@ class FatigueTest {
     nCycles,
     creep,
     hysteresisArea,
-    stiffness
+    stiffness,
+    stressAtFailure,
+    strainAtFailure,
+    nFail
   ) {
     FatigueTest.initialize(
       this,
@@ -51,7 +57,10 @@ class FatigueTest {
       nCycles,
       creep,
       hysteresisArea,
-      stiffness
+      stiffness,
+      stressAtFailure,
+      strainAtFailure,
+      nFail
     );
   }
 
@@ -69,7 +78,10 @@ class FatigueTest {
     nCycles,
     creep,
     hysteresisArea,
-    stiffness
+    stiffness,
+    stressAtFailure,
+    strainAtFailure,
+    nFail
   ) {
     obj["specimen_id"] = specimenId;
     obj["total_dissipated_energy"] = totalDissipatedEnergy;
@@ -79,6 +91,9 @@ class FatigueTest {
     obj["creep"] = creep;
     obj["hysteresis_area"] = hysteresisArea;
     obj["stiffness"] = stiffness;
+    obj["stress_at_failure"] = stressAtFailure;
+    obj["strain_at_failure"] = strainAtFailure;
+    obj["n_fail"] = nFail;
   }
 
   /**
@@ -130,6 +145,21 @@ class FatigueTest {
           "Number",
         ]);
       }
+      if (data.hasOwnProperty("stress_at_failure")) {
+        obj["stress_at_failure"] = ApiClient.convertToType(
+          data["stress_at_failure"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("strain_at_failure")) {
+        obj["strain_at_failure"] = ApiClient.convertToType(
+          data["strain_at_failure"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("n_fail")) {
+        obj["n_fail"] = ApiClient.convertToType(data["n_fail"], "Number");
+      }
     }
     return obj;
   }
@@ -174,5 +204,20 @@ FatigueTest.prototype["hysteresis_area"] = undefined;
  * @member {Array.<Number>} stiffness
  */
 FatigueTest.prototype["stiffness"] = undefined;
+
+/**
+ * @member {Number} stress_at_failure
+ */
+FatigueTest.prototype["stress_at_failure"] = undefined;
+
+/**
+ * @member {Number} strain_at_failure
+ */
+FatigueTest.prototype["strain_at_failure"] = undefined;
+
+/**
+ * @member {Number} n_fail
+ */
+FatigueTest.prototype["n_fail"] = undefined;
 
 export default FatigueTest;
