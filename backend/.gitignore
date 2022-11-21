@@ -2,4 +2,5 @@ output/
 .venv/
 
 # generated python modules from fortran code with f2py
-ccfatigue/fortran/
+ccfatigue/analysis/fortran/*.so
+ccfatigue/analysis/fortran/*.dll
