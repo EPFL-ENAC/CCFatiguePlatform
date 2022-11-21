@@ -34,6 +34,14 @@
         </v-col>
       </v-row>
     </v-card-subtitle>
+    <v-card-text v-if="series.length > 0">
+      <simple-chart
+        :aspect-ratio="2"
+        :series="series"
+        x-axis-name="cum_n_cycles"
+        y-axis-name="stress_range"
+      ></simple-chart>
+    </v-card-text>
     <v-card-actions v-if="hasInput" class="justify-end">
       <v-btn :disabled="loading && output != null" @click="downloadOutput">
         Download
@@ -44,8 +52,11 @@
 
 <script>
 import CycleCountingMethod from "@/backend/model/CycleCountingMethod";
+import SimpleChart from "@/components/charts/SimpleChart";
 import InfoTooltip from "@/components/InfoTooltip";
+import { parserConfig } from "@/utils/papaparse";
 import download from "downloadjs";
+import { parse } from "papaparse";
 
 const methods = Object.values(new CycleCountingMethod());
 
@@ -53,6 +64,7 @@ export default {
   name: "CycleCounting",
   components: {
     InfoTooltip,
+    SimpleChart,
   },
   data() {
     return {
@@ -62,6 +74,7 @@ export default {
       methods: methods,
       method: methods[0],
       errorMessages: null,
+      series: [],
     };
   },
   computed: {
@@ -77,10 +90,22 @@ export default {
           .runCycleCountingFile(this.method, this.file)
           .then((data) => {
             this.output = data;
+            const results = parse(data, parserConfig);
+            this.series = [
+              {
+                type: "line",
+                name: this.method,
+                data: results.data.map((item) => [
+                  item.cum_n_cycles,
+                  item.stress_range,
+                ]),
+              },
+            ];
             this.errorMessages = null;
           })
           .catch(() => {
             this.file = null;
+            this.series = [];
             this.errorMessages = "Invalid input";
           })
           .finally(() => (this.loading = false));
@@ -90,8 +115,8 @@ export default {
       if (this.output) {
         download(
           this.output,
-          `cycle-counting-${this.method}-output.txt`,
-          "text/plain"
+          `cycle-counting-${this.method}-output.csv`,
+          "text/csv"
         );
       }
     },
