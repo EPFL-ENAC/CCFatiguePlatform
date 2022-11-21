@@ -9,13 +9,14 @@ from deprecation import deprecated
 from pandas._typing import ReadCsvBuffer, WriteBuffer
 from pandas.core.frame import DataFrame
 
-import ccfatigue.modules.cld_harris as cld_harris
-import ccfatigue.modules.cyc_range_mean as cyc_range_mean
-import ccfatigue.modules.faf_ftpf as faf_ftpf
-import ccfatigue.modules.miner_harris as miner_harris
-import ccfatigue.modules.sn_curve_linlog as sn_curve_linlog
-import ccfatigue.modules.sn_curve_loglog as sn_curve_loglog
-import ccfatigue.modules.sn_curve_sendeckyj as sn_curve_sendeckyj
+import ccfatigue.analysis.cld_harris as cld_harris
+import ccfatigue.analysis.cyc_range_mean as cyc_range_mean
+import ccfatigue.analysis.faf_ftpf as faf_ftpf
+import ccfatigue.analysis.miner_harris as miner_harris
+import ccfatigue.analysis.sn_curve_linlog as sn_curve_linlog
+import ccfatigue.analysis.sn_curve_loglog as sn_curve_loglog
+import ccfatigue.analysis.sn_curve_sendeckyj as sn_curve_sendeckyj
+from ccfatigue.analysis.faf_ftpf import SnModel
 from ccfatigue.model import (
     CldMethod,
     CycleCountingMethod,
@@ -25,7 +26,6 @@ from ccfatigue.model import (
     SnCurveMethod,
     SnCurveResult,
 )
-from ccfatigue.modules.faf_ftpf import SnModel
 from ccfatigue.plotter import DataKey, Line
 
 ROUND_DECIMAL = 8
