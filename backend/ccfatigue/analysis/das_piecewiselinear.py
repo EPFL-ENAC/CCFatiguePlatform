@@ -16,7 +16,7 @@ import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 from scipy import stats
 
-import ccfatigue.analysis.piecewiselinear_utils as piecewiselinear_utils
+import ccfatigue.analysis.utils.piecewiselinear as piecewiselinear
 
 DEFAULT_UCS = 367.2
 DEFAULT_UTS = 416.5
@@ -304,7 +304,7 @@ def execute(
 
     # Calculate stress amplitude (sigma_a) for each known stress ratios
     snc_df["stress_amplitude"] = snc_df.apply(
-        lambda x: piecewiselinear_utils.calculate_stress_amplitude(
+        lambda x: piecewiselinear.calculate_stress_amplitude(
             x.stress_ratio, x.stress_max
         ),
         axis=1,
@@ -312,7 +312,7 @@ def execute(
 
     # Sort know stress ratios by sector counterclockwise
     # according to fig 1, p660, ref [2]
-    piecewiselinear_utils.sort_by_stress_ratios(snc_df)
+    piecewiselinear.sort_by_stress_ratios(snc_df)
 
     stress_ratio = snc_df.iloc[0].stress_ratio
     log10_cycles_to_failure = np.log10(

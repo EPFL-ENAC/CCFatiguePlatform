@@ -7,7 +7,7 @@ from typing import List
 from fastapi import APIRouter, File, Query, UploadFile
 
 from ccfatigue.analyzer import (
-    SnModel,
+    FatigueModel,
     run_cld,
     run_cycle_counting,
     run_damage_summation,
@@ -60,7 +60,7 @@ async def run_fatigue_failure_file(
     y_file: UploadFile = File(..., alias="yFile"),
     f_file: UploadFile = File(..., alias="fFile"),
     method: FatigueFailureMethod = Query(...),
-    sn_model: SnModel = Query(..., alias="snModel"),
+    sn_model: FatigueModel = Query(..., alias="snModel"),
     desirable_angle: float = Query(..., alias="desirableAngle"),
     off_axis_angle: float = Query(..., alias="offAxisAngle"),
 ) -> bytes:

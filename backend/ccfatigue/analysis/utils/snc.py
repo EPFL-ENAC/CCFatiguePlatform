@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-""" CCFatigue - Module 2 - sn_curve_utils.py
-This code regroups shared ressources for module 2
+"""
+Shared ressources for snc analysis modules
 """
 
-from math import log10, sqrt
 from typing import Optional
 
 import numpy as np
@@ -11,7 +10,7 @@ import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 from scipy import stats
 
-from ccfatigue.analysis.astm import Astm
+from ccfatigue.analysis.utils.astm import Astm
 
 
 def equation_ycar(slope: float, intercept: float, stress_parameter: float) -> float:
@@ -71,20 +70,20 @@ def stress_at_failure_bounds(
 
     term1 = (
         (sample_count * q * slope * intercept)
-        - (sample_count * q * log10(cycles_to_failure) * intercept)
+        - (sample_count * q * np.log10(cycles_to_failure) * intercept)
         + (pp * sample_count * xb)
     )
-    term2 = sqrt(
+    term2 = np.sqrt(
         sample_count
         * pp
         * q
         * (
             2 * sample_count * slope * intercept * xb
-            - 2 * sample_count * log10(cycles_to_failure) * intercept * xb
+            - 2 * sample_count * np.log10(cycles_to_failure) * intercept * xb
             + q * intercept**2
             + sample_count * intercept**2 * xb**2
-            + sample_count * log10(cycles_to_failure) ** 2
-            - 2 * sample_count * log10(cycles_to_failure) * slope
+            + sample_count * np.log10(cycles_to_failure) ** 2
+            - 2 * sample_count * np.log10(cycles_to_failure) * slope
             - pp
             + sample_count * slope**2
         )
@@ -196,7 +195,10 @@ def execute_linlog_loglog(
 
     # Calculate slope A and intercept B
     linregress = agg_df.groupby("stress_ratio_id").apply(
-        lambda x: stats.linregress(x.stress_max, x.log10_cycles_to_failure)
+        lambda x: stats.linregress(
+            x.stress_max,  # type: ignore
+            x.log10_cycles_to_failure,  # type: ignore
+        )
     )
     stress_ratios_df["slope"] = linregress.apply(lambda x: x[1])
     stress_ratios_df["intercept"] = linregress.apply(lambda x: x[0])
@@ -212,8 +214,8 @@ def execute_linlog_loglog(
     # TODO ask Tassos define ycar
     agg_df["ycar"] = agg_df.apply(
         lambda x: equation_ycar(
-            stress_ratios_df.loc[x.stress_ratio_id].slope,
-            stress_ratios_df.loc[x.stress_ratio_id].intercept,
+            stress_ratios_df.loc[x.stress_ratio_id].slope,  # type: ignore
+            stress_ratios_df.loc[x.stress_ratio_id].intercept,  # type: ignore
             x.stress_max,
         ),
         axis=1,
@@ -270,8 +272,8 @@ def execute_linlog_loglog(
     # Eq 6, p4, ref [1]
     # Variance
     # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/2_S-NCurves/S-N-Curve-LinLog.for#L333
-    stress_ratios_df["variance"] = stress_ratios_df.apply(
-        lambda x: sqrt(x.lsse / (x.sample_count - 2)), axis=1
+    stress_ratios_df["variance"] = np.sqrt(
+        stress_ratios_df.lsse / (stress_ratios_df.sample_count - 2)
     )
 
     # Fp is given in table 2, p5, ref [1]
@@ -331,7 +333,7 @@ def execute_linlog_loglog(
                 x.cycles_to_failure,
                 stress_ratio_df.pp,
                 stress_ratio_df.avg_stress_max,
-            ),
+            ),  # type: ignore
             axis=1,
         )
         stress["stress_lowerbound"] = stress_bounds.apply(lambda x: x[0])

@@ -10,13 +10,13 @@ from pandas._typing import ReadCsvBuffer, WriteBuffer
 from pandas.core.frame import DataFrame
 
 import ccfatigue.analysis.cld_harris as cld_harris
-import ccfatigue.analysis.cyc_range_mean as cyc_range_mean
+import ccfatigue.analysis.cyc_rangemean as cyc_rangemean
+import ccfatigue.analysis.das_harris as das_harris
 import ccfatigue.analysis.faf_ftpf as faf_ftpf
-import ccfatigue.analysis.miner_harris as miner_harris
-import ccfatigue.analysis.sn_curve_linlog as sn_curve_linlog
-import ccfatigue.analysis.sn_curve_loglog as sn_curve_loglog
-import ccfatigue.analysis.sn_curve_sendeckyj as sn_curve_sendeckyj
-from ccfatigue.analysis.faf_ftpf import SnModel
+import ccfatigue.analysis.snc_linlog as snc_linlog
+import ccfatigue.analysis.snc_loglog as snc_loglog
+import ccfatigue.analysis.snc_sendeckyj as snc_sendeckyj
+from ccfatigue.analysis.utils.faf import FatigueModel
 from ccfatigue.model import (
     CldMethod,
     CycleCountingMethod,
@@ -142,21 +142,21 @@ def run_sn_curve(
         match method:
             case SnCurveMethod.LIN_LOG:
                 output = run_python(
-                    lambda input, csv_output: sn_curve_linlog.execute(
+                    lambda input, csv_output: snc_linlog.execute(
                         input, None, csv_output
                     ),
                     file,
                 )
             case SnCurveMethod.LOG_LOG:
                 output = run_python(
-                    lambda input, csv_output: sn_curve_loglog.execute(
+                    lambda input, csv_output: snc_loglog.execute(
                         input, None, csv_output
                     ),
                     file,
                 )
             case SnCurveMethod.SENDECKYJ:
                 output = run_python(
-                    lambda input, csv_output: sn_curve_sendeckyj.execute(
+                    lambda input, csv_output: snc_sendeckyj.execute(
                         input, None, csv_output
                     ),
                     file,
@@ -175,7 +175,7 @@ def run_cycle_counting(
     match method:
         case CycleCountingMethod.RANGE_MEAN:
             output = run_python(
-                lambda input, csv_output: cyc_range_mean.execute(input, csv_output),
+                lambda input, csv_output: cyc_rangemean.execute(input, csv_output),
                 file,
             )
         case _:
@@ -203,7 +203,7 @@ def run_fatigue_failure(
     y_file: SpooledTemporaryFile[bytes] | IO,
     f_file: SpooledTemporaryFile[bytes] | IO,
     method: FatigueFailureMethod,
-    snModel: SnModel,
+    snModel: FatigueModel,
     desirable_angle: float,
     off_axis_angle: float,
 ) -> bytes:
@@ -237,7 +237,7 @@ def run_damage_summation(
     match method:
         case DamageSummationMethod.HARRIS:
             output = run_python_2(
-                lambda snc_input, cyc_input, csv_output: miner_harris.execute(
+                lambda snc_input, cyc_input, csv_output: das_harris.execute(
                     snc_input,
                     cyc_input,
                     csv_output,
