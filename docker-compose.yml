@@ -53,6 +53,7 @@ services:
       - "5432:5432"
     env_file:
       - ./secrets/.env
+    restart: unless-stopped
     volumes:
       - database:/var/lib/postgresql/data
 volumes:
