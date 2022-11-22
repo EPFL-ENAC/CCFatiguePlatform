@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 RUN pip install --no-cache-dir numpy
 COPY ./ccfatigue/analysis/fortran /app/fortran
-RUN python -m numpy.f2py -c fortran/sendeckyj.f -m ccfatigue.fortran.sendeckyj
+RUN python -m numpy.f2py -c fortran/sendeckyj.f -m ccfatigue.analysis.fortran.sendeckyj
 
 
 FROM python:3.10-slim as production-stage
@@ -31,7 +31,7 @@ RUN apt-get update && apt-get install -y \
 COPY --from=poetry-stage /app/requirements.txt /app
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY --from=fortran-stage /app/ccfatigue/fortran/ /app/ccfatigue/fortran/
+COPY --from=fortran-stage /app/ccfatigue/analysis/fortran/ /app/ccfatigue/analysis/fortran/
 
 COPY ./alembic.ini /app/
 COPY ./init_db.py /app/
