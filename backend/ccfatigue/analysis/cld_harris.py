@@ -15,6 +15,7 @@ import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 from scipy import stats
 
+import ccfatigue.analysis.cld_utils as cld_utils
 import ccfatigue.analysis.harris_utils as harris_utils
 
 DEFAULT_UCS = 27.1
@@ -22,40 +23,6 @@ DEFAULT_UTS = 27.7
 
 # Cycles for the isolines (the lines of the CLD)
 CLD_CYCLES_COUNT = [10**x for x in range(3, 10)]  # = 1e3, 1e4, ..., 1e9
-
-
-def cld_add_row(
-    cld_df, cycles_to_failure: float, stress_amplitude: float, stress_mean: float
-) -> pd.DataFrame:
-    """
-    Add row to CLD DataFrame
-    Parameters
-    ----------
-        cld_df
-            CLD DataFrame
-        cycles_to_failure: float
-        stress_amplitude: float
-        stress_mean: float
-    Returns
-    -------
-        CLD DataFrame
-    """
-    row = pd.DataFrame(
-        {
-            "cycles_to_failure": [cycles_to_failure],
-            "stress_amplitude": [stress_amplitude],
-            "stress_mean": [stress_mean],
-        }
-    )
-
-    cld_df = pd.concat(
-        [
-            cld_df,
-            row,
-        ],
-        ignore_index=True,
-    )
-    return cld_df
 
 
 def execute(
@@ -168,11 +135,11 @@ def execute(
         uu = linregress_u.slope * np.log10(cycles_to_failure) + linregress_u.intercept  # type: ignore # noqa
         vv = linregress_v.slope * np.log10(cycles_to_failure) + linregress_v.intercept  # type: ignore # noqa
 
-        cld_df = cld_add_row(
-            cld_df=cld_df,
-            cycles_to_failure=cycles_to_failure,
-            stress_amplitude=0,
-            stress_mean=-ucs,
+        cld_df = cld_utils.cld_add_row(
+            cld_df,
+            cycles_to_failure,
+            0,
+            -ucs,
         )
 
         increment = 0.90 * (uts + ucs) / 40
@@ -191,18 +158,18 @@ def execute(
             stress_amplitude = c2 * c3 * uts
             stress_mean = sm
 
-            cld_df = cld_add_row(
-                cld_df=cld_df,
-                cycles_to_failure=cycles_to_failure,
-                stress_amplitude=stress_amplitude,
-                stress_mean=stress_mean,
+            cld_df = cld_utils.cld_add_row(
+                cld_df,
+                cycles_to_failure,
+                stress_amplitude,
+                stress_mean,
             )
 
-        cld_df = cld_add_row(
-            cld_df=cld_df,
-            cycles_to_failure=cycles_to_failure,
-            stress_amplitude=0,
-            stress_mean=uts,
+        cld_df = cld_utils.cld_add_row(
+            cld_df,
+            cycles_to_failure,
+            0,
+            uts,
         )
 
     # Generate output files
