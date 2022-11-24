@@ -10,8 +10,6 @@ FTPF is described in Tassos red book, in p. 163 - the original papers are
     (https://doi.org/10.1016/S0142-1123(02)00004-X)
 """
 
-import math
-from enum import Enum
 from itertools import chain
 from typing import Optional
 
@@ -19,11 +17,7 @@ import numpy as np
 import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 
-
-class SnModel(str, Enum):
-    LIN_LOG = "Lin-Log"
-    LOG_LOG = "Log-Log"
-
+import ccfatigue.analysis.utils.faf as faf
 
 LIST_CYCLES_TO_FAILURE = list(
     chain(
@@ -157,7 +151,7 @@ def execute(
     snc_input_f_json_file: FilePath | ReadCsvBuffer,
     faf_output_csv_file: FilePath | WriteBuffer,
     faf_output_json_file: Optional[FilePath | WriteBuffer],
-    sn_model: SnModel,
+    sn_model: faf.FatigueModel,
     desirable_angle: float,
     off_axis_angle: float,
 ) -> None:
@@ -203,16 +197,16 @@ def execute(
     b_y: float = snc_y_df.iloc[0].b
     b_f: float = snc_f_df.iloc[0].b
 
-    theta = math.radians(desirable_angle)
-    off_axis_rad = math.radians(off_axis_angle)
+    theta = np.radians(desirable_angle)
+    off_axis_rad = np.radians(off_axis_angle)
 
-    tm = math.sin(off_axis_rad) ** 4
-    tnc = math.cos(off_axis_rad) ** 4
-    tmn = math.sin(off_axis_rad) ** 2 * math.cos(off_axis_rad) ** 2
+    tm = np.sin(off_axis_rad) ** 4
+    tnc = np.cos(off_axis_rad) ** 4
+    tmn = np.sin(off_axis_rad) ** 2 * np.cos(off_axis_rad) ** 2
 
-    nc = math.cos(theta) ** 4
-    m = math.sin(theta) ** 4
-    mn = math.sin(theta) ** 2 * math.cos(theta) ** 2
+    nc = np.cos(theta) ** 4
+    m = np.sin(theta) ** 4
+    mn = np.sin(theta) ** 2 * np.cos(theta) ** 2
 
     stress_ratio = r_x if r_x == r_y == r_f else 0
     confidence_interval: float = (
@@ -234,7 +228,7 @@ def execute(
 
     faf_csv_df["stress_ratio"] = stress_ratio
 
-    if sn_model == SnModel.LOG_LOG:
+    if sn_model == faf.FatigueModel.LOG_LOG:
         get_stress = get_loglog_stress
         get_sn = get_loglog_sn
     else:
@@ -244,7 +238,7 @@ def execute(
     faf_csv_df["x"] = get_stress(a_x, b_x, faf_csv_df.cycles_to_failure)
     faf_csv_df["y"] = get_stress(a_y, b_y, faf_csv_df.cycles_to_failure)
 
-    if not math.isclose(off_axis_angle, 0):
+    if not np.isclose(off_axis_angle, 0):
 
         faf_csv_df["t"] = get_stress(a_f, b_f, faf_csv_df.cycles_to_failure)
 
@@ -254,13 +248,12 @@ def execute(
 
         # Remove rows where ssqr < 0
         faf_csv_df.drop(faf_csv_df[faf_csv_df.ssqr < 0].index, inplace=True)
-        # output_df["s"] = output_df.apply(lambda z: 1 / math.sqrt(z.ssqr), axis=1)
         faf_csv_df["s"] = 1 / np.sqrt(faf_csv_df.ssqr)
 
     else:
         faf_csv_df["s"] = get_stress(a_f, b_f, faf_csv_df.cycles_to_failure)
 
-    if math.isclose(off_axis_angle, 22.5):
+    if np.isclose(off_axis_angle, 22.5):
         faf_csv_df["s"] = faf_csv_df["t"] / 2.2
 
     faf_csv_df["stress_max"] = faf_csv_df.apply(
