@@ -1,10 +1,11 @@
 import os
 
 import ccfatigue.analysis.cld_harris as cld_harris
-import ccfatigue.analysis.cld_piecewiselinear as cld_piecewiselinear
+import ccfatigue.analysis.cld_piecewiselinear as cld_piecewiselinear  # noqa: E501
 import ccfatigue.analysis.cyc_rangemean as cyc_rangemean
+import ccfatigue.analysis.cyc_simplified_rainflow as cyc_simplified_rainflow
 import ccfatigue.analysis.das_harris as das_harris
-import ccfatigue.analysis.das_piecewiselinear as das_piecewiselinear
+import ccfatigue.analysis.das_piecewiselinear as das_piecewiselinear  # noqa: E501
 import ccfatigue.analysis.faf_ftpf as faf_ftpf
 import ccfatigue.analysis.faf_hashinrotem as faf_hashinrotem
 import ccfatigue.analysis.snc_linlog as sn_curve_linlog
@@ -33,6 +34,12 @@ LDS_CSV_1_INPUT_FILE = os.path.join(DATA_DIR, "LDS_sample_2022-11.csv")
 # Mod 1 - Cycle counting - Range mean
 CYC_RANGEMEAN_CSV_OUTPUT_FILE = os.path.join(
     OUTPUT_DIR, "CYC_sample_2022-11_RangeMean.csv"
+)
+
+
+# Mod 1 - Cycle counting - Simplified Rainflow
+CYC_SIMPLIFIEDRAINFLOW_CSV_OUTPUT_FILE = os.path.join(
+    OUTPUT_DIR, "CYC_simplifiedrainflow.csv"
 )
 
 # Mod 2 - S-N Curve - LogLog
@@ -121,6 +128,12 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def test_cyc_range_mean():
     cyc_rangemean.execute(LDS_CSV_1_INPUT_FILE, CYC_RANGEMEAN_CSV_OUTPUT_FILE)
+
+
+def test_cyc_simplified_rainflow():
+    cyc_simplified_rainflow.execute(
+        LDS_CSV_1_INPUT_FILE, CYC_SIMPLIFIEDRAINFLOW_CSV_OUTPUT_FILE
+    )
 
 
 # Module 2 - S-N curve

@@ -7,20 +7,7 @@ This file is a translation from fortran Cycle-Counting-Range-Mean.for
 import pandas as pd
 from pandas._typing import FilePath, ReadBuffer, WriteBuffer
 
-
-class FlowRow:
-    """
-    Row of a Flow table
-    """
-
-    def __init__(
-        self, _range: float, _mean: float, peak1: float, peak2: float, n_cycles: float
-    ):
-        self.range = _range
-        self.mean = _mean
-        self.peak1 = peak1
-        self.peak2 = peak2
-        self.n_cycles = n_cycles
+from ccfatigue.analysis.utils.cyc import FlowRow
 
 
 def execute(
