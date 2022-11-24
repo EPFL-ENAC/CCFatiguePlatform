@@ -21,3 +21,5 @@
 | stress_range          | Stress range (= `2 * sigma_a`)                          | delta_sigma | `[MPa]`   | double    | CYC                     |
 | stress_ratio          | Stress ratio                                            | R           | `[-]`     | double    | AGG, SNC, FAF, CYC      |
 | stress_upperbound     | Stress at failure (upper bound)                         | sigma_max   | `[MPa]`   | double    | SNC                     |
+| ucs                   | Ultimate compressive stress                             | UCS         |           |           |                         |
+| uts                   | Ultimate tensile stress                                 | UTS         |           |           |                         |
