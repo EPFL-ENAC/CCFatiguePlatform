@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Simplified Rainflow Counting
+Simplified Rainflow Cycle Counting
 This module takes in LDS and outputs CYC
 Translation from fortran Cycle-Counting-Simplified-Rainflow.for
 Algorithm described in "Simple rainflow counting algorithms"
@@ -9,8 +9,6 @@ Algorithm described in "Simple rainflow counting algorithms"
  """
 
 import pandas as pd
-
-# import rainflow
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 
 from ccfatigue.analysis.utils.cyc import FlowRow
@@ -46,7 +44,7 @@ def execute(
     cyc_csv_output_file: FilePath | WriteBuffer,
 ) -> None:
     """
-    Execute the LinLog algorithm
+    Execute the Simplified Rainflow Cycle Counting algorithm
     Parameters
     ----------
         lds_input_csv_file: FilePath | ReadCsvBuffer
