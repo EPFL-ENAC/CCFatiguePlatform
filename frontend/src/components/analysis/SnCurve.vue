@@ -18,14 +18,19 @@
             v-model="file"
             chips
             show-size
-            accept=".txt,.csv"
-            label="Upload file"
+            accept=".csv"
+            label="AGG csv file"
             :disabled="loading"
             @change="updateOutput"
           >
             <template #append>
               <info-tooltip>
-                The data required as input for this module takes the form of a
+                See the
+                <a
+                  href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/AGG_Data_Convention.md"
+                  >AGG Data Convention</a
+                >
+                <!-- The data required as input for this module takes the form of a
                 csv file containing 6 columns and as many rows as there were
                 testings in the experiment. The columns are populated as
                 follows:
@@ -43,7 +48,7 @@
                   of a quasi static loading up to breaking. If the sample
                   doesn't break, residual strength takes the same value as the
                   stress parameter.
-                </p>
+                </p> -->
               </info-tooltip>
             </template>
           </v-file-input>
@@ -93,8 +98,15 @@
     </v-card-text>
     <v-card-actions v-if="hasInput" class="justify-end">
       <v-btn :disabled="loading && output" @click="downloadOutput">
-        Download
+        Download SNC
       </v-btn>
+      <info-tooltip>
+        See the
+        <a
+          href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/SNC_Data_Convention.md"
+          >SNC Data Convention</a
+        >
+      </info-tooltip>
     </v-card-actions>
   </v-card>
 </template>
@@ -154,7 +166,7 @@ export default {
     },
     downloadOutput() {
       for (const [key, value] of Object.entries(this.outputs)) {
-        download(value, `sn-curve-${key.toLowerCase()}-output.csv`, "text/csv");
+        download(value, `SNC-${key.toLowerCase()}.csv`, "text/csv");
       }
     },
   },

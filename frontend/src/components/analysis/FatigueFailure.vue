@@ -18,12 +18,17 @@
             accept=".json"
             :error-messages="errorMessages"
             :disabled="loading"
-            label="X file"
+            label="SNC X json file"
             @change="updateOutput"
           >
             <template #append>
               <info-tooltip>
-                <p>
+                See the
+                <a
+                  href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/SNC_Data_Convention.md"
+                  >SNC Data Convention</a
+                >
+                <!-- <p>
                   The data type selection box allows us to enter static, fatigue
                   and reference data that are necessary to the analysis, the
                   values that should be placed as input are dependent on the
@@ -79,7 +84,7 @@
                   <li>SSE !Sum of squares due to errors</li>
                   <li>SST !Sum of squares about the mean</li>
                   <li>RSQ !R-square</li>
-                </ul>
+                </ul> -->
               </info-tooltip>
             </template>
           </v-file-input>
@@ -91,7 +96,7 @@
             accept=".json"
             :error-messages="errorMessages"
             :disabled="loading"
-            label="Y file"
+            label="SNC Y json file"
             @change="updateOutput"
           ></v-file-input>
         </v-col>
@@ -102,7 +107,7 @@
             accept=".json"
             :error-messages="errorMessages"
             :disabled="loading"
-            label="F file"
+            label="SNC F json file"
             @change="updateOutput"
           ></v-file-input>
         </v-col>
@@ -152,8 +157,15 @@
     </v-card-text>
     <v-card-actions v-if="hasInput" class="justify-end">
       <v-btn :disabled="loading && output != null" @click="downloadOutput">
-        Download
+        Download FAF
       </v-btn>
+      <info-tooltip>
+        See the
+        <a
+          href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/FAF_Data_Convention.md"
+          >FAF Data Convention</a
+        >
+      </info-tooltip>
     </v-card-actions>
   </v-card>
 </template>
@@ -234,11 +246,7 @@ export default {
     },
     downloadOutput() {
       if (this.output) {
-        download(
-          this.output,
-          `fatigue-failure-${this.method}-output.csv`,
-          "text/csv"
-        );
+        download(this.output, `FAF-${this.method}.csv`, "text/csv");
       }
     },
   },
