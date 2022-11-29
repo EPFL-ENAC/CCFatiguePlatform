@@ -122,7 +122,7 @@ def get_echarts_lines(
     for r_ratio in r_ratios:
         selected_df = round_df[round_df[DataKey.R_RATIO.key] == r_ratio]
         n_cycles = selected_df[DataKey.N_CYCLES.key].to_list()
-        stress_param = selected_df[DataKey.STRESS.key].to_list()
+        stress_param = selected_df[DataKey.STRESS_MAX.key].to_list()
         lines.append(
             EchartLine(
                 xData=n_cycles, yData=stress_param, name=f"{method.value} {r_ratio}"
