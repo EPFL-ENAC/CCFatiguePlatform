@@ -48,22 +48,22 @@
       <simple-chart
         :aspect-ratio="2"
         :series="series"
-        x-axis-name="cum_n_cycles"
-        y-axis-name="stress_range"
+        x-axis-name="Cummulative Percentage of Spectrum Cycles"
+        y-axis-name="Stress Range [MPa]"
       >
       </simple-chart>
     </v-card-text>
     <v-card-actions v-if="hasInput" class="justify-end">
       <v-btn :disabled="loading && output != null" @click="downloadOutput">
         Download CYC
+        <info-tooltip>
+          See the
+          <a
+            href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/CYC_Data_Convention.md"
+            >CYC Data Convention</a
+          >
+        </info-tooltip>
       </v-btn>
-      <info-tooltip>
-        See the
-        <a
-          href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/CYC_Data_Convention.md"
-          >CYC Data Convention</a
-        >
-      </info-tooltip>
     </v-card-actions>
   </v-card>
 </template>

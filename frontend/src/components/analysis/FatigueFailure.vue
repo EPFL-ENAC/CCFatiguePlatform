@@ -151,21 +151,21 @@
       <simple-chart
         :aspect-ratio="2"
         :series="series"
-        x-axis-name="cycles_to_failure"
-        y-axis-name="stress_max"
+        x-axis-name="N"
+        y-axis-name="Maximum Cyclic Stress [MPa]"
       ></simple-chart>
     </v-card-text>
     <v-card-actions v-if="hasInput" class="justify-end">
       <v-btn :disabled="loading && output != null" @click="downloadOutput">
         Download FAF
+        <info-tooltip>
+          See the
+          <a
+            href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/FAF_Data_Convention.md"
+            >FAF Data Convention</a
+          >
+        </info-tooltip>
       </v-btn>
-      <info-tooltip>
-        See the
-        <a
-          href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/FAF_Data_Convention.md"
-          >FAF Data Convention</a
-        >
-      </info-tooltip>
     </v-card-actions>
   </v-card>
 </template>

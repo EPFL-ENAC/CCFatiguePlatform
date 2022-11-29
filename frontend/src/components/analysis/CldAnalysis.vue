@@ -71,21 +71,21 @@
       <simple-chart
         :aspect-ratio="2"
         :series="series"
-        x-axis-name="stress_mean"
-        y-axis-name="stress_amplitude"
+        x-axis-name="Mean Stress [MPa]"
+        y-axis-name="Stress Amplitude [MPa]"
       ></simple-chart>
     </v-card-text>
     <v-card-actions v-if="hasInput" class="justify-end">
       <v-btn :disabled="loading && output != null" @click="downloadOutput">
         Download CLD
+        <info-tooltip>
+          See the
+          <a
+            href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/CLD_Data_Convention.md"
+            >CLD Data Convention</a
+          >
+        </info-tooltip>
       </v-btn>
-      <info-tooltip>
-        See the
-        <a
-          href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/CLD_Data_Convention.md"
-          >CLD Data Convention</a
-        >
-      </info-tooltip>
     </v-card-actions>
   </v-card>
 </template>

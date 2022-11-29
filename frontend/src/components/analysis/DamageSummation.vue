@@ -80,21 +80,21 @@
       <simple-chart
         :aspect-ratio="2"
         :series="series"
-        x-axis-name="damage"
-        y-axis-name="stress_max"
+        x-axis-name="Spectrum Passes"
+        y-axis-name="Maximum Cyclic Stress [MPa]"
       ></simple-chart>
     </v-card-text>
     <v-card-actions v-if="hasInput" class="justify-end">
       <v-btn :disabled="loading && output != null" @click="downloadOutput">
         Download DAS
+        <info-tooltip>
+          See the
+          <a
+            href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/DAS_Data_Convention.md"
+            >DAS Data Convention</a
+          >
+        </info-tooltip>
       </v-btn>
-      <info-tooltip>
-        See the
-        <a
-          href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/DAS_Data_Convention.md"
-          >DAS Data Convention</a
-        >
-      </info-tooltip>
     </v-card-actions>
   </v-card>
 </template>

@@ -90,8 +90,8 @@
           :aspect-ratio="2"
           :series="series"
           title="S-N Curves"
-          x-axis-name="Number of cycles"
-          y-axis-name="Stress"
+          x-axis-name="N"
+          y-axis-name="Maximum Cyclic Stress [MPa]"
           x-axis-type="log"
         ></simple-chart>
       </v-row>
@@ -99,14 +99,14 @@
     <v-card-actions v-if="hasInput" class="justify-end">
       <v-btn :disabled="loading && output" @click="downloadOutput">
         Download SNC
+        <info-tooltip>
+          See the
+          <a
+            href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/SNC_Data_Convention.md"
+            >SNC Data Convention</a
+          >
+        </info-tooltip>
       </v-btn>
-      <info-tooltip>
-        See the
-        <a
-          href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/SNC_Data_Convention.md"
-          >SNC Data Convention</a
-        >
-      </info-tooltip>
     </v-card-actions>
   </v-card>
 </template>
