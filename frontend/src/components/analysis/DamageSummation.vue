@@ -1,7 +1,7 @@
 <template>
   <v-card :loading="loading">
     <v-card-title>
-      Damage Summation (uniaxial)
+      Damage Summation
       <v-spacer />
       <info-tooltip>
         The damage summation module is based on the Palgrem-Miner linear damage
