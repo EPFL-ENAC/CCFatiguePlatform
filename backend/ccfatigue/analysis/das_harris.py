@@ -15,7 +15,7 @@ import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 from scipy import optimize, stats
 
-import ccfatigue.analysis.harris_utils as harris_utils
+import ccfatigue.analysis.utils.harris as harris
 
 DEFAULT_UCS = 367.2
 DEFAULT_UTS = 416.5
@@ -249,13 +249,13 @@ def execute(
 
     # Calculate sigma amplitude
     SNC_df["stress_amplitude"] = SNC_df.apply(
-        lambda x: harris_utils.calculate_stress_amplitude(x.stress_ratio, x.stress_max),
+        lambda x: harris.calculate_stress_amplitude(x.stress_ratio, x.stress_max),
         axis=1,
     )
 
     # Calculate mean sigma
     SNC_df["stress_mean"] = SNC_df.apply(
-        lambda x: harris_utils.calculate_stress_mean(x.stress_ratio, x.stress_max),
+        lambda x: harris.calculate_stress_mean(x.stress_ratio, x.stress_max),
         axis=1,
     )
 
@@ -273,7 +273,7 @@ def execute(
 
         cycle_df = SNC_df.loc[SNC_df.cycles_to_failure == cycles_count]
 
-        f, u, v = harris_utils.calculate_fuv(
+        f, u, v = harris.calculate_fuv(
             cycle_df.x1.to_numpy(), cycle_df.x2.to_numpy(), cycle_df.y.to_numpy()
         )
 

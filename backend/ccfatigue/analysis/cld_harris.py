@@ -1,12 +1,15 @@
 #!/usr/bin/env python
-""" CCFatigue - Module 3 - CLD-Harris.py
+"""
 This code takes in SNC data and outputs CLD data
 
-Harris diagram is described in Tassos red book p. 108 - the original paper is:
+Harris's CLD is described in Fatigue of Fiber-reinforced Composites [1] p. 108
+The original papers are [2] and [3]
 
-[1] https://www.sciencedirect.com/science/article/pii/0142112394904782?via%3Dihub
+[1] https://link.springer.com/book/10.1007/978-1-84996-181-3
+    DOI 10.1007/978-1-84996-181-3
+[2] https://www.sciencedirect.com/science/article/pii/0142112394904782?via%3Dihub
     (https://doi.org/10.1016/0142-1123(94)90478-2)
-[2] https://www.sciencedirect.com/science/article/pii/S0266353897001218?via%3Dihub
+[3] https://www.sciencedirect.com/science/article/pii/S0266353897001218?via%3Dihub
     (https://doi.org/10.1016/S0266-3538(97)00121-8)
 """
 
@@ -15,8 +18,8 @@ import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 from scipy import stats
 
-import ccfatigue.analysis.cld_utils as cld_utils
-import ccfatigue.analysis.harris_utils as harris_utils
+import ccfatigue.analysis.utils.cld as cld
+import ccfatigue.analysis.utils.harris as harris
 
 DEFAULT_UCS = 27.1
 DEFAULT_UTS = 27.7
@@ -48,7 +51,7 @@ def execute(
         None
     """
 
-    bounds_margin = harris_utils.BOUNDS_MARGIN
+    bounds_margin = harris.BOUNDS_MARGIN
 
     # Import input files (SNC format)
     snc_df = pd.read_csv(input_file)
@@ -77,19 +80,19 @@ def execute(
 
     # Calculate sigma amplitude
     snc_df["stress_amplitude"] = snc_df.apply(
-        lambda x: harris_utils.calculate_stress_amplitude(x.stress_ratio, x.stress_max),
+        lambda x: harris.calculate_stress_amplitude(x.stress_ratio, x.stress_max),
         axis=1,
     )
 
     # Calculate mean sigma
     snc_df["stress_mean"] = snc_df.apply(
-        lambda x: harris_utils.calculate_stress_mean(x.stress_ratio, x.stress_max),
+        lambda x: harris.calculate_stress_mean(x.stress_ratio, x.stress_max),
         axis=1,
     )
 
     # Apply bounds to mean sigma (applied to module 3, not to module 5)
     snc_df["stress_mean"] = snc_df.apply(
-        lambda x: harris_utils.bounds_stress_mean(
+        lambda x: harris.bounds_stress_mean(
             x.stress_mean,
             uts,
             ucs,
@@ -113,7 +116,7 @@ def execute(
 
         cycle_df = snc_df.loc[snc_df.cycles_to_failure == cycles_count]
 
-        f, u, v = harris_utils.calculate_fuv(
+        f, u, v = harris.calculate_fuv(
             cycle_df.x1.to_numpy(), cycle_df.x2.to_numpy(), cycle_df.y.to_numpy()
         )
 
@@ -130,12 +133,12 @@ def execute(
 
     for cycles_to_failure in CLD_CYCLES_COUNT:
 
-        # Eq 8 p530 ref[1]
+        # Eq 8 p530 ref[2]
         ff = linregress_f.slope * np.log10(cycles_to_failure) + linregress_f.intercept  # type: ignore # noqa
         uu = linregress_u.slope * np.log10(cycles_to_failure) + linregress_u.intercept  # type: ignore # noqa
         vv = linregress_v.slope * np.log10(cycles_to_failure) + linregress_v.intercept  # type: ignore # noqa
 
-        cld_df = cld_utils.cld_add_row(
+        cld_df = cld.cld_add_row(
             cld_df,
             cycles_to_failure,
             0,
@@ -158,14 +161,14 @@ def execute(
             stress_amplitude = c2 * c3 * uts
             stress_mean = sm
 
-            cld_df = cld_utils.cld_add_row(
+            cld_df = cld.cld_add_row(
                 cld_df,
                 cycles_to_failure,
                 stress_amplitude,
                 stress_mean,
             )
 
-        cld_df = cld_utils.cld_add_row(
+        cld_df = cld.cld_add_row(
             cld_df,
             cycles_to_failure,
             0,

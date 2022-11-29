@@ -17,7 +17,7 @@ from typing import Optional
 import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 
-import ccfatigue.analysis.sn_curve_utils as sn_curve_utils
+import ccfatigue.analysis.utils.snc as snc
 
 # Prepare all cycles to failure output (SNC)
 # Refs:
@@ -137,7 +137,7 @@ def execute(
     -------
         None
     """
-    sn_curve_utils.execute_linlog_loglog(
+    snc.execute_linlog_loglog(
         use_logarithm=True,
         input_file=input_file,
         output_json_file=output_json_file,
