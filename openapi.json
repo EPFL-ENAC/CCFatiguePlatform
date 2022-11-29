@@ -1051,6 +1051,7 @@
           "specimen_id",
           "total_dissipated_energy",
           "run_out",
+          "stress_ratio",
           "hysteresis_loops",
           "n_cycles",
           "creep",
@@ -1073,6 +1074,10 @@
           "run_out": {
             "title": "Run Out",
             "type": "boolean"
+          },
+          "stress_ratio": {
+            "title": "Stress Ratio",
+            "type": "number"
           },
           "hysteresis_loops": {
             "title": "Hysteresis Loops",
