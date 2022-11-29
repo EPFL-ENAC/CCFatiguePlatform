@@ -26,6 +26,7 @@ class FatigueTest {
    * @param specimenId {Number}
    * @param totalDissipatedEnergy {Number}
    * @param runOut {Boolean}
+   * @param stressRatio {Number}
    * @param hysteresisLoops {Array.<module:model/HysteresisLoop>}
    * @param nCycles {Array.<Number>}
    * @param creep {Array.<Number>}
@@ -39,6 +40,7 @@ class FatigueTest {
     specimenId,
     totalDissipatedEnergy,
     runOut,
+    stressRatio,
     hysteresisLoops,
     nCycles,
     creep,
@@ -53,6 +55,7 @@ class FatigueTest {
       specimenId,
       totalDissipatedEnergy,
       runOut,
+      stressRatio,
       hysteresisLoops,
       nCycles,
       creep,
@@ -74,6 +77,7 @@ class FatigueTest {
     specimenId,
     totalDissipatedEnergy,
     runOut,
+    stressRatio,
     hysteresisLoops,
     nCycles,
     creep,
@@ -86,6 +90,7 @@ class FatigueTest {
     obj["specimen_id"] = specimenId;
     obj["total_dissipated_energy"] = totalDissipatedEnergy;
     obj["run_out"] = runOut;
+    obj["stress_ratio"] = stressRatio;
     obj["hysteresis_loops"] = hysteresisLoops;
     obj["n_cycles"] = nCycles;
     obj["creep"] = creep;
@@ -121,6 +126,12 @@ class FatigueTest {
       }
       if (data.hasOwnProperty("run_out")) {
         obj["run_out"] = ApiClient.convertToType(data["run_out"], "Boolean");
+      }
+      if (data.hasOwnProperty("stress_ratio")) {
+        obj["stress_ratio"] = ApiClient.convertToType(
+          data["stress_ratio"],
+          "Number"
+        );
       }
       if (data.hasOwnProperty("hysteresis_loops")) {
         obj["hysteresis_loops"] = ApiClient.convertToType(
@@ -179,6 +190,11 @@ FatigueTest.prototype["total_dissipated_energy"] = undefined;
  * @member {Boolean} run_out
  */
 FatigueTest.prototype["run_out"] = undefined;
+
+/**
+ * @member {Number} stress_ratio
+ */
+FatigueTest.prototype["stress_ratio"] = undefined;
 
 /**
  * @member {Array.<module:model/HysteresisLoop>} hysteresis_loops

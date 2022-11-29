@@ -28,6 +28,7 @@ class FatigueTest(BaseModel):
     specimen_id: int
     total_dissipated_energy: int
     run_out: bool
+    stress_ratio: float
     hysteresis_loops: List[HysteresisLoop]
     n_cycles: List[float]
     creep: List[float]
@@ -135,7 +136,10 @@ async def fatigue_test(
         ._asdict()
     )
     test_meta = await get_test_fields(
-        session, experiment_id, test_id, (Test.specimen_number, Test.run_out)
+        session,
+        experiment_id,
+        test_id,
+        (Test.specimen_number, Test.run_out, Test.stress_ratio),
     )
     std_df = get_dataframe("TST", experiment, test_meta["specimen_number"])
     hyst_df = get_dataframe("HYS", experiment, test_meta["specimen_number"]).fillna(
@@ -148,6 +152,7 @@ async def fatigue_test(
     return FatigueTest(
         specimen_id=test_meta["specimen_number"],
         run_out=test_meta["run_out"],
+        stress_ratio=test_meta["stress_ratio"],
         total_dissipated_energy=get_total_dissipated_energy(hyst_df),
         hysteresis_loops=hysteresis_loops,
         n_cycles=hyst_df["n_cycles"].to_list(),
