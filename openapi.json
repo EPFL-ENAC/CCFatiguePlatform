@@ -1050,11 +1050,16 @@
         "required": [
           "specimen_id",
           "total_dissipated_energy",
+          "run_out",
+          "stress_ratio",
           "hysteresis_loops",
           "n_cycles",
           "creep",
           "hysteresis_area",
-          "stiffness"
+          "stiffness",
+          "stress_at_failure",
+          "strain_at_failure",
+          "n_fail"
         ],
         "type": "object",
         "properties": {
@@ -1065,6 +1070,14 @@
           "total_dissipated_energy": {
             "title": "Total Dissipated Energy",
             "type": "integer"
+          },
+          "run_out": {
+            "title": "Run Out",
+            "type": "boolean"
+          },
+          "stress_ratio": {
+            "title": "Stress Ratio",
+            "type": "number"
           },
           "hysteresis_loops": {
             "title": "Hysteresis Loops",
@@ -1100,6 +1113,18 @@
             "items": {
               "type": "number"
             }
+          },
+          "stress_at_failure": {
+            "title": "Stress At Failure",
+            "type": "number"
+          },
+          "strain_at_failure": {
+            "title": "Strain At Failure",
+            "type": "number"
+          },
+          "n_fail": {
+            "title": "N Fail",
+            "type": "integer"
           }
         }
       },

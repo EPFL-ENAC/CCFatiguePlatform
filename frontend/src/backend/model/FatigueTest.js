@@ -25,30 +25,45 @@ class FatigueTest {
    * @alias module:model/FatigueTest
    * @param specimenId {Number}
    * @param totalDissipatedEnergy {Number}
+   * @param runOut {Boolean}
+   * @param stressRatio {Number}
    * @param hysteresisLoops {Array.<module:model/HysteresisLoop>}
    * @param nCycles {Array.<Number>}
    * @param creep {Array.<Number>}
    * @param hysteresisArea {Array.<Number>}
    * @param stiffness {Array.<Number>}
+   * @param stressAtFailure {Number}
+   * @param strainAtFailure {Number}
+   * @param nFail {Number}
    */
   constructor(
     specimenId,
     totalDissipatedEnergy,
+    runOut,
+    stressRatio,
     hysteresisLoops,
     nCycles,
     creep,
     hysteresisArea,
-    stiffness
+    stiffness,
+    stressAtFailure,
+    strainAtFailure,
+    nFail
   ) {
     FatigueTest.initialize(
       this,
       specimenId,
       totalDissipatedEnergy,
+      runOut,
+      stressRatio,
       hysteresisLoops,
       nCycles,
       creep,
       hysteresisArea,
-      stiffness
+      stiffness,
+      stressAtFailure,
+      strainAtFailure,
+      nFail
     );
   }
 
@@ -61,19 +76,29 @@ class FatigueTest {
     obj,
     specimenId,
     totalDissipatedEnergy,
+    runOut,
+    stressRatio,
     hysteresisLoops,
     nCycles,
     creep,
     hysteresisArea,
-    stiffness
+    stiffness,
+    stressAtFailure,
+    strainAtFailure,
+    nFail
   ) {
     obj["specimen_id"] = specimenId;
     obj["total_dissipated_energy"] = totalDissipatedEnergy;
+    obj["run_out"] = runOut;
+    obj["stress_ratio"] = stressRatio;
     obj["hysteresis_loops"] = hysteresisLoops;
     obj["n_cycles"] = nCycles;
     obj["creep"] = creep;
     obj["hysteresis_area"] = hysteresisArea;
     obj["stiffness"] = stiffness;
+    obj["stress_at_failure"] = stressAtFailure;
+    obj["strain_at_failure"] = strainAtFailure;
+    obj["n_fail"] = nFail;
   }
 
   /**
@@ -96,6 +121,15 @@ class FatigueTest {
       if (data.hasOwnProperty("total_dissipated_energy")) {
         obj["total_dissipated_energy"] = ApiClient.convertToType(
           data["total_dissipated_energy"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("run_out")) {
+        obj["run_out"] = ApiClient.convertToType(data["run_out"], "Boolean");
+      }
+      if (data.hasOwnProperty("stress_ratio")) {
+        obj["stress_ratio"] = ApiClient.convertToType(
+          data["stress_ratio"],
           "Number"
         );
       }
@@ -122,6 +156,21 @@ class FatigueTest {
           "Number",
         ]);
       }
+      if (data.hasOwnProperty("stress_at_failure")) {
+        obj["stress_at_failure"] = ApiClient.convertToType(
+          data["stress_at_failure"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("strain_at_failure")) {
+        obj["strain_at_failure"] = ApiClient.convertToType(
+          data["strain_at_failure"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("n_fail")) {
+        obj["n_fail"] = ApiClient.convertToType(data["n_fail"], "Number");
+      }
     }
     return obj;
   }
@@ -136,6 +185,16 @@ FatigueTest.prototype["specimen_id"] = undefined;
  * @member {Number} total_dissipated_energy
  */
 FatigueTest.prototype["total_dissipated_energy"] = undefined;
+
+/**
+ * @member {Boolean} run_out
+ */
+FatigueTest.prototype["run_out"] = undefined;
+
+/**
+ * @member {Number} stress_ratio
+ */
+FatigueTest.prototype["stress_ratio"] = undefined;
 
 /**
  * @member {Array.<module:model/HysteresisLoop>} hysteresis_loops
@@ -161,5 +220,20 @@ FatigueTest.prototype["hysteresis_area"] = undefined;
  * @member {Array.<Number>} stiffness
  */
 FatigueTest.prototype["stiffness"] = undefined;
+
+/**
+ * @member {Number} stress_at_failure
+ */
+FatigueTest.prototype["stress_at_failure"] = undefined;
+
+/**
+ * @member {Number} strain_at_failure
+ */
+FatigueTest.prototype["strain_at_failure"] = undefined;
+
+/**
+ * @member {Number} n_fail
+ */
+FatigueTest.prototype["n_fail"] = undefined;
 
 export default FatigueTest;

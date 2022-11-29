@@ -1,4 +1,5 @@
 import os
+from operator import itemgetter
 from typing import Dict, List
 
 import numpy as np
@@ -8,8 +9,9 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from ccfatigue.experiment.common import DATA_DIRECTORY, get_specimen_id
-from ccfatigue.models.database import Experiment
+from ccfatigue.experiment.common import DATA_DIRECTORY, get_test_fields
+from ccfatigue.models.database import Experiment, Test
+from preprocessing.hysteresis_loops import process_hysteresis
 
 INTERVAL: int = 10
 LOOP_SPACING: int = 1000
@@ -25,11 +27,16 @@ class HysteresisLoop(BaseModel):
 class FatigueTest(BaseModel):
     specimen_id: int
     total_dissipated_energy: int
+    run_out: bool
+    stress_ratio: float
     hysteresis_loops: List[HysteresisLoop]
     n_cycles: List[float]
     creep: List[float]
     hysteresis_area: List[float]
     stiffness: List[float]
+    stress_at_failure: float
+    strain_at_failure: float
+    n_fail: int
 
 
 def get_dataframe(
@@ -128,16 +135,31 @@ async def fatigue_test(
         .one()  # type: ignore
         ._asdict()
     )
-    specimen_id = await get_specimen_id(session, experiment_id, test_id)
-    std_df = get_dataframe("TST", experiment, specimen_id)
-    hyst_df = get_dataframe("HYS", experiment, specimen_id).fillna(value=0)
+    test_meta = await get_test_fields(
+        session,
+        experiment_id,
+        test_id,
+        (Test.specimen_number, Test.run_out, Test.stress_ratio),
+    )
+    std_df = get_dataframe("TST", experiment, test_meta["specimen_number"])
+    hyst_df = get_dataframe("HYS", experiment, test_meta["specimen_number"]).fillna(
+        value=0
+    )
     hysteresis_loops = create_sub_hystloops(std_df, compute_sub_indexes(hyst_df))
+    (stress_at_failure, strain_at_failure, n_fail) = itemgetter(
+        "stress_at_failure", "strain_at_failure", "n_fail"
+    )(process_hysteresis(std_df))
     return FatigueTest(
-        specimen_id=specimen_id,
+        specimen_id=test_meta["specimen_number"],
+        run_out=test_meta["run_out"],
+        stress_ratio=test_meta["stress_ratio"],
         total_dissipated_energy=get_total_dissipated_energy(hyst_df),
         hysteresis_loops=hysteresis_loops,
         n_cycles=hyst_df["n_cycles"].to_list(),
         creep=hyst_df["creep"].to_list(),
         hysteresis_area=hyst_df["hysteresis_area"].to_list(),
         stiffness=hyst_df["stiffness"].to_list(),
+        stress_at_failure=stress_at_failure,
+        strain_at_failure=strain_at_failure,
+        n_fail=n_fail,
     )
