@@ -17,7 +17,7 @@ class Astm:
     """Astm helps reading ASTM table"""
 
     SRC_DIR = os.path.dirname(os.path.realpath(__file__))
-    PARAM_DIR = os.path.join(SRC_DIR, "external_data_sources")
+    PARAM_DIR = os.path.join(SRC_DIR, "..", "external_data_sources")
 
     def __init__(self, confidence: int):
         """

@@ -22,8 +22,8 @@ import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 from scipy import stats
 
-import ccfatigue.analysis.cld_utils as cld_utils
-import ccfatigue.analysis.piecewiselinear_utils as piecewiselinear_utils
+import ccfatigue.analysis.utils.cld as cld
+import ccfatigue.analysis.utils.piecewiselinear as piecewiselinear
 
 SRC_DIR = os.path.dirname(os.path.realpath(__file__))
 DATA_DIR = os.path.join(SRC_DIR, "..", "..", "..", "Data")
@@ -70,7 +70,7 @@ def execute(
 
     # Calculate stress amplitude (sigma_a) for each known stress ratios
     snc_df["stress_amplitude"] = snc_df.apply(
-        lambda x: piecewiselinear_utils.calculate_stress_amplitude(
+        lambda x: piecewiselinear.calculate_stress_amplitude(
             x.stress_ratio, x.stress_max
         ),
         axis=1,
@@ -80,7 +80,7 @@ def execute(
     stress_ratios_df = pd.DataFrame({"stress_ratio": snc_df.stress_ratio.unique()})
 
     # Sort R according to sectors, counterclockwise
-    piecewiselinear_utils.sort_by_stress_ratios(stress_ratios_df)
+    piecewiselinear.sort_by_stress_ratios(stress_ratios_df)
 
     # Calculate slope A and intercept B (linear regression) for each group of R
     linregress = snc_df.groupby("stress_ratio").apply(
@@ -103,7 +103,7 @@ def execute(
 
     for cycles_to_failure in CLD_CYCLES_COUNT:
 
-        cld_df = cld_utils.cld_add_row(
+        cld_df = cld.cld_add_row(
             cld_df,
             cycles_to_failure,
             0,
@@ -126,14 +126,14 @@ def execute(
 
         for index, stress_ratio in stress_ratios_df.iterrows():
 
-            cld_df = cld_utils.cld_add_row(
+            cld_df = cld.cld_add_row(
                 cld_df,
                 cycles_to_failure,
                 stress_ratio.stress_amplitude,
                 stress_ratio.stress_mean,
             )
 
-        cld_df = cld_utils.cld_add_row(
+        cld_df = cld.cld_add_row(
             cld_df,
             cycles_to_failure,
             0,
