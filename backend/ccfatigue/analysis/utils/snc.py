@@ -3,8 +3,6 @@
 Shared ressources for snc analysis modules
 """
 
-from typing import Optional
-
 import numpy as np
 import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
@@ -39,7 +37,7 @@ def stress_at_failure_bounds(
     q: float,
     slope: float,
     intercept: float,
-    cycles_to_failure: float,
+    list_cycles_to_failure: float,
     pp: float,
     xb: float,
 ) -> tuple[float, float]:
@@ -70,7 +68,7 @@ def stress_at_failure_bounds(
 
     term1 = (
         (sample_count * q * slope * intercept)
-        - (sample_count * q * np.log10(cycles_to_failure) * intercept)
+        - (sample_count * q * np.log10(list_cycles_to_failure) * intercept)
         + (pp * sample_count * xb)
     )
     term2 = np.sqrt(
@@ -79,11 +77,11 @@ def stress_at_failure_bounds(
         * q
         * (
             2 * sample_count * slope * intercept * xb
-            - 2 * sample_count * np.log10(cycles_to_failure) * intercept * xb
+            - 2 * sample_count * np.log10(list_cycles_to_failure) * intercept * xb
             + q * intercept**2
             + sample_count * intercept**2 * xb**2
-            + sample_count * np.log10(cycles_to_failure) ** 2
-            - 2 * sample_count * np.log10(cycles_to_failure) * slope
+            + sample_count * np.log10(list_cycles_to_failure) ** 2
+            - 2 * sample_count * np.log10(list_cycles_to_failure) * slope
             - pp
             + sample_count * slope**2
         )
@@ -99,8 +97,8 @@ def stress_at_failure_bounds(
 def execute_linlog_loglog(
     use_logarithm: bool,
     input_file: FilePath | ReadCsvBuffer,
-    output_json_file: Optional[FilePath | WriteBuffer],
-    output_csv_file: FilePath | WriteBuffer,
+    output_json_file: FilePath | WriteBuffer | None,
+    output_csv_file: FilePath | WriteBuffer | None,
     list_cycles_to_failure: list[int],
     get_stress_at_failure,
     get_a_b,
@@ -176,21 +174,6 @@ def execute_linlog_loglog(
                 "log10_cycles_to_failure": "avg_log10_cycles_to_failure",
             }
         )
-    )
-
-    cycles_to_failure = pd.DataFrame(
-        list_cycles_to_failure,
-        columns=["cycles_to_failure"],
-    )
-
-    snc_output_csv_df = pd.DataFrame(
-        columns=[
-            "stress_ratio",
-            "cycles_to_failure",
-            "stress_max",
-            "stress_lowerbound",
-            "stress_upperbound",
-        ]
     )
 
     # Calculate slope A and intercept B
@@ -304,7 +287,7 @@ def execute_linlog_loglog(
         columns=[
             "stress_ratio",
             "cycles_to_failure",
-            "stress",
+            "stress_max",
             "stress_lowerbound",
             "stress_upperbound",
         ]
@@ -314,8 +297,11 @@ def execute_linlog_loglog(
     for (stress_ratio_id, stress_ratio_df) in stress_ratios_df.iterrows():
 
         # Prepare CSV data for each cycles to failure
-        stress = cycles_to_failure.copy()
-        stress["stress"] = stress.apply(
+        cycles_to_failure = pd.DataFrame(
+            list_cycles_to_failure,
+            columns=["cycles_to_failure"],
+        )
+        cycles_to_failure["stress_max"] = cycles_to_failure.apply(
             lambda x: get_stress_at_failure(
                 stress_ratio_df.aa,
                 stress_ratio_df.bb,
@@ -324,7 +310,7 @@ def execute_linlog_loglog(
             axis=1,
         )
 
-        stress_bounds = stress.apply(
+        stress_bounds = cycles_to_failure.apply(
             lambda x: stress_at_failure_bounds(
                 stress_ratio_df.sample_count,
                 stress_ratio_df.q,
@@ -336,15 +322,19 @@ def execute_linlog_loglog(
             ),  # type: ignore
             axis=1,
         )
-        stress["stress_lowerbound"] = stress_bounds.apply(lambda x: x[0])
-        stress["stress_upperbound"] = stress_bounds.apply(lambda x: x[1])
+        cycles_to_failure["stress_lowerbound"] = stress_bounds.apply(lambda x: x[0])
+        cycles_to_failure["stress_upperbound"] = stress_bounds.apply(lambda x: x[1])
         if use_logarithm:
-            stress["stress_lowerbound"] = 10**stress.stress_lowerbound
-            stress["stress_upperbound"] = 10**stress.stress_upperbound
+            cycles_to_failure["stress_lowerbound"] = (
+                10**cycles_to_failure.stress_lowerbound
+            )
+            cycles_to_failure["stress_upperbound"] = (
+                10**cycles_to_failure.stress_upperbound
+            )
 
-        stress["stress_ratio"] = stress_ratio_df.stress_ratio
+        cycles_to_failure["stress_ratio"] = stress_ratio_df.stress_ratio
 
-        snc_output_csv_df = pd.concat([snc_output_csv_df, stress])
+        snc_output_csv_df = pd.concat([snc_output_csv_df, cycles_to_failure])
         a, b = get_a_b(stress_ratio_df)
 
         # Prepare JSON
