@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "serve-frontend",
+      "type": "npm",
+      "script": "serve",
+      "isBackground": true,
+      "problemMatcher": [
+        {
+          "base": "$tsc-watch",
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": "Starting development server",
+            "endsPattern": "App running at:"
+          }
+        }
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "options": {
+        "cwd": "frontend"
+      }
+    },
+    {
+      "label": "run-database",
+      "type": "docker-compose",
+      "dockerCompose": {
+        "up": {
+          "detached": true,
+          "build": true,
+          "services": ["database"]
+        },
+        "files": ["${workspaceFolder}/docker-compose.yml"]
+      }
+    }
+  ]
+}

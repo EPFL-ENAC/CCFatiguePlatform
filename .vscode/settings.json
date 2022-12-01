@@ -1,0 +1,14 @@
+{
+  "editor.formatOnSave": true,
+  "python.analysis.stubPath": "${workspaceFolder}/backend/",
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/backend/.venv/Lib/site-packages",
+    "${workspaceFolder}/backend/preprocessing"
+  ],
+  "python.analysis.typeCheckingMode": "basic",
+  "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv",
+  "python.formatting.provider": "black",
+  "python.linting.flake8Enabled": true,
+  "python.testing.pytestEnabled": true,
+  "python.testing.cwd": "${workspaceFolder}/backend/tests"
+}

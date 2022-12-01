@@ -1,0 +1,71 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    // https://v2.vuejs.org/v2/cookbook/debugging-in-vscode.html
+    {
+      "name": "frontend: run",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}/frontend/src",
+      "sourceMapPathOverrides": {
+        "webpack:///src/*": "${webRoot}/*"
+      },
+      "preLaunchTask": "serve-frontend"
+    },
+    {
+      "name": "backend: run",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "ccfatigue.main:app",
+        "--reload"
+      ],
+      "jinja": true,
+      "cwd": "${workspaceFolder}/backend",
+      "envFile": "${workspaceFolder}/secrets/.env",
+      "preLaunchTask": "run-database"
+    },
+    {
+      "name": "backend: alembic",
+      "type": "python",
+      "request": "launch",
+      "module": "alembic",
+      "args": [
+        "upgrade",
+        "head"
+      ],
+      "cwd": "${workspaceFolder}/backend",
+      "envFile": "${workspaceFolder}/secrets/.env"
+    },
+    {
+      "name": "backend: init db",
+      "type": "python",
+      "request": "launch",
+      "module": "init_db",
+      "cwd": "${workspaceFolder}/backend",
+      "envFile": "${workspaceFolder}/secrets/.env"
+    },
+    {
+      "name": "backend: preprocessing",
+      "type": "python",
+      "request": "launch",
+      "module": "tst_preprocessing",
+      "args": [
+        "--save",
+      ],
+      "cwd": "${workspaceFolder}/backend/preprocessing",
+    },
+    {
+      "name": "backend: preprocessing hys",
+      "type": "python",
+      "request": "launch",
+      "module": "hysteresis_loops",
+      "cwd": "${workspaceFolder}/backend/preprocessing",
+    }
+  ]
+}

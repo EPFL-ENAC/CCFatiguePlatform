@@ -1,0 +1,9 @@
+[
+    {
+        "stress_ratio": 0.1,
+        "confidence_interval": 50,
+        "a": 613.8195,
+        "b": 0.1047379,
+        "fp": 0
+    }
+]

@@ -1,0 +1,27 @@
+{
+  "general": {
+    "laboratory": "CCLAB",
+    "researcher": "Lulu Liu",
+    "date": "2020-09",
+    "experiment type": "FA",
+    "fracture": false,
+    "fatigue test type": "CA",
+    "measuring equipment": "Instron 100kN",
+    "control mode": "Load Controlled"
+  },
+  "publication": {
+    "title": "Tension-tension fatigue behavior of ductile adhesively-bonded FRP joints\nLulu",
+    "author": "Lulu Liu, Xin Wang, Zhishen Wu, Thomas Keller",
+    "year": 2021,
+    "doi": "10.1016/j.compstruct.2021.113925"
+  },
+  "material type": {
+    "fiber material": "Basalt FRP",
+    "fiber form": "Fiber rovings",
+    "resin": "Aradur 1562-1 epoxy"
+  },
+  "laminates and assemblies": {
+    "fiber volume ratio": 0.66,
+    "stacking sequence": "UD"
+  }
+}

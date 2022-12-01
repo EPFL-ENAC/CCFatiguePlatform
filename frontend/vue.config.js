@@ -1,10 +1,6 @@
 module.exports = {
   configureWebpack: {
-    externals: {
-      bokeh: 'Bokeh'
-    }
+    devtool: "source-map",
   },
-  transpileDependencies: [
-    'vuetify'
-  ]
-}
+  transpileDependencies: ["vuetify"],
+};

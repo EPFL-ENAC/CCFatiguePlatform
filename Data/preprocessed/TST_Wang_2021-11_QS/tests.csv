@@ -1,0 +1,6 @@
+specimen number,specimen name,stress ratio,maximum stress,frequency,run out,displacement controlled loading rate,load controlled loading rate,length,width,thickness,temperature,humidity,initial crack length,x coordinate of measuring point 1,y coordinate of measuring point 1,x coordinate of measuring point 2,y coordinate of measuring point 2
+1,IS1,,,,,,,75,25.33,5.43,,,,,,,
+2,IS2,,,,,,,75,25.24,5.46,,,,4.4301,1.99711,-8.06989,2.13636
+3,IS3,,,,,,,75,25.29,5.48,,,,4.75348,1.83704,-7.74613,1.96617
+4,IS4,,,,,,,75,25.3,5.52,,,,4.57485,1.90215,-7.92626,2.03089
+5,IS5,,,,,,,75,25.36,5.41,,,,4.74408,1.89259,-7.75571,1.92404

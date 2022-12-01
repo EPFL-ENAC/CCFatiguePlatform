@@ -1,14 +1,7 @@
 <template>
-  <v-dialog
-    v-model="dialog"
-    width="500"
-  >
-    <template v-slot:activator="{ on, attrs }">
-      <v-btn
-        icon
-        v-bind="attrs"
-        v-on="on"
-      >
+  <v-dialog v-model="dialog" width="500">
+    <template #activator="{ on, attrs }">
+      <v-btn icon v-bind="attrs" v-on="on">
         <v-icon>mdi-information-outline</v-icon>
       </v-btn>
     </template>
@@ -22,17 +15,11 @@
         <slot />
       </v-card-text>
 
-      <v-divider></v-divider>
+      <v-divider> </v-divider>
 
       <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn
-          color="primary"
-          text
-          @click="dialog = false"
-        >
-          OK
-        </v-btn>
+        <v-spacer> </v-spacer>
+        <v-btn color="primary" text @click="dialog = false"> OK </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -40,15 +27,13 @@
 
 <script>
 export default {
-  name: 'InfoButton',
-  data () {
+  name: "InfoButton",
+  data() {
     return {
       dialog: false,
-    }
+    };
   },
-}
+};
 </script>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

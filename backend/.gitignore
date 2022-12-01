@@ -1,0 +1,6 @@
+output/
+.venv/
+
+# generated python modules from fortran code with f2py
+*.so
+*.dll
