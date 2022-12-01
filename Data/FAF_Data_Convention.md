@@ -4,12 +4,14 @@ FAF Data corresponds to the output of Fatigue failure module.
 
 ## File naming conventions
 
-- Files: `FAF_{Researcher's lastname}_{Date}.json`
-- Files: `FAF_{Researcher's lastname}_{Date}.csv`
+- Files: `FAF_{Researcher's lastname}_{date}_{SNC method}_{FAF method}.json`
+- Files: `FAF_{Researcher's lastname}_{date}_{SNC method}_{FAF method}.csv`
 
 with:
 
 - date: `YYYY-MM` (starting month of the experiment)
+- SNC method: see [SNC_Data_Convention.md](SNC_Data_Convention.md)
+- FAF method: `FawazEllyin`, `FTPF`, `HashinRotem`, `Kawai`, `SlimsBrogdon`, `ShokriehTaheri`
 
 ## SNC JSON files standards :
 

@@ -7,12 +7,13 @@ SNC Data corresponds to the output of S-N Curve module and is composed of 2 file
 
 ## File naming conventions
 
-- Files: `SNC_{Researcher's lastname}_{Date}.json`
-- Files: `SNC_{Researcher's lastname}_{Date}.csv`
+- Files: `SNC_{Researcher's lastname}_{date}_{SNC method}.json`
+- Files: `SNC_{Researcher's lastname}_{date}_{SNC method}.csv`
 
 with:
 
 - date: `YYYY-MM` (starting month of the experiment)
+- SNC method: `LogLog`, `LinLog`, `Sendeckyj`, `Whitney`
 
 ## SNC JSON files standards :
 
