@@ -37,7 +37,7 @@ def stress_at_failure_bounds(
     q: float,
     slope: float,
     intercept: float,
-    list_cycles_to_failure: float,
+    cycles_to_failure: float,
     pp: float,
     xb: float,
 ) -> tuple[float, float]:
@@ -68,7 +68,7 @@ def stress_at_failure_bounds(
 
     term1 = (
         (sample_count * q * slope * intercept)
-        - (sample_count * q * np.log10(list_cycles_to_failure) * intercept)
+        - (sample_count * q * np.log10(cycles_to_failure) * intercept)
         + (pp * sample_count * xb)
     )
     term2 = np.sqrt(
@@ -77,11 +77,11 @@ def stress_at_failure_bounds(
         * q
         * (
             2 * sample_count * slope * intercept * xb
-            - 2 * sample_count * np.log10(list_cycles_to_failure) * intercept * xb
+            - 2 * sample_count * np.log10(cycles_to_failure) * intercept * xb
             + q * intercept**2
             + sample_count * intercept**2 * xb**2
-            + sample_count * np.log10(list_cycles_to_failure) ** 2
-            - 2 * sample_count * np.log10(list_cycles_to_failure) * slope
+            + sample_count * np.log10(cycles_to_failure) ** 2
+            - 2 * sample_count * np.log10(cycles_to_failure) * slope
             - pp
             + sample_count * slope**2
         )
@@ -156,8 +156,8 @@ def execute_linlog_loglog(
         agg_df.stress_ratio != agg_df.stress_ratio.shift()
     ).cumsum()
 
-    # Average by stress_ratio
-    stress_ratios_df = (
+    # Groups AGG by stress_ratio
+    agg_grpby_stress_ratios_df = (
         agg_df[
             [
                 "stress_ratio_id",
@@ -176,29 +176,30 @@ def execute_linlog_loglog(
         )
     )
 
-    # Calculate slope A and intercept B
-    linregress = agg_df.groupby("stress_ratio_id").apply(
-        lambda x: stats.linregress(
-            x.stress_max,  # type: ignore
-            x.log10_cycles_to_failure,  # type: ignore
+    # Calculate slope (A) and intercept (B)
+    agg_grpby_stress_ratios_df[["intercept", "slope"]] = (
+        agg_df.groupby("stress_ratio_id")
+        .apply(
+            lambda x: stats.linregress(
+                x.stress_max,  # type: ignore
+                x.log10_cycles_to_failure,  # type: ignore
+            )
         )
+        .apply(pd.Series)
+        .iloc[:, [0, 1]]  # Get columns 0 (intercept) and 1 (slope)
     )
-    stress_ratios_df["slope"] = linregress.apply(lambda x: x[1])
-    stress_ratios_df["intercept"] = linregress.apply(lambda x: x[0])
 
     # Add AA and BB TODO reference for these equations
     # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/2_S-NCurves/S-N-Curve-LinLog.for#L367
-    stress_ratios_df["aa"], stress_ratios_df["bb"] = get_aa_bb(
-        stress_ratios_df.slope, stress_ratios_df.intercept
+    agg_grpby_stress_ratios_df["aa"], agg_grpby_stress_ratios_df["bb"] = get_aa_bb(
+        agg_grpby_stress_ratios_df.slope, agg_grpby_stress_ratios_df.intercept
     )
-    #  = aa
-    #  = bb
 
     # TODO ask Tassos define ycar
     agg_df["ycar"] = agg_df.apply(
         lambda x: equation_ycar(
-            stress_ratios_df.loc[x.stress_ratio_id].slope,  # type: ignore
-            stress_ratios_df.loc[x.stress_ratio_id].intercept,  # type: ignore
+            agg_grpby_stress_ratios_df.loc[x.stress_ratio_id].slope,  # type: ignore
+            agg_grpby_stress_ratios_df.loc[x.stress_ratio_id].intercept,  # type: ignore
             x.stress_max,
         ),
         axis=1,
@@ -209,44 +210,49 @@ def execute_linlog_loglog(
         lambda x: get_lsst(
             x.stress_max,
             x.log10_cycles_to_failure,
-            stress_ratios_df.loc[x.stress_ratio_id].avg_log10_cycles_to_failure,
+            agg_grpby_stress_ratios_df.loc[
+                x.stress_ratio_id
+            ].avg_log10_cycles_to_failure,
         ),
         axis=1,
     )
 
-    stress_ratios_df["lsst"] = (
+    agg_grpby_stress_ratios_df["lsst"] = (
         agg_df[["stress_ratio_id", "lsst"]].groupby("stress_ratio_id").sum()
     )
 
     # Eq 9, p4, ref [1]
     # TODO ask Tassos define LSSE
     agg_df["lsse"] = (agg_df.log10_cycles_to_failure - agg_df.ycar) ** 2
-    stress_ratios_df["lsse"] = (
+    agg_grpby_stress_ratios_df["lsse"] = (
         agg_df[["stress_ratio_id", "lsse"]].groupby("stress_ratio_id").sum()
     )
 
     # TODO ask Tassos define LRSQ
-    stress_ratios_df["lrsq"] = 1 - stress_ratios_df.lsse / stress_ratios_df.lsst
+    agg_grpby_stress_ratios_df["lrsq"] = (
+        1 - agg_grpby_stress_ratios_df.lsse / agg_grpby_stress_ratios_df.lsst
+    )
 
     # TODO ask Tassos define Q
     agg_df["q"] = agg_df.apply(
         lambda x: (
-            x.stress_max - stress_ratios_df.loc[x.stress_ratio_id].avg_stress_max
+            x.stress_max
+            - agg_grpby_stress_ratios_df.loc[x.stress_ratio_id].avg_stress_max
         )
         ** 2,
         axis=1,
     )
-    stress_ratios_df["q"] = (
+    agg_grpby_stress_ratios_df["q"] = (
         agg_df[["stress_ratio_id", "q"]].groupby("stress_ratio_id").sum()
     )
 
     # NOD
-    stress_ratios_df["sample_count"] = (
+    agg_grpby_stress_ratios_df["sample_count"] = (
         agg_df[["stress_ratio_id", "stress_ratio"]].groupby("stress_ratio_id").count()
     )
 
     # level
-    stress_ratios_df["stress_cluster_count"] = (
+    agg_grpby_stress_ratios_df["stress_cluster_count"] = (
         agg_df[["stress_ratio_id", "stress_cluster_number"]]
         .groupby("stress_ratio_id")
         .nunique()
@@ -255,12 +261,12 @@ def execute_linlog_loglog(
     # Eq 6, p4, ref [1]
     # Variance
     # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/2_S-NCurves/S-N-Curve-LinLog.for#L333
-    stress_ratios_df["variance"] = np.sqrt(
-        stress_ratios_df.lsse / (stress_ratios_df.sample_count - 2)
+    agg_grpby_stress_ratios_df["variance"] = np.sqrt(
+        agg_grpby_stress_ratios_df.lsse / (agg_grpby_stress_ratios_df.sample_count - 2)
     )
 
     # Fp is given in table 2, p5, ref [1]
-    stress_ratios_df["fp"] = stress_ratios_df.apply(
+    agg_grpby_stress_ratios_df["fp"] = agg_grpby_stress_ratios_df.apply(
         lambda x: astm.get_astm_val(
             x.stress_cluster_count - 2, x.sample_count - x.stress_cluster_count
         ),
@@ -268,7 +274,9 @@ def execute_linlog_loglog(
     )
 
     # TODO ask Tassos define PP
-    stress_ratios_df["pp"] = 2 * stress_ratios_df.fp * stress_ratios_df.variance**2
+    agg_grpby_stress_ratios_df["pp"] = (
+        2 * agg_grpby_stress_ratios_df.fp * agg_grpby_stress_ratios_df.variance**2
+    )
 
     # Prepare SNC output list of cycles to failure
 
@@ -294,14 +302,14 @@ def execute_linlog_loglog(
     )
 
     # For each group of stress_ratio
-    for (stress_ratio_id, stress_ratio_df) in stress_ratios_df.iterrows():
+    for (stress_ratio_id, stress_ratio_df) in agg_grpby_stress_ratios_df.iterrows():
 
-        # Prepare CSV data for each cycles to failure
-        cycles_to_failure = pd.DataFrame(
+        # Prepare SNC csv data for each stress ratio
+        snc_current_stress_ratio = pd.DataFrame(
             list_cycles_to_failure,
             columns=["cycles_to_failure"],
         )
-        cycles_to_failure["stress_max"] = cycles_to_failure.apply(
+        snc_current_stress_ratio["stress_max"] = snc_current_stress_ratio.apply(
             lambda x: get_stress_at_failure(
                 stress_ratio_df.aa,
                 stress_ratio_df.bb,
@@ -310,7 +318,9 @@ def execute_linlog_loglog(
             axis=1,
         )
 
-        stress_bounds = cycles_to_failure.apply(
+        snc_current_stress_ratio[
+            ["stress_lowerbound", "stress_upperbound"]
+        ] = snc_current_stress_ratio.apply(
             lambda x: stress_at_failure_bounds(
                 stress_ratio_df.sample_count,
                 stress_ratio_df.q,
@@ -321,20 +331,21 @@ def execute_linlog_loglog(
                 stress_ratio_df.avg_stress_max,
             ),  # type: ignore
             axis=1,
+        ).apply(
+            pd.Series
         )
-        cycles_to_failure["stress_lowerbound"] = stress_bounds.apply(lambda x: x[0])
-        cycles_to_failure["stress_upperbound"] = stress_bounds.apply(lambda x: x[1])
+
         if use_logarithm:
-            cycles_to_failure["stress_lowerbound"] = (
-                10**cycles_to_failure.stress_lowerbound
+            snc_current_stress_ratio["stress_lowerbound"] = (
+                10**snc_current_stress_ratio.stress_lowerbound
             )
-            cycles_to_failure["stress_upperbound"] = (
-                10**cycles_to_failure.stress_upperbound
+            snc_current_stress_ratio["stress_upperbound"] = (
+                10**snc_current_stress_ratio.stress_upperbound
             )
 
-        cycles_to_failure["stress_ratio"] = stress_ratio_df.stress_ratio
+        snc_current_stress_ratio["stress_ratio"] = stress_ratio_df.stress_ratio
 
-        snc_output_csv_df = pd.concat([snc_output_csv_df, cycles_to_failure])
+        snc_output_csv_df = pd.concat([snc_output_csv_df, snc_current_stress_ratio])
         a, b = get_a_b(stress_ratio_df)
 
         # Prepare JSON
