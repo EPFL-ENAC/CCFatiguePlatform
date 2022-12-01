@@ -43,6 +43,7 @@ class Logger:
         self.messages = []
         self.warning_count = 0
         self.error_count = 0
+        self.mute = False
 
     def __enter__(self):
         if self.filename is not None:
@@ -58,7 +59,7 @@ class Logger:
         message = end.join(messages)
         if self.filename is not None:
             self.f_handler.write(f"{message}{end}")
-        if self.write_to_stdout:
+        if self.write_to_stdout and not self.mute:
             print(message, end=end)
 
     def reset_counts(self):
@@ -807,6 +808,19 @@ class Experiment:
                     )
                     == "FA",
                     "mandatory_condition": "when experiment type is 'FA'",
+                },
+                {
+                    "paths": ("length",),
+                    "mandatory": Experiment.__get_val_at(
+                        self.experiment, "general>experiment type", ""
+                    )
+                    == "FA"
+                    and not Experiment.__get_val_at(
+                        self.experiment, "general>fracture", False
+                    ),
+                    "mandatory_condition": (
+                        "when experiment type is 'FA' and no fracture"
+                    ),
                 },
                 {
                     "paths": ("width",),
