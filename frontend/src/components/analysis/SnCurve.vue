@@ -5,11 +5,10 @@
       <v-spacer />
       <info-tooltip>
         This module plots curves on the (Stress - Number of cycles) plane. The
-        curves are associated with 4 different methods (Lin-Log, Log-Log,
-        Sendeckyj, Whitney) and can be considered as constitutive laws for
-        fatigue life predictions. On the graphs we also plot the individual
-        results gathered over the tests with inputs (Cycles to failure - Stress
-        at failure)
+        curves are associated with 3 different methods (Lin-Log, Log-Log,
+        Sendeckyj) and can be considered as constitutive laws for fatigue life
+        predictions. On the graphs we also plot the individual results gathered
+        over the tests with inputs (Cycles to failure - Stress at failure)
       </info-tooltip>
     </v-card-title>
     <v-card-subtitle>
