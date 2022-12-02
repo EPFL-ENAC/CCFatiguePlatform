@@ -1,9 +1,6 @@
 """
 Handle /analysis requests
 """
-
-from typing import List
-
 from fastapi import APIRouter, File, Query, UploadFile
 
 from ccfatigue.analyzer import (
@@ -15,12 +12,12 @@ from ccfatigue.analyzer import (
     run_sn_curve,
 )
 from ccfatigue.model import (
+    AnalysisResult,
     CldMethod,
     CycleCountingMethod,
     DamageSummationMethod,
     FatigueFailureMethod,
     SnCurveMethod,
-    SnCurveResult,
 )
 
 router = APIRouter(
@@ -37,13 +34,12 @@ async def run_cycle_counting_file(
     return run_cycle_counting(file.file, method)
 
 
-@router.post("/snCurve/file", response_model=SnCurveResult)
+@router.post("/snCurve/file", response_model=AnalysisResult)
 async def run_sn_curve_file(
     file: UploadFile = File(...),
-    methods: List[SnCurveMethod] = Query(...),
-    r_ratios: List[float] = Query(..., alias="rRatios"),
-) -> SnCurveResult:
-    return run_sn_curve(file.file, methods, r_ratios)
+    method: SnCurveMethod = Query(...),
+) -> AnalysisResult:
+    return run_sn_curve(file.file, method)
 
 
 @router.post("/cld/file", response_model=bytes)

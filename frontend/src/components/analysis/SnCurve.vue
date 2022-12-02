@@ -28,8 +28,9 @@
                 See the
                 <a
                   href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/AGG_Data_Convention.md"
-                  >AGG Data Convention</a
                 >
+                  AGG Data Convention
+                </a>
                 <!-- The data required as input for this module takes the form of a
                 csv file containing 6 columns and as many rows as there were
                 testings in the experiment. The columns are populated as
@@ -53,12 +54,7 @@
             </template>
           </v-file-input>
         </v-col>
-        <v-col>
-          <v-btn disabled>Browse from Fatigue DB</v-btn>
-        </v-col>
       </v-row>
-    </v-card-subtitle>
-    <v-card-text v-if="hasInput">
       <v-row>
         <v-col>
           <v-select
@@ -85,26 +81,27 @@
           </v-select>
         </v-col>
       </v-row>
-      <v-row>
-        <simple-chart
-          :aspect-ratio="2"
-          :series="series"
-          title="S-N Curves"
-          x-axis-name="N"
-          y-axis-name="Maximum Cyclic Stress [MPa]"
-          x-axis-type="log"
-        ></simple-chart>
-      </v-row>
+    </v-card-subtitle>
+    <v-card-text v-if="series.length > 0">
+      <simple-chart
+        :aspect-ratio="2"
+        :series="series"
+        title="S-N Curves"
+        x-axis-name="N"
+        y-axis-name="Maximum Cyclic Stress [MPa]"
+        x-axis-type="log"
+      ></simple-chart>
     </v-card-text>
     <v-card-actions v-if="hasInput" class="justify-end">
-      <v-btn :disabled="loading && output" @click="downloadOutput">
+      <v-btn :disabled="loading && outputs != null" @click="downloadOutput">
         Download SNC
         <info-tooltip>
           See the
           <a
             href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/SNC_Data_Convention.md"
-            >SNC Data Convention</a
           >
+            SNC Data Convention
+          </a>
         </info-tooltip>
       </v-btn>
     </v-card-actions>
@@ -115,10 +112,12 @@
 import SnCurveMethod from "@/backend/model/SnCurveMethod";
 import SimpleChart from "@/components/charts/SimpleChart";
 import InfoTooltip from "@/components/InfoTooltip";
+import { parserConfig } from "@/utils/papaparse";
 import download from "downloadjs";
-import { zip } from "lodash";
+import { parse } from "papaparse";
 
 const methods = Object.values(new SnCurveMethod());
+const rRatios = [-1, 0.1, 10, 0.5];
 
 export default {
   name: "SnCurve",
@@ -130,10 +129,10 @@ export default {
     return {
       file: null,
       loading: false,
-      selectedMethods: [],
       methods: methods,
-      selectedRRatios: [],
-      rRatios: [-1, 0.1, 10, 0.5],
+      selectedMethods: [methods[0]],
+      rRatios: rRatios,
+      selectedRRatios: [rRatios[0]],
       outputs: {},
       series: [],
     };
@@ -151,22 +150,52 @@ export default {
         this.file
       ) {
         this.loading = true;
-        this.$analysisApi
-          .runSnCurveFile(this.selectedMethods, this.selectedRRatios, this.file)
+        Promise.all(
+          this.selectedMethods.map((method) =>
+            this.$analysisApi
+              .runSnCurveFile(method, this.file)
+              .then((analysisResult) => {
+                const results = parse(analysisResult.csv_data, parserConfig);
+                const rows = results.data.filter((row) =>
+                  this.selectedRRatios.includes(row.stress_ratio)
+                );
+                return {
+                  method: method,
+                  analysisResult: analysisResult,
+                  rows: rows,
+                };
+              })
+          )
+        )
           .then((data) => {
-            this.outputs = data.outputs;
-            this.series = data.lines.map((line) => ({
-              type: "line",
-              name: line.name,
-              data: zip(line.xData, line.yData),
-            }));
+            this.outputs = Object.fromEntries(
+              data.map((item) => [item.method, item.analysisResult])
+            );
+            this.series = data.flatMap((item) =>
+              this.selectedRRatios.map((rRatio) => ({
+                type: "line",
+                name: `${item.method} ${rRatio}`,
+                data: item.rows
+                  .filter((row) => row.stress_ratio === rRatio)
+                  .map((row) => [row.cycles_to_failure, row.stress]),
+              }))
+            );
+          })
+          .catch(() => {
+            this.outputs = {};
+            this.series = [];
           })
           .finally(() => (this.loading = false));
       }
     },
     downloadOutput() {
       for (const [key, value] of Object.entries(this.outputs)) {
-        download(value, `SNC-${key.toLowerCase()}.csv`, "text/csv");
+        download(value.csv_data, `SNC-${key.toLowerCase()}.csv`, "text/csv");
+        download(
+          value.json_data,
+          `SNC-${key.toLowerCase()}.json`,
+          "application/json"
+        );
       }
     },
   },

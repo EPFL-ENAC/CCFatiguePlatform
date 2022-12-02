@@ -12,7 +12,7 @@
  */
 
 import ApiClient from "../ApiClient";
-import SnCurveResult from "../model/SnCurveResult";
+import AnalysisResult from "../model/AnalysisResult";
 
 /**
  * Analysis service.
@@ -237,7 +237,7 @@ export default class AnalysisApi {
   /**
    * Run Fatigue Failure File
    * @param {module:model/FatigueFailureMethod} method
-   * @param {module:model/SnModel} snModel
+   * @param {module:model/FatigueModel} snModel
    * @param {Number} desirableAngle
    * @param {Number} offAxisAngle
    * @param {File} xFile
@@ -335,7 +335,7 @@ export default class AnalysisApi {
   /**
    * Run Fatigue Failure File
    * @param {module:model/FatigueFailureMethod} method
-   * @param {module:model/SnModel} snModel
+   * @param {module:model/FatigueModel} snModel
    * @param {Number} desirableAngle
    * @param {Number} offAxisAngle
    * @param {File} xFile
@@ -367,23 +367,16 @@ export default class AnalysisApi {
 
   /**
    * Run Sn Curve File
-   * @param {Array.<module:model/SnCurveMethod>} methods
-   * @param {Array.<Number>} rRatios
+   * @param {module:model/SnCurveMethod} method
    * @param {File} file
-   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/SnCurveResult} and HTTP response
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/AnalysisResult} and HTTP response
    */
-  runSnCurveFileWithHttpInfo(methods, rRatios, file) {
+  runSnCurveFileWithHttpInfo(method, file) {
     let postBody = null;
-    // verify the required parameter 'methods' is set
-    if (methods === undefined || methods === null) {
+    // verify the required parameter 'method' is set
+    if (method === undefined || method === null) {
       throw new Error(
-        "Missing the required parameter 'methods' when calling runSnCurveFile"
-      );
-    }
-    // verify the required parameter 'rRatios' is set
-    if (rRatios === undefined || rRatios === null) {
-      throw new Error(
-        "Missing the required parameter 'rRatios' when calling runSnCurveFile"
+        "Missing the required parameter 'method' when calling runSnCurveFile"
       );
     }
     // verify the required parameter 'file' is set
@@ -395,8 +388,7 @@ export default class AnalysisApi {
 
     let pathParams = {};
     let queryParams = {
-      methods: this.apiClient.buildCollectionParam(methods, "multi"),
-      rRatios: this.apiClient.buildCollectionParam(rRatios, "multi"),
+      method: method,
     };
     let headerParams = {};
     let formParams = {
@@ -406,7 +398,7 @@ export default class AnalysisApi {
     let authNames = [];
     let contentTypes = ["multipart/form-data"];
     let accepts = ["application/json"];
-    let returnType = SnCurveResult;
+    let returnType = AnalysisResult;
     return this.apiClient.callApi(
       "/analysis/snCurve/file",
       "POST",
@@ -425,16 +417,15 @@ export default class AnalysisApi {
 
   /**
    * Run Sn Curve File
-   * @param {Array.<module:model/SnCurveMethod>} methods
-   * @param {Array.<Number>} rRatios
+   * @param {module:model/SnCurveMethod} method
    * @param {File} file
-   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/SnCurveResult}
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/AnalysisResult}
    */
-  runSnCurveFile(methods, rRatios, file) {
-    return this.runSnCurveFileWithHttpInfo(methods, rRatios, file).then(
-      function (response_and_data) {
-        return response_and_data.data;
-      }
-    );
+  runSnCurveFile(method, file) {
+    return this.runSnCurveFileWithHttpInfo(method, file).then(function (
+      response_and_data
+    ) {
+      return response_and_data.data;
+    });
   }
 }

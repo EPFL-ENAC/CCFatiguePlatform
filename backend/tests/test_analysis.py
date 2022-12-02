@@ -3,8 +3,8 @@ import os
 import ccfatigue.analysis.cld_harris as cld_harris
 import ccfatigue.analysis.cld_piecewiselinear as cld_piecewiselinear
 import ccfatigue.analysis.cyc_rangemean as cyc_rangemean
-import ccfatigue.analysis.das_piecewiselinear as das_piecewiselinear
 import ccfatigue.analysis.das_harris as das_harris
+import ccfatigue.analysis.das_piecewiselinear as das_piecewiselinear
 import ccfatigue.analysis.faf_ftpf as faf_ftpf
 import ccfatigue.analysis.faf_hashinrotem as faf_hashinrotem
 import ccfatigue.analysis.snc_linlog as sn_curve_linlog

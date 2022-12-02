@@ -11,11 +11,11 @@
  *
  */
 /**
- * Enum class SnModel.
+ * Enum class FatigueModel.
  * @enum {}
  * @readonly
  */
-export default class SnModel {
+export default class FatigueModel {
   /**
    * value: "Lin-Log"
    * @const
@@ -29,9 +29,9 @@ export default class SnModel {
   "Log-Log" = "Log-Log";
 
   /**
-   * Returns a <code>SnModel</code> enum value from a Javascript object name.
+   * Returns a <code>FatigueModel</code> enum value from a Javascript object name.
    * @param {Object} data The plain JavaScript object containing the name of the enum value.
-   * @return {module:model/SnModel} The enum <code>SnModel</code> value.
+   * @return {module:model/FatigueModel} The enum <code>FatigueModel</code> value.
    */
   static constructFromObject(object) {
     return object;
