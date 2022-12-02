@@ -29,28 +29,6 @@
                   href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/SNC_Data_Convention.md"
                   >SNC Data Convention</a
                 >
-                <!-- The data required as input is a csv file with 3 distinct
-                columns:
-                <ul>
-                  <li>Stress ratio (R) [-]</li>
-                  <li>Number of cycles to failure</li>
-                  <li>Stress parameter (Stress at failure) [MPa]</li>
-                </ul>
-                Additionally to these 3 columns, there are 11 values required
-                for analysis:
-                <ul>
-                  <li>R-ratio</li>
-                  <li>PN(f) !Reliability level</li>
-                  <li>So !(c^(-1/b))</li>
-                  <li>1/k ! (1/b)? -> Pow in fortran code</li>
-                  <li>af pooled data</li>
-                  <li>Scale pooled data</li>
-                  <li>LRSQ</li>
-                  <li>RMSE !Root mean square error</li>
-                  <li>SSE !Sum of squares due to errors</li>
-                  <li>SST !Sum of squares about the mean</li>
-                  <li>RSQ !R-square</li>
-                </ul> -->
               </info-tooltip>
             </template>
           </v-file-input>

@@ -30,16 +30,6 @@
                   href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/SNC_Data_Convention.md"
                   >SNC Data Convention</a
                 >
-                <!-- The data used as input for this method is slightly different
-                than that of the previous modules. As damage summation deals
-                with the fatigue life as a whole, we use the results from the
-                previous analysis. We first browse for the load spectrum which
-                is presented as a txt file with one numerical column
-                representing the peaks and valleys of the loading. We then
-                select the method we will use for counting the cycles, and
-                finally choose the appropriate methods for CLD and for S-N
-                curves/fatigue failure depending on whether we are in presence
-                of a uniaxial or multiaxial loading. -->
               </info-tooltip>
             </template>
           </v-file-input>

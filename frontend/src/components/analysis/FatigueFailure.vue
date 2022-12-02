@@ -18,7 +18,7 @@
             accept=".json"
             :error-messages="errorMessages"
             :disabled="loading"
-            label="SNC X json file"
+            label="Longitudinal fatigue (SNC json file)"
             @change="updateOutput"
           >
             <template #append>
@@ -28,63 +28,6 @@
                   href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/SNC_Data_Convention.md"
                   >SNC Data Convention</a
                 >
-                <!-- <p>
-                  The data type selection box allows us to enter static, fatigue
-                  and reference data that are necessary to the analysis, the
-                  values that should be placed as input are dependent on the
-                  method used for analysis. Static data have to do with the
-                  static parameters of an experiment, they give information
-                  relative to the strength of the material. Fatigue data are
-                  related to the fatigue analysis, they give information about
-                  the fatigue life of the experiment. Reference data are related
-                  to the data we wish to extract from the analysis, they give
-                  information about the orientation in which we seek more
-                  information.
-                </p>
-                <p>
-                  The inputs to provide highly depend on the selected method but
-                  there are two main formats used as input data:
-                </p>
-                <p>
-                  MKawai & Shorkieh-Taheri: (Same as input of S-N curve module)
-                  Aggregated test results with 6 distinct columns:
-                </p>
-                <ul>
-                  <li>Stress ratio (R) [-]</li>
-                  <li>Reliability level (input parameter)</li>
-                  <li>Stress level no. (estimated)</li>
-                  <li>Stress parameter [MPa]</li>
-                  <li>Number of cycles</li>
-                  <li>Residual strength [MPa]</li>
-                </ul>
-                <br />
-                <p>
-                  Fawaz-Ellyin, FTPF, Hashim-Rothem, Sims-Brogdon: (Same as
-                  output of S-N curve module)
-                </p>
-                <ul>
-                  <li>Stress ratio (R) [-]</li>
-                  <li>Number of cycles to failure</li>
-                  <li>Stress parameter (Stress at failure) [MPa]</li>
-                </ul>
-                <br />
-                <p>
-                  Additionally to these 3 columns, there are 11 values required
-                  for analysis:
-                </p>
-                <ul>
-                  <li>R R-ratio</li>
-                  <li>PN(f) !Reliability level</li>
-                  <li>So !(c^(-1/b))</li>
-                  <li>1/k ! (1/b)? -> Pow in fortran code</li>
-                  <li>af pooled data</li>
-                  <li>Scale pooled data</li>
-                  <li>LRSQ</li>
-                  <li>RMSE !Root mean square error</li>
-                  <li>SSE !Sum of squares due to errors</li>
-                  <li>SST !Sum of squares about the mean</li>
-                  <li>RSQ !R-square</li>
-                </ul> -->
               </info-tooltip>
             </template>
           </v-file-input>
@@ -96,7 +39,7 @@
             accept=".json"
             :error-messages="errorMessages"
             :disabled="loading"
-            label="SNC Y json file"
+            label="Transverse fatigue (SNC json file)"
             @change="updateOutput"
           ></v-file-input>
         </v-col>
@@ -107,7 +50,7 @@
             accept=".json"
             :error-messages="errorMessages"
             :disabled="loading"
-            label="SNC S json file"
+            label="Shear or off-axis (SNC json file)"
             @change="updateOutput"
           ></v-file-input>
         </v-col>

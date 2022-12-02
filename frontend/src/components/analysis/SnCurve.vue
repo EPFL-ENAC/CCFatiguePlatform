@@ -31,25 +31,6 @@
                 >
                   AGG Data Convention
                 </a>
-                <!-- The data required as input for this module takes the form of a
-                csv file containing 6 columns and as many rows as there were
-                testings in the experiment. The columns are populated as
-                follows:
-                <ul>
-                  <li>Stress ratio (R) [-]</li>
-                  <li>Reliability level (input parameter)</li>
-                  <li>Stress level no. (estimated)</li>
-                  <li>Stress parameter [MPa]</li>
-                  <li>Number of cycles</li>
-                  <li>Residual strength [MPa]</li>
-                </ul>
-                <p>
-                  If a sample doesn't break under loading, we call it a test run
-                  off and the value for residual strength is obtained by means
-                  of a quasi static loading up to breaking. If the sample
-                  doesn't break, residual strength takes the same value as the
-                  stress parameter.
-                </p> -->
               </info-tooltip>
             </template>
           </v-file-input>
