@@ -107,7 +107,7 @@
             accept=".json"
             :error-messages="errorMessages"
             :disabled="loading"
-            label="SNC F json file"
+            label="SNC S json file"
             @change="updateOutput"
           ></v-file-input>
         </v-col>
