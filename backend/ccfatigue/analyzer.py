@@ -66,33 +66,51 @@ def run_python(
 
 
 def run_python_2(
-    execute: Callable[[ReadCsvBuffer, ReadCsvBuffer, WriteBuffer], None],
+    execute: Callable[[ReadCsvBuffer, ReadCsvBuffer, WriteBuffer, WriteBuffer], None],
     input_file_1: SpooledTemporaryFile[bytes] | IO,
     input_file_2: SpooledTemporaryFile[bytes] | IO,
-) -> bytes:
-    with NamedTemporaryFile() as output_tmp_file:
-        print(f"executing -> {output_tmp_file.name}")
+) -> AnalysisResult:
+    with (
+        NamedTemporaryFile() as output_csv_file,
+        NamedTemporaryFile() as output_json_file,
+    ):
+        print(f"executing -> {output_csv_file.name} + {output_json_file.name}")
         input_file_1.seek(0)
         input_file_2.seek(0)
-        execute(input_file_1, input_file_2, output_tmp_file)
-        output_tmp_file.seek(0)
-        return output_tmp_file.read()
+        execute(input_file_1, input_file_2, output_csv_file, output_json_file)
+        output_csv_file.seek(0)
+        output_json_file.seek(0)
+        return AnalysisResult(
+            csv_data=output_csv_file.read(),
+            json_data=output_json_file.read(),
+        )
 
 
 def run_python_3(
-    execute: Callable[[ReadCsvBuffer, ReadCsvBuffer, ReadCsvBuffer, WriteBuffer], None],
+    execute: Callable[
+        [ReadCsvBuffer, ReadCsvBuffer, ReadCsvBuffer, WriteBuffer, WriteBuffer], None
+    ],
     input_file_1: SpooledTemporaryFile[bytes] | IO,
     input_file_2: SpooledTemporaryFile[bytes] | IO,
     input_file_3: SpooledTemporaryFile[bytes] | IO,
-) -> bytes:
-    with NamedTemporaryFile() as output_tmp_file:
-        print(f"executing -> {output_tmp_file.name}")
+) -> AnalysisResult:
+    with (
+        NamedTemporaryFile() as output_csv_file,
+        NamedTemporaryFile() as output_json_file,
+    ):
+        print(f"executing -> {output_csv_file.name} + {output_json_file.name}")
         input_file_1.seek(0)
         input_file_2.seek(0)
         input_file_3.seek(0)
-        execute(input_file_1, input_file_2, input_file_3, output_tmp_file)
-        output_tmp_file.seek(0)
-        return output_tmp_file.read()
+        execute(
+            input_file_1, input_file_2, input_file_3, output_csv_file, output_json_file
+        )
+        output_csv_file.seek(0)
+        output_json_file.seek(0)
+        return AnalysisResult(
+            csv_data=output_csv_file.read(),
+            json_data=output_json_file.read(),
+        )
 
 
 def create_dataframe(output: bytes) -> DataFrame:
@@ -169,16 +187,16 @@ def run_fatigue_failure(
     snModel: FatigueModel,
     desirable_angle: float,
     off_axis_angle: float,
-) -> bytes:
+) -> AnalysisResult:
     match method:
         case FatigueFailureMethod.FTPT:
             output = run_python_3(
-                lambda x_input, y_input, f_input, csv_output: faf_ftpf.execute(
+                lambda x_input, y_input, f_input, csv, json: faf_ftpf.execute(
                     x_input,
                     y_input,
                     f_input,
-                    csv_output,
-                    None,
+                    csv,
+                    json,
                     snModel,
                     desirable_angle,
                     off_axis_angle,
@@ -200,7 +218,7 @@ def run_damage_summation(
     match method:
         case DamageSummationMethod.HARRIS:
             output = run_python_2(
-                lambda snc_input, cyc_input, csv_output: das_harris.execute(
+                lambda snc_input, cyc_input, csv_output, _: das_harris.execute(
                     snc_input,
                     cyc_input,
                     csv_output,
@@ -210,4 +228,4 @@ def run_damage_summation(
             )
         case _:
             raise Exception(f"unknown method {method}")
-    return output
+    return output.csv_data

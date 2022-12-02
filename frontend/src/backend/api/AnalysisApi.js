@@ -243,7 +243,7 @@ export default class AnalysisApi {
    * @param {File} xFile
    * @param {File} yFile
    * @param {File} fFile
-   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link File} and HTTP response
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/AnalysisResult} and HTTP response
    */
   runFatigueFailureFileWithHttpInfo(
     method,
@@ -315,7 +315,7 @@ export default class AnalysisApi {
     let authNames = [];
     let contentTypes = ["multipart/form-data"];
     let accepts = ["application/json"];
-    let returnType = File;
+    let returnType = AnalysisResult;
     return this.apiClient.callApi(
       "/analysis/fatigueFailure/file",
       "POST",
@@ -341,7 +341,7 @@ export default class AnalysisApi {
    * @param {File} xFile
    * @param {File} yFile
    * @param {File} fFile
-   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link File}
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/AnalysisResult}
    */
   runFatigueFailureFile(
     method,

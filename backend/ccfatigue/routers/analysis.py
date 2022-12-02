@@ -50,7 +50,7 @@ async def run_cld_file(
     return run_cld(file.file, method)
 
 
-@router.post("/fatigueFailure/file", response_model=bytes)
+@router.post("/fatigueFailure/file", response_model=AnalysisResult)
 async def run_fatigue_failure_file(
     x_file: UploadFile = File(..., alias="xFile"),
     y_file: UploadFile = File(..., alias="yFile"),
@@ -59,7 +59,7 @@ async def run_fatigue_failure_file(
     sn_model: FatigueModel = Query(..., alias="snModel"),
     desirable_angle: float = Query(..., alias="desirableAngle"),
     off_axis_angle: float = Query(..., alias="offAxisAngle"),
-) -> bytes:
+) -> AnalysisResult:
     return run_fatigue_failure(
         x_file.file,
         y_file.file,

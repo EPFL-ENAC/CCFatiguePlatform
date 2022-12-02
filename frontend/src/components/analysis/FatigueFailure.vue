@@ -224,7 +224,7 @@ export default {
           )
           .then((data) => {
             this.output = data;
-            const results = parse(data, parserConfig);
+            const results = parse(data.csv_data, parserConfig);
             this.series = [
               {
                 type: "line",
@@ -246,7 +246,12 @@ export default {
     },
     downloadOutput() {
       if (this.output) {
-        download(this.output, `FAF-${this.method}.csv`, "text/csv");
+        download(this.output.csv_data, `FAF-${this.method}.csv`, "text/csv");
+        download(
+          this.output.json_data,
+          `FAF-${this.method}.json`,
+          "application/json"
+        );
       }
     },
   },

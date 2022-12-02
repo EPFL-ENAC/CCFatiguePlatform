@@ -597,9 +597,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Response Run Fatigue Failure File Analysis Fatiguefailure File Post",
-                  "type": "string",
-                  "format": "binary"
+                  "$ref": "#/components/schemas/AnalysisResult"
                 }
               }
             }
