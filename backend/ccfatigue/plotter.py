@@ -23,6 +23,7 @@ class DataKey(Enum):
     STIFNESS = ("stiffness", "Stiffness")
     STRAIN = ("strain", "Strain")
     STRESS = ("stress", "Stress")
+    STRESS_MAX = ("stress_max", "Maximum stress")
 
     def __init__(self, key: str, label: str):
         self.key = key
