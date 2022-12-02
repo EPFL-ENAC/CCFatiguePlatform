@@ -103,6 +103,18 @@ export default {
           unit: "ENAC-IT4R",
           title: "Ing dev",
         },
+        {
+          name: "David Tang",
+          url: "https://people.epfl.ch/david.tang",
+          unit: "ENAC-IT4R",
+          title: "Ing data + dev",
+        },
+        {
+          name: "Nicolas Dubois",
+          url: "https://people.epfl.ch/nicolas.dubois",
+          unit: "ENAC-IT4R",
+          title: "Ing dev",
+        },
       ],
     };
   },
