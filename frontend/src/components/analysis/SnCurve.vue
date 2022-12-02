@@ -112,6 +112,7 @@
 import SnCurveMethod from "@/backend/model/SnCurveMethod";
 import SimpleChart from "@/components/charts/SimpleChart";
 import InfoTooltip from "@/components/InfoTooltip";
+import { getOutputFileName } from "@/utils/analysis";
 import { parserConfig } from "@/utils/papaparse";
 import download from "downloadjs";
 import { parse } from "papaparse";
@@ -190,12 +191,9 @@ export default {
     },
     downloadOutput() {
       for (const [key, value] of Object.entries(this.outputs)) {
-        download(value.csv_data, `SNC-${key.toLowerCase()}.csv`, "text/csv");
-        download(
-          value.json_data,
-          `SNC-${key.toLowerCase()}.json`,
-          "application/json"
-        );
+        const outputName = getOutputFileName("AGG", "SNC", this.file.name, key);
+        download(value.csv_data, outputName + ".csv", "text/csv");
+        download(value.json_data, outputName + ".json", "application/json");
       }
     },
   },

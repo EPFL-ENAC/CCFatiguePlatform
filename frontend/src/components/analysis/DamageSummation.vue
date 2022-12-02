@@ -103,6 +103,7 @@
 import DamageSummationMethod from "@/backend/model/DamageSummationMethod";
 import SimpleChart from "@/components/charts/SimpleChart";
 import InfoTooltip from "@/components/InfoTooltip";
+import { getOutputFileName } from "@/utils/analysis";
 import { parserConfig } from "@/utils/papaparse";
 import download from "downloadjs";
 import { parse } from "papaparse";
@@ -162,7 +163,13 @@ export default {
     },
     downloadOutput() {
       if (this.output) {
-        download(this.output, `DAS-${this.method}.csv`, "text/csv");
+        const outputName = getOutputFileName(
+          "SNC",
+          "DAS",
+          this.sncFile.name,
+          this.method
+        );
+        download(this.output, outputName + ".csv", "text/csv");
       }
     },
   },

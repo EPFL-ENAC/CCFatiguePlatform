@@ -174,6 +174,7 @@
 import FatigueFailureMethod from "@/backend/model/FatigueFailureMethod";
 import SimpleChart from "@/components/charts/SimpleChart";
 import InfoTooltip from "@/components/InfoTooltip";
+import { getOutputFileName } from "@/utils/analysis";
 import { parserConfig } from "@/utils/papaparse";
 import download from "downloadjs";
 import { parse } from "papaparse";
@@ -246,10 +247,16 @@ export default {
     },
     downloadOutput() {
       if (this.output) {
-        download(this.output.csv_data, `FAF-${this.method}.csv`, "text/csv");
+        const outputName = getOutputFileName(
+          "SNC",
+          "FAF",
+          this.xFile.name,
+          this.method
+        );
+        download(this.output.csv_data, outputName + ".csv", "text/csv");
         download(
           this.output.json_data,
-          `FAF-${this.method}.json`,
+          outputName + ".json",
           "application/json"
         );
       }

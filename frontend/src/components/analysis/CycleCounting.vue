@@ -72,6 +72,7 @@
 import CycleCountingMethod from "@/backend/model/CycleCountingMethod";
 import SimpleChart from "@/components/charts/SimpleChart";
 import InfoTooltip from "@/components/InfoTooltip";
+import { getOutputFileName } from "@/utils/analysis";
 import { parserConfig } from "@/utils/papaparse";
 import download from "downloadjs";
 import { parse } from "papaparse";
@@ -131,7 +132,13 @@ export default {
     },
     downloadOutput() {
       if (this.output) {
-        download(this.output, `CYC-${this.method}.csv`, "text/csv");
+        const outputName = getOutputFileName(
+          "LDS",
+          "CYC",
+          this.file.name,
+          this.method
+        );
+        download(this.output, outputName + ".csv", "text/csv");
       }
     },
   },
