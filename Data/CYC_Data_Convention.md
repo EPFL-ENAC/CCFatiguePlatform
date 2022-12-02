@@ -4,12 +4,12 @@ CYC Data is the output of the Cycle Counting module.
 
 ### File naming conventions
 
-- File: `CYC_{Researcher's lastname}_{date}_{CYC method}.csv`
+- File: `CYC_{Researcher's lastname}_{date}[_{methods}].csv`
 
 with:
 
 - date: `YYYY-MM` (starting month of the experiment)
-- CYC_method: `SimplifiedRainflow`, `Rainflow`, `RangePair`, `RangeMean`
+- methods (optional): lists the methods used successively in the different modules
 
 ### CYC CSV files standards (column names must be exact) :
 

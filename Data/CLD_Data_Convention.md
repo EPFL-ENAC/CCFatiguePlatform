@@ -5,14 +5,13 @@ CLD Data is the output of the Constant-Life Diagram module.
 
 ## File naming conventions
 
-- Files: `CLD_{Researcher's lastname}_{date}_{SNC method}_{CLD method}.json`
-- Files: `CLD_{Researcher's lastname}_{date}_{SNC method}_{CLD method}.csv`
+- Files: `CLD_{Researcher's lastname}_{date}[_{methods}].json`
+- Files: `CLD_{Researcher's lastname}_{date}[_{methods}].csv`
 
 with:
 
 - date: `YYYY-MM` (starting month of the experiment)
-- SNC method: see [SNC_Data_Convention.md](SNC_Data_Convention.md)
-- CLD method: `Boestra`, `Harris`, `HarrisPower`, `Kawai`, `Linear`, `PiecewiseLinear`, `PiecewiseNonLinear`
+- methods (optional): lists the methods used successively in the different modules
 
 ## CLD CSV files standards (column names must be exact) :
 
