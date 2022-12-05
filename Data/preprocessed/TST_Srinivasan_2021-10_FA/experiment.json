@@ -1,0 +1,21 @@
+{
+  "general": {
+    "laboratory": "CCLAB",
+    "researcher": "Dharun Vadugappatty Srinivasan",
+    "date": "2021-10",
+    "experiment type": "FA",
+    "fracture": false,
+    "fatigue test type": "CA",
+    "measuring equipment": "MTS 25 kN",
+    "control mode": "Load Controlled"
+  },
+  "material type": {
+    "resin": "Epoxy",
+    "mixing ratio": "100/34"
+  },
+  "laminates and assemblies": {
+    "curing time": 2.0,
+    "curing temperature": 70.0,
+    "curing pressure": 1.0
+  }
+}
