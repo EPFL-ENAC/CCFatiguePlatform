@@ -16,7 +16,7 @@ RAW_EXPERIMENT_FP_FOLDERS = sorted(
     filter(lambda fp: os.path.isdir(fp), glob.glob(f"{EXPERIMENTS_FOLDER}/raw/TST_*"))
 )
 XLS_TEMPLATE_URL = (
-    "https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop"
+    "https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/main"
     "/Data/TST_Data_Template.xls"
 )
 
