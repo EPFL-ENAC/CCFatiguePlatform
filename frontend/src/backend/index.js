@@ -16,15 +16,16 @@ import DefaultApi from "./api/DefaultApi";
 import ExperimentsApi from "./api/ExperimentsApi";
 import TestsApi from "./api/TestsApi";
 import ApiClient from "./ApiClient";
+import AnalysisResult from "./model/AnalysisResult";
 import AppInfo from "./model/AppInfo";
 import CldMethod from "./model/CldMethod";
 import CycleCountingMethod from "./model/CycleCountingMethod";
 import DamageSummationMethod from "./model/DamageSummationMethod";
-import EchartLine from "./model/EchartLine";
 import ExperimentDataPreprocessed from "./model/ExperimentDataPreprocessed";
 import ExperimentFieldNames from "./model/ExperimentFieldNames";
 import ExperimentModel from "./model/ExperimentModel";
 import FatigueFailureMethod from "./model/FatigueFailureMethod";
+import FatigueModel from "./model/FatigueModel";
 import FatigueTest from "./model/FatigueTest";
 import HTTPValidationError from "./model/HTTPValidationError";
 import HysteresisLoop from "./model/HysteresisLoop";
@@ -33,8 +34,6 @@ import PageExperimentModel from "./model/PageExperimentModel";
 import PageTestModel from "./model/PageTestModel";
 import QuasiStaticTest from "./model/QuasiStaticTest";
 import SnCurveMethod from "./model/SnCurveMethod";
-import SnCurveResult from "./model/SnCurveResult";
-import SnModel from "./model/SnModel";
 import TestModel from "./model/TestModel";
 import UnitInfo from "./model/UnitInfo";
 import ValidationError from "./model/ValidationError";
@@ -74,6 +73,12 @@ export {
   ApiClient,
 
   /**
+   * The AnalysisResult model constructor.
+   * @property {module:model/AnalysisResult}
+   */
+  AnalysisResult,
+
+  /**
    * The AppInfo model constructor.
    * @property {module:model/AppInfo}
    */
@@ -98,12 +103,6 @@ export {
   DamageSummationMethod,
 
   /**
-   * The EchartLine model constructor.
-   * @property {module:model/EchartLine}
-   */
-  EchartLine,
-
-  /**
    * The ExperimentDataPreprocessed model constructor.
    * @property {module:model/ExperimentDataPreprocessed}
    */
@@ -126,6 +125,12 @@ export {
    * @property {module:model/FatigueFailureMethod}
    */
   FatigueFailureMethod,
+
+  /**
+   * The FatigueModel model constructor.
+   * @property {module:model/FatigueModel}
+   */
+  FatigueModel,
 
   /**
    * The FatigueTest model constructor.
@@ -174,18 +179,6 @@ export {
    * @property {module:model/SnCurveMethod}
    */
   SnCurveMethod,
-
-  /**
-   * The SnCurveResult model constructor.
-   * @property {module:model/SnCurveResult}
-   */
-  SnCurveResult,
-
-  /**
-   * The SnModel model constructor.
-   * @property {module:model/SnModel}
-   */
-  SnModel,
 
   /**
    * The TestModel model constructor.

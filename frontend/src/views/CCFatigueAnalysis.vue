@@ -1,6 +1,5 @@
 <template>
   <v-container fluid>
-    <p>- not implemented yet -</p>
     <v-row>
       <v-col cols="6">
         <cycle-counting></cycle-counting>

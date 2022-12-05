@@ -1,7 +1,6 @@
 import datetime
-from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List
+from typing import Any, List
 
 from pydantic import BaseModel
 
@@ -45,15 +44,9 @@ class SnCurveMethod(str, Enum):
     SENDECKYJ = "Sendeckyj"
 
 
-class EchartLine(BaseModel):
-    name: str
-    xData: List[Decimal]
-    yData: List[Decimal]
-
-
-class SnCurveResult(BaseModel):
-    outputs: Dict[SnCurveMethod, bytes]
-    lines: List[EchartLine]
+class AnalysisResult(BaseModel):
+    csv_data: bytes
+    json_data: bytes
 
 
 class CycleCountingMethod(str, Enum):
