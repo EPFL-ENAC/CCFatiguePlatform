@@ -1,5 +1,4 @@
 import os
-from operator import itemgetter
 from typing import Dict, List
 
 import numpy as np
@@ -11,7 +10,6 @@ from sqlalchemy.future import select
 
 from ccfatigue.experiment.common import DATA_DIRECTORY, get_test_fields
 from ccfatigue.models.database import Experiment, Test
-from preprocessing.hysteresis_loops import process_hysteresis
 
 INTERVAL: int = 10
 LOOP_SPACING: int = 1000
@@ -81,39 +79,73 @@ def compute_sub_indexes(df: DataFrame) -> List[int]:
     return unique_n_cycles[indexes]
 
 
-def create_sub_hystloops(df: DataFrame, sub_indexes: List[int]) -> List[HysteresisLoop]:
+def fatigue_processing(df: DataFrame, sub_indexes: List[int], test_meta) -> Dict:
     """
-    Conditional plotting of hysteresis loops
-    we only plot the loops specified by sub_index
+    return {
+        "sub_hystloops": list of hysteresis loops
+            only for the loops specified by sub_index
+        "n_fail"
+        "stress_at_failure"
+        "strain_at_failure"
+
+    }
     """
     sub_hystloops: List[HysteresisLoop] = []
+
+    if "Machine_N_cycles" in df.columns and df.count().Machine_N_cycles > 0:
+        n_cycles = np.sort(df["Machine_N_cycles"].unique())
+        cycle_field = "Machine_N_cycles"
+        load_field = "Machine_Load"
+        displacement_field = "Machine_Displacement"
+    else:
+        n_cycles = np.sort(df["MD_N_cycles--1"].unique())
+        cycle_field = "MD_N_cycles--1"
+        load_field = "MD_Load--1"
+        displacement_field = "MD_Displacement--1"
+
+    # calculate Stress and Strain
+    df = df.assign(
+        stress=df[load_field] / (test_meta["width"] * test_meta["thickness"]),
+        strain=df[displacement_field] / test_meta["length"],
+    )
+
+    n_fail = np.max(n_cycles)
+    last_cycle = df[cycle_field].unique()[-1]
+    stress_at_failure = np.max(df[df[cycle_field] == last_cycle].stress)
+    strain_at_failure = np.max(df[df[cycle_field] == last_cycle].strain)
+
     for sub_index in sub_indexes:
-        sub_hystloops_strain = []
-        sub_hystloops_stress = []
-        sub_hystloops_ncycles = []
-        for i in range(len(df)):
-            if df.Machine_N_cycles[i] == sub_index:
-                sub_hystloops_strain.append(df.Machine_Displacement[i])
-                sub_hystloops_stress.append(df.Machine_Load[i])
-                sub_hystloops_ncycles.append(df.Machine_N_cycles[i])
-        # make curve closed // Optional
-        if len(sub_hystloops_ncycles) != 0:
-            sub_hystloops_strain.append(sub_hystloops_strain[0])
-            sub_hystloops_stress.append(sub_hystloops_stress[0])
-            sub_hystloops_ncycles.append(sub_hystloops_ncycles[0])
+        mask = df.Machine_N_cycles == sub_index
+        nb_entries = mask.value_counts().loc[True]
+
+        sub_hystloops_strain = np.full(nb_entries + 1, np.nan)
+        sub_hystloops_stress = np.full(nb_entries + 1, np.nan)
+        sub_hystloops_ncycles = np.full(nb_entries + 1, np.nan)
+
+        sub_hystloops_stress[0:nb_entries] = df[mask].stress
+        sub_hystloops_strain[0:nb_entries] = df[mask].strain
+        sub_hystloops_ncycles[0:nb_entries] = df[mask][cycle_field]
+        sub_hystloops_stress[nb_entries] = sub_hystloops_stress[0]
+        sub_hystloops_strain[nb_entries] = sub_hystloops_strain[0]
+        sub_hystloops_ncycles[nb_entries] = sub_hystloops_ncycles[0]
         if (
-            len(sub_hystloops_ncycles) > 0
-            and len(sub_hystloops_strain) > 0
-            and len(sub_hystloops_stress) > 0
+            sub_hystloops_ncycles.size > 0
+            and sub_hystloops_stress.size > 0
+            and sub_hystloops_strain.size > 0
         ):
             sub_hystloops.append(
                 HysteresisLoop(
-                    n_cycles=sub_hystloops_ncycles,
-                    strain=sub_hystloops_strain,
-                    stress=sub_hystloops_stress,
+                    n_cycles=sub_hystloops_ncycles.tolist(),
+                    stress=sub_hystloops_stress.tolist(),
+                    strain=sub_hystloops_strain.tolist(),
                 )
             )
-    return sub_hystloops
+    return {
+        "sub_hystloops": sub_hystloops,
+        "n_fail": int(n_fail),
+        "stress_at_failure": stress_at_failure,
+        "strain_at_failure": strain_at_failure,
+    }
 
 
 async def fatigue_test(
@@ -139,27 +171,34 @@ async def fatigue_test(
         session,
         experiment_id,
         test_id,
-        (Test.specimen_number, Test.run_out, Test.stress_ratio),
+        (
+            Test.specimen_number,
+            Test.run_out,
+            Test.stress_ratio,
+            Test.width,
+            Test.thickness,
+            Test.length,
+        ),
     )
     std_df = get_dataframe("TST", experiment, test_meta["specimen_number"])
     hyst_df = get_dataframe("HYS", experiment, test_meta["specimen_number"]).fillna(
         value=0
     )
-    hysteresis_loops = create_sub_hystloops(std_df, compute_sub_indexes(hyst_df))
-    (stress_at_failure, strain_at_failure, n_fail) = itemgetter(
-        "stress_at_failure", "strain_at_failure", "n_fail"
-    )(process_hysteresis(std_df))
+    fatigue_processed = fatigue_processing(
+        std_df, compute_sub_indexes(hyst_df), test_meta
+    )
+
     return FatigueTest(
         specimen_id=test_meta["specimen_number"],
         run_out=test_meta["run_out"],
         stress_ratio=test_meta["stress_ratio"],
         total_dissipated_energy=get_total_dissipated_energy(hyst_df),
-        hysteresis_loops=hysteresis_loops,
+        hysteresis_loops=fatigue_processed["sub_hystloops"],
         n_cycles=hyst_df["n_cycles"].to_list(),
         creep=hyst_df["creep"].to_list(),
         hysteresis_area=hyst_df["hysteresis_area"].to_list(),
         stiffness=hyst_df["stiffness"].to_list(),
-        stress_at_failure=stress_at_failure,
-        strain_at_failure=strain_at_failure,
-        n_fail=n_fail,
+        stress_at_failure=fatigue_processed["stress_at_failure"],
+        strain_at_failure=fatigue_processed["strain_at_failure"],
+        n_fail=fatigue_processed["n_fail"],
     )
