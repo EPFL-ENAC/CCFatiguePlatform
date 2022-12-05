@@ -5,12 +5,13 @@ CLD Data is the output of the Constant-Life Diagram module.
 
 ## File naming conventions
 
-- Files: `CLD_{Researcher's lastname}_{Date}.json`
-- Files: `CLD_{Researcher's lastname}_{Date}.csv`
+- Files: `CLD_{Researcher's lastname}_{date}[_{methods}].json`
+- Files: `CLD_{Researcher's lastname}_{date}[_{methods}].csv`
 
 with:
 
 - date: `YYYY-MM` (starting month of the experiment)
+- methods (optional): lists the methods used successively in the different modules
 
 ## CLD CSV files standards (column names must be exact) :
 

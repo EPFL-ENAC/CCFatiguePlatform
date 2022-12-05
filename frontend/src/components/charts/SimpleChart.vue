@@ -53,7 +53,10 @@ export default {
     };
   },
   computed: {
-    actualOption: function () {
+    xLog() {
+      return this.xAxisType === "log";
+    },
+    actualOption() {
       return {
         title: {
           text: this.title,
@@ -76,12 +79,16 @@ export default {
           min: "dataMin",
           max: "dataMax",
           axisLabel: {
-            formatter: function (value) {
-              return value.toLocaleString(undefined, {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 4,
-              });
-            },
+            formatter: this.xLog
+              ? function (value) {
+                  return value.toExponential();
+                }
+              : function (value) {
+                  return value.toLocaleString(undefined, {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 4,
+                  });
+                },
             hideOverlap: true,
           },
         },

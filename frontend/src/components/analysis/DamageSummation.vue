@@ -1,7 +1,7 @@
 <template>
   <v-card :loading="loading">
     <v-card-title>
-      Damage Summation (uniaxial)
+      Damage Summation
       <v-spacer />
       <info-tooltip>
         The damage summation module is based on the Palgrem-Miner linear damage
@@ -20,21 +20,16 @@
             accept=".csv"
             :error-messages="errorMessages"
             :disabled="loading"
-            label="SNC file"
+            label="SNC csv file"
             @change="updateOutput"
           >
             <template #append>
               <info-tooltip>
-                The data used as input for this method is slightly different
-                than that of the previous modules. As damage summation deals
-                with the fatigue life as a whole, we use the results from the
-                previous analysis. We first browse for the load spectrum which
-                is presented as a txt file with one numerical column
-                representing the peaks and valleys of the loading. We then
-                select the method we will use for counting the cycles, and
-                finally choose the appropriate methods for CLD and for S-N
-                curves/fatigue failure depending on whether we are in presence
-                of a uniaxial or multiaxial loading.
+                Known stress ratios. See the
+                <a
+                  href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/SNC_Data_Convention.md"
+                  >SNC Data Convention</a
+                >
               </info-tooltip>
             </template>
           </v-file-input>
@@ -46,9 +41,19 @@
             accept=".csv"
             :error-messages="errorMessages"
             :disabled="loading"
-            label="CYC file"
+            label="CYC csv file"
             @change="updateOutput"
-          ></v-file-input>
+          >
+            <template #append>
+              <info-tooltip>
+                See the
+                <a
+                  href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/CYC_Data_Convention.md"
+                  >CYC Data Convention</a
+                >
+              </info-tooltip>
+            </template>
+          </v-file-input>
         </v-col>
         <v-col>
           <v-select
@@ -65,13 +70,20 @@
       <simple-chart
         :aspect-ratio="2"
         :series="series"
-        x-axis-name="damage"
-        y-axis-name="stress_max"
+        x-axis-name="Spectrum Passes"
+        y-axis-name="Maximum Cyclic Stress [MPa]"
       ></simple-chart>
     </v-card-text>
     <v-card-actions v-if="hasInput" class="justify-end">
       <v-btn :disabled="loading && output != null" @click="downloadOutput">
-        Download
+        Download DAS
+        <info-tooltip>
+          See the
+          <a
+            href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/DAS_Data_Convention.md"
+            >DAS Data Convention</a
+          >
+        </info-tooltip>
       </v-btn>
     </v-card-actions>
   </v-card>
@@ -81,6 +93,7 @@
 import DamageSummationMethod from "@/backend/model/DamageSummationMethod";
 import SimpleChart from "@/components/charts/SimpleChart";
 import InfoTooltip from "@/components/InfoTooltip";
+import { getOutputFileName } from "@/utils/analysis";
 import { parserConfig } from "@/utils/papaparse";
 import download from "downloadjs";
 import { parse } from "papaparse";
@@ -140,11 +153,13 @@ export default {
     },
     downloadOutput() {
       if (this.output) {
-        download(
-          this.output,
-          `damage-summation-${this.method}-output.csv`,
-          "text/csv"
+        const outputName = getOutputFileName(
+          "SNC",
+          "DAS",
+          this.sncFile.name,
+          this.method
         );
+        download(this.output, outputName + ".csv", "text/csv");
       }
     },
   },

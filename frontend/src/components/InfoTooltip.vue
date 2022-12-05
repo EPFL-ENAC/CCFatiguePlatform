@@ -1,5 +1,5 @@
 <template>
-  <v-tooltip bottom max-width="500px" open-on-focus>
+  <v-tooltip bottom max-width="500px" open-on-focus close-delay="1000">
     <template #activator="{ on, attrs }">
       <v-btn icon v-bind="attrs" v-on="on">
         <v-icon>mdi-information-outline</v-icon>
@@ -17,4 +17,8 @@ export default {
 };
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.v-tooltip__content {
+  pointer-events: initial;
+}
+</style>
