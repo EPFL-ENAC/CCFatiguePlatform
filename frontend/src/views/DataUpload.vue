@@ -3,6 +3,11 @@
     <v-card>
       <v-card-title>Dataset checker</v-card-title>
       <v-card-text>
+        <p>
+          Refer to the
+          <a :href="TSTDataConventionURL"> TST Data Convention </a>
+          to prepare your Dataset.
+        </p>
         <v-file-input
           v-model="experimentZip.file"
           chips
@@ -21,11 +26,13 @@
               {{ countWarnings }} {{ "warning" | pluralize(countWarnings) }}.
               <br />
               You can send your dataset for integration
-              <a
+              <v-btn
                 href="https://github.com/EPFL-ENAC/CCFatiguePlatform/issues/new?assignees=sbancal&labels=Dataset%2Ctriage&template=dataset_integration_request.yml&title=%5BNew+Dataset%5D+%3A+%7B3LettersDataCode%7D_%7BResearcher%27s+lastname%7D_%7BDate%7D_%7BTest+type%7D"
+                outlined
+                small
               >
                 here
-              </a>
+              </v-btn>
               .
             </v-alert>
           </template>
@@ -35,11 +42,7 @@
               {{ countWarnings }} {{ "warning" | pluralize(countWarnings) }},
               {{ countErrors }} {{ "error" | pluralize(countErrors) }}. <br />
               Please fix it according to the
-              <a
-                href="https://github.com/EPFL-ENAC/CCFatiguePlatform/tree/develop/Data"
-              >
-                Data convention
-              </a>
+              <a :href="TSTDataConventionURL"> TST Data convention </a>
               and test it here again
             </v-alert>
           </template>
@@ -69,6 +72,8 @@ export default {
   name: "DataUpload",
   data() {
     return {
+      TSTDataConventionURL:
+        "https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/main/Data/TST_Data_Convention.md",
       experimentZip: {
         file: null,
         loading: false,
