@@ -13,10 +13,10 @@ SNC Data corresponds to the output of S-N Curve module and is composed of 2 file
 with:
 
 - date: `YYYY-MM` (starting month of the experiment)
-- axis: {X|Y|S}
+- axis: to be defined, seems to depends on the method used, for instance for TFTP:
   - X = longitudinal
   - Y = transverse
-  - S = under shear loading
+  - F = under shear loading
 - methods (optional): lists the methods used successively in the different modules
 
 ## SNC JSON files standards :

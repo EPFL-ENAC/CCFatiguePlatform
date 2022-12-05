@@ -18,12 +18,13 @@
             accept=".json"
             :error-messages="errorMessages"
             :disabled="loading"
-            label="Longitudinal fatigue (SNC json file)"
+            label="Longitudinal fatigue data (SNC json file)"
             @change="updateOutput"
           >
             <template #append>
               <info-tooltip>
-                See the
+                Longitudinal fatigue data.<br />Format: SNC json file.<br />See
+                the
                 <a
                   href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/SNC_Data_Convention.md"
                   >SNC Data Convention</a
@@ -39,9 +40,20 @@
             accept=".json"
             :error-messages="errorMessages"
             :disabled="loading"
-            label="Transverse fatigue (SNC json file)"
+            label="Transverse fatigue data. (SNC json file)"
             @change="updateOutput"
-          ></v-file-input>
+          >
+            <template #append>
+              <info-tooltip>
+                Transverse fatigue data.<br />Format: SNC json file.<br />See
+                the
+                <a
+                  href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/SNC_Data_Convention.md"
+                  >SNC Data Convention</a
+                >
+              </info-tooltip>
+            </template>
+          </v-file-input>
         </v-col>
         <v-col>
           <v-file-input
@@ -50,9 +62,19 @@
             accept=".json"
             :error-messages="errorMessages"
             :disabled="loading"
-            label="Shear or off-axis (SNC json file)"
+            label="Shear or off-axis fatigue data (SNC json file)"
             @change="updateOutput"
-          ></v-file-input>
+            ><template #append>
+              <info-tooltip>
+                Shear or off-axis fatigue data.<br />Format: SNC json file.<br />See
+                the
+                <a
+                  href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/SNC_Data_Convention.md"
+                  >SNC Data Convention</a
+                >
+              </info-tooltip>
+            </template>
+          </v-file-input>
         </v-col>
       </v-row>
       <v-row>
