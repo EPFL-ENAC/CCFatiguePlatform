@@ -23,11 +23,10 @@ g: ?? TODO
 
 import math
 from itertools import chain
-from typing import Optional
 
 import numpy as np
 import pandas as pd
-from pandas._typing import FilePath, ReadBuffer, WriteBuffer
+from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 from scipy import stats
 
 import ccfatigue.analysis.fortran.sendeckyj as sendeckyj  # Fortran optimized functions
@@ -45,6 +44,16 @@ C_INITIAL_INCREMENT = 0.000001
 S_MIN = 0.001
 S_MAX = 0.5
 S_STEP = 0.0005
+
+LIST_CYCLES_TO_FAILURE = list(
+    chain(
+        range(1, 1000, 50),
+        range(1000, 1001),
+        range(10000, 2000000, 10000),
+        range(3000000, 20000000, 1000000),
+        range(30000000, 1400000000, 100000000),
+    )
+)
 
 
 def sendeckyj_equation_1(
@@ -75,11 +84,15 @@ def sendeckyj_equation_17(m: int, k: int, sigma_e) -> float:
     return g
 
 
-def sendeckyj_equation_19(g: float, m: int, k: int, xs: float, alpha: float) -> float:
+def sendeckyj_equation_19(
+    g: float, m: int, k: int, xs: pd.Series, alpha: float
+) -> float:
     """Returns beta TODO beta = ??
     Eq 19 (see ref, p259)
     """
-    beta = g * (1 / (m - k) * xs.apply(lambda x: x**alpha).sum()) ** (1 / alpha)
+    beta = g * (1 / (m - k) * float(xs.apply(lambda x: x**alpha).sum())) ** (
+        1 / alpha
+    )
     return beta
 
 
@@ -102,10 +115,10 @@ def tassos_equation(
 
 
 def execute(
-    input_file: Optional[FilePath | ReadBuffer],
-    output_json_file: Optional[FilePath | WriteBuffer],
-    output_csv_file: Optional[FilePath | WriteBuffer],
-    reliability_level: float = 50,
+    input_file: FilePath | ReadCsvBuffer,
+    output_json_file: FilePath | WriteBuffer | None,
+    output_csv_file: FilePath | WriteBuffer | None,
+    confidence_interval: float = 50,
     confidence: int = 95,
 ):
 
@@ -126,33 +139,15 @@ def execute(
     snc_output_json_df = pd.DataFrame(
         columns=[
             "stress_ratio",
-            "RSQL",
-            "A",
-            "B",
-            "LRSQ",
-            "Fp",
-            "Linearity",
-            "RMSE",
-            "SSE",
-            "SST",
-            "RSQ",
-            "Sstar",
-            "Cstar",
+            "confidence_interval",
+            "a",
+            "b",
+            "sstar",
+            "cstar",
         ],
     )
     # snc_output_json_df["stress_ratio"] = df["stress_ratio"].unique()
     # snc_output_json_df.set_index("stress_ratio", inplace=True)
-
-    LIST_CYCLES_TO_FAILURE = pd.DataFrame(
-        chain(
-            range(1, 1000, 50),
-            range(1000, 1001),
-            range(10000, 2000000, 10000),
-            range(3000000, 20000000, 1000000),
-            range(30000000, 1400000000, 100000000),
-        ),
-        columns=["cycles_to_failure"],
-    )
 
     snc_output_csv_df = pd.DataFrame(
         columns=[
@@ -197,7 +192,10 @@ def execute(
 
     # Calculate A (Eq 4) and B (Eq 5)
     linregress = samples.groupby("stress_ratio_id").apply(
-        lambda x: stats.linregress(x.log10_stress_max, x.log10_cycles_to_failure)
+        lambda x: stats.linregress(
+            x.log10_stress_max,  # type: ignore
+            x.log10_cycles_to_failure,  # type: ignore
+        )
     )
 
     # Eq 4 and 5
@@ -208,8 +206,8 @@ def execute(
 
     samples["ycar"] = samples.apply(
         lambda x: snc.equation_ycar(
-            stress_ratios_df.loc[x.stress_ratio_id].slope,
-            stress_ratios_df.loc[x.stress_ratio_id].intercept,
+            stress_ratios_df.loc[x.stress_ratio_id].slope,  # type: ignore
+            stress_ratios_df.loc[x.stress_ratio_id].intercept,  # type: ignore
             x.log10_stress_max,
         ),
         axis=1,
@@ -254,12 +252,15 @@ def execute(
         stress_ratio = stress_ratio_sample_df.iloc[0].stress_ratio
 
         # Find the optimum solution
+        alpha = 0
         alpha_max = 0
         p = 1
         q = 1
         alpha_old = 0
         c = C_MIN
         c_increment = C_INITIAL_INCREMENT
+        c_star = 0
+        s_star = 0
         alpha_c_old = 0  # TODO ??
 
         data_count = len(stress_ratio_sample_df)
@@ -298,7 +299,6 @@ def execute(
                     c_star = c
 
                 if p > 1:
-                    # if (alpha - alpha_old) / (s - s_old) >= 0:
                     if alpha >= alpha_old:
                         alpha_old = alpha
                     else:
@@ -308,7 +308,6 @@ def execute(
                 s += S_STEP
 
             if q > 1:
-                # if (alpha_old - alpha_c_old) / (c - c_c_old) >= 0:
                 if alpha_old >= alpha_c_old:
                     if alpha_old - alpha_c_old < 0.01 * alpha_max:
                         c_increment = 0.000001
@@ -358,11 +357,11 @@ def execute(
         json_df = pd.DataFrame(
             {
                 "stress_ratio": stress_ratio,
-                "RSQL": reliability_level,
-                "A": alpha_max,
-                "B": beta,
-                "Sstar": s_star,
-                "Cstar": c_star,
+                "confidence_interval": confidence_interval,
+                "a": alpha_max,
+                "b": beta,
+                "sstar": s_star,
+                "cstar": c_star,
             },
             index=[0],
         )
@@ -370,10 +369,11 @@ def execute(
 
         a = -(1 - c_star) / c_star
 
-        stress_max = LIST_CYCLES_TO_FAILURE.copy()
+        stress_max = pd.DataFrame(LIST_CYCLES_TO_FAILURE, columns=["cycles_to_failure"])
+
         stress_max["stress_max"] = stress_max.apply(
             lambda x: tassos_equation(
-                reliability_level, alpha, c_star, s_star, x, a, beta
+                confidence_interval, alpha, c_star, s_star, x, a, beta
             )
         )
 
@@ -386,7 +386,7 @@ def execute(
                 x.cycles_to_failure,
                 stress_ratio_df.pp,
                 stress_ratio_df.xb,
-            ),
+            ),  # type: ignore
             axis=1,
         )
         stress_max["stress_lowerbound"] = stress_bounds.apply(lambda x: x[0])

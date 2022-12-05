@@ -43,7 +43,6 @@ class SnCurveMethod(str, Enum):
     LIN_LOG = "LinLog"
     LOG_LOG = "LogLog"
     SENDECKYJ = "Sendeckyj"
-    WHITNEY = "Whitney"
 
 
 class EchartLine(BaseModel):

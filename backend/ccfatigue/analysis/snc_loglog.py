@@ -12,7 +12,6 @@ as described in
 """
 
 from itertools import chain
-from typing import Optional
 
 import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
@@ -114,8 +113,8 @@ def get_loglog_lsst(
 
 def execute(
     input_file: FilePath | ReadCsvBuffer,
-    output_json_file: Optional[FilePath | WriteBuffer],
-    output_csv_file: FilePath | WriteBuffer,
+    output_json_file: FilePath | WriteBuffer | None,
+    output_csv_file: FilePath | WriteBuffer | None,
     reliability_level: float = 50,
     confidence: int = 95,
 ) -> None:
