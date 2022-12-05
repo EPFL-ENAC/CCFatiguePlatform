@@ -159,7 +159,7 @@ export default {
                 name: `${item.method} ${rRatio}`,
                 data: item.rows
                   .filter((row) => row.stress_ratio === rRatio)
-                  .map((row) => [row.cycles_to_failure, row.stress]),
+                  .map((row) => [row.cycles_to_failure, row.stress_max]),
               }))
             );
           })
