@@ -1,4 +1,4 @@
-Machine_Displacement,Machine_Load,u--#,v--#,exx--#,eyy--# ,exy--#,Th_chamber,Specimen Name
+Machine_Displacement,Machine_Load,u--1,v--1,exx--1,eyy--1 ,exy--1,Th_chamber,Specimen Name
 0.003902,12.765147,0.00344595,-0.00214665,-1.51E-05,3.11E-05,5.13E-05,20,S-0.25-20-001
 0.005706,10.027115,0.00150832,-0.00234495,-9.03E-06,2.74E-05,5.98E-05,20,
 0.005835,10.300919,-0.00147636,-0.00232623,-4.35E-05,1.36E-05,5.96E-05,20,
