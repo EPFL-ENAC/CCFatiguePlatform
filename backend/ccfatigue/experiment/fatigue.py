@@ -105,7 +105,7 @@ def fatigue_processing(df: DataFrame, sub_indexes: List[int], test_meta) -> Dict
 
     # calculate Stress and Strain
     df = df.assign(
-        stress=df[load_field] / (test_meta["width"] * test_meta["thickness"]),
+        stress=(df[load_field] * 1000) / (test_meta["width"] * test_meta["thickness"]),
         strain=df[displacement_field] / test_meta["length"],
     )
 
