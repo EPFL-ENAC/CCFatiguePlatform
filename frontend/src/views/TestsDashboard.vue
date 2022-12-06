@@ -327,10 +327,8 @@ export default {
         type: "line",
         name: `${testId}`,
         data: zip(
-          this.loadOption ? this.loadData[testId][this.loadOption] : [],
-          this.displacementOption
-            ? this.displacementData[testId][this.displacementOption]
-            : []
+          this.displacementData[testId]?.[this.displacementOption] ?? [],
+          this.loadData[testId]?.[this.loadOption] ?? []
         ),
       }));
     },
@@ -340,8 +338,8 @@ export default {
           type: "line",
           name: `${testId}`,
           data: zip(
-            this.strainOption ? this.strainData[testId][this.strainOption] : [],
-            this.stressOption ? this.stressData[testId][this.stressOption] : []
+            this.strainData[testId]?.[this.strainOption] ?? [],
+            this.stressData[testId]?.[this.stressOption] ?? []
           ),
         }))
         .filter((line) => line.data.length > 0);
