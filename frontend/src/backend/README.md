@@ -135,15 +135,16 @@ All URIs are relative to _http://localhost_
 
 ## Documentation for Models
 
+- [Ccfatigue.AnalysisResult](docs/AnalysisResult.md)
 - [Ccfatigue.AppInfo](docs/AppInfo.md)
 - [Ccfatigue.CldMethod](docs/CldMethod.md)
 - [Ccfatigue.CycleCountingMethod](docs/CycleCountingMethod.md)
 - [Ccfatigue.DamageSummationMethod](docs/DamageSummationMethod.md)
-- [Ccfatigue.EchartLine](docs/EchartLine.md)
 - [Ccfatigue.ExperimentDataPreprocessed](docs/ExperimentDataPreprocessed.md)
 - [Ccfatigue.ExperimentFieldNames](docs/ExperimentFieldNames.md)
 - [Ccfatigue.ExperimentModel](docs/ExperimentModel.md)
 - [Ccfatigue.FatigueFailureMethod](docs/FatigueFailureMethod.md)
+- [Ccfatigue.FatigueModel](docs/FatigueModel.md)
 - [Ccfatigue.FatigueTest](docs/FatigueTest.md)
 - [Ccfatigue.HTTPValidationError](docs/HTTPValidationError.md)
 - [Ccfatigue.HysteresisLoop](docs/HysteresisLoop.md)
@@ -152,8 +153,6 @@ All URIs are relative to _http://localhost_
 - [Ccfatigue.PageTestModel](docs/PageTestModel.md)
 - [Ccfatigue.QuasiStaticTest](docs/QuasiStaticTest.md)
 - [Ccfatigue.SnCurveMethod](docs/SnCurveMethod.md)
-- [Ccfatigue.SnCurveResult](docs/SnCurveResult.md)
-- [Ccfatigue.SnModel](docs/SnModel.md)
 - [Ccfatigue.TestModel](docs/TestModel.md)
 - [Ccfatigue.UnitInfo](docs/UnitInfo.md)
 - [Ccfatigue.ValidationError](docs/ValidationError.md)

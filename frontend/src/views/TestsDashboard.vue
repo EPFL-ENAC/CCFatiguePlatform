@@ -264,6 +264,7 @@ import SimpleChart from "@/components/charts/SimpleChart.vue";
 import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
 import ExperimentSV from "@/components/ExperimentSV.vue";
 import InfoTooltip from "@/components/InfoTooltip";
+import { formatNumber } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
 import { zip } from "lodash";
 import { mapState } from "vuex";
@@ -285,6 +286,7 @@ export default {
     return {
       loading: false,
       colors: colorPalette,
+      specimenName: {},
       // FA
       cycleAtFailure: [],
       stressAtFailure: [],
@@ -324,12 +326,10 @@ export default {
     loadDisplacementSeries: function () {
       return this.testIds.map((testId) => ({
         type: "line",
-        name: `${testId}`,
+        name: this.specimenName[testId],
         data: zip(
-          this.loadOption ? this.loadData[testId][this.loadOption] : [],
-          this.displacementOption
-            ? this.displacementData[testId][this.displacementOption]
-            : []
+          this.displacementData[testId]?.[this.displacementOption] ?? [],
+          this.loadData[testId]?.[this.loadOption] ?? []
         ),
       }));
     },
@@ -337,10 +337,10 @@ export default {
       return this.testIds
         .map((testId) => ({
           type: "line",
-          name: `${testId}`,
+          name: this.specimenName[testId],
           data: zip(
-            this.strainOption ? this.strainData[testId][this.strainOption] : [],
-            this.stressOption ? this.stressData[testId][this.stressOption] : []
+            this.strainData[testId]?.[this.strainOption] ?? [],
+            this.stressData[testId]?.[this.stressOption] ?? []
           ),
         }))
         .filter((line) => line.data.length > 0);
@@ -357,12 +357,15 @@ export default {
             )
           )
             .then((dataList) => {
+              zip(this.testIds, dataList).forEach(([testId, data]) => {
+                this.specimenName[testId] = data.specimen_name;
+              });
               this.cycleAtFailure = dataList.map((data) => data.n_fail);
-              this.stressAtFailure = dataList.map(
-                (data) => data.stress_at_failure
+              this.stressAtFailure = dataList.map((data) =>
+                formatNumber(data.stress_at_failure)
               );
-              this.strainAtFailure = dataList.map(
-                (data) => data.strain_at_failure
+              this.strainAtFailure = dataList.map((data) =>
+                formatNumber(data.strain_at_failure)
               );
               this.specimenIds = dataList.map((data) => data.specimen_id);
               this.totalDissipatedEnergies = dataList.map(
@@ -374,27 +377,27 @@ export default {
               this.hysteresisAreaSeries = [];
               this.creepSeries = [];
               this.stiffnessSeries = [];
-              zip(this.testIds, dataList).forEach(([testId, data]) => {
+              zip(this.testIds, dataList).forEach(([, data]) => {
                 this.stressStrainSeries.push(
                   ...data.hysteresis_loops.map((loop) => ({
                     type: "line",
-                    name: `${testId}`,
+                    name: data.specimen_name,
                     data: zip(loop.strain, loop.stress),
                   }))
                 );
                 this.hysteresisAreaSeries.push({
                   type: "line",
-                  name: `${testId}`,
+                  name: data.specimen_name,
                   data: zip(data.n_cycles, data.hysteresis_area),
                 });
                 this.creepSeries.push({
                   type: "line",
-                  name: `${testId}`,
+                  name: data.specimen_name,
                   data: zip(data.n_cycles, data.creep),
                 });
                 this.stiffnessSeries.push({
                   type: "line",
-                  name: `${testId}`,
+                  name: data.specimen_name,
                   data: zip(data.n_cycles, data.stiffness),
                 });
               });
@@ -419,6 +422,7 @@ export default {
               const strainOptions = new Set();
               const stressOptions = new Set();
               zip(this.testIds, dataList).forEach(([testId, data]) => {
+                this.specimenName[testId] = data.specimen_name;
                 if (
                   data.crack_displacement.length > 0 &&
                   data.crack_load.length > 0 &&
@@ -426,12 +430,12 @@ export default {
                 ) {
                   this.crackSeries.push({
                     type: "line",
-                    name: `${testId}`,
+                    name: data.specimen_name,
                     data: zip(data.crack_displacement, data.crack_load),
                   });
                   this.crackSeries.push({
                     type: "scatter",
-                    name: `${testId}`,
+                    name: data.specimen_name,
                     yAxisIndex: 1,
                     symbolSize: 6,
                     data: zip(data.crack_displacement, data.crack_length),

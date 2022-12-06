@@ -5,12 +5,13 @@ DAS Data corresponds to the output of Damage summation module.
 
 ## File naming conventions
 
-- Files: `DAS_{Researcher's lastname}_{Date}.json`
-- Files: `DAS_{Researcher's lastname}_{Date}.csv`
+- Files: `DAS_{Researcher's lastname}_{date}[_{methods}].json`
+- Files: `DAS_{Researcher's lastname}_{date}[_{methods}].csv`
 
 with:
 
 - date: `YYYY-MM` (starting month of the experiment)
+- methods (optional): lists the methods used successively in the different modules
 
 ## DAS CSV files standards (column names must be exact) :
 

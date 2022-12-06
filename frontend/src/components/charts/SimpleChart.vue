@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import { formatNumber } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
 import { LineChart } from "echarts/charts";
 import {
@@ -53,7 +54,7 @@ export default {
     };
   },
   computed: {
-    actualOption: function () {
+    actualOption() {
       return {
         title: {
           text: this.title,
@@ -76,12 +77,7 @@ export default {
           min: "dataMin",
           max: "dataMax",
           axisLabel: {
-            formatter: function (value) {
-              return value.toLocaleString(undefined, {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 4,
-              });
-            },
+            formatter: formatNumber,
             hideOverlap: true,
           },
         },
@@ -92,19 +88,14 @@ export default {
           min: "dataMin",
           max: "dataMax",
           axisLabel: {
-            formatter: function (value) {
-              return value.toLocaleString(undefined, {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 4,
-              });
-            },
+            formatter: formatNumber,
             hideOverlap: true,
           },
         },
         tooltip: {
           trigger: "axis",
           confine: true,
-          valueFormatter: (value) => value?.toFixed(2),
+          valueFormatter: formatNumber,
         },
         series: this.series.map((serie) => merge(serie, { showSymbol: false })),
         color: this.color,

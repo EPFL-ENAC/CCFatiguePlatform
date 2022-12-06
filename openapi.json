@@ -1,1493 +1,1452 @@
 {
-    "openapi": "3.0.2",
-    "info": {
-        "title": "ccfatigue",
-        "version": "0.1.0"
-    },
-    "paths": {
-        "/": {
-            "get": {
-                "summary": "Root",
-                "description": "Get AppInfo",
-                "operationId": "root",
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AppInfo"
-                                }
-                            }
-                        }
-                    }
+  "openapi": "3.0.2",
+  "info": {
+    "title": "ccfatigue",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Root",
+        "description": "Get AppInfo",
+        "operationId": "root",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppInfo"
                 }
+              }
             }
-        },
-        "/units": {
-            "get": {
-                "summary": "Get Units",
-                "description": "Get All standardized units",
-                "operationId": "get_units",
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "title": "Response Get Units Units Get",
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/UnitInfo"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/experiments": {
-            "get": {
-                "tags": [
-                    "experiments"
-                ],
-                "summary": "Get Experiments",
-                "description": "Get all experiments",
-                "operationId": "get_experiments",
-                "parameters": [
-                    {
-                        "required": false,
-                        "schema": {
-                            "title": "Query",
-                            "type": "string",
-                            "default": ""
-                        },
-                        "name": "query",
-                        "in": "query"
-                    },
-                    {
-                        "required": false,
-                        "schema": {
-                            "title": "Text Search",
-                            "type": "string",
-                            "default": ""
-                        },
-                        "name": "text_search",
-                        "in": "query"
-                    },
-                    {
-                        "required": false,
-                        "schema": {
-                            "title": "Page",
-                            "minimum": 1.0,
-                            "type": "integer",
-                            "default": 1
-                        },
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "required": false,
-                        "schema": {
-                            "title": "Size",
-                            "maximum": 100.0,
-                            "minimum": 1.0,
-                            "type": "integer",
-                            "default": 50
-                        },
-                        "name": "size",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Page_ExperimentModel_"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/experiments/{field}/distinct": {
-            "get": {
-                "tags": [
-                    "experiments"
-                ],
-                "summary": "Get Field Distinct",
-                "description": "Get all distinct values for field column, sorted",
-                "operationId": "get_field_distinct",
-                "parameters": [
-                    {
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/components/schemas/ExperimentFieldNames"
-                        },
-                        "name": "field",
-                        "in": "path"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "title": "Response Get Field Distinct Experiments  Field  Distinct Get",
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/experiments/{experiment_id}/fatigue/{test_id}": {
-            "get": {
-                "tags": [
-                    "experiments"
-                ],
-                "summary": "Get Fatigue Test",
-                "description": "Return test result data",
-                "operationId": "get_fatigue_test",
-                "parameters": [
-                    {
-                        "required": true,
-                        "schema": {
-                            "title": "Experiment Id",
-                            "type": "integer"
-                        },
-                        "name": "experiment_id",
-                        "in": "path"
-                    },
-                    {
-                        "required": true,
-                        "schema": {
-                            "title": "Test Id",
-                            "type": "integer"
-                        },
-                        "name": "test_id",
-                        "in": "path"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/FatigueTest"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/experiments/{experiment_id}/quasi-static/{test_id}": {
-            "get": {
-                "tags": [
-                    "experiments"
-                ],
-                "summary": "Get Quasi Static Test",
-                "description": "Return quasi static test",
-                "operationId": "get_quasi_static_test",
-                "parameters": [
-                    {
-                        "required": true,
-                        "schema": {
-                            "title": "Experiment Id",
-                            "type": "integer"
-                        },
-                        "name": "experiment_id",
-                        "in": "path"
-                    },
-                    {
-                        "required": true,
-                        "schema": {
-                            "title": "Test Id",
-                            "type": "integer"
-                        },
-                        "name": "test_id",
-                        "in": "path"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/QuasiStaticTest"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/experiments/data_preprocess_check": {
-            "post": {
-                "tags": [
-                    "experiments"
-                ],
-                "summary": "Post Data Preprocess Check",
-                "operationId": "post_data_preprocess_check",
-                "requestBody": {
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/Body_post_data_preprocess_check_experiments_data_preprocess_check_post"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Experiment_Data_Preprocessed"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/tests": {
-            "get": {
-                "tags": [
-                    "tests"
-                ],
-                "summary": "Get Tests",
-                "description": "Get all tests for specific experiment",
-                "operationId": "get_tests",
-                "parameters": [
-                    {
-                        "required": true,
-                        "schema": {
-                            "title": "Experiment Id",
-                            "type": "integer"
-                        },
-                        "name": "experiment_id",
-                        "in": "query"
-                    },
-                    {
-                        "required": false,
-                        "schema": {
-                            "title": "Page",
-                            "minimum": 1.0,
-                            "type": "integer",
-                            "default": 1
-                        },
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "required": false,
-                        "schema": {
-                            "title": "Size",
-                            "maximum": 100.0,
-                            "minimum": 1.0,
-                            "type": "integer",
-                            "default": 50
-                        },
-                        "name": "size",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Page_TestModel_"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/analysis/cycleCounting/file": {
-            "post": {
-                "tags": [
-                    "analysis"
-                ],
-                "summary": "Run Cycle Counting File",
-                "operationId": "run_cycle_counting_file",
-                "parameters": [
-                    {
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/components/schemas/CycleCountingMethod"
-                        },
-                        "name": "method",
-                        "in": "query"
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/Body_run_cycle_counting_file_analysis_cycleCounting_file_post"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "title": "Response Run Cycle Counting File Analysis Cyclecounting File Post",
-                                    "type": "string",
-                                    "format": "binary"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/analysis/snCurve/file": {
-            "post": {
-                "tags": [
-                    "analysis"
-                ],
-                "summary": "Run Sn Curve File",
-                "operationId": "run_sn_curve_file",
-                "parameters": [
-                    {
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/components/schemas/SnCurveMethod"
-                            }
-                        },
-                        "name": "methods",
-                        "in": "query"
-                    },
-                    {
-                        "required": true,
-                        "schema": {
-                            "title": "Rratios",
-                            "type": "array",
-                            "items": {
-                                "type": "number"
-                            }
-                        },
-                        "name": "rRatios",
-                        "in": "query"
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/Body_run_sn_curve_file_analysis_snCurve_file_post"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SnCurveResult"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/analysis/cld/file": {
-            "post": {
-                "tags": [
-                    "analysis"
-                ],
-                "summary": "Run Cld File",
-                "operationId": "run_cld_file",
-                "parameters": [
-                    {
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/components/schemas/CldMethod"
-                        },
-                        "name": "method",
-                        "in": "query"
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/Body_run_cld_file_analysis_cld_file_post"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "title": "Response Run Cld File Analysis Cld File Post",
-                                    "type": "string",
-                                    "format": "binary"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/analysis/fatigueFailure/file": {
-            "post": {
-                "tags": [
-                    "analysis"
-                ],
-                "summary": "Run Fatigue Failure File",
-                "operationId": "run_fatigue_failure_file",
-                "parameters": [
-                    {
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/components/schemas/FatigueFailureMethod"
-                        },
-                        "name": "method",
-                        "in": "query"
-                    },
-                    {
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/components/schemas/SnModel"
-                        },
-                        "name": "snModel",
-                        "in": "query"
-                    },
-                    {
-                        "required": true,
-                        "schema": {
-                            "title": "Desirableangle",
-                            "type": "number"
-                        },
-                        "name": "desirableAngle",
-                        "in": "query"
-                    },
-                    {
-                        "required": true,
-                        "schema": {
-                            "title": "Offaxisangle",
-                            "type": "number"
-                        },
-                        "name": "offAxisAngle",
-                        "in": "query"
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/Body_run_fatigue_failure_file_analysis_fatigueFailure_file_post"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "title": "Response Run Fatigue Failure File Analysis Fatiguefailure File Post",
-                                    "type": "string",
-                                    "format": "binary"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/analysis/damageSummation/file": {
-            "post": {
-                "tags": [
-                    "analysis"
-                ],
-                "summary": "Run Damage Summation File",
-                "operationId": "run_damage_summation_file",
-                "parameters": [
-                    {
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/components/schemas/DamageSummationMethod"
-                        },
-                        "name": "method",
-                        "in": "query"
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/Body_run_damage_summation_file_analysis_damageSummation_file_post"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "title": "Response Run Damage Summation File Analysis Damagesummation File Post",
-                                    "type": "string",
-                                    "format": "binary"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+          }
         }
+      }
     },
-    "components": {
-        "schemas": {
-            "AppInfo": {
-                "title": "AppInfo",
-                "required": [
-                    "name",
-                    "version"
-                ],
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "title": "Name",
-                        "type": "string"
-                    },
-                    "version": {
-                        "title": "Version",
-                        "type": "string"
-                    }
-                },
-                "description": "App Info"
-            },
-            "Body_post_data_preprocess_check_experiments_data_preprocess_check_post": {
-                "title": "Body_post_data_preprocess_check_experiments_data_preprocess_check_post",
-                "required": [
-                    "file"
-                ],
-                "type": "object",
-                "properties": {
-                    "file": {
-                        "title": "File",
-                        "type": "string",
-                        "format": "binary"
-                    }
+    "/units": {
+      "get": {
+        "summary": "Get Units",
+        "description": "Get All standardized units",
+        "operationId": "get_units",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Get Units Units Get",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UnitInfo"
+                  }
                 }
-            },
-            "Body_run_cld_file_analysis_cld_file_post": {
-                "title": "Body_run_cld_file_analysis_cld_file_post",
-                "required": [
-                    "file"
-                ],
-                "type": "object",
-                "properties": {
-                    "file": {
-                        "title": "File",
-                        "type": "string",
-                        "format": "binary"
-                    }
-                }
-            },
-            "Body_run_cycle_counting_file_analysis_cycleCounting_file_post": {
-                "title": "Body_run_cycle_counting_file_analysis_cycleCounting_file_post",
-                "required": [
-                    "file"
-                ],
-                "type": "object",
-                "properties": {
-                    "file": {
-                        "title": "File",
-                        "type": "string",
-                        "format": "binary"
-                    }
-                }
-            },
-            "Body_run_damage_summation_file_analysis_damageSummation_file_post": {
-                "title": "Body_run_damage_summation_file_analysis_damageSummation_file_post",
-                "required": [
-                    "sncFile",
-                    "cycFile"
-                ],
-                "type": "object",
-                "properties": {
-                    "sncFile": {
-                        "title": "Sncfile",
-                        "type": "string",
-                        "format": "binary"
-                    },
-                    "cycFile": {
-                        "title": "Cycfile",
-                        "type": "string",
-                        "format": "binary"
-                    }
-                }
-            },
-            "Body_run_fatigue_failure_file_analysis_fatigueFailure_file_post": {
-                "title": "Body_run_fatigue_failure_file_analysis_fatigueFailure_file_post",
-                "required": [
-                    "xFile",
-                    "yFile",
-                    "fFile"
-                ],
-                "type": "object",
-                "properties": {
-                    "xFile": {
-                        "title": "Xfile",
-                        "type": "string",
-                        "format": "binary"
-                    },
-                    "yFile": {
-                        "title": "Yfile",
-                        "type": "string",
-                        "format": "binary"
-                    },
-                    "fFile": {
-                        "title": "Ffile",
-                        "type": "string",
-                        "format": "binary"
-                    }
-                }
-            },
-            "Body_run_sn_curve_file_analysis_snCurve_file_post": {
-                "title": "Body_run_sn_curve_file_analysis_snCurve_file_post",
-                "required": [
-                    "file"
-                ],
-                "type": "object",
-                "properties": {
-                    "file": {
-                        "title": "File",
-                        "type": "string",
-                        "format": "binary"
-                    }
-                }
-            },
-            "CldMethod": {
-                "title": "CldMethod",
-                "enum": [
-                    "Harris"
-                ],
-                "type": "string",
-                "description": "An enumeration."
-            },
-            "CycleCountingMethod": {
-                "title": "CycleCountingMethod",
-                "enum": [
-                    "RangeMean"
-                ],
-                "type": "string",
-                "description": "An enumeration."
-            },
-            "DamageSummationMethod": {
-                "title": "DamageSummationMethod",
-                "enum": [
-                    "Harris"
-                ],
-                "type": "string",
-                "description": "An enumeration."
-            },
-            "EchartLine": {
-                "title": "EchartLine",
-                "required": [
-                    "name",
-                    "xData",
-                    "yData"
-                ],
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "title": "Name",
-                        "type": "string"
-                    },
-                    "xData": {
-                        "title": "Xdata",
-                        "type": "array",
-                        "items": {
-                            "type": "number"
-                        }
-                    },
-                    "yData": {
-                        "title": "Ydata",
-                        "type": "array",
-                        "items": {
-                            "type": "number"
-                        }
-                    }
-                }
-            },
-            "ExperimentFieldNames": {
-                "title": "ExperimentFieldNames",
-                "enum": [
-                    "fracture_mode",
-                    "material_type_fiber_material",
-                    "material_type_resin",
-                    "laminates_and_assemblies_stacking_sequence"
-                ],
-                "type": "string",
-                "description": "\n    Enumerate all fields that can be requested as distinct\n    "
-            },
-            "ExperimentModel": {
-                "title": "ExperimentModel",
-                "required": [
-                    "id",
-                    "researcher",
-                    "experiment_type",
-                    "fracture"
-                ],
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "title": "Id",
-                        "type": "integer"
-                    },
-                    "laboratory": {
-                        "title": "Laboratory",
-                        "type": "string"
-                    },
-                    "researcher": {
-                        "title": "Researcher",
-                        "type": "string"
-                    },
-                    "date": {
-                        "title": "Date",
-                        "type": "string"
-                    },
-                    "experiment_type": {
-                        "title": "Experiment Type",
-                        "type": "string"
-                    },
-                    "fracture": {
-                        "title": "Fracture",
-                        "type": "boolean"
-                    },
-                    "fracture_mode": {
-                        "title": "Fracture Mode",
-                        "type": "string"
-                    },
-                    "fatigue_test_type": {
-                        "title": "Fatigue Test Type",
-                        "type": "string"
-                    },
-                    "quasi_static_test_type": {
-                        "title": "Quasi Static Test Type",
-                        "type": "string"
-                    },
-                    "temperature_test_type": {
-                        "title": "Temperature Test Type",
-                        "type": "string"
-                    },
-                    "measuring_equipment": {
-                        "title": "Measuring Equipment",
-                        "type": "string"
-                    },
-                    "reliability_level": {
-                        "title": "Reliability Level",
-                        "type": "number"
-                    },
-                    "control_mode": {
-                        "title": "Control Mode",
-                        "type": "string"
-                    },
-                    "publication_title": {
-                        "title": "Publication Title",
-                        "type": "string"
-                    },
-                    "publication_author": {
-                        "title": "Publication Author",
-                        "type": "string"
-                    },
-                    "publication_year": {
-                        "title": "Publication Year",
-                        "type": "string"
-                    },
-                    "publication_doi": {
-                        "title": "Publication Doi",
-                        "type": "string"
-                    },
-                    "publication_images_repository": {
-                        "title": "Publication Images Repository",
-                        "type": "string"
-                    },
-                    "material_type_sample_type": {
-                        "title": "Material Type Sample Type",
-                        "type": "string"
-                    },
-                    "material_type_fiber_material": {
-                        "title": "Material Type Fiber Material",
-                        "type": "string"
-                    },
-                    "material_type_fiber_form": {
-                        "title": "Material Type Fiber Form",
-                        "type": "string"
-                    },
-                    "material_type_area_density": {
-                        "title": "Material Type Area Density",
-                        "type": "number"
-                    },
-                    "material_type_resin": {
-                        "title": "Material Type Resin",
-                        "type": "string"
-                    },
-                    "material_type_hardener": {
-                        "title": "Material Type Hardener",
-                        "type": "string"
-                    },
-                    "material_type_mixing_ratio": {
-                        "title": "Material Type Mixing Ratio",
-                        "type": "string"
-                    },
-                    "laminates_and_assemblies_curing_time": {
-                        "title": "Laminates And Assemblies Curing Time",
-                        "type": "number"
-                    },
-                    "laminates_and_assemblies_curing_temperature": {
-                        "title": "Laminates And Assemblies Curing Temperature",
-                        "type": "number"
-                    },
-                    "laminates_and_assemblies_curing_pressure": {
-                        "title": "Laminates And Assemblies Curing Pressure",
-                        "type": "number"
-                    },
-                    "laminates_and_assemblies_fiber_volume_ratio": {
-                        "title": "Laminates And Assemblies Fiber Volume Ratio",
-                        "type": "number"
-                    },
-                    "laminates_and_assemblies_stacking_sequence": {
-                        "title": "Laminates And Assemblies Stacking Sequence",
-                        "type": "string"
-                    },
-                    "measurement_measuring_points": {
-                        "title": "Measurement Measuring Points",
-                        "type": "integer"
-                    },
-                    "dic_analysis_subset_size": {
-                        "title": "Dic Analysis Subset Size",
-                        "type": "integer"
-                    },
-                    "dic_analysis_step_size": {
-                        "title": "Dic Analysis Step Size",
-                        "type": "integer"
-                    }
-                },
-                "description": "Defines how experiment is seen on the API"
-            },
-            "Experiment_Data_Preprocessed": {
-                "title": "Experiment_Data_Preprocessed",
-                "required": [
-                    "output",
-                    "success"
-                ],
-                "type": "object",
-                "properties": {
-                    "output": {
-                        "title": "Output",
-                        "type": "array",
-                        "items": {}
-                    },
-                    "success": {
-                        "title": "Success",
-                        "type": "boolean"
-                    }
-                }
-            },
-            "FatigueFailureMethod": {
-                "title": "FatigueFailureMethod",
-                "enum": [
-                    "FTPT"
-                ],
-                "type": "string",
-                "description": "An enumeration."
-            },
-            "FatigueTest": {
-                "title": "FatigueTest",
-                "required": [
-                    "specimen_id",
-                    "total_dissipated_energy",
-                    "run_out",
-                    "stress_ratio",
-                    "hysteresis_loops",
-                    "n_cycles",
-                    "creep",
-                    "hysteresis_area",
-                    "stiffness",
-                    "stress_at_failure",
-                    "strain_at_failure",
-                    "n_fail"
-                ],
-                "type": "object",
-                "properties": {
-                    "specimen_id": {
-                        "title": "Specimen Id",
-                        "type": "integer"
-                    },
-                    "total_dissipated_energy": {
-                        "title": "Total Dissipated Energy",
-                        "type": "integer"
-                    },
-                    "run_out": {
-                        "title": "Run Out",
-                        "type": "boolean"
-                    },
-                    "stress_ratio": {
-                        "title": "Stress Ratio",
-                        "type": "number"
-                    },
-                    "hysteresis_loops": {
-                        "title": "Hysteresis Loops",
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/HysteresisLoop"
-                        }
-                    },
-                    "n_cycles": {
-                        "title": "N Cycles",
-                        "type": "array",
-                        "items": {
-                            "type": "number"
-                        }
-                    },
-                    "creep": {
-                        "title": "Creep",
-                        "type": "array",
-                        "items": {
-                            "type": "number"
-                        }
-                    },
-                    "hysteresis_area": {
-                        "title": "Hysteresis Area",
-                        "type": "array",
-                        "items": {
-                            "type": "number"
-                        }
-                    },
-                    "stiffness": {
-                        "title": "Stiffness",
-                        "type": "array",
-                        "items": {
-                            "type": "number"
-                        }
-                    },
-                    "stress_at_failure": {
-                        "title": "Stress At Failure",
-                        "type": "number"
-                    },
-                    "strain_at_failure": {
-                        "title": "Strain At Failure",
-                        "type": "number"
-                    },
-                    "n_fail": {
-                        "title": "N Fail",
-                        "type": "integer"
-                    }
-                }
-            },
-            "HTTPValidationError": {
-                "title": "HTTPValidationError",
-                "type": "object",
-                "properties": {
-                    "detail": {
-                        "title": "Detail",
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ValidationError"
-                        }
-                    }
-                }
-            },
-            "HysteresisLoop": {
-                "title": "HysteresisLoop",
-                "required": [
-                    "n_cycles",
-                    "strain",
-                    "stress"
-                ],
-                "type": "object",
-                "properties": {
-                    "n_cycles": {
-                        "title": "N Cycles",
-                        "type": "array",
-                        "items": {
-                            "type": "number"
-                        }
-                    },
-                    "strain": {
-                        "title": "Strain",
-                        "type": "array",
-                        "items": {
-                            "type": "number"
-                        }
-                    },
-                    "stress": {
-                        "title": "Stress",
-                        "type": "array",
-                        "items": {
-                            "type": "number"
-                        }
-                    }
-                }
-            },
-            "Page_ExperimentModel_": {
-                "title": "Page[ExperimentModel]",
-                "required": [
-                    "items",
-                    "total",
-                    "page",
-                    "size"
-                ],
-                "type": "object",
-                "properties": {
-                    "items": {
-                        "title": "Items",
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ExperimentModel"
-                        }
-                    },
-                    "total": {
-                        "title": "Total",
-                        "minimum": 0.0,
-                        "type": "integer"
-                    },
-                    "page": {
-                        "title": "Page",
-                        "minimum": 1.0,
-                        "type": "integer"
-                    },
-                    "size": {
-                        "title": "Size",
-                        "minimum": 1.0,
-                        "type": "integer"
-                    }
-                }
-            },
-            "Page_TestModel_": {
-                "title": "Page[TestModel]",
-                "required": [
-                    "items",
-                    "total",
-                    "page",
-                    "size"
-                ],
-                "type": "object",
-                "properties": {
-                    "items": {
-                        "title": "Items",
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/TestModel"
-                        }
-                    },
-                    "total": {
-                        "title": "Total",
-                        "minimum": 0.0,
-                        "type": "integer"
-                    },
-                    "page": {
-                        "title": "Page",
-                        "minimum": 1.0,
-                        "type": "integer"
-                    },
-                    "size": {
-                        "title": "Size",
-                        "minimum": 1.0,
-                        "type": "integer"
-                    }
-                }
-            },
-            "QuasiStaticTest": {
-                "title": "QuasiStaticTest",
-                "required": [
-                    "crack_displacement",
-                    "crack_load",
-                    "crack_length",
-                    "displacement",
-                    "load",
-                    "strain",
-                    "stress"
-                ],
-                "type": "object",
-                "properties": {
-                    "crack_displacement": {
-                        "title": "Crack Displacement",
-                        "type": "array",
-                        "items": {
-                            "type": "number"
-                        }
-                    },
-                    "crack_load": {
-                        "title": "Crack Load",
-                        "type": "array",
-                        "items": {
-                            "type": "number"
-                        }
-                    },
-                    "crack_length": {
-                        "title": "Crack Length",
-                        "type": "array",
-                        "items": {
-                            "type": "number"
-                        }
-                    },
-                    "displacement": {
-                        "title": "Displacement",
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "array",
-                            "items": {
-                                "type": "number"
-                            }
-                        }
-                    },
-                    "load": {
-                        "title": "Load",
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "array",
-                            "items": {
-                                "type": "number"
-                            }
-                        }
-                    },
-                    "strain": {
-                        "title": "Strain",
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "array",
-                            "items": {
-                                "type": "number"
-                            }
-                        }
-                    },
-                    "stress": {
-                        "title": "Stress",
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "array",
-                            "items": {
-                                "type": "number"
-                            }
-                        }
-                    }
-                }
-            },
-            "SnCurveMethod": {
-                "title": "SnCurveMethod",
-                "enum": [
-                    "LinLog",
-                    "LogLog",
-                    "Sendeckyj"
-                ],
-                "type": "string",
-                "description": "An enumeration."
-            },
-            "SnCurveResult": {
-                "title": "SnCurveResult",
-                "required": [
-                    "outputs",
-                    "lines"
-                ],
-                "type": "object",
-                "properties": {
-                    "outputs": {
-                        "title": "Outputs",
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "string",
-                            "format": "binary"
-                        }
-                    },
-                    "lines": {
-                        "title": "Lines",
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/EchartLine"
-                        }
-                    }
-                }
-            },
-            "SnModel": {
-                "title": "SnModel",
-                "enum": [
-                    "Lin-Log",
-                    "Log-Log"
-                ],
-                "type": "string",
-                "description": "An enumeration."
-            },
-            "TestModel": {
-                "title": "TestModel",
-                "required": [
-                    "id",
-                    "experiment_id"
-                ],
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "title": "Id",
-                        "type": "integer"
-                    },
-                    "experiment_id": {
-                        "title": "Experiment Id",
-                        "type": "integer"
-                    },
-                    "specimen_number": {
-                        "title": "Specimen Number",
-                        "type": "integer"
-                    },
-                    "specimen_name": {
-                        "title": "Specimen Name",
-                        "type": "string"
-                    },
-                    "stress_ratio": {
-                        "title": "Stress Ratio",
-                        "type": "number"
-                    },
-                    "maximum_stress": {
-                        "title": "Maximum Stress",
-                        "type": "number"
-                    },
-                    "frequency": {
-                        "title": "Frequency",
-                        "type": "number"
-                    },
-                    "run_out": {
-                        "title": "Run Out",
-                        "type": "boolean"
-                    },
-                    "displacement_controlled_loading_rate": {
-                        "title": "Displacement Controlled Loading Rate",
-                        "type": "number"
-                    },
-                    "load_controlled_loading_rate": {
-                        "title": "Load Controlled Loading Rate",
-                        "type": "number"
-                    },
-                    "length": {
-                        "title": "Length",
-                        "type": "number"
-                    },
-                    "width": {
-                        "title": "Width",
-                        "type": "number"
-                    },
-                    "thickness": {
-                        "title": "Thickness",
-                        "type": "number"
-                    },
-                    "temperature": {
-                        "title": "Temperature",
-                        "type": "number"
-                    },
-                    "humidity": {
-                        "title": "Humidity",
-                        "type": "number"
-                    },
-                    "initial_crack_length": {
-                        "title": "Initial Crack Length",
-                        "type": "number"
-                    }
-                },
-                "description": "Defines how test is seen on the API"
-            },
-            "UnitInfo": {
-                "title": "UnitInfo",
-                "required": [
-                    "subject",
-                    "unit"
-                ],
-                "type": "object",
-                "properties": {
-                    "subject": {
-                        "title": "Subject",
-                        "type": "string"
-                    },
-                    "unit": {
-                        "title": "Unit",
-                        "type": "string"
-                    }
-                },
-                "description": "Unit Info"
-            },
-            "ValidationError": {
-                "title": "ValidationError",
-                "required": [
-                    "loc",
-                    "msg",
-                    "type"
-                ],
-                "type": "object",
-                "properties": {
-                    "loc": {
-                        "title": "Location",
-                        "type": "array",
-                        "items": {
-                            "anyOf": [
-                                {
-                                    "type": "string"
-                                },
-                                {
-                                    "type": "integer"
-                                }
-                            ]
-                        }
-                    },
-                    "msg": {
-                        "title": "Message",
-                        "type": "string"
-                    },
-                    "type": {
-                        "title": "Error Type",
-                        "type": "string"
-                    }
-                }
+              }
             }
+          }
         }
+      }
+    },
+    "/experiments": {
+      "get": {
+        "tags": [
+          "experiments"
+        ],
+        "summary": "Get Experiments",
+        "description": "Get all experiments",
+        "operationId": "get_experiments",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "title": "Query",
+              "type": "string",
+              "default": ""
+            },
+            "name": "query",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Text Search",
+              "type": "string",
+              "default": ""
+            },
+            "name": "text_search",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Page",
+              "minimum": 1.0,
+              "type": "integer",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Size",
+              "maximum": 100.0,
+              "minimum": 1.0,
+              "type": "integer",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ExperimentModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/experiments/{field}/distinct": {
+      "get": {
+        "tags": [
+          "experiments"
+        ],
+        "summary": "Get Field Distinct",
+        "description": "Get all distinct values for field column, sorted",
+        "operationId": "get_field_distinct",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ExperimentFieldNames"
+            },
+            "name": "field",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Get Field Distinct Experiments  Field  Distinct Get",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/experiments/{experiment_id}/fatigue/{test_id}": {
+      "get": {
+        "tags": [
+          "experiments"
+        ],
+        "summary": "Get Fatigue Test",
+        "description": "Return test result data",
+        "operationId": "get_fatigue_test",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Experiment Id",
+              "type": "integer"
+            },
+            "name": "experiment_id",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Test Id",
+              "type": "integer"
+            },
+            "name": "test_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FatigueTest"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/experiments/{experiment_id}/quasi-static/{test_id}": {
+      "get": {
+        "tags": [
+          "experiments"
+        ],
+        "summary": "Get Quasi Static Test",
+        "description": "Return quasi static test",
+        "operationId": "get_quasi_static_test",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Experiment Id",
+              "type": "integer"
+            },
+            "name": "experiment_id",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Test Id",
+              "type": "integer"
+            },
+            "name": "test_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuasiStaticTest"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/experiments/data_preprocess_check": {
+      "post": {
+        "tags": [
+          "experiments"
+        ],
+        "summary": "Post Data Preprocess Check",
+        "operationId": "post_data_preprocess_check",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_post_data_preprocess_check_experiments_data_preprocess_check_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Experiment_Data_Preprocessed"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tests": {
+      "get": {
+        "tags": [
+          "tests"
+        ],
+        "summary": "Get Tests",
+        "description": "Get all tests for specific experiment",
+        "operationId": "get_tests",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Experiment Id",
+              "type": "integer"
+            },
+            "name": "experiment_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Page",
+              "minimum": 1.0,
+              "type": "integer",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Size",
+              "maximum": 100.0,
+              "minimum": 1.0,
+              "type": "integer",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_TestModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analysis/cycleCounting/file": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run Cycle Counting File",
+        "operationId": "run_cycle_counting_file",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CycleCountingMethod"
+            },
+            "name": "method",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_cycle_counting_file_analysis_cycleCounting_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Run Cycle Counting File Analysis Cyclecounting File Post",
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analysis/snCurve/file": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run Sn Curve File",
+        "operationId": "run_sn_curve_file",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/SnCurveMethod"
+            },
+            "name": "method",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_sn_curve_file_analysis_snCurve_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analysis/cld/file": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run Cld File",
+        "operationId": "run_cld_file",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CldMethod"
+            },
+            "name": "method",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_cld_file_analysis_cld_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Run Cld File Analysis Cld File Post",
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analysis/fatigueFailure/file": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run Fatigue Failure File",
+        "operationId": "run_fatigue_failure_file",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/FatigueFailureMethod"
+            },
+            "name": "method",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/FatigueModel"
+            },
+            "name": "snModel",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Desirableangle",
+              "type": "number"
+            },
+            "name": "desirableAngle",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Offaxisangle",
+              "type": "number"
+            },
+            "name": "offAxisAngle",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_fatigue_failure_file_analysis_fatigueFailure_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analysis/damageSummation/file": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run Damage Summation File",
+        "operationId": "run_damage_summation_file",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/DamageSummationMethod"
+            },
+            "name": "method",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_damage_summation_file_analysis_damageSummation_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Run Damage Summation File Analysis Damagesummation File Post",
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
+  },
+  "components": {
+    "schemas": {
+      "AnalysisResult": {
+        "title": "AnalysisResult",
+        "required": [
+          "csv_data",
+          "json_data"
+        ],
+        "type": "object",
+        "properties": {
+          "csv_data": {
+            "title": "Csv Data",
+            "type": "string",
+            "format": "binary"
+          },
+          "json_data": {
+            "title": "Json Data",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "AppInfo": {
+        "title": "AppInfo",
+        "required": [
+          "name",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "description": "App Info"
+      },
+      "Body_post_data_preprocess_check_experiments_data_preprocess_check_post": {
+        "title": "Body_post_data_preprocess_check_experiments_data_preprocess_check_post",
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "Body_run_cld_file_analysis_cld_file_post": {
+        "title": "Body_run_cld_file_analysis_cld_file_post",
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "Body_run_cycle_counting_file_analysis_cycleCounting_file_post": {
+        "title": "Body_run_cycle_counting_file_analysis_cycleCounting_file_post",
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "Body_run_damage_summation_file_analysis_damageSummation_file_post": {
+        "title": "Body_run_damage_summation_file_analysis_damageSummation_file_post",
+        "required": [
+          "sncFile",
+          "cycFile"
+        ],
+        "type": "object",
+        "properties": {
+          "sncFile": {
+            "title": "Sncfile",
+            "type": "string",
+            "format": "binary"
+          },
+          "cycFile": {
+            "title": "Cycfile",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "Body_run_fatigue_failure_file_analysis_fatigueFailure_file_post": {
+        "title": "Body_run_fatigue_failure_file_analysis_fatigueFailure_file_post",
+        "required": [
+          "xFile",
+          "yFile",
+          "fFile"
+        ],
+        "type": "object",
+        "properties": {
+          "xFile": {
+            "title": "Xfile",
+            "type": "string",
+            "format": "binary"
+          },
+          "yFile": {
+            "title": "Yfile",
+            "type": "string",
+            "format": "binary"
+          },
+          "fFile": {
+            "title": "Ffile",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "Body_run_sn_curve_file_analysis_snCurve_file_post": {
+        "title": "Body_run_sn_curve_file_analysis_snCurve_file_post",
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "CldMethod": {
+        "title": "CldMethod",
+        "enum": [
+          "Harris"
+        ],
+        "type": "string",
+        "description": "An enumeration."
+      },
+      "CycleCountingMethod": {
+        "title": "CycleCountingMethod",
+        "enum": [
+          "RangeMean"
+        ],
+        "type": "string",
+        "description": "An enumeration."
+      },
+      "DamageSummationMethod": {
+        "title": "DamageSummationMethod",
+        "enum": [
+          "Harris"
+        ],
+        "type": "string",
+        "description": "An enumeration."
+      },
+      "ExperimentFieldNames": {
+        "title": "ExperimentFieldNames",
+        "enum": [
+          "fracture_mode",
+          "material_type_fiber_material",
+          "material_type_resin",
+          "laminates_and_assemblies_stacking_sequence"
+        ],
+        "type": "string",
+        "description": "\n    Enumerate all fields that can be requested as distinct\n    "
+      },
+      "ExperimentModel": {
+        "title": "ExperimentModel",
+        "required": [
+          "id",
+          "researcher",
+          "experiment_type",
+          "fracture"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "laboratory": {
+            "title": "Laboratory",
+            "type": "string"
+          },
+          "researcher": {
+            "title": "Researcher",
+            "type": "string"
+          },
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "experiment_type": {
+            "title": "Experiment Type",
+            "type": "string"
+          },
+          "fracture": {
+            "title": "Fracture",
+            "type": "boolean"
+          },
+          "fracture_mode": {
+            "title": "Fracture Mode",
+            "type": "string"
+          },
+          "fatigue_test_type": {
+            "title": "Fatigue Test Type",
+            "type": "string"
+          },
+          "quasi_static_test_type": {
+            "title": "Quasi Static Test Type",
+            "type": "string"
+          },
+          "temperature_test_type": {
+            "title": "Temperature Test Type",
+            "type": "string"
+          },
+          "measuring_equipment": {
+            "title": "Measuring Equipment",
+            "type": "string"
+          },
+          "reliability_level": {
+            "title": "Reliability Level",
+            "type": "number"
+          },
+          "control_mode": {
+            "title": "Control Mode",
+            "type": "string"
+          },
+          "publication_title": {
+            "title": "Publication Title",
+            "type": "string"
+          },
+          "publication_author": {
+            "title": "Publication Author",
+            "type": "string"
+          },
+          "publication_year": {
+            "title": "Publication Year",
+            "type": "string"
+          },
+          "publication_doi": {
+            "title": "Publication Doi",
+            "type": "string"
+          },
+          "publication_images_repository": {
+            "title": "Publication Images Repository",
+            "type": "string"
+          },
+          "material_type_sample_type": {
+            "title": "Material Type Sample Type",
+            "type": "string"
+          },
+          "material_type_fiber_material": {
+            "title": "Material Type Fiber Material",
+            "type": "string"
+          },
+          "material_type_fiber_form": {
+            "title": "Material Type Fiber Form",
+            "type": "string"
+          },
+          "material_type_area_density": {
+            "title": "Material Type Area Density",
+            "type": "number"
+          },
+          "material_type_resin": {
+            "title": "Material Type Resin",
+            "type": "string"
+          },
+          "material_type_hardener": {
+            "title": "Material Type Hardener",
+            "type": "string"
+          },
+          "material_type_mixing_ratio": {
+            "title": "Material Type Mixing Ratio",
+            "type": "string"
+          },
+          "laminates_and_assemblies_curing_time": {
+            "title": "Laminates And Assemblies Curing Time",
+            "type": "number"
+          },
+          "laminates_and_assemblies_curing_temperature": {
+            "title": "Laminates And Assemblies Curing Temperature",
+            "type": "number"
+          },
+          "laminates_and_assemblies_curing_pressure": {
+            "title": "Laminates And Assemblies Curing Pressure",
+            "type": "number"
+          },
+          "laminates_and_assemblies_fiber_volume_ratio": {
+            "title": "Laminates And Assemblies Fiber Volume Ratio",
+            "type": "number"
+          },
+          "laminates_and_assemblies_stacking_sequence": {
+            "title": "Laminates And Assemblies Stacking Sequence",
+            "type": "string"
+          },
+          "measurement_measuring_points": {
+            "title": "Measurement Measuring Points",
+            "type": "integer"
+          },
+          "dic_analysis_subset_size": {
+            "title": "Dic Analysis Subset Size",
+            "type": "integer"
+          },
+          "dic_analysis_step_size": {
+            "title": "Dic Analysis Step Size",
+            "type": "integer"
+          }
+        },
+        "description": "Defines how experiment is seen on the API"
+      },
+      "Experiment_Data_Preprocessed": {
+        "title": "Experiment_Data_Preprocessed",
+        "required": [
+          "output",
+          "success"
+        ],
+        "type": "object",
+        "properties": {
+          "output": {
+            "title": "Output",
+            "type": "array",
+            "items": {}
+          },
+          "success": {
+            "title": "Success",
+            "type": "boolean"
+          }
+        }
+      },
+      "FatigueFailureMethod": {
+        "title": "FatigueFailureMethod",
+        "enum": [
+          "FTPT"
+        ],
+        "type": "string",
+        "description": "An enumeration."
+      },
+      "FatigueModel": {
+        "title": "FatigueModel",
+        "enum": [
+          "Lin-Log",
+          "Log-Log"
+        ],
+        "type": "string",
+        "description": "An enumeration."
+      },
+      "FatigueTest": {
+        "title": "FatigueTest",
+        "required": [
+          "specimen_id",
+          "specimen_name",
+          "total_dissipated_energy",
+          "run_out",
+          "stress_ratio",
+          "hysteresis_loops",
+          "n_cycles",
+          "creep",
+          "hysteresis_area",
+          "stiffness",
+          "stress_at_failure",
+          "strain_at_failure",
+          "n_fail"
+        ],
+        "type": "object",
+        "properties": {
+          "specimen_id": {
+            "title": "Specimen Id",
+            "type": "integer"
+          },
+          "specimen_name": {
+            "title": "Specimen Name",
+            "type": "string"
+          },
+          "total_dissipated_energy": {
+            "title": "Total Dissipated Energy",
+            "type": "integer"
+          },
+          "run_out": {
+            "title": "Run Out",
+            "type": "boolean"
+          },
+          "stress_ratio": {
+            "title": "Stress Ratio",
+            "type": "number"
+          },
+          "hysteresis_loops": {
+            "title": "Hysteresis Loops",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HysteresisLoop"
+            }
+          },
+          "n_cycles": {
+            "title": "N Cycles",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "creep": {
+            "title": "Creep",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "hysteresis_area": {
+            "title": "Hysteresis Area",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "stiffness": {
+            "title": "Stiffness",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "stress_at_failure": {
+            "title": "Stress At Failure",
+            "type": "number"
+          },
+          "strain_at_failure": {
+            "title": "Strain At Failure",
+            "type": "number"
+          },
+          "n_fail": {
+            "title": "N Fail",
+            "type": "integer"
+          }
+        }
+      },
+      "HTTPValidationError": {
+        "title": "HTTPValidationError",
+        "type": "object",
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            }
+          }
+        }
+      },
+      "HysteresisLoop": {
+        "title": "HysteresisLoop",
+        "required": [
+          "n_cycles",
+          "strain",
+          "stress"
+        ],
+        "type": "object",
+        "properties": {
+          "n_cycles": {
+            "title": "N Cycles",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "strain": {
+            "title": "Strain",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "stress": {
+            "title": "Stress",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "Page_ExperimentModel_": {
+        "title": "Page[ExperimentModel]",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "size"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "title": "Items",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExperimentModel"
+            }
+          },
+          "total": {
+            "title": "Total",
+            "minimum": 0.0,
+            "type": "integer"
+          },
+          "page": {
+            "title": "Page",
+            "minimum": 1.0,
+            "type": "integer"
+          },
+          "size": {
+            "title": "Size",
+            "minimum": 1.0,
+            "type": "integer"
+          }
+        }
+      },
+      "Page_TestModel_": {
+        "title": "Page[TestModel]",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "size"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "title": "Items",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestModel"
+            }
+          },
+          "total": {
+            "title": "Total",
+            "minimum": 0.0,
+            "type": "integer"
+          },
+          "page": {
+            "title": "Page",
+            "minimum": 1.0,
+            "type": "integer"
+          },
+          "size": {
+            "title": "Size",
+            "minimum": 1.0,
+            "type": "integer"
+          }
+        }
+      },
+      "QuasiStaticTest": {
+        "title": "QuasiStaticTest",
+        "required": [
+          "specimen_name",
+          "crack_displacement",
+          "crack_load",
+          "crack_length",
+          "displacement",
+          "load",
+          "strain",
+          "stress"
+        ],
+        "type": "object",
+        "properties": {
+          "specimen_name": {
+            "title": "Specimen Name",
+            "type": "string"
+          },
+          "crack_displacement": {
+            "title": "Crack Displacement",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "crack_load": {
+            "title": "Crack Load",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "crack_length": {
+            "title": "Crack Length",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "displacement": {
+            "title": "Displacement",
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          },
+          "load": {
+            "title": "Load",
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          },
+          "strain": {
+            "title": "Strain",
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          },
+          "stress": {
+            "title": "Stress",
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      },
+      "SnCurveMethod": {
+        "title": "SnCurveMethod",
+        "enum": [
+          "LinLog",
+          "LogLog",
+          "Sendeckyj"
+        ],
+        "type": "string",
+        "description": "An enumeration."
+      },
+      "TestModel": {
+        "title": "TestModel",
+        "required": [
+          "id",
+          "experiment_id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "experiment_id": {
+            "title": "Experiment Id",
+            "type": "integer"
+          },
+          "specimen_number": {
+            "title": "Specimen Number",
+            "type": "integer"
+          },
+          "specimen_name": {
+            "title": "Specimen Name",
+            "type": "string"
+          },
+          "stress_ratio": {
+            "title": "Stress Ratio",
+            "type": "number"
+          },
+          "maximum_stress": {
+            "title": "Maximum Stress",
+            "type": "number"
+          },
+          "frequency": {
+            "title": "Frequency",
+            "type": "number"
+          },
+          "run_out": {
+            "title": "Run Out",
+            "type": "boolean"
+          },
+          "displacement_controlled_loading_rate": {
+            "title": "Displacement Controlled Loading Rate",
+            "type": "number"
+          },
+          "load_controlled_loading_rate": {
+            "title": "Load Controlled Loading Rate",
+            "type": "number"
+          },
+          "length": {
+            "title": "Length",
+            "type": "number"
+          },
+          "width": {
+            "title": "Width",
+            "type": "number"
+          },
+          "thickness": {
+            "title": "Thickness",
+            "type": "number"
+          },
+          "temperature": {
+            "title": "Temperature",
+            "type": "number"
+          },
+          "humidity": {
+            "title": "Humidity",
+            "type": "number"
+          },
+          "initial_crack_length": {
+            "title": "Initial Crack Length",
+            "type": "number"
+          }
+        },
+        "description": "Defines how test is seen on the API"
+      },
+      "UnitInfo": {
+        "title": "UnitInfo",
+        "required": [
+          "subject",
+          "unit"
+        ],
+        "type": "object",
+        "properties": {
+          "subject": {
+            "title": "Subject",
+            "type": "string"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "description": "Unit Info"
+      },
+      "ValidationError": {
+        "title": "ValidationError",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "loc": {
+            "title": "Location",
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            }
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
 }

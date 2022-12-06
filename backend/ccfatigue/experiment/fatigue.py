@@ -24,6 +24,7 @@ class HysteresisLoop(BaseModel):
 
 class FatigueTest(BaseModel):
     specimen_id: int
+    specimen_name: str
     total_dissipated_energy: int
     run_out: bool
     stress_ratio: float
@@ -105,7 +106,7 @@ def fatigue_processing(df: DataFrame, sub_indexes: List[int], test_meta) -> Dict
 
     # calculate Stress and Strain
     df = df.assign(
-        stress=df[load_field] / (test_meta["width"] * test_meta["thickness"]),
+        stress=(df[load_field] * 1000) / (test_meta["width"] * test_meta["thickness"]),
         strain=df[displacement_field] / test_meta["length"],
     )
 
@@ -173,6 +174,7 @@ async def fatigue_test(
         test_id,
         (
             Test.specimen_number,
+            Test.specimen_name,
             Test.run_out,
             Test.stress_ratio,
             Test.width,
@@ -190,6 +192,7 @@ async def fatigue_test(
 
     return FatigueTest(
         specimen_id=test_meta["specimen_number"],
+        specimen_name=test_meta["specimen_name"],
         run_out=test_meta["run_out"],
         stress_ratio=test_meta["stress_ratio"],
         total_dissipated_energy=get_total_dissipated_energy(hyst_df),

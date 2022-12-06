@@ -16,30 +16,30 @@
  * @readonly
  */
 export default class SnCurveMethod {
-    /**
-     * value: "LinLog"
-     * @const
-     */
-    LinLog = "LinLog";
+  /**
+   * value: "LinLog"
+   * @const
+   */
+  LinLog = "LinLog";
 
-    /**
-     * value: "LogLog"
-     * @const
-     */
-    LogLog = "LogLog";
+  /**
+   * value: "LogLog"
+   * @const
+   */
+  LogLog = "LogLog";
 
-    /**
-     * value: "Sendeckyj"
-     * @const
-     */
-    Sendeckyj = "Sendeckyj";
+  /**
+   * value: "Sendeckyj"
+   * @const
+   */
+  Sendeckyj = "Sendeckyj";
 
-    /**
-     * Returns a <code>SnCurveMethod</code> enum value from a Javascript object name.
-     * @param {Object} data The plain JavaScript object containing the name of the enum value.
-     * @return {module:model/SnCurveMethod} The enum <code>SnCurveMethod</code> value.
-     */
-    static constructFromObject(object) {
-        return object;
-    }
+  /**
+   * Returns a <code>SnCurveMethod</code> enum value from a Javascript object name.
+   * @param {Object} data The plain JavaScript object containing the name of the enum value.
+   * @return {module:model/SnCurveMethod} The enum <code>SnCurveMethod</code> value.
+   */
+  static constructFromObject(object) {
+    return object;
+  }
 }

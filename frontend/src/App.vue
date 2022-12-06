@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dense dark>
+    <v-app-bar app color="secondary" dense dark>
       <v-tabs align-with-title fixed-tabs>
         <v-tab :to="{ name: 'Home' }" exact>
           <v-icon>mdi-home</v-icon>
@@ -9,15 +9,15 @@
         <v-tab :to="{ name: 'FatigueDatabase' }">
           <v-menu offset-y open-on-hover>
             <template #activator="{ on }">
-              <v-btn color="primary" elevation="0" v-on="on">
+              <v-btn color="secondary" elevation="0" v-on="on">
                 Fatigue database
               </v-btn>
             </template>
-            <v-list color="primary">
+            <v-list color="secondary">
               <v-list-item>
                 <v-list-item-title>
                   <v-btn
-                    color="primary"
+                    color="secondary"
                     elevation="0"
                     :to="{ name: 'SearchDatabase' }"
                   >
@@ -28,7 +28,7 @@
               <v-list-item>
                 <v-list-item-title>
                   <v-btn
-                    color="primary"
+                    color="secondary"
                     elevation="0"
                     :to="{ name: 'DataUpload' }"
                   >

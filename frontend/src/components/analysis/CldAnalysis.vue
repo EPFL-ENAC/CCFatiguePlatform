@@ -1,7 +1,7 @@
 <template>
   <v-card :loading="loading">
     <v-card-title>
-      CLD
+      Constant Life Diagram
       <v-spacer />
       <info-tooltip>
         The Constant Life Diagram (CLD) allows us to predict the outcome of
@@ -16,36 +16,19 @@
           <v-file-input
             v-model="file"
             show-size
-            accept=".txt,.csv"
+            accept=".csv"
             :error-messages="errorMessages"
             :disabled="loading"
-            label="Upload file"
+            label="SNC csv file"
             @change="updateOutput"
           >
             <template #append>
               <info-tooltip>
-                The data required as input is a csv file with 3 distinct
-                columns:
-                <ul>
-                  <li>Stress ratio (R) [-]</li>
-                  <li>Number of cycles to failure</li>
-                  <li>Stress parameter (Stress at failure) [MPa]</li>
-                </ul>
-                Additionally to these 3 columns, there are 11 values required
-                for analysis:
-                <ul>
-                  <li>R-ratio</li>
-                  <li>PN(f) !Reliability level</li>
-                  <li>So !(c^(-1/b))</li>
-                  <li>1/k ! (1/b)? -> Pow in fortran code</li>
-                  <li>af pooled data</li>
-                  <li>Scale pooled data</li>
-                  <li>LRSQ</li>
-                  <li>RMSE !Root mean square error</li>
-                  <li>SSE !Sum of squares due to errors</li>
-                  <li>SST !Sum of squares about the mean</li>
-                  <li>RSQ !R-square</li>
-                </ul>
+                See the
+                <a
+                  href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/SNC_Data_Convention.md"
+                  >SNC Data Convention</a
+                >
               </info-tooltip>
             </template>
           </v-file-input>
@@ -66,13 +49,20 @@
       <simple-chart
         :aspect-ratio="2"
         :series="series"
-        x-axis-name="stress_mean"
-        y-axis-name="stress_amplitude"
+        x-axis-name="Mean Stress [MPa]"
+        y-axis-name="Stress Amplitude [MPa]"
       ></simple-chart>
     </v-card-text>
     <v-card-actions v-if="hasInput" class="justify-end">
       <v-btn :disabled="loading && output != null" @click="downloadOutput">
-        Download
+        Download CLD
+        <info-tooltip>
+          See the
+          <a
+            href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/CLD_Data_Convention.md"
+            >CLD Data Convention</a
+          >
+        </info-tooltip>
       </v-btn>
     </v-card-actions>
   </v-card>
@@ -82,6 +72,7 @@
 import CldMethod from "@/backend/model/CldMethod";
 import SimpleChart from "@/components/charts/SimpleChart";
 import InfoTooltip from "@/components/InfoTooltip";
+import { getOutputFileName } from "@/utils/analysis";
 import { parserConfig } from "@/utils/papaparse";
 import download from "downloadjs";
 import { parse } from "papaparse";
@@ -141,7 +132,13 @@ export default {
     },
     downloadOutput() {
       if (this.output) {
-        download(this.output, `cld-${this.method}-output.csv`, "text/csv");
+        const outputName = getOutputFileName(
+          "SNC",
+          "CLD",
+          this.file.name,
+          this.method
+        );
+        download(this.output, outputName + ".csv", "text/csv");
       }
     },
   },
