@@ -190,9 +190,14 @@ async def fatigue_test(
         std_df, compute_sub_indexes(hyst_df), test_meta
     )
 
+    if test_meta["specimen_name"] is not None:
+        specimen_name = test_meta["specimen_name"]
+    else:
+        specimen_name = test_meta["specimen_number"]
+
     return FatigueTest(
         specimen_id=test_meta["specimen_number"],
-        specimen_name=test_meta["specimen_name"],
+        specimen_name=specimen_name,
         run_out=test_meta["run_out"],
         stress_ratio=test_meta["stress_ratio"],
         total_dissipated_energy=get_total_dissipated_energy(hyst_df),
