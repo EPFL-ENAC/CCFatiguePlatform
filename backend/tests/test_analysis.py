@@ -3,13 +3,13 @@ import os
 import ccfatigue.analysis.cld_harris as cld_harris
 import ccfatigue.analysis.cld_piecewiselinear as cld_piecewiselinear  # noqa: E501
 import ccfatigue.analysis.cyc_rangemean as cyc_rangemean
-import ccfatigue.analysis.cyc_simplified_rainflow as cyc_simplified_rainflow
+import ccfatigue.analysis.cyc_simplifiedrainflow as cyc_simplifiedrainflow
 import ccfatigue.analysis.das_harris as das_harris
 import ccfatigue.analysis.das_piecewiselinear as das_piecewiselinear  # noqa: E501
 import ccfatigue.analysis.faf_ftpf as faf_ftpf
 import ccfatigue.analysis.faf_hashinrotem as faf_hashinrotem
-import ccfatigue.analysis.snc_linlog as sn_curve_linlog
-import ccfatigue.analysis.snc_loglog as sn_curve_loglog
+import ccfatigue.analysis.snc_linlog as snc_linlog
+import ccfatigue.analysis.snc_loglog as snc_loglog
 import ccfatigue.analysis.snc_sendeckyj as snc_sendeckyj
 import ccfatigue.analysis.utils.faf as faf
 
@@ -39,7 +39,7 @@ CYC_RANGEMEAN_CSV_OUTPUT_FILE = os.path.join(
 
 # Mod 1 - Cycle counting - Simplified Rainflow
 CYC_SIMPLIFIEDRAINFLOW_CSV_OUTPUT_FILE = os.path.join(
-    OUTPUT_DIR, "CYC_simplifiedrainflow.csv"
+    OUTPUT_DIR, "CYC_sample_2022-11_SimplifiedRainflow.csv"
 )
 
 # Mod 2 - S-N Curve - LogLog
@@ -126,12 +126,12 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 # Module 1 - Cycle counting
 
 
-def test_cyc_range_mean():
+def test_cyc_rangemean():
     cyc_rangemean.execute(LDS_CSV_1_INPUT_FILE, CYC_RANGEMEAN_CSV_OUTPUT_FILE)
 
 
-def test_cyc_simplified_rainflow():
-    cyc_simplified_rainflow.execute(
+def test_cyc_simplifiedrainflow():
+    cyc_simplifiedrainflow.execute(
         LDS_CSV_1_INPUT_FILE, CYC_SIMPLIFIEDRAINFLOW_CSV_OUTPUT_FILE
     )
 
@@ -139,19 +139,19 @@ def test_cyc_simplified_rainflow():
 # Module 2 - S-N curve
 
 
-def test_sn_curve_loglog():
-    sn_curve_loglog.execute(
+def test_snc_loglog():
+    snc_loglog.execute(
         AGG_CSV_INPUT_FILE, SNC_LOGLOG_JSON_OUTPUT_FILE, SNC_LOGLOG_CSV_OUTPUT_FILE
     )
 
 
-def test_sn_curve_linlog():
-    sn_curve_linlog.execute(
+def test_snc_linlog():
+    snc_linlog.execute(
         AGG_CSV_INPUT_FILE, SNC_LINLOG_JSON_OUTPUT_FILE, SNC_LINLOG_CSV_OUTPUT_FILE
     )
 
 
-def test_sn_curve_sendeckyj():
+def test_snc_sendeckyj():
     snc_sendeckyj.execute(
         AGG_CSV_INPUT_FILE,
         SNC_SENDECKYJ_JSON_OUTPUT_FILE,

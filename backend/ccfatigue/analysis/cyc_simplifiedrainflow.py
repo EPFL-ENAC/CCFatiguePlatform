@@ -11,7 +11,9 @@ Algorithm described in "Simple rainflow counting algorithms"
 import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 
-from ccfatigue.analysis.utils.cyc import FlowRow
+import ccfatigue.analysis.utils.cyc as cyc
+
+MATRIX_SIZE = 64
 
 
 def rearrange_peaks(peaks):
@@ -56,14 +58,9 @@ def execute(
         None
     """
 
-    peaks = []
-    flows = []
-
     lds_df = pd.read_csv(lds_input_csv_file)
 
     rearranged_peaks = rearrange_peaks(lds_df.stress_max)
-
-    peaks = []  # Stack of peaks and valleys
 
     # RAINFLOW ALGORITHM I as describe in ref [1] p32
     # 1 - Read the next peak or valley
@@ -77,6 +74,9 @@ def execute(
     #     Discard the peak and valley of Y
     #     Go to Step 2
 
+    peaks = []  # Stack of peaks and valleys
+    ranges = []  # List of ranges
+
     for p in rearranged_peaks:
         peaks.append(p)
 
@@ -88,69 +88,12 @@ def execute(
 
             _mean = (peaks[-2] + peaks[-3]) / 2
             _range = y
-            flows.append(FlowRow(_range, _mean, peaks[-3], peaks[-2], 2))
+            ranges.append(cyc.CycRangeRow(_range, _mean, peaks[-3], peaks[-2], 2))
             peaks.pop(-2)
             peaks.pop(-2)
 
-    # Creating 64*64 markov matrix
-    # ##########################################################################
-
-    maxrange = max(flows, key=lambda p: p.range).range
-    minrange = min(flows, key=lambda p: p.range).range
-    maxmean = max(flows, key=lambda p: p.mean).mean
-    minmean = min(flows, key=lambda p: p.mean).mean
-
-    matrixsize = 64
-    deltarange = (maxrange - minrange) / matrixsize
-    deltamean = (maxmean - minmean) / matrixsize
-    sumcum = 0.0
-    cum = 0
-
-    # init cc[matrixsize * matrixsize] filled with 0
-    n_cycles = [[0 for i in range(matrixsize)] for j in range(matrixsize)]
-
-    for flow in flows:
-
-        i = min(int((flow.range - minrange) / deltarange), matrixsize - 1)
-        j = min(int((flow.mean - minmean) / deltamean), matrixsize - 1)
-        n_cycles[i][j] += flow.n_cycles
-
-    cyc_df = pd.DataFrame()
-
-    for i in range(matrixsize):
-        for j in range(matrixsize):
-            sumcum += n_cycles[i][j]
-
-    for i in range(matrixsize):
-        for j in range(matrixsize):
-            if n_cycles[i][j] != 0:
-                downra = minrange + i * deltarange
-                upra = minrange + (i + 1) * deltarange
-                stress_range = (upra + downra) / 2
-                downme = minmean + j * deltamean
-                upme = minmean + (j + 1) * deltamean
-                stress_mean = (upme + downme) / 2
-                stress_ratio = -1 + (4 * stress_mean) / (2 * stress_mean + stress_range)
-                cum += n_cycles[i][j]
-                cum_n_cycles = abs(sumcum - cum) * 100 / sumcum
-
-                row = pd.DataFrame(
-                    {
-                        "stress_range": [stress_range],
-                        "stress_mean": [stress_mean],
-                        "stress_ratio": [stress_ratio],
-                        "n_cycles": [n_cycles[i][j] / 2],
-                        "cum_n_cycles": [cum_n_cycles],
-                    }
-                )
-
-                cyc_df = pd.concat(
-                    [
-                        cyc_df,
-                        row,
-                    ],
-                    ignore_index=True,
-                )
+    # Create Markov Matrix then CYC dataframe
+    cyc_df = pd.DataFrame(cyc.ranges2cyc(MATRIX_SIZE, ranges))
 
     # Generate output files
     cyc_df.to_csv(path_or_buf=cyc_csv_output_file, index=False)  # type: ignore
