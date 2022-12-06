@@ -264,6 +264,7 @@ import SimpleChart from "@/components/charts/SimpleChart.vue";
 import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
 import ExperimentSV from "@/components/ExperimentSV.vue";
 import InfoTooltip from "@/components/InfoTooltip";
+import { formatNumber } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
 import { zip } from "lodash";
 import { mapState } from "vuex";
@@ -358,11 +359,11 @@ export default {
           )
             .then((dataList) => {
               this.cycleAtFailure = dataList.map((data) => data.n_fail);
-              this.stressAtFailure = dataList.map(
-                (data) => data.stress_at_failure
+              this.stressAtFailure = dataList.map((data) =>
+                formatNumber(data.stress_at_failure)
               );
-              this.strainAtFailure = dataList.map(
-                (data) => data.strain_at_failure
+              this.strainAtFailure = dataList.map((data) =>
+                formatNumber(data.strain_at_failure)
               );
               this.specimenIds = dataList.map((data) => data.specimen_id);
               this.totalDissipatedEnergies = dataList.map(
