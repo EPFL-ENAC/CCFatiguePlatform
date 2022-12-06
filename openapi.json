@@ -1032,6 +1032,7 @@
         "title": "FatigueTest",
         "required": [
           "specimen_id",
+          "specimen_name",
           "total_dissipated_energy",
           "run_out",
           "stress_ratio",
@@ -1049,6 +1050,10 @@
           "specimen_id": {
             "title": "Specimen Id",
             "type": "integer"
+          },
+          "specimen_name": {
+            "title": "Specimen Name",
+            "type": "string"
           },
           "total_dissipated_energy": {
             "title": "Total Dissipated Energy",
@@ -1227,6 +1232,7 @@
       "QuasiStaticTest": {
         "title": "QuasiStaticTest",
         "required": [
+          "specimen_name",
           "crack_displacement",
           "crack_load",
           "crack_length",
@@ -1237,6 +1243,10 @@
         ],
         "type": "object",
         "properties": {
+          "specimen_name": {
+            "title": "Specimen Name",
+            "type": "string"
+          },
           "crack_displacement": {
             "title": "Crack Displacement",
             "type": "array",
