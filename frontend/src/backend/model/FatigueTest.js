@@ -24,6 +24,7 @@ class FatigueTest {
    * Constructs a new <code>FatigueTest</code>.
    * @alias module:model/FatigueTest
    * @param specimenId {Number}
+   * @param specimenName {String}
    * @param totalDissipatedEnergy {Number}
    * @param runOut {Boolean}
    * @param stressRatio {Number}
@@ -38,6 +39,7 @@ class FatigueTest {
    */
   constructor(
     specimenId,
+    specimenName,
     totalDissipatedEnergy,
     runOut,
     stressRatio,
@@ -53,6 +55,7 @@ class FatigueTest {
     FatigueTest.initialize(
       this,
       specimenId,
+      specimenName,
       totalDissipatedEnergy,
       runOut,
       stressRatio,
@@ -75,6 +78,7 @@ class FatigueTest {
   static initialize(
     obj,
     specimenId,
+    specimenName,
     totalDissipatedEnergy,
     runOut,
     stressRatio,
@@ -88,6 +92,7 @@ class FatigueTest {
     nFail
   ) {
     obj["specimen_id"] = specimenId;
+    obj["specimen_name"] = specimenName;
     obj["total_dissipated_energy"] = totalDissipatedEnergy;
     obj["run_out"] = runOut;
     obj["stress_ratio"] = stressRatio;
@@ -116,6 +121,12 @@ class FatigueTest {
         obj["specimen_id"] = ApiClient.convertToType(
           data["specimen_id"],
           "Number"
+        );
+      }
+      if (data.hasOwnProperty("specimen_name")) {
+        obj["specimen_name"] = ApiClient.convertToType(
+          data["specimen_name"],
+          "String"
         );
       }
       if (data.hasOwnProperty("total_dissipated_energy")) {
@@ -180,6 +191,11 @@ class FatigueTest {
  * @member {Number} specimen_id
  */
 FatigueTest.prototype["specimen_id"] = undefined;
+
+/**
+ * @member {String} specimen_name
+ */
+FatigueTest.prototype["specimen_name"] = undefined;
 
 /**
  * @member {Number} total_dissipated_energy
