@@ -22,6 +22,7 @@ class QuasiStaticTest {
   /**
    * Constructs a new <code>QuasiStaticTest</code>.
    * @alias module:model/QuasiStaticTest
+   * @param specimenName {String}
    * @param crackDisplacement {Array.<Number>}
    * @param crackLoad {Array.<Number>}
    * @param crackLength {Array.<Number>}
@@ -31,6 +32,7 @@ class QuasiStaticTest {
    * @param stress {Object.<String, Array.<Number>>}
    */
   constructor(
+    specimenName,
     crackDisplacement,
     crackLoad,
     crackLength,
@@ -41,6 +43,7 @@ class QuasiStaticTest {
   ) {
     QuasiStaticTest.initialize(
       this,
+      specimenName,
       crackDisplacement,
       crackLoad,
       crackLength,
@@ -58,6 +61,7 @@ class QuasiStaticTest {
    */
   static initialize(
     obj,
+    specimenName,
     crackDisplacement,
     crackLoad,
     crackLength,
@@ -66,6 +70,7 @@ class QuasiStaticTest {
     strain,
     stress
   ) {
+    obj["specimen_name"] = specimenName;
     obj["crack_displacement"] = crackDisplacement;
     obj["crack_load"] = crackLoad;
     obj["crack_length"] = crackLength;
@@ -86,6 +91,12 @@ class QuasiStaticTest {
     if (data) {
       obj = obj || new QuasiStaticTest();
 
+      if (data.hasOwnProperty("specimen_name")) {
+        obj["specimen_name"] = ApiClient.convertToType(
+          data["specimen_name"],
+          "String"
+        );
+      }
       if (data.hasOwnProperty("crack_displacement")) {
         obj["crack_displacement"] = ApiClient.convertToType(
           data["crack_displacement"],
@@ -126,6 +137,11 @@ class QuasiStaticTest {
     return obj;
   }
 }
+
+/**
+ * @member {String} specimen_name
+ */
+QuasiStaticTest.prototype["specimen_name"] = undefined;
 
 /**
  * @member {Array.<Number>} crack_displacement
