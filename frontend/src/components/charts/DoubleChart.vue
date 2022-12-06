@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import { formatNumber } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
 import { LineChart, ScatterChart } from "echarts/charts";
 import {
@@ -78,6 +79,7 @@ export default {
           min: "dataMin",
           max: "dataMax",
           axisLabel: {
+            formatter: formatNumber,
             fontSize: 10,
           },
         },
@@ -89,6 +91,7 @@ export default {
             min: "dataMin",
             max: "dataMax",
             axisLabel: {
+              formatter: formatNumber,
               fontSize: 10,
             },
           },
@@ -99,6 +102,7 @@ export default {
             min: "dataMin",
             max: "dataMax",
             axisLabel: {
+              formatter: formatNumber,
               fontSize: 10,
             },
           },
@@ -106,7 +110,7 @@ export default {
         tooltip: {
           trigger: "axis",
           confine: true,
-          valueFormatter: (value) => value?.toFixed(2),
+          valueFormatter: formatNumber,
         },
         series: this.series.map((serie) => merge(serie, { showSymbol: false })),
         color: this.color,
