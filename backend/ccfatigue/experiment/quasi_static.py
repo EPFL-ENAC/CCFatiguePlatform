@@ -13,6 +13,7 @@ from ccfatigue.models.database import Experiment, Test
 
 
 class QuasiStaticTest(BaseModel):
+    specimen_name: str
     crack_displacement: List[float]
     crack_load: List[float]
     crack_length: List[float]
@@ -96,7 +97,7 @@ async def quasi_static_test(
     )
 
     test_meta = await get_test_fields(
-        session, experiment_id, test_id, (Test.specimen_number,)
+        session, experiment_id, test_id, (Test.specimen_number, Test.specimen_name)
     )
     df = get_dataframe(experiment, test_meta["specimen_number"])
     column_list = df.columns.to_list()
@@ -127,6 +128,7 @@ async def quasi_static_test(
                 lambda value: value / area,
             )
     return QuasiStaticTest(
+        specimen_name=test_meta["specimen_name"],
         crack_displacement=crack_df["Crack_Displacement"].to_list(),
         crack_load=crack_df["Crack_Load"].to_list(),
         crack_length=crack_df["Crack_length"].to_list(),
