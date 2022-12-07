@@ -22,3 +22,7 @@ Encoding format: UTF-8, Separator: ',' (comma)
 | stress_ratio  | Stress ratio                                                              | R           | `[-]`   | double    | y         |
 | n_cycles      | Number of cycles                                                          | n           |         | double    | y         |
 | cum_n_cycles  | cumulative number of cycles for a given bin of sigma_a, sigma_mean and R. |             |         | double    | y         |
+
+### CYC example file
+
+[CYC_sample_2022-09.csv](/Data/samples/CYC_sample_2022-09.csv)

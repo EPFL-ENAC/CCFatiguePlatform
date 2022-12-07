@@ -41,3 +41,8 @@ Encoding format: UTF-8, Separator: ',' (comma)
 | stress_ratio      | Stress ratio                | R         | `[-]`   | double    | y         |
 | cycles_to_failure | Number of cycles to failure | N         | `[-]`   | int       | y         |
 | stress_max        | Max stress                  | sigma_max | `[MPa]` | double    | y         |
+
+### FAF example file
+
+- [FAF_sample_2022-10.json](/Data/samples/FAF_sample_2022-10.json)
+- [FAF_sample_2022-10.csv](/Data/samples/FAF_sample_2022-10.csv)

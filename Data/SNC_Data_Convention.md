@@ -48,3 +48,8 @@ Encoding format: UTF-8, Separator: ',' (comma)
 | stress_max        | Max stress                      | sigma_max | `[MPa]` | double    | y         |
 | stress_lowerbound | Stress at failure (lower bound) | sigma_max | `[MPa]` | double    |           |
 | stress_upperbound | Stress at failure (upper bound) | sigma_max | `[MPa]` | double    |           |
+
+### SNC example file
+
+- [SNC_sample_2022-08.json](/Data/samples/SSNC_sample_2022-08.json)
+- [SNC_sample_2022-08.csv](/Data/samples/SNC_sample_2022-08.csv)

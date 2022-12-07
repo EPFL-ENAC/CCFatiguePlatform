@@ -5,7 +5,6 @@ DAS Data corresponds to the output of Damage summation module.
 
 ## File naming conventions
 
-- Files: `DAS_{Researcher's lastname}_{date}[_{methods}].json`
 - Files: `DAS_{Researcher's lastname}_{date}[_{methods}].csv`
 
 with:
@@ -21,3 +20,7 @@ Encoding format: UTF-8, Separator: ',' (comma)
 | ------------- | ----------- | --------- | ------- | --------- | --------- |
 | stress_max    | Max stress  | sigma_max | `[MPa]` | double    | y         |
 | damage        | Damage      | D         | `[-]`   | double    | y         |
+
+### DAS example file
+
+[DAS_sample_2022-10.csv](/Data/samples/DAS_sample_2022-10.csv)

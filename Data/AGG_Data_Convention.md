@@ -24,3 +24,7 @@ Encoding format: UTF-8, Separator: ',' (comma)
 | stress_max            | Max stress                                              | sigma_max | `[MPa]` | double    | y               |
 | cycles_to_failure     | Number of cycles to failure                             | N         | `[-]`   | int       | y               |
 | residual_strength     | Residual strength                                       | sigma_r   | `[MPa]` | double    | y for Sendeckyj |
+
+### AGG example file
+
+[AGG_sample_2022-09.csv](/Data/samples/AGG_sample_2022-09.csv)

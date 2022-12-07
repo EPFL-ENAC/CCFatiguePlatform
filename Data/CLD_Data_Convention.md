@@ -5,7 +5,6 @@ CLD Data is the output of the Constant-Life Diagram module.
 
 ## File naming conventions
 
-- Files: `CLD_{Researcher's lastname}_{date}[_{methods}].json`
 - Files: `CLD_{Researcher's lastname}_{date}[_{methods}].csv`
 
 with:
@@ -22,3 +21,7 @@ Encoding format: UTF-8, Separator: ',' (comma)
 | cycles_to_failure | Number of cycles to failure | N          | `[-]`   | int       | y         |
 | stress_amplitude  | Stress amplitude            | sigma_a    | `[MPa]` | double    | y         |
 | stress_mean       | Mean stress                 | sigma_mean | `[MPa]` | double    | y         |
+
+### CLD example file
+
+[CLD_sample_2022-09_Harris.csv](/Data/samples/CLD_sample_2022-09.csv)

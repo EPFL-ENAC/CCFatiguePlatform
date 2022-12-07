@@ -17,3 +17,7 @@ Encoding format: UTF-8, Separator: ',' (comma)
 | Variable name | Description | Symbol    | Unit    | Data type | Mandatory |
 | ------------- | ----------- | --------- | ------- | --------- | --------- |
 | stress_max    | Max stress  | sigma_max | `[MPa]` | double    | y         |
+
+### LDS example file
+
+[LDS_sample_2022-11.csv](/Data/samples/LDS_sample_2022-11.csv)
