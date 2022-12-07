@@ -23,6 +23,12 @@ export default class CycleCountingMethod {
   RangeMean = "RangeMean";
 
   /**
+   * value: "RangePair"
+   * @const
+   */
+  RangePair = "RangePair";
+
+  /**
    * value: "SimplifiedRainflow"
    * @const
    */

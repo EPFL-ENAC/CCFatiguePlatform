@@ -824,6 +824,7 @@
         "title": "CycleCountingMethod",
         "enum": [
           "RangeMean",
+          "RangePair",
           "SimplifiedRainflow"
         ],
         "type": "string",
