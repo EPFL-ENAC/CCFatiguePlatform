@@ -118,6 +118,7 @@
         :series="series"
         x-axis-name="N"
         y-axis-name="Maximum Cyclic Stress [MPa]"
+        x-axis-type="log"
       ></simple-chart>
     </v-card-text>
     <v-card-actions v-if="hasInput" class="justify-end">
