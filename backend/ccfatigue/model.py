@@ -51,6 +51,8 @@ class AnalysisResult(BaseModel):
 
 class CycleCountingMethod(str, Enum):
     RANGE_MEAN = "RangeMean"
+    RANGE_PAIR = "RangePair"
+    SIMPLIFIED_RAINFLOW = "SimplifiedRainflow"
 
 
 class CldMethod(str, Enum):
