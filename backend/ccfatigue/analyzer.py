@@ -10,6 +10,8 @@ from pandas.core.frame import DataFrame
 
 import ccfatigue.analysis.cld_harris as cld_harris
 import ccfatigue.analysis.cyc_rangemean as cyc_rangemean
+import ccfatigue.analysis.cyc_rangepair as cyc_rangepair
+import ccfatigue.analysis.cyc_simplifiedrainflow as cyc_simplifiedrainflow
 import ccfatigue.analysis.das_harris as das_harris
 import ccfatigue.analysis.faf_ftpf as faf_ftpf
 import ccfatigue.analysis.snc_linlog as snc_linlog
@@ -157,6 +159,18 @@ def run_cycle_counting(
         case CycleCountingMethod.RANGE_MEAN:
             output = run_python(
                 lambda input, csv_output, _: cyc_rangemean.execute(input, csv_output),
+                file,
+            )
+        case CycleCountingMethod.RANGE_PAIR:
+            output = run_python(
+                lambda input, csv_output, _: cyc_rangepair.execute(input, csv_output),
+                file,
+            )
+        case CycleCountingMethod.SIMPLIFIED_RAINFLOW:
+            output = run_python(
+                lambda input, csv_output, _: cyc_simplifiedrainflow.execute(
+                    input, csv_output
+                ),
                 file,
             )
         case _:

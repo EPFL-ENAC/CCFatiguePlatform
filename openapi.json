@@ -823,7 +823,9 @@
       "CycleCountingMethod": {
         "title": "CycleCountingMethod",
         "enum": [
-          "RangeMean"
+          "RangeMean",
+          "RangePair",
+          "SimplifiedRainflow"
         ],
         "type": "string",
         "description": "An enumeration."
