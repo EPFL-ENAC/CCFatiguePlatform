@@ -23,6 +23,12 @@ export default class DamageSummationMethod {
   Harris = "Harris";
 
   /**
+   * value: "PiecewiseLinear"
+   * @const
+   */
+  PiecewiseLinear = "PiecewiseLinear";
+
+  /**
    * Returns a <code>DamageSummationMethod</code> enum value from a Javascript object name.
    * @param {Object} data The plain JavaScript object containing the name of the enum value.
    * @return {module:model/DamageSummationMethod} The enum <code>DamageSummationMethod</code> value.
