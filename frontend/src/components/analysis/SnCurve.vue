@@ -69,7 +69,7 @@
         :series="series"
         title="S-N Curves"
         x-axis-name="N"
-        y-axis-name="Maximum Cyclic Stress [MPa]"
+        y-axis-name="σₘₐₓ [MPa]"
         x-axis-type="log"
       ></simple-chart>
     </v-card-text>
