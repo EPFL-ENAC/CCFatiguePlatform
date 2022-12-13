@@ -57,6 +57,7 @@ class CycleCountingMethod(str, Enum):
 
 class CldMethod(str, Enum):
     HARRIS = "Harris"
+    PIECEWISELINEAR = "PiecewiseLinear"
 
 
 class FatigueFailureMethod(str, Enum):
@@ -65,3 +66,4 @@ class FatigueFailureMethod(str, Enum):
 
 class DamageSummationMethod(str, Enum):
     HARRIS = "Harris"
+    PIECEWISELINEAR = "PiecewiseLinear"

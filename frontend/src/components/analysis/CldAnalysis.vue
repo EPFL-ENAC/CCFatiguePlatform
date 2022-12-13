@@ -44,6 +44,22 @@
           </v-select>
         </v-col>
       </v-row>
+      <v-row>
+        <v-col>
+          <v-text-field
+            v-model.number="ucs"
+            label="UCS"
+            type="number"
+          ></v-text-field>
+        </v-col>
+        <v-col>
+          <v-text-field
+            v-model.number="uts"
+            label="UTS"
+            type="number"
+          ></v-text-field>
+        </v-col>
+      </v-row>
     </v-card-subtitle>
     <v-card-text v-if="series.length > 0">
       <simple-chart
@@ -92,6 +108,8 @@ export default {
       output: null,
       methods: methods,
       method: methods[0],
+      ucs: 27.1,
+      uts: 27.7,
       series: [],
       errorMessages: null,
     };
@@ -106,7 +124,7 @@ export default {
       if (this.file && this.method) {
         this.loading = true;
         this.$analysisApi
-          .runCldFile(this.method, this.file)
+          .runCldFile(this.method, this.ucs, this.uts, this.file)
           .then((data) => {
             this.output = data;
             const results = parse(data, parserConfig);
