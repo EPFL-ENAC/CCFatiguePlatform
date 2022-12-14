@@ -23,6 +23,12 @@ export default class CldMethod {
   Harris = "Harris";
 
   /**
+   * value: "PiecewiseLinear"
+   * @const
+   */
+  PiecewiseLinear = "PiecewiseLinear";
+
+  /**
    * Returns a <code>CldMethod</code> enum value from a Javascript object name.
    * @param {Object} data The plain JavaScript object containing the name of the enum value.
    * @return {module:model/CldMethod} The enum <code>CldMethod</code> value.
