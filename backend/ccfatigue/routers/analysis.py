@@ -46,8 +46,10 @@ async def run_sn_curve_file(
 async def run_cld_file(
     file: UploadFile = File(...),
     method: CldMethod = Query(...),
+    ucs: float = Query(...),
+    uts: float = Query(...),
 ) -> bytes:
-    return run_cld(file.file, method)
+    return run_cld(file.file, method, ucs, uts)
 
 
 @router.post("/fatigueFailure/file", response_model=AnalysisResult)

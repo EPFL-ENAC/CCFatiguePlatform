@@ -9,10 +9,12 @@ from pandas._typing import ReadCsvBuffer, WriteBuffer
 from pandas.core.frame import DataFrame
 
 import ccfatigue.analysis.cld_harris as cld_harris
+import ccfatigue.analysis.cld_piecewiselinear as cld_piecewiselinear
 import ccfatigue.analysis.cyc_rangemean as cyc_rangemean
 import ccfatigue.analysis.cyc_rangepair as cyc_rangepair
 import ccfatigue.analysis.cyc_simplifiedrainflow as cyc_simplifiedrainflow
 import ccfatigue.analysis.das_harris as das_harris
+import ccfatigue.analysis.das_piecewiselinear as das_piecewiselinear
 import ccfatigue.analysis.faf_ftpf as faf_ftpf
 import ccfatigue.analysis.snc_linlog as snc_linlog
 import ccfatigue.analysis.snc_loglog as snc_loglog
@@ -181,11 +183,22 @@ def run_cycle_counting(
 def run_cld(
     file: SpooledTemporaryFile[bytes] | IO,
     method: CldMethod,
+    ucs: float,
+    uts: float,
 ) -> bytes:
     match method:
         case CldMethod.HARRIS:
             output = run_python(
-                lambda input, csv_output, _: cld_harris.execute(input, csv_output),
+                lambda input, csv_output, _: cld_harris.execute(
+                    input, csv_output, ucs, uts
+                ),
+                file,
+            )
+        case CldMethod.PIECEWISELINEAR:
+            output = run_python(
+                lambda input, csv_output, _: cld_piecewiselinear.execute(
+                    input, csv_output, ucs, uts
+                ),
                 file,
             )
         case _:
@@ -233,6 +246,16 @@ def run_damage_summation(
         case DamageSummationMethod.HARRIS:
             output = run_python_2(
                 lambda snc_input, cyc_input, csv_output, _: das_harris.execute(
+                    snc_input,
+                    cyc_input,
+                    csv_output,
+                ),
+                snc_file,
+                cyc_file,
+            )
+        case DamageSummationMethod.PIECEWISELINEAR:
+            output = run_python_2(
+                lambda snc_input, cyc_input, csv_output, _: das_piecewiselinear.execute(
                     snc_input,
                     cyc_input,
                     csv_output,

@@ -34,15 +34,29 @@ export default class AnalysisApi {
   /**
    * Run Cld File
    * @param {module:model/CldMethod} method
+   * @param {Number} ucs
+   * @param {Number} uts
    * @param {File} file
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link File} and HTTP response
    */
-  runCldFileWithHttpInfo(method, file) {
+  runCldFileWithHttpInfo(method, ucs, uts, file) {
     let postBody = null;
     // verify the required parameter 'method' is set
     if (method === undefined || method === null) {
       throw new Error(
         "Missing the required parameter 'method' when calling runCldFile"
+      );
+    }
+    // verify the required parameter 'ucs' is set
+    if (ucs === undefined || ucs === null) {
+      throw new Error(
+        "Missing the required parameter 'ucs' when calling runCldFile"
+      );
+    }
+    // verify the required parameter 'uts' is set
+    if (uts === undefined || uts === null) {
+      throw new Error(
+        "Missing the required parameter 'uts' when calling runCldFile"
       );
     }
     // verify the required parameter 'file' is set
@@ -55,6 +69,8 @@ export default class AnalysisApi {
     let pathParams = {};
     let queryParams = {
       method: method,
+      ucs: ucs,
+      uts: uts,
     };
     let headerParams = {};
     let formParams = {
@@ -84,11 +100,13 @@ export default class AnalysisApi {
   /**
    * Run Cld File
    * @param {module:model/CldMethod} method
+   * @param {Number} ucs
+   * @param {Number} uts
    * @param {File} file
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link File}
    */
-  runCldFile(method, file) {
-    return this.runCldFileWithHttpInfo(method, file).then(function (
+  runCldFile(method, ucs, uts, file) {
+    return this.runCldFileWithHttpInfo(method, ucs, uts, file).then(function (
       response_and_data
     ) {
       return response_and_data.data;
