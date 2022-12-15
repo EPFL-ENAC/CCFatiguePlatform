@@ -154,13 +154,43 @@ export default {
               data.map((item) => [item.method, item.analysisResult])
             );
             this.series = data.flatMap((item) =>
-              this.selectedRRatios.map((rRatio) => ({
-                type: "line",
-                name: `${item.method} ${rRatio}`,
-                data: item.rows
-                  .filter((row) => row.stress_ratio === rRatio)
-                  .map((row) => [row.cycles_to_failure, row.stress_max]),
-              }))
+              this.selectedRRatios.flatMap((rRatio) => [
+                {
+                  type: "line",
+                  name: `${item.method} ${rRatio}`,
+                  data: item.rows
+                    .filter((row) => row.stress_ratio === rRatio)
+                    .map((row) => [row.cycles_to_failure, row.stress_max]),
+                },
+                {
+                  type: "line",
+                  name: `${item.method} ${rRatio}`,
+                  data: item.rows
+                    .filter((row) => row.stress_ratio === rRatio)
+                    .map((row) => [
+                      row.cycles_to_failure,
+                      row.stress_lowerbound,
+                    ]),
+                  lineStyle: {
+                    type: "dashed",
+                    width: 1,
+                  },
+                },
+                {
+                  type: "line",
+                  name: `${item.method} ${rRatio}`,
+                  data: item.rows
+                    .filter((row) => row.stress_ratio === rRatio)
+                    .map((row) => [
+                      row.cycles_to_failure,
+                      row.stress_upperbound,
+                    ]),
+                  lineStyle: {
+                    type: "dashed",
+                    width: 1,
+                  },
+                },
+              ])
             );
           })
           .catch(() => {
