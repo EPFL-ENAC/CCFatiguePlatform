@@ -94,7 +94,7 @@ import SnCurveMethod from "@/backend/model/SnCurveMethod";
 import SimpleChart from "@/components/charts/SimpleChart";
 import InfoTooltip from "@/components/InfoTooltip";
 import { getOutputFileName } from "@/utils/analysis";
-import { parserConfig } from "@/utils/papaparse";
+import { parseFile, parserConfig } from "@/utils/papaparse";
 import download from "downloadjs";
 import { parse } from "papaparse";
 
@@ -132,8 +132,8 @@ export default {
         this.file
       ) {
         this.loading = true;
-        Promise.all(
-          this.selectedMethods.map((method) =>
+        Promise.all([
+          ...this.selectedMethods.map((method) =>
             this.$analysisApi
               .runSnCurveFile(method, this.file)
               .then((analysisResult) => {
@@ -147,51 +147,71 @@ export default {
                   rows: rows,
                 };
               })
-          )
-        )
+          ),
+          parseFile(this.file).then((parsed) => {
+            return { parsedInputFile: parsed };
+          }),
+        ])
           .then((data) => {
+            const analysisResults = data.filter((x) => "analysisResult" in x);
+            const parsedInputFile = data.find(
+              (x) => "parsedInputFile" in x
+            ).parsedInputFile;
             this.outputs = Object.fromEntries(
-              data.map((item) => [item.method, item.analysisResult])
+              analysisResults.map((item) => [item.method, item.analysisResult])
             );
-            this.series = data.flatMap((item) =>
-              this.selectedRRatios.flatMap((rRatio) => [
+            this.series = [
+              ...analysisResults.flatMap((item) =>
+                this.selectedRRatios.flatMap((rRatio) => [
+                  {
+                    type: "line",
+                    name: `${item.method} ${rRatio}`,
+                    data: item.rows
+                      .filter((row) => row.stress_ratio === rRatio)
+                      .map((row) => [row.cycles_to_failure, row.stress_max]),
+                  },
+                  {
+                    type: "line",
+                    name: `${item.method} ${rRatio}`,
+                    data: item.rows
+                      .filter((row) => row.stress_ratio === rRatio)
+                      .map((row) => [
+                        row.cycles_to_failure,
+                        row.stress_lowerbound,
+                      ]),
+                    lineStyle: {
+                      type: "dashed",
+                      width: 1,
+                    },
+                  },
+                  {
+                    type: "line",
+                    name: `${item.method} ${rRatio}`,
+                    data: item.rows
+                      .filter((row) => row.stress_ratio === rRatio)
+                      .map((row) => [
+                        row.cycles_to_failure,
+                        row.stress_upperbound,
+                      ]),
+                    lineStyle: {
+                      type: "dashed",
+                      width: 1,
+                    },
+                  },
+                ])
+              ),
+              // Plots input file
+              ...this.selectedRRatios.flatMap((rRatio) => [
                 {
-                  type: "line",
-                  name: `${item.method} ${rRatio}`,
-                  data: item.rows
+                  symbolSize: 5,
+                  type: "scatter",
+                  data: parsedInputFile.data
                     .filter((row) => row.stress_ratio === rRatio)
                     .map((row) => [row.cycles_to_failure, row.stress_max]),
+                  rRatio,
                 },
-                {
-                  type: "line",
-                  name: `${item.method} ${rRatio}`,
-                  data: item.rows
-                    .filter((row) => row.stress_ratio === rRatio)
-                    .map((row) => [
-                      row.cycles_to_failure,
-                      row.stress_lowerbound,
-                    ]),
-                  lineStyle: {
-                    type: "dashed",
-                    width: 1,
-                  },
-                },
-                {
-                  type: "line",
-                  name: `${item.method} ${rRatio}`,
-                  data: item.rows
-                    .filter((row) => row.stress_ratio === rRatio)
-                    .map((row) => [
-                      row.cycles_to_failure,
-                      row.stress_upperbound,
-                    ]),
-                  lineStyle: {
-                    type: "dashed",
-                    width: 1,
-                  },
-                },
-              ])
-            );
+              ]),
+            ];
           })
           .catch(() => {
             this.outputs = {};
