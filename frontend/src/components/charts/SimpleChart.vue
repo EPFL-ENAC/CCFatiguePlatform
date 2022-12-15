@@ -11,7 +11,7 @@
 <script>
 import { formatNumber } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
-import { LineChart } from "echarts/charts";
+import { LineChart, ScatterChart } from "echarts/charts";
 import {
   GridComponent,
   LegendComponent,
@@ -26,6 +26,7 @@ import VChart from "vue-echarts";
 use([
   CanvasRenderer,
   LineChart,
+  ScatterChart,
   GridComponent,
   LegendComponent,
   TitleComponent,
