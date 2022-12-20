@@ -91,6 +91,7 @@ import InfoTooltip from "@/components/InfoTooltip";
 import { getOutputFileName } from "@/utils/analysis";
 import { parserConfig } from "@/utils/papaparse";
 import download from "downloadjs";
+import { groupBy } from "lodash";
 import { parse } from "papaparse";
 
 const methods = Object.values(new CldMethod());
@@ -128,16 +129,16 @@ export default {
           .then((data) => {
             this.output = data;
             const results = parse(data, parserConfig);
-            this.series = [
-              {
-                type: "line",
-                name: this.method,
-                data: results.data.map((item) => [
-                  item.stress_mean,
-                  item.stress_amplitude,
-                ]),
-              },
-            ];
+            this.series = Object.entries(
+              groupBy(results.data, (row) => row.cycles_to_failure)
+            ).map((cycles_to_failure) => ({
+              type: "line",
+              name: `${this.method} ${cycles_to_failure[0]}`,
+              data: cycles_to_failure[1].map((item) => [
+                item.stress_mean,
+                item.stress_amplitude,
+              ]),
+            }));
             this.errorMessages = null;
           })
           .catch(() => {

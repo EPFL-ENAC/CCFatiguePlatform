@@ -13,6 +13,7 @@
     "core-js": "^3.6.5",
     "downloadjs": "^1.4.7",
     "echarts": "^5.3.3",
+    "lodash": "^4.17.21",
     "numeral": "^2.0.6",
     "papaparse": "^5.3.2",
     "querystring": "^0.2.1",
