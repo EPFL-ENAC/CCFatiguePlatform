@@ -11,7 +11,7 @@
 <script>
 import { formatNumber } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
-import { LineChart } from "echarts/charts";
+import { LineChart, ScatterChart } from "echarts/charts";
 import {
   DataZoomComponent,
   GridComponent,
@@ -28,6 +28,7 @@ use([
   DataZoomComponent,
   CanvasRenderer,
   LineChart,
+  ScatterChart,
   GridComponent,
   LegendComponent,
   TitleComponent,
