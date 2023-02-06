@@ -2,8 +2,6 @@ name: Feature request
 description: Request to integrate a new feature into the project
 title: "[New Feature] : {Feature summarized in 1 sentence}"
 labels: ["triage", "enhancement"]
-assignees:
-  - sbancal
 body:
   - type: markdown
     attributes:
