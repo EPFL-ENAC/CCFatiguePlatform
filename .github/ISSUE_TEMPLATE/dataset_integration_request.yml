@@ -2,8 +2,6 @@ name: Dataset integration request
 description: Request to integrate a new dataset into the project
 title: "[New Dataset] : {3LettersDataCode}_{Researcher's lastname}_{Date}_{Test type}"
 labels: ["Dataset", "triage"]
-assignees:
-  - sbancal
 body:
   - type: markdown
     attributes:
