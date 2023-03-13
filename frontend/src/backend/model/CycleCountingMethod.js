@@ -23,6 +23,18 @@ export default class CycleCountingMethod {
   RangeMean = "RangeMean";
 
   /**
+   * value: "RangePair"
+   * @const
+   */
+  RangePair = "RangePair";
+
+  /**
+   * value: "SimplifiedRainflow"
+   * @const
+   */
+  SimplifiedRainflow = "SimplifiedRainflow";
+
+  /**
    * Returns a <code>CycleCountingMethod</code> enum value from a Javascript object name.
    * @param {Object} data The plain JavaScript object containing the name of the enum value.
    * @return {module:model/CycleCountingMethod} The enum <code>CycleCountingMethod</code> value.

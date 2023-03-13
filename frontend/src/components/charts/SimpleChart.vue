@@ -11,8 +11,9 @@
 <script>
 import { formatNumber } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
-import { LineChart } from "echarts/charts";
+import { LineChart, ScatterChart } from "echarts/charts";
 import {
+  DataZoomComponent,
   GridComponent,
   LegendComponent,
   TitleComponent,
@@ -24,8 +25,10 @@ import { merge } from "lodash";
 import VChart from "vue-echarts";
 
 use([
+  DataZoomComponent,
   CanvasRenderer,
   LineChart,
+  ScatterChart,
   GridComponent,
   LegendComponent,
   TitleComponent,
@@ -44,6 +47,7 @@ export default {
     xAxisName: { type: String, default: "" },
     yAxisName: { type: String, default: "" },
     xAxisType: { type: String, default: "" },
+    dataZoom: { type: String, default: "" },
     color: { type: Array, default: () => colorPalette },
   },
   data() {
@@ -97,6 +101,20 @@ export default {
           confine: true,
           valueFormatter: formatNumber,
         },
+        dataZoom: [
+          {
+            id: "dataZoomX",
+            xAxisIndex: [0],
+            filterMode: "none",
+            type: "inside",
+          },
+          {
+            id: "dataZoomY",
+            yAxisIndex: [0],
+            filterMode: "none",
+            type: "inside",
+          },
+        ],
         series: this.series.map((serie) => merge(serie, { showSymbol: false })),
         color: this.color,
       };

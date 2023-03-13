@@ -44,6 +44,22 @@
           </v-select>
         </v-col>
       </v-row>
+      <v-row>
+        <v-col>
+          <v-text-field
+            v-model.number="ucs"
+            label="UCS"
+            type="number"
+          ></v-text-field>
+        </v-col>
+        <v-col>
+          <v-text-field
+            v-model.number="uts"
+            label="UTS"
+            type="number"
+          ></v-text-field>
+        </v-col>
+      </v-row>
     </v-card-subtitle>
     <v-card-text v-if="series.length > 0">
       <simple-chart
@@ -75,6 +91,7 @@ import InfoTooltip from "@/components/InfoTooltip";
 import { getOutputFileName } from "@/utils/analysis";
 import { parserConfig } from "@/utils/papaparse";
 import download from "downloadjs";
+import { groupBy } from "lodash";
 import { parse } from "papaparse";
 
 const methods = Object.values(new CldMethod());
@@ -92,6 +109,8 @@ export default {
       output: null,
       methods: methods,
       method: methods[0],
+      ucs: 27.1,
+      uts: 27.7,
       series: [],
       errorMessages: null,
     };
@@ -106,20 +125,20 @@ export default {
       if (this.file && this.method) {
         this.loading = true;
         this.$analysisApi
-          .runCldFile(this.method, this.file)
+          .runCldFile(this.method, this.ucs, this.uts, this.file)
           .then((data) => {
             this.output = data;
             const results = parse(data, parserConfig);
-            this.series = [
-              {
-                type: "line",
-                name: this.method,
-                data: results.data.map((item) => [
-                  item.stress_mean,
-                  item.stress_amplitude,
-                ]),
-              },
-            ];
+            this.series = Object.entries(
+              groupBy(results.data, (row) => row.cycles_to_failure)
+            ).map((cycles_to_failure) => ({
+              type: "line",
+              name: `${this.method} ${cycles_to_failure[0]}`,
+              data: cycles_to_failure[1].map((item) => [
+                item.stress_mean,
+                item.stress_amplitude,
+              ]),
+            }));
             this.errorMessages = null;
           })
           .catch(() => {

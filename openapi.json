@@ -500,6 +500,24 @@
             },
             "name": "method",
             "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Ucs",
+              "type": "number"
+            },
+            "name": "ucs",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Uts",
+              "type": "number"
+            },
+            "name": "uts",
+            "in": "query"
           }
         ],
         "requestBody": {
@@ -815,7 +833,8 @@
       "CldMethod": {
         "title": "CldMethod",
         "enum": [
-          "Harris"
+          "Harris",
+          "PiecewiseLinear"
         ],
         "type": "string",
         "description": "An enumeration."
@@ -823,7 +842,9 @@
       "CycleCountingMethod": {
         "title": "CycleCountingMethod",
         "enum": [
-          "RangeMean"
+          "RangeMean",
+          "RangePair",
+          "SimplifiedRainflow"
         ],
         "type": "string",
         "description": "An enumeration."
@@ -831,7 +852,8 @@
       "DamageSummationMethod": {
         "title": "DamageSummationMethod",
         "enum": [
-          "Harris"
+          "Harris",
+          "PiecewiseLinear"
         ],
         "type": "string",
         "description": "An enumeration."

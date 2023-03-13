@@ -102,14 +102,16 @@ var Ccfatigue = require("ccfatigue");
 
 var api = new Ccfatigue.AnalysisApi();
 var method = new Ccfatigue.CldMethod(); // {CldMethod}
+var ucs = 3.4; // {Number}
+var uts = 3.4; // {Number}
 var file = "/path/to/file"; // {File}
-api.runCldFile(method, file).then(
+api.runCldFile(method, ucs, uts, file).then(
   function (data) {
     console.log("API called successfully. Returned data: " + data);
   },
   function (error) {
     console.error(error);
-  }
+  },
 );
 ```
 
