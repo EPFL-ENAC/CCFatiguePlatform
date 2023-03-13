@@ -1,3 +1,6 @@
+include ./secrets/.env
+export $(shell sed 's/=.*//' ./secrets/.env)
+
 # install* -> install libs localy (without Docker)
 install:
 	npm install
@@ -46,3 +49,6 @@ run:
 # compile* -> does all Fortran compilation
 compile:
 	$(MAKE) -C backend compile
+
+backup-dump:
+	@docker-compose exec database sh -c 'PGPASSWORD="${POSTGRES_PASSWORD}" pg_dumpall -U ${POSTGRES_USER}' > ${DEST_FOLDER}/all-databases.sql
