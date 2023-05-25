@@ -3,6 +3,7 @@ Handle /experiments requests
 """
 
 import glob
+import os
 import subprocess
 import tempfile
 import zipfile
@@ -121,14 +122,24 @@ async def post_data_preprocess_check(
             with tst_data_lib.Logger(write_to_stdout=False) as logger:
                 logger.info(f"Parsing experiment {file.filename}")
 
-                exp_fp_folders = glob.glob(f"{tmp_dir_fp}/TST_*")
+                try:
+                    exp_fp_folders = glob.glob(f"{tmp_dir_fp}/TST_*")
+                    at_least_one_experiment = False
+                    for experiment_raw_fp_folder in exp_fp_folders:
+                        if os.path.isdir(experiment_raw_fp_folder):
+                            print(f"Parsing experiment {experiment_raw_fp_folder}")
+                            tst_data_lib.Experiment(experiment_raw_fp_folder, logger)
+                            at_least_one_experiment = True
+                        else:
+                            logger.warning(
+                                f"{experiment_raw_fp_folder} is not a directory, "
+                                "skipping"
+                            )
 
-                for experiment_raw_fp_folder in exp_fp_folders:
-                    print(f"Parsing experiment {experiment_raw_fp_folder}")
-                    tst_data_lib.Experiment(experiment_raw_fp_folder, logger)
-
-                if len(exp_fp_folders) == 0:
-                    logger.error("No experiment folder found")
+                    if not at_least_one_experiment:
+                        logger.error("No experiment folder found")
+                except Exception as e:
+                    logger.error(f"Error while parsing experiment: {e}")
 
                 # answer with output + success answer
                 return Experiment_Data_Preprocessed(
