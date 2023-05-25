@@ -3,15 +3,17 @@
 ## Structure
 
 Each experiment is composed of several tests.
+When sent to Dataset checker, the ZIP file must match the following structure:
 
 ```
-raw
-└───Experiment folder
-	   │   Metadata file .xls
-	   │   Test data 001 .csv
-	   │   Test data 002 .csv
-	   │   ...
+Experiment folder
+│   Metadata file .xls
+│   Test data 001 .csv
+│   Test data 002 .csv
+│   ...
 ```
+
+When added to the project, it is unzipped under Data/raw/ folder.
 
 ## Directory/file naming conventions
 
@@ -27,6 +29,16 @@ with:
   - `QS` = standard quasi-static
   - `TM` = DMA or temperature
 - `###`: Specimen number
+
+Example:
+
+```
+TST_Doe_2020-01_FA
+│   TST_2020-01_FA_metadata.xls
+│   TST_2020-01_FA_001.csv
+│   TST_2020-01_FA_002.csv
+│   ...
+```
 
 ## TST XLS file standards
 
