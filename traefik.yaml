@@ -4,3 +4,12 @@ tls:
       defaultCertificate:
         certFile: {{ env "SSL_CERT_CRT" }}
         keyFile: {{ env "SSL_CERT_KEY" }}
+  options:
+    default:
+      cipherSuites:
+        - TLS_AES_128_GCM_SHA256
+        - TLS_AES_256_GCM_SHA384
+        - TLS_CHACHA20_POLY1305_SHA256
+        - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
