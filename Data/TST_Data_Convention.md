@@ -45,7 +45,7 @@ TST_Doe_2020-01_FA
 Must match metadata template : [TST_Data_Template.xls](TST_Data_Template.xls)
 In the Excel metadata template, note that only row 4 (sheet 1) and row 3 (sheet 2) must be filled with metadata. The rest must remain unchanged.
 
-## TST CSV files standards (column names must be exact) :
+## TST CSV files standards (column names must be exact, where # is replaced by a number) :
 
 | Column name            | Description                                           | Unit    | Data type | Mandatory | Multiple measurement points |
 | ---------------------- | ----------------------------------------------------- | ------- | --------- | --------- | --------------------------- |
