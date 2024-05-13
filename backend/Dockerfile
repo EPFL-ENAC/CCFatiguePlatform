@@ -2,6 +2,7 @@ FROM python:3.10-alpine as poetry-stage
 WORKDIR /app
 RUN apk add --no-cache \
     gcc \
+    libffi-dev \
     musl-dev
 RUN pip install poetry
 COPY ./pyproject.toml ./poetry.lock* /app/
@@ -23,8 +24,11 @@ FROM python:3.10-slim as production-stage
 EXPOSE 80
 WORKDIR /app
 RUN apt-get update && apt-get install -y \
+    g++ \
     gcc \
+    musl-dev \
     libpq-dev \
+    libffi-dev \
     tree \
     && rm -rf /var/lib/apt/lists/*
 
