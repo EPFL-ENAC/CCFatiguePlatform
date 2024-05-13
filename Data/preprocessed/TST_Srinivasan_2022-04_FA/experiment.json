@@ -1,0 +1,28 @@
+{
+  "general": {
+    "laboratory": "CCLAB",
+    "researcher": "Dharun Srinivasan",
+    "date": "2022-04",
+    "experiment type": "FA",
+    "fracture": false,
+    "fatigue test type": "CA",
+    "measuring equipment": "MTS 25 kN",
+    "control mode": "Load Controlled"
+  },
+  "publication": {
+    "title": "Fatigue performance of wind turbine rotor blade epoxy adhesives",
+    "author": "Srinivasan",
+    "year": 2023,
+    "doi": "10.1016/j.polymertesting.2023.107975"
+  },
+  "material type": {
+    "sample type": "Adhesives",
+    "resin": "Epoxy",
+    "mixing ratio": "100/34"
+  },
+  "laminates and assemblies": {
+    "curing time": 2.0,
+    "curing temperature": 70.0,
+    "curing pressure": 1.0
+  }
+}

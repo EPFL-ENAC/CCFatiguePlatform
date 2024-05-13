@@ -110,6 +110,18 @@ export default {
           title: "Ing data + dev",
         },
         {
+          name: "Pierre Guilbert",
+          url: "https://people.epfl.ch/pierre.guilbert",
+          unit: "ENAC-IT4R",
+          title: "Ing data + dev",
+        },
+        {
+          name: "Yannick Marcon",
+          url: "https://people.epfl.ch/yannick.marcon",
+          unit: "ENAC-IT4R",
+          title: "Ing data + dev",
+        },
+        {
           name: "Nicolas Dubois",
           url: "https://people.epfl.ch/nicolas.dubois",
           unit: "ENAC-IT4R",

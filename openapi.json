@@ -867,7 +867,7 @@
           "laminates_and_assemblies_stacking_sequence"
         ],
         "type": "string",
-        "description": "\n    Enumerate all fields that can be requested as distinct\n    "
+        "description": "Enumerate all fields that can be requested as distinct"
       },
       "ExperimentModel": {
         "title": "ExperimentModel",

@@ -33,3 +33,4 @@ node_modules/
 *.vsix
 
 CCFatigue_modules/
+.DS_Store

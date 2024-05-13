@@ -15,6 +15,7 @@ dynaconf = "^3.1.7"
 psycopg2 = "^2.9.2"
 asyncpg = "^0.27.0"
 SQLAlchemy = {extras = ["asyncio"], version = "^1.4.41"}
+greenlet = "^1" # required by SQLAlchemy (on m1 mac)
 alembic = "^1.8.1"
 fastapi-pagination = {extras = ["async_sqlalchemy"], version = "^0.10.0"}
 bokeh = "^3.0.1"
