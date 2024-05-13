@@ -68,4 +68,4 @@ MIT
 
 # Contributors
 
-Charlotte Weil, Samuel Bancal, David Tang, Nicolas Dubois, Scott M. Salmon, Anastasios Vassilopoulos, Shayan Khalooei
+Charlotte Weil, Samuel Bancal, David Tang, Nicolas Dubois, Pierre Guilbert, Yannick Marcon Scott M. Salmon, Anastasios Vassilopoulos, Shayan Khalooei
