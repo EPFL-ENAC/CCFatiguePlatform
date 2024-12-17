@@ -1,0 +1,18 @@
+# https://github.com/EPFL-ENAC/epfl-enac-build-push-deploy-action#readme
+name: deploy
+
+"on":
+  push:
+    branches:
+      - develop
+    tags: ["v*.*.*"]
+
+jobs:
+  deploy:
+    uses: EPFL-ENAC/epfl-enac-build-push-deploy-action/.github/workflows/deploy.yml@v2.0.0
+    secrets:
+      token: ${{ secrets.CD_TOKEN }}
+    with:
+      org: epfl-cclab
+      repo: ccfatigue
+      build_context: '["./backend", "./frontend"]'
