@@ -5,6 +5,7 @@ RUN apk add --no-cache \
     libffi-dev \
     musl-dev
 RUN pip install poetry
+RUN pip install --user poetry-plugin-export
 COPY ./pyproject.toml ./poetry.lock* /app/
 RUN poetry export --without-hashes --format=requirements.txt --output requirements.txt
 
