@@ -3,11 +3,30 @@
     <v-card>
       <v-card-title>Dataset checker</v-card-title>
       <v-card-text>
+        <!--
+          <p>
+            Refer to the dio santo
+            <a :href="TSTDataConventionURL"> TST Data Convention </a>
+            to prepare your Dataset prova.
+          </p>
+        -->
         <p>
-          Refer to the
-          <a :href="TSTDataConventionURL"> TST Data Convention </a>
-          to prepare your Dataset.
+          To upload a new database please follow the proposed guide:
+          <button class="custom-button" @click="openPdf">Upload Guide</button>
         </p>
+        <div v-if="isPdfVisible" class="pdf-container">
+          <iframe :src="pdfFileUrl" width="100%" height="500px"></iframe>
+          <button @click="closePdf">Close</button>
+        </div>
+        <!-- Dropdown Menu Inserted Here -->
+        <v-select
+          v-model="selectedOption"
+          :items="dropdownOptions"
+          label="Choose the experimental campaign"
+          dense
+          outlined
+          @change="downloadZip"
+        ></v-select>
         <v-file-input
           v-model="experimentZip.file"
           chips
@@ -88,6 +107,18 @@ export default {
         "Warning: ": "warning white--text",
         "ERROR: ": "error white--text",
       },
+      selectedOption: null,
+      dropdownOptions: [
+        { text: "QuasiStatic", value: "/files/QuasiStatic.zip" },
+        {
+          text: "QuasiStatic with fracture",
+          value: "/files/QuasiStatic_fracture.zip",
+        },
+        { text: "Fatigue", value: "/files/Fatigue.zip" },
+        { text: "Fatigue with fracture", value: "/files/Fatigue_fracture.zip" },
+      ],
+      isPdfVisible: false,
+      pdfFileUrl: "/files/Upload_guide.pdf",
     };
   },
   computed: {
@@ -146,6 +177,22 @@ export default {
           console.log("Error", { error });
         });
       return true;
+    },
+    downloadZip() {
+      if (this.selectedOption) {
+        const link = document.createElement("a");
+        link.href = this.selectedOption;
+        link.setAttribute("download", "");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    },
+    openPdf() {
+      this.isPdfVisible = true;
+    },
+    closePdf() {
+      this.isPdfVisible = false;
     },
   },
 };

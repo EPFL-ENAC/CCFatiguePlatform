@@ -4,7 +4,7 @@
       <v-card-title>About</v-card-title>
       <v-card-text>
         <p class="text-justify">
-          CCFatiguePlatform is an initiative from CCLab at EPFL that aims to
+          CCFatiguePlatform is an initiative from GR-MeC at EPFL that aims to
           develop a open-source web application to harmonize, facilitate storage
           and analysis of composite materials testing datasets.
         </p>
