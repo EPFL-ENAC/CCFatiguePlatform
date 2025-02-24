@@ -11,7 +11,7 @@ CCFatiguePlatform is an initiative from CCLab that aims to develop a web applica
 ```bash
 mkdir -p secrets && cat <<EOF > secrets/.env
 POSTGRES_USER=ccfatigue
-POSTGRES_PASSWORD=change-it!
+POSTGRES_PASSWORD=mannino
 EOF
 ```
 
