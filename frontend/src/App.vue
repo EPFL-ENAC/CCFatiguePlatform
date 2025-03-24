@@ -36,6 +36,17 @@
                   </v-btn>
                 </v-list-item-title>
               </v-list-item>
+              <v-list-item>
+                <v-list-item-title>
+                  <v-btn
+                    color="secondary"
+                    elevation="0"
+                    :to="{ name: 'DataUpload_V2' }"
+                  >
+                    Data upload V2 Filippo
+                  </v-btn>
+                </v-list-item-title>
+              </v-list-item>
             </v-list>
           </v-menu>
         </v-tab>
