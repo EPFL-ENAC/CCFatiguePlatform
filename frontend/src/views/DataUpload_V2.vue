@@ -1,13 +1,65 @@
 <template>
   <v-container>
     <v-card>
-      <v-card-title>Dataset checker, page just added </v-card-title>
+      <v-card-title>Upload Guidelines</v-card-title>
       <v-card-text>
+        <v-btn color="primary" outlined @click="showPdf = !showPdf">
+          {{ showPdf ? "Hide PDF" : "Open PDF" }}
+        </v-btn>
+
+        <div v-if="showPdf" class="mt-4">
+          <iframe
+            :src="pdfURL"
+            width="100%"
+            height="500px"
+            style="border: none"
+          ></iframe>
+        </div>
+      </v-card-text>
+    </v-card>
+    <!-- Card con bottone per aprire il PDF in un'altra scheda
+    <v-card>
+    <v-card-title>Dataset Guidelines</v-card-title>
+    <v-card-text>
+    <v-btn :href="pdfURL" target="_blank" color="primary" outlined>
+    Apri PDF
+    </v-btn>
+    </v-card-text>
+    </v-card>
+    -->
+    <!-- File Download Dropdown -->
+    <v-card class="mt-4">
+      <v-card-title>Select the experimental campaign type</v-card-title>
+      <v-card-text>
+        <v-select
+          v-model="selectedFile"
+          :items="fileOptions"
+          label="Choose a file"
+          dense
+          outlined
+        ></v-select>
+        <v-btn
+          :disabled="!selectedFile"
+          color="primary"
+          class="mt-2"
+          @click="downloadFile"
+        >
+          Download ZIP
+        </v-btn>
+      </v-card-text>
+    </v-card>
+
+    <!-- Dataset checker -->
+    <v-card class="mt-4">
+      <v-card-title>Dataset checker</v-card-title>
+      <v-card-text>
+        <!--  
         <p>
           Refer to the
-          <a :href="TSTDataConventionURL"> TST Data Convention </a>
+          <a :href="TSTDataConventionURL">TST Data Convention</a>
           to prepare your Dataset.
         </p>
+        -->
         <v-file-input
           v-model="experimentZip.file"
           chips
@@ -42,7 +94,7 @@
               {{ countWarnings }} {{ "warning" | pluralize(countWarnings) }},
               {{ countErrors }} {{ "error" | pluralize(countErrors) }}. <br />
               Please fix it according to the
-              <a :href="TSTDataConventionURL"> TST Data convention </a>
+              <a :href="TSTDataConventionURL">TST Data convention</a>
               and test it here again
             </v-alert>
           </template>
@@ -67,11 +119,15 @@
 </template>
 
 <script>
-const axios = require("axios");
+import axios from "axios";
+
 export default {
   name: "DataUpload",
   data() {
     return {
+      showPdf: false,
+      pdfURL: "/downloads/Upload_guide.pdf", // Assicurati che il file sia in public/downloads/
+
       TSTDataConventionURL:
         "https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/main/Data/TST_Data_Convention.md",
       experimentZip: {
@@ -88,6 +144,19 @@ export default {
         "Warning: ": "warning white--text",
         "ERROR: ": "error white--text",
       },
+      selectedFile: null,
+      fileOptions: [
+        { text: "Quasi static", value: "/downloads/QuasiStatic.zip" },
+        {
+          text: "Quasi static with fracture",
+          value: "/downloads/QuasiStatic_fracture.zip",
+        },
+        { text: "Fatigue", value: "/downloads/Fatigue.zip" },
+        {
+          text: "Fatigue with fracture",
+          value: "/downloads/Fatigue_fracture.zip",
+        },
+      ],
     };
   },
   computed: {
@@ -103,6 +172,16 @@ export default {
     },
   },
   methods: {
+    downloadFile() {
+      if (!this.selectedFile) return;
+
+      const link = document.createElement("a");
+      link.href = this.selectedFile;
+      link.setAttribute("download", this.selectedFile.split("/").pop());
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    },
     changeExperimentZip() {
       this.experimentCheckResult = {
         output: [],
@@ -115,6 +194,7 @@ export default {
 
       const formData = new FormData();
       formData.append("file", this.experimentZip.file);
+
       axios
         .post(
           `${this.$experimentsApi.apiClient.basePath}/experiments/data_preprocess_check`,
@@ -142,9 +222,10 @@ export default {
           this.experimentZip.loading = false;
         })
         .catch((error) => {
-          // eslint-disable-next-line no-console
           console.log("Error", { error });
+          this.experimentZip.loading = false;
         });
+
       return true;
     },
   },
@@ -158,5 +239,8 @@ a {
 .output {
   height: 30vh;
   overflow-y: scroll;
+}
+iframe {
+  border-radius: 6px;
 }
 </style>
