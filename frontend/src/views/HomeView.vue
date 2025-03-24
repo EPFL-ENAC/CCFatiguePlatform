@@ -5,10 +5,10 @@
     <v-card flat>
       <v-card-title> Introduction </v-card-title>
       <p>
-        CCFatigue is an initiative from the Composite Construction Laboratory
-        (CCLab) that aims at facilitating access to and analysis of composite
-        materials testings. It is comprised of a database environment allowing
-        for organized storage and retrieval of new and already existing data.
+        CCFatigue is an initiative from the Composite Mechanics Group (GR-MeC)
+        that aims at facilitating access to and analysis of composite materials
+        testings. It is comprised of a database environment allowing for
+        organized storage and retrieval of new and already existing data.
         Additionally to the database, an analysis tool is made available to
         allow for computation, visualization and comparison of experimental
         data.
