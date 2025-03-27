@@ -316,8 +316,8 @@ class FilippoExperiment:
                 {"path": "general>QS add info", "type": str},
                 {"path": "general>other test type OT", "type": str},
                 {"path": "general>OT add info", "type": str},
-                {"path": "general>fracture mode", "type": str},
-                {"path": "general>additional info", "type": str},                
+                {"path": "general>fracture mode FM", "type": str},
+                {"path": "general>FM add info", "type": str},                
                 {"path": "general>control mode CM", "type": str},
                 {"path": "general>CM add info", "type": str},
                 {"path": "general>fatigue control mode FCM", "type": str},
@@ -396,23 +396,19 @@ class FilippoExperiment:
                     "mandatory": True,
                 },
                 {
-                    "path": "general>control mode",
+                    "path": "general>control mode CM",
                     "mandatory": True,
                 },
                 {
-                    "path": "general>fracture mode",
+                    "path": "general>fracture mode FM",
                     "mandatory": (
-                        FilippoExperiment.__get_val_at(self.experiment, "general>quasi-static test type", "") == "fracture"
-                        or FilippoExperiment.__get_val_at(self.experiment, "general>fatigue test type", "") == "fracture"
+                        FilippoExperiment.__get_val_at(self.experiment, "general>quasi-static test type QS", "") == "fracture"
+                        or FilippoExperiment.__get_val_at(self.experiment, "general>fatigue test type FA", "") == "fracture"
                     ),
                     "mandatory_condition": "when quasi-static test type or fatigue test type is 'fracture'",
                 },
                 {
-                    "path": "general>additional info",
-                    "mandatory": False,
-                },
-                {
-                    "path": "general>fatigue test type",
+                    "path": "general>fatigue test type FA",
                     "mandatory": FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "") == "FA",
                     "mandatory_condition": "when experiment type is 'FA'",
                 },
@@ -422,12 +418,12 @@ class FilippoExperiment:
                     "mandatory_condition": "when experiment type is 'FA'",
                 },
                 {
-                    "path": "general>quasi-static test type",
+                    "path": "general>quasi-static test type QS",
                     "mandatory": FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "") == "QS",
                     "mandatory_condition": "when experiment type is 'QS'",
                 },
                 {
-                    "path": "general>other test type",
+                    "path": "general>other test type OT",
                     "mandatory": FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "") == "TM",
                     "mandatory_condition": "when experiment type is 'OT'",
                 },
@@ -542,8 +538,8 @@ class FilippoExperiment:
                             "general>experiment type",
                             "",
                         )
-                        == "TM",
-                        "path": "general>temperature test type",
+                        == "OT",
+                        "path": "general>other test type",
                         "enum": (
                             "DMA",
                             "DSC",
@@ -553,7 +549,7 @@ class FilippoExperiment:
                     },
                     {
                         "check_needed": True,
-                        "path": "general>control mode",
+                        "path": "general>control mode CM",
                         "enum": (
                             "Load Controlled",
                             "Displacement Controlled",
@@ -576,65 +572,65 @@ class FilippoExperiment:
 
             # Block 4: Additional Info Check for 'Other/NA' (Direct Checks)
             # Description: Directly check that if a field is 'Other/NA', its corresponding additional info field is provided.
-            if self.experiment.get("general>fatigue test type") == "Other/NA":
+            if self.experiment.get("general>fatigue test type FA") == "Other/NA":
                 if not self.experiment.get("general>FA add info", "").strip():
                     self.logger.error(
-                        "Il campo 'general>FA add info' è obbligatorio quando 'general>fatigue test type' è 'Other/NA'."
+                        "Il campo 'general>FA add info' è obbligatorio quando 'general>fatigue test type FA' è 'Other/NA'."
                     )
 
-            if self.experiment.get("general>quasi-static test type") == "Other/NA":
+            if self.experiment.get("general>quasi-static test type QS") == "Other/NA":
                 if not self.experiment.get("general>QS add info", "").strip():
                     self.logger.error(
-                        "Il campo 'general>QS add info' è obbligatorio quando 'general>quasi-static test type' è 'Other/NA'."
+                        "Il campo 'general>QS add info' è obbligatorio quando 'general>quasi-static test type QS' è 'Other/NA'."
                     )
 
-            if self.experiment.get("general>control mode") == "Other/NA":
+            if self.experiment.get("general>control mode CM") == "Other/NA":
                 if not self.experiment.get("general>CM add info", "").strip():
                     self.logger.error(
-                        "Il campo 'general>CM add info' è obbligatorio quando 'general>control mode' è 'Other/NA'."
+                        "Il campo 'general>CM add info' è obbligatorio quando 'general>control mode CM' è 'Other/NA'."
                     )
 
-            if self.experiment.get("general>fatigue control mode") == "Other/NA":
+            if self.experiment.get("general>fatigue control mode FCM") == "Other/NA":
                 if not self.experiment.get("general>FCM add info", "").strip():
                     self.logger.error(
-                        "Il campo 'general>FCM add info' è obbligatorio quando 'general>fatigue control mode' è 'Other/NA'."
+                        "Il campo 'general>FCM add info' è obbligatorio quando 'general>fatigue control mode FCM' è 'Other/NA'."
                     )
 
-            if self.experiment.get("general>temperature test type") == "Other/NA":
+            if self.experiment.get("general>other test type OT") == "Other/NA":
                 if not self.experiment.get("general>OT add info", "").strip():
                     self.logger.error(
-                        "Il campo 'general>OT add info' è obbligatorio quando 'general>temperature test type' è 'Other/NA'."
+                        "Il campo 'general>OT add info' è obbligatorio quando 'general>other test type OT' è 'Other/NA'."
                     )
 
             # Block 5: Additional Info Check for 'Other/NA' (Structured Constraint)
             # Description: Using a structured constraints list to validate that the additional info field is provided if the main field is 'Other/NA'.
             other_fields_constraints = (
                 {
-                    "path": "general>fatigue test type",
+                    "path": "general>fatigue test type FA",
                     "expected": "Other/NA",
                     "additional": "general>FA add info",
                     "type": str,
                 },
                 {
-                    "path": "general>quasi-static test type",
+                    "path": "general>quasi-static test type QS",
                     "expected": "Other/NA",
                     "additional": "general>QS add info",
                     "type": str,
                 },
                 {
-                    "path": "general>control mode",
+                    "path": "general>control mode CM",
                     "expected": "Other/NA",
                     "additional": "general>CM add info",
                     "type": str,
                 },
                 {
-                    "path": "general>fatigue control mode",
+                    "path": "general>fatigue control mode FCM",
                     "expected": "Other/NA",
                     "additional": "general>FCM add info",
                     "type": str,
                 },
                 {
-                    "path": "general>temperature test type",
+                    "path": "general>other test type OT",
                     "expected": "Other/NA",
                     "additional": "general>OT add info",
                     "type": str,
