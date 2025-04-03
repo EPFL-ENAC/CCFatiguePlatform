@@ -6,7 +6,7 @@
         <p class="text-justify">
           CCFatiguePlatform is an initiative from GR-MeC at EPFL that aims to
           develop a open-source web application to harmonize, facilitate storage
-          and analysis of composite materials testing datasets Filippo.
+          and analysis of composite materials testing datasets.
         </p>
         <p class="text-justify">
           The web app is under active development and at prototype stage. Please
