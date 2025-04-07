@@ -314,10 +314,10 @@ class FilippoExperiment:
                 {"path": "general>fa experiment type", "type": str},
                 {"path": "general>ot experiment type", "type": str},
                 {"path": "general>ot add info", "type": str},
-                {"path": "general>fracture mode fm", "type": str},
+                {"path": "general>fracture mode (fm)", "type": str},
                 {"path": "general>fm add info", "type": str},                
                 {"path": "general>control mode", "type": str},
-                {"path": "general>fatigue control mode fcm", "type": str},
+                {"path": "general>fatigue control mode (fcm)", "type": str},
                 {"path": "general>fcm add info", "type": str},
                 {"path": "general>measuring equipment", "type": str},
                 # PUBLICATION SECTION
@@ -325,6 +325,7 @@ class FilippoExperiment:
                 # MATERIAL TYPE SECTION
                 {"path": "material type>material tested", "type": str},
                 {"path": "material type>sample type", "type": str},
+                {"path": "material type>sample type add info", "type": str},
                 {"path": "material type>fiber material", "type": str},
                 {"path": "material type>fiber form", "type": str},
                 {"path": "material type>area density", "type": str},
@@ -337,6 +338,10 @@ class FilippoExperiment:
                 {"path": "material type>postcuring time", "type": float},
                 {"path": "material type>postcuring temperature", "type": float},
                 {"path": "material type>postcuring pressure", "type": float},
+                {"path": "material type>glue", "type": str},
+                {"path": "material type>glue curing time", "type": float},
+                {"path": "material type>glue curing pressure", "type": float},
+                {"path": "material type>glue curing temperature", "type": float},                                                                
                 # LAMINATES AND ASSEMBLIES SECTION
                 {"path": "laminates and assemblies>stacking sequence", "type": str},
                 {"path": "laminates and assemblies>fiber volume ratio", "type": str},
@@ -408,10 +413,10 @@ class FilippoExperiment:
                 else:
                     self.logger.info(f"Found 'general>fa experiment type': {general_section['fa experiment type']}")
 
-                if "fatigue control mode fcm" not in general_section:
-                    self.logger.error("Missing mandatory column 'general>fatigue control mode fcm' (experiment type is 'FA')")
+                if "fatigue control mode (fcm)" not in general_section:
+                    self.logger.error("Missing mandatory column 'general>fatigue control mode (fcm)' (experiment type is 'FA')")
                 else:
-                    self.logger.info(f"Found 'general>fatigue control mode fcm': {general_section['fatigue control mode fcm']}")
+                    self.logger.info(f"Found 'general>fatigue control mode (fcm)': {general_section['fatigue control mode (fcm)']}")
 
                 fatigue_section = self.experiment.get("fatigue", {})
                 if "r ratio" not in fatigue_section:
@@ -444,7 +449,7 @@ class FilippoExperiment:
                     "mandatory": True,
                 },
                 {
-                    "path": "general>fracture mode fm",
+                    "path": "general>fracture mode (fm)",
                     "mandatory": (
                         FilippoExperiment.__get_val_at(self.experiment, "general>qs experiment type", "") == "fracture"
                         or FilippoExperiment.__get_val_at(self.experiment, "general>fa experiment type", "") == "fracture"
@@ -459,7 +464,7 @@ class FilippoExperiment:
                     "mandatory_condition": "when experiment type is 'FA'",
                 },
                 {
-                    "path": "general>fatigue control mode fcm",
+                    "path": "general>fatigue control mode (fcm)",
                     "mandatory": FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "") == "FA",
                     "mandatory_condition": "quando experiment type è 'FA'",
                 },
@@ -537,7 +542,7 @@ class FilippoExperiment:
                             FilippoExperiment.__get_val_at(self.experiment, "general>qs experiment type", "") == "fracture"
                             or FilippoExperiment.__get_val_at(self.experiment, "general>fa experiment type", "") == "fracture"
                         ),
-                        "path": "general>fracture mode",
+                        "path": "general>fracture mode (fm)",
                         "enum": (
                             "Mode I",
                             "Mode II",
@@ -552,12 +557,12 @@ class FilippoExperiment:
                             "",
                         )
                         == "FA",
-                        "path": "general>fatigue control mode fcm",
+                        "path": "general>fatigue control mode (fcm)",
                         "enum": (
                             "CA",
                             "VA",
                             "BL",
-                            "Other/NA",
+                            "Other",
                         ),
                     },
                     {
@@ -604,7 +609,7 @@ class FilippoExperiment:
                             "DMA",
                             "DSC",
                             "Fire",
-                            "Other/NA",
+                            "Other",
                         ),
                     },
                     {
@@ -616,6 +621,16 @@ class FilippoExperiment:
                             "Strain controlled",
                         ),
                     },
+                    {
+                        "check_needed": True,
+                        "path": "material type>other polymers add info",
+                        "enum": (
+                            "Laminates",
+                            "Bulk adhesives",
+                            "Adhesive joints",
+                            "Other polymers"
+                        ),
+                    },                    
                 ),
             ):
                 try:
@@ -630,19 +645,25 @@ class FilippoExperiment:
                 except KeyError:
                     pass
 
-            # Block 4: Additional Info Check for 'Other/NA'
+            # Block 4: Additional Info Check for 'Other'
             # Check if, for OT and FCM, the 'add info' field is provided when necessary.
-            if self.experiment.get("general", {}).get("ot experiment type") == "Other/NA":
+            if self.experiment.get("general", {}).get("ot experiment type") == "Other":
                 if not self.experiment.get("general", {}).get("ot add info", "").strip():
                     self.logger.error(
-                        "The field 'general>ot add info' is mandatory when 'general>ot experiment type' is 'Other/NA'."
+                        "The field 'general>ot add info' is mandatory when 'general>ot experiment type' is 'Other'."
                     )
 
-            if self.experiment.get("general", {}).get("fatigue control mode fcm") == "Other/NA":
+            if self.experiment.get("general", {}).get("fatigue control mode (fcm)") == "Other":
                 if not self.experiment.get("general", {}).get("fcm add info", "").strip():
                     self.logger.error(
-                        "The field 'general>fcm add info' is mandatory when 'general>fatigue control mode fcm' is 'Other/NA'."
+                        "The field 'general>fcm add info' is mandatory when 'general>fatigue control mode fcm' is 'Other'."
                     )
+
+            if self.experiment.get("material type", {}).get("material tested") == "Other polymers":
+                if not self.experiment.get("material type", {}).get("other polymers add info", "").strip():
+                    self.logger.error(
+                        "The field 'material type>other polymers add info' is mandatory when 'material type>other polymers add info' is 'Other polymers'."
+                    )                    
 
             # Block 6: Type Check
             for col_constraint in (
@@ -666,6 +687,10 @@ class FilippoExperiment:
                     "path": "material type>sample type",
                     "type": str,
                 },
+                {
+                    "path": "material type>other polymers add info",
+                    "type": str,
+                },                
                 {
                     "path": "material type>fiber material",
                     "type": str,
@@ -714,6 +739,22 @@ class FilippoExperiment:
                     "path": "material type>postcuring pressure",
                     "type": float,
                 },
+                {
+                    "path": "material type>glue",
+                    "type": str,
+                },
+                {
+                    "path": "material type>glue curing time",
+                    "type": float,
+                },
+                {
+                    "path": "material type>glue curing pressure",
+                    "type": float,
+                },
+                {
+                    "path": "material type>glue curing temperature",
+                    "type": float,
+                },                
                 {
                     "path": "laminates and assemblies>stacking sequence",
                     "type": str,
@@ -785,56 +826,46 @@ class FilippoExperiment:
 
     def _read_tests(self):
         """
-        Read tests metadata from XLS Tests tab
+        Read tests metadata from XLS Tests tab and convert to nested dict
         """
         self.logger.info(
             f"Read {os.path.basename(self.exp_meta_meta['raw_xls_fp'])} Tests tab"
         )
         with self.logger.indent:
-            # Store the original tests DataFrame in tests_df
-            self.tests_df = pd.read_excel(
-                self.exp_meta_meta["raw_xls_fp"], sheet_name="Tests"
+            tests_df = pd.read_excel(
+                self.exp_meta_meta["raw_xls_fp"],
+                sheet_name="Tests",
+                header=[0, 1]
             )
-            # Also keep self.tests for later processing (cleanup/validation)
-            self.tests = self.tests_df.copy()
+            self.tests_df = tests_df
+
+            def df_to_nested_dict(df: pd.DataFrame) -> dict:
+                def nest(d: dict) -> dict:
+                    result = {}
+                    for key, value in d.items():
+                        target = result
+                        for k in key[:-1]:
+                            target = target.setdefault(k.strip().lower(), {})
+                        target[key[-1].strip().lower()] = value
+                    return result
+                d = df.to_dict(orient="index")
+                return {k: nest(v) for k, v in d.items()}
+
+            self.tests = df_to_nested_dict(tests_df)[0]
+
 
     def _cleanup_tests(self):
         """
-        Cleanup tests metadata
-        + small typos fixed
-        + only expected fields
-        + only non-empty fields (null/NaN)
-        + fields casted as bool / float / int / str
+        Cleanup tests metadata: remove nulls, fix types, keep only expected keys
         """
         self.logger.info("Cleanup tests")
         with self.logger.indent:
-
-            # Logga struttura originale dei dati
-            self.logger.info("Tests structure BEFORE cleanup:")
-            try:
-                import json
-                if isinstance(self.tests, pd.DataFrame):
-                    self.logger.info(json.dumps(self.tests.to_dict(orient="list"), indent=2, ensure_ascii=False))
-                else:
-                    self.logger.error("self.tests is not a DataFrame; cannot call to_dict.")
-            except Exception as e:
-                if isinstance(self.tests, dict):
-                    self.logger.info(json.dumps(self.tests, indent=2, ensure_ascii=False))
-                else:
-                    self.logger.error("self.tests is not a dictionary; cannot process.")
-                self.logger.error(f"Cannot print raw tests: {e}")
-
             def to_bool(value):
-                if pd.isna(value):  # evita 'NaN' in input
-                    raise ValueError("Cannot convert NaN to bool")
-                if isinstance(value, bool):
-                    return value
-                if isinstance(value, str):
-                    val = value.strip().lower()
-                    if val.startswith("y") or val == "1":
-                        return True
-                    elif val.startswith("n") or val == "0":
-                        return False
+                if pd.isna(value): raise ValueError("NaN cannot be converted to bool")
+                if isinstance(value, bool): return value
+                val = str(value).strip().lower()
+                if val.startswith("y") or val == "1": return True
+                if val.startswith("n") or val == "0": return False
                 raise ValueError(f"Cannot convert '{value}' to bool")
 
             CASTING = {
@@ -845,173 +876,87 @@ class FilippoExperiment:
             }
 
             expected_constraints = (
-                {"path": "sequential number", "type": int},
-                {"path": "specimen name", "type": str},
-                {"path": "number of cycles", "type": int},
-                {"path": "maximum load", "type": float},
-                {"path": "run out", "type": bool},
-                {"path": "length", "type": float},
-                {"path": "width", "type": float},
-                {"path": "thickness", "type": float},
-                {"path": "temperature", "type": float},
-                {"path": "humidity", "type": float},
-                {"path": "initial crack length", "type": float},
-                {"path": "subset size", "type": float},
-                {"path": "step size", "type": float},
+                {"path": "specimen information>sequential number", "type": int},
+                {"path": "specimen information>specimen name", "type": str},
+                {"path": "fatigue>number of cycles", "type": int},
+                {"path": "fatigue>maximum load", "type": float},
+                {"path": "fatigue>run out", "type": bool},
+                {"path": "geometry>length", "type": float},
+                {"path": "geometry>width", "type": float},
+                {"path": "geometry>thickness", "type": float},
+                {"path": "environment>temperature", "type": float},
+                {"path": "environment>humidity", "type": float},
+                {"path": "geometry>initial crack length", "type": float},
+                {"path": "dic analysis>subset size", "type": float},
+                {"path": "dic analysis>step size", "type": float},
             )
 
             fixed_tests = {}
-
-            # Normalizza colonne
-            if isinstance(self.tests, pd.DataFrame):
-                self.tests.columns = self.tests.columns.str.strip().str.lower()
-            else:
-                self.logger.error("self.tests is not a DataFrame; cannot process columns.")
-
             for constraint in expected_constraints:
-                col = constraint["path"]
-                col_type = constraint["type"]
                 try:
-                    if col in self.tests:
-                        series = self.tests[col]
-                        # Filtra valori validi (non-NaN)
-                        valid_values = [v for v in series if not pd.isna(v)]
+                    val = FilippoExperiment.__get_val_at(self.tests, constraint["path"])
+                    if val is not None and not (isinstance(val, float) and np.isnan(val)):
+                        casted_val = CASTING[constraint["type"]](val)
+                        FilippoExperiment.__set_val_at(fixed_tests, constraint["path"], casted_val)
+                except (KeyError, ValueError) as e:
+                    self.logger.warning(f"Skipping field '{constraint['path']}': {e}")
 
-                        if not valid_values:
-                            continue  # niente da settare
-
-                        casted_val = CASTING[col_type](valid_values[0])
-                        FilippoExperiment.__set_val_at(fixed_tests, col, casted_val)
-
-                except Exception as e:
-                    self.logger.error(f"exception while processing column '{col}': {e}")
-
-            # Converte in struttura annidata
-            def nest_dict(flat_dict):
-                nested = {}
-                for compound_key, value in flat_dict.items():
-                    keys = compound_key.split(">")
-                    d = nested
-                    for key in keys[:-1]:
-                        key = key.strip()
-                        if key not in d:
-                            d[key] = {}
-                        d = d[key]
-                    d[keys[-1].strip()] = value
-                return nested
-
-            self.tests = nest_dict(fixed_tests)
-
-            # Logga struttura finale dei test
+            self.tests = fixed_tests  # already a nested dict from __set_val_at
             self.logger.info("Tests structure AFTER cleanup:")
-            try:
-                self.logger.info(json.dumps(self.tests, indent=2, ensure_ascii=False))
-            except Exception as e:
-                self.logger.error(f"Cannot print cleaned test structure: {e}")
+            import json
+            self.logger.info(json.dumps(self.tests, indent=2, ensure_ascii=False))
+
 
     def _validate_tests(self):
         """
-        Validate tests metadata.
+        Validate cleaned test metadata
         """
         self.logger.info("Validate tests")
         with self.logger.indent:
             import json
             self.logger.info("Tests structure after cleanup:")
-            try:
-                self.logger.info(json.dumps(self.tests, indent=2, ensure_ascii=False))
-            except Exception as e:
-                self.logger.error(f"Failed to print test structure: {e}")
-            
+            self.logger.info(json.dumps(self.tests, indent=2, ensure_ascii=False))
+
             if hasattr(self, 'tests_df'):
                 num_tests_lines = self.tests_df.shape[0]
                 num_csv_files = len(self.exp_meta_meta["measures"])
                 if num_tests_lines != num_csv_files:
                     self.logger.error(
-                        f"Mismatch: Number of tests sheet lines ({num_tests_lines}) does not match number of CSV files ({num_csv_files})."
+                        f"Mismatch: Number of tests sheet lines ({num_tests_lines}) "
+                        f"does not match number of CSV files ({num_csv_files})."
                     )
                 else:
-                    self.logger.info("The number of tests sheet lines matches the number of CSV files.")
-            else:
-                self.logger.error("tests_df is not available to perform the CSV count check.")
+                    self.logger.info("The number of tests matches the number of CSV files.")
 
-            # Recupera il tipo di test dall'esperimento
-            test_type_raw = FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "")
-            test_type = test_type_raw.strip().upper()
-            self.logger.info(f"Normalized test type: '{test_type}' (raw: '{test_type_raw}')")
-
+            test_type = FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "").strip().upper()
             fa_type = FilippoExperiment.__get_val_at(self.experiment, "general>fa experiment type", "").strip().lower()
-            print(f"fa_type: {fa_type}")
             qs_type = FilippoExperiment.__get_val_at(self.experiment, "general>qs experiment type", "").strip().lower()
             is_fracture = fa_type == "fracture" or qs_type == "fracture"
 
-        # Blocco 1: Verifica campi obbligatori
-        for col_constraint in (
-            {"path": "sequential number", "mandatory": True},
-            {"path": "specimen name", "mandatory": True},
-            {"path": "width", "mandatory": True},
-            {"path": "thickness", "mandatory": True},
-            {
-                "path": "number of cycles",
-                "mandatory": test_type == "FA",
-                "mandatory_condition": "when test type is FA",
-            },
-            {
-                "path": "run out",
-                "mandatory": test_type == "FA",
-                "mandatory_condition": "when test type is FA",
-            },
-            {
-                "path": "maximum load",
-                "mandatory": test_type == "FA",
-                "mandatory_condition": "when test type is FA",
-            },
-            {
-                "path": "initial crack length",
-                "mandatory": is_fracture,
-                "mandatory_condition": "when fa or qs type is fracture",
-            },
-        ):
-            try:
-                val = FilippoExperiment.__get_val_at(self.tests, col_constraint["path"])
-                # Se è NaN o stringa vuota
-                if val is None or (isinstance(val, float) and np.isnan(val)) or (isinstance(val, str) and val.strip() == ""):
-                    if col_constraint["mandatory"]:
-                        self.logger.error(
-                            f"Missing mandatory column or value {col_constraint.get('mandatory_condition', '')}: '{col_constraint['path']}'"
-                        )
-            except KeyError:
-                if col_constraint["mandatory"]:
-                    self.logger.error(
-                        f"Missing mandatory column {col_constraint.get('mandatory_condition', '')}: '{col_constraint['path']}'"
-                    )
+            mandatory_fields = [
+                "specimen information>sequential number",
+                "specimen information>specimen name",
+                "geometry>width",
+                "geometry>thickness",
+            ]
 
-            # Blocco 2: Verifica tipi di dati
-            for col_constraint in (
-                {"path": "sequential number", "type": int},
-                {"path": "specimen name", "type": str},
-                {"path": "number of cycles", "type": int},
-                {"path": "maximum load", "type": float},
-                {"path": "run out", "type": bool},
-                {"path": "length", "type": float},
-                {"path": "width", "type": float},
-                {"path": "thickness", "type": float},
-                {"path": "temperature", "type": float},
-                {"path": "humidity", "type": float},
-                {"path": "initial crack length", "type": float},
-                {"path": "subset size", "type": float},
-                {"path": "step size", "type": float},
-            ):
+            if test_type == "FA":
+                mandatory_fields += [
+                    "fatigue>number of cycles",
+                    "fatigue>run out",
+                    "fatigue>maximum load",
+                ]
+            if is_fracture:
+                mandatory_fields += ["geometry>initial crack length"]
+
+            for path in mandatory_fields:
                 try:
-                    val = FilippoExperiment.__get_val_at(self.tests, col_constraint["path"])
-                    expected_type = col_constraint["type"]
-
-                    if not isinstance(val, expected_type):
-                        self.logger.error(
-                            f"Wrong type for column '{col_constraint['path']}': {val} (expected {expected_type.__name__})"
-                        )
+                    val = FilippoExperiment.__get_val_at(self.tests, path)
+                    if val is None or (isinstance(val, float) and np.isnan(val)):
+                        self.logger.error(f"Missing mandatory value: '{path}'")
                 except KeyError:
-                    # già gestito sopra come campo mancante
-                    pass
+                    self.logger.error(f"Missing mandatory column: '{path}'")
+
 
 
     def _save_preprocessed_tests(self):
