@@ -317,31 +317,31 @@ class FilippoExperiment:
                 {"path": "general>fracture mode (fm)", "type": str},
                 {"path": "general>fm add info", "type": str},                
                 {"path": "general>control mode", "type": str},
-                {"path": "general>fatigue control mode (fcm)", "type": str},
-                {"path": "general>fcm add info", "type": str},
+                {"path": "general>fatigue loading type (flt)", "type": str},
+                {"path": "general>flt add info", "type": str},
                 {"path": "general>measuring equipment", "type": str},
                 # PUBLICATION SECTION
                 {"path": "publication>doi", "type": str},
-                # MATERIAL TYPE SECTION
-                {"path": "material type>material tested", "type": str},
-                {"path": "material type>sample type", "type": str},
-                {"path": "material type>sample type add info", "type": str},
-                {"path": "material type>fiber material", "type": str},
-                {"path": "material type>fiber form", "type": str},
-                {"path": "material type>area density", "type": str},
-                {"path": "material type>resin", "type": str},
-                {"path": "material type>hardener", "type": str},
-                {"path": "material type>mixing ratio", "type": str},
-                {"path": "material type>curing time", "type": float},
-                {"path": "material type>curing temperature", "type": float},
-                {"path": "material type>curing pressure", "type": float},
-                {"path": "material type>postcuring time", "type": float},
-                {"path": "material type>postcuring temperature", "type": float},
-                {"path": "material type>postcuring pressure", "type": float},
-                {"path": "material type>glue", "type": str},
-                {"path": "material type>glue curing time", "type": float},
-                {"path": "material type>glue curing pressure", "type": float},
-                {"path": "material type>glue curing temperature", "type": float},                                                                
+                # material info SECTION
+                {"path": "material info>material tested", "type": str},
+                {"path": "material info>sample type", "type": str},
+                {"path": "material info>sample type add info", "type": str},
+                {"path": "material info>fiber material", "type": str},
+                {"path": "material info>fiber form", "type": str},
+                {"path": "material info>area density", "type": str},
+                {"path": "material info>resin", "type": str},
+                {"path": "material info>hardener", "type": str},
+                {"path": "material info>mixing ratio", "type": str},
+                {"path": "material info>curing time", "type": float},
+                {"path": "material info>curing temperature", "type": float},
+                {"path": "material info>curing pressure", "type": float},
+                {"path": "material info>postcuring time", "type": float},
+                {"path": "material info>postcuring temperature", "type": float},
+                {"path": "material info>postcuring pressure", "type": float},
+                {"path": "material info>glue", "type": str},
+                {"path": "material info>glue curing time", "type": float},
+                {"path": "material info>glue curing pressure", "type": float},
+                {"path": "material info>glue curing temperature", "type": float},                                                                
                 # LAMINATES AND ASSEMBLIES SECTION
                 {"path": "laminates and assemblies>stacking sequence", "type": str},
                 {"path": "laminates and assemblies>fiber volume ratio", "type": str},
@@ -413,10 +413,10 @@ class FilippoExperiment:
                 else:
                     self.logger.info(f"Found 'general>fa experiment type': {general_section['fa experiment type']}")
 
-                if "fatigue control mode (fcm)" not in general_section:
-                    self.logger.error("Missing mandatory column 'general>fatigue control mode (fcm)' (experiment type is 'FA')")
+                if "fatigue loading type (flt)" not in general_section:
+                    self.logger.error("Missing mandatory column 'general>fatigue loading type (flt)' (experiment type is 'FA')")
                 else:
-                    self.logger.info(f"Found 'general>fatigue control mode (fcm)': {general_section['fatigue control mode (fcm)']}")
+                    self.logger.info(f"Found 'general>fatigue loading type (flt)': {general_section['fatigue loading type (flt)']}")
 
                 fatigue_section = self.experiment.get("fatigue", {})
                 if "r ratio" not in fatigue_section:
@@ -464,7 +464,7 @@ class FilippoExperiment:
                     "mandatory_condition": "when experiment type is 'FA'",
                 },
                 {
-                    "path": "general>fatigue control mode (fcm)",
+                    "path": "general>fatigue loading type (flt)",
                     "mandatory": FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "") == "FA",
                     "mandatory_condition": "quando experiment type è 'FA'",
                 },
@@ -496,11 +496,11 @@ class FilippoExperiment:
                     "mandatory_condition": "when experiment type is 'OT'",
                 },
                 {
-                    "path": "material type>material tested",
+                    "path": "material info>material tested",
                     "mandatory": True,
                 },
                 {
-                    "path": "material type>sample type",
+                    "path": "material info>sample type",
                     "mandatory": True,
                 },
             ):
@@ -557,7 +557,7 @@ class FilippoExperiment:
                             "",
                         )
                         == "FA",
-                        "path": "general>fatigue control mode (fcm)",
+                        "path": "general>fatigue loading type (flt)",
                         "enum": (
                             "CA",
                             "VA",
@@ -623,7 +623,7 @@ class FilippoExperiment:
                     },
                     {
                         "check_needed": True,
-                        "path": "material type>other polymers add info",
+                        "path": "material info>other polymers add info",
                         "enum": (
                             "Laminates",
                             "Bulk adhesives",
@@ -646,23 +646,23 @@ class FilippoExperiment:
                     pass
 
             # Block 4: Additional Info Check for 'Other'
-            # Check if, for OT and FCM, the 'add info' field is provided when necessary.
+            # Check if, for OT and FLT, the 'add info' field is provided when necessary.
             if self.experiment.get("general", {}).get("ot experiment type") == "Other":
                 if not self.experiment.get("general", {}).get("ot add info", "").strip():
                     self.logger.error(
                         "The field 'general>ot add info' is mandatory when 'general>ot experiment type' is 'Other'."
                     )
 
-            if self.experiment.get("general", {}).get("fatigue control mode (fcm)") == "Other":
-                if not self.experiment.get("general", {}).get("fcm add info", "").strip():
+            if self.experiment.get("general", {}).get("fatigue loading type (flt)") == "Other":
+                if not self.experiment.get("general", {}).get("flt add info", "").strip():
                     self.logger.error(
-                        "The field 'general>fcm add info' is mandatory when 'general>fatigue control mode fcm' is 'Other'."
+                        "The field 'general>flt add info' is mandatory when 'general>fatigue control mode flt' is 'Other'."
                     )
 
-            if self.experiment.get("material type", {}).get("material tested") == "Other polymers":
-                if not self.experiment.get("material type", {}).get("other polymers add info", "").strip():
+            if self.experiment.get("material info", {}).get("material tested") == "Other polymers":
+                if not self.experiment.get("material info", {}).get("other polymers add info", "").strip():
                     self.logger.error(
-                        "The field 'material type>other polymers add info' is mandatory when 'material type>other polymers add info' is 'Other polymers'."
+                        "The field 'material info>other polymers add info' is mandatory when 'material info>other polymers add info' is 'Other polymers'."
                     )                    
 
             # Block 6: Type Check
@@ -680,79 +680,79 @@ class FilippoExperiment:
                     "type": str,
                 },
                 {
-                    "path": "material type>material tested",
+                    "path": "material info>material tested",
                     "type": str,
                 },
                 {
-                    "path": "material type>sample type",
+                    "path": "material info>sample type",
                     "type": str,
                 },
                 {
-                    "path": "material type>other polymers add info",
+                    "path": "material info>other polymers add info",
                     "type": str,
                 },                
                 {
-                    "path": "material type>fiber material",
+                    "path": "material info>fiber material",
                     "type": str,
                 },
                 {
-                    "path": "material type>fiber form",
+                    "path": "material info>fiber form",
                     "type": str,
                 },
                 {
-                    "path": "material type>area density",
+                    "path": "material info>area density",
                     "type": str,
                 },
                 {
-                    "path": "material type>resin",
+                    "path": "material info>resin",
                     "type": str,
                 },
                 {
-                    "path": "material type>hardener",
+                    "path": "material info>hardener",
                     "type": str,
                 },
                 {
-                    "path": "material type>mixing ratio",
+                    "path": "material info>mixing ratio",
                     "type": str,
                 },
                 {
-                    "path": "material type>curing time",
+                    "path": "material info>curing time",
                     "type": float,
                 },
                 {
-                    "path": "material type>curing temperature",
+                    "path": "material info>curing temperature",
                     "type": float,
                 },
                 {
-                    "path": "material type>curing pressure",
+                    "path": "material info>curing pressure",
                     "type": float,
                 },
                 {
-                    "path": "material type>postcuring time",
+                    "path": "material info>postcuring time",
                     "type": float,
                 },
                 {
-                    "path": "material type>postcuring temperature",
+                    "path": "material info>postcuring temperature",
                     "type": float,
                 },
                 {
-                    "path": "material type>postcuring pressure",
+                    "path": "material info>postcuring pressure",
                     "type": float,
                 },
                 {
-                    "path": "material type>glue",
+                    "path": "material info>glue",
                     "type": str,
                 },
                 {
-                    "path": "material type>glue curing time",
+                    "path": "material info>glue curing time",
                     "type": float,
                 },
                 {
-                    "path": "material type>glue curing pressure",
+                    "path": "material info>glue curing pressure",
                     "type": float,
                 },
                 {
-                    "path": "material type>glue curing temperature",
+                    "path": "material info>glue curing temperature",
                     "type": float,
                 },                
                 {

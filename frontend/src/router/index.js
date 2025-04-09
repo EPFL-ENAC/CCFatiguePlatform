@@ -42,17 +42,17 @@ const routes = [
     component: HomeView,
   },
   {
-    path: "/fatigue_database",
-    name: "FatigueDatabase",
+    path: "/material_database",
+    name: "MaterialDatabase",
     redirect: { name: "SearchDatabase" },
   },
   {
-    path: "/fatigue_database/search",
+    path: "/material_database/search",
     name: "SearchDatabase",
     component: SearchDatabase,
   },
   {
-    path: "/fatigue_database/tests_selection",
+    path: "/material_database/tests_selection",
     name: "TestsSelection",
     component: TestsSelection,
     props: (route) => ({
@@ -61,7 +61,7 @@ const routes = [
     }),
   },
   {
-    path: "/fatigue_database/tests_dashboard",
+    path: "/material_database/tests_dashboard",
     name: "TestsDashboard",
     component: TestsDashboard,
     props: (route) => {
@@ -76,12 +76,12 @@ const routes = [
     },
   },
   {
-    path: "/fatigue_database/data_upload",
+    path: "/material_database/data_upload",
     name: "DataUpload",
     component: DataUpload,
   },
   {
-    path: "/fatigue_database/data_upload_V2",
+    path: "/material_database/data_upload_V2",
     name: "DataUpload_V2",
     component: DataUpload_V2,
   },
