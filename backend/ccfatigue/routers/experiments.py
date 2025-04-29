@@ -24,6 +24,8 @@ from ccfatigue.models.database import Experiment
 from ccfatigue.services.database import get_session
 from ccfatigue.utils.routers import get_where_clauses
 from preprocessing import tst_data_lib
+from preprocessing import filippo_data_lib
+
 
 router = APIRouter(
     prefix="/experiments",
@@ -129,6 +131,56 @@ async def post_data_preprocess_check(
                         if os.path.isdir(experiment_raw_fp_folder):
                             print(f"Parsing experiment {experiment_raw_fp_folder}")
                             tst_data_lib.Experiment(experiment_raw_fp_folder, logger)
+                            at_least_one_experiment = True
+                        else:
+                            logger.warning(
+                                f"{experiment_raw_fp_folder} is not a directory, "
+                                "skipping"
+                            )
+
+                    if not at_least_one_experiment:
+                        logger.error("No experiment folder found")
+                except Exception as e:
+                    logger.error(f"Error while parsing experiment: {e}")
+
+                # answer with output + success answer
+                return Experiment_Data_Preprocessed(
+                    output=logger.messages,
+                    success=logger.error_count == 0,
+                )
+
+@router.post("/Filippo/data_preprocess_check", response_model=Experiment_Data_Preprocessed)
+async def post_Filippo_data_preprocess_check(
+    session: AsyncSession = Depends(get_session),
+    file: UploadFile = File(...),
+):
+    # Save uploaded zip to temp file
+    with tempfile.TemporaryFile(
+        mode="w+b", prefix="data_preprocess_check_zip"
+    ) as tmp_uploaded_zip:
+        tmp_uploaded_zip.write(file.file.read())
+        # Create temp directory to unzip it all
+        with tempfile.TemporaryDirectory(prefix="data_preprocess_check") as tmp_dir_fp:
+            print(f"Created temp directory {tmp_dir_fp=}")
+            # Unzip uploaded ZIP file
+            with zipfile.ZipFile(tmp_uploaded_zip, "r") as zip_received:
+                zip_received.extractall(tmp_dir_fp)
+            # List all files unZipped
+            tree_process_completed = subprocess.run(
+                ["tree", "-a", tmp_dir_fp], capture_output=True
+            )
+            print(tree_process_completed.stdout.decode())
+            # run preprocessing script on it
+            with tst_data_lib.Logger(write_to_stdout=False) as logger:
+                logger.info(f"Parsing experiment {file.filename}")
+
+                try:
+                    exp_fp_folders = glob.glob(f"{tmp_dir_fp}/TST_*")
+                    at_least_one_experiment = False
+                    for experiment_raw_fp_folder in exp_fp_folders:
+                        if os.path.isdir(experiment_raw_fp_folder):
+                            print(f"Parsing experiment {experiment_raw_fp_folder}")
+                            filippo_data_lib.FilippoExperiment(experiment_raw_fp_folder, logger)
                             at_least_one_experiment = True
                         else:
                             logger.warning(

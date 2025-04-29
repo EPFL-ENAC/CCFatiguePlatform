@@ -6,11 +6,11 @@
           <v-icon>mdi-home</v-icon>
         </v-tab>
 
-        <v-tab :to="{ name: 'FatigueDatabase' }">
+        <v-tab :to="{ name: 'MaterialDatabase' }">
           <v-menu offset-y open-on-hover>
             <template #activator="{ on }">
               <v-btn color="secondary" elevation="0" v-on="on">
-                Fatigue database
+                Material database
               </v-btn>
             </template>
             <v-list color="secondary">
@@ -33,6 +33,17 @@
                     :to="{ name: 'DataUpload' }"
                   >
                     Data upload
+                  </v-btn>
+                </v-list-item-title>
+              </v-list-item>
+              <v-list-item>
+                <v-list-item-title>
+                  <v-btn
+                    color="secondary"
+                    elevation="0"
+                    :to="{ name: 'DataUpload_V2' }"
+                  >
+                    Data upload V2 Filippo
                   </v-btn>
                 </v-list-item-title>
               </v-list-item>
