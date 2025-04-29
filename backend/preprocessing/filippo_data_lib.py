@@ -348,7 +348,7 @@ class FilippoExperiment:
                 # FATIGUE SECTION
                 {"path": "fatigue>r ratio", "type": float},
                 {"path": "fatigue>frequency", "type": float},
-                {"path": "fatigue>loading rate", "type": float},
+                {"path": "general>loading rate", "type": float},
             ):
                 try:
                     try:
@@ -425,6 +425,16 @@ class FilippoExperiment:
                     self.logger.info(f"Found 'fatigue>r ratio': {fatigue_section['r ratio']}")
             else:
                 self.logger.info("Experiment type is not 'FA'; specific FA checks skipped.")
+            
+            # Custom check: if experiment is FA, at least one of 'loading rate' or 'frequency' must be present
+            if experiment_type == "FA":
+                has_loading_rate = "loading rate" in self.experiment.get("fatigue", {}) and self.experiment["fatigue"]["loading rate"] is not None
+                has_frequency = "frequency" in self.experiment.get("fatigue", {}) and self.experiment["fatigue"]["frequency"] is not None
+                if not has_loading_rate and not has_frequency:
+                    self.logger.error(
+                        "For FA experiments, at least one of 'fatigue>loading rate' or 'fatigue>frequency' must be provided."
+                    )
+
 
             # Block 1: Mandatory Fields Check
             for col_constraint in (
@@ -473,18 +483,18 @@ class FilippoExperiment:
                     "mandatory": FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "") == "FA",
                     "mandatory_condition": "when experiment type is 'FA'",
                 },
-                {
-                    "path": "fatigue>frequency",
-                    "mandatory": (FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "") == "FA") 
-                                and (not self.experiment.get("fatigue", {}).get("loading rate")),
-                    "mandatory_condition": "when experiment type is 'FA' and 'fatigue>loading rate' is not provided",
-                },
-                {
-                    "path": "fatigue>loading rate",
-                    "mandatory": (FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "") == "FA") 
-                                and (not self.experiment.get("fatigue", {}).get("frequency")),
-                    "mandatory_condition": "when experiment type is 'FA' and 'fatigue>frequency' is not provided",
-                },
+                #{
+                #    "path": "fatigue>frequency",
+                #    "mandatory": (FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "") == "FA") 
+                #                and (not self.experiment.get("general", {}).get("loading rate")),
+                #    "mandatory_condition": "when experiment type is 'FA' and 'general>loading rate' is not provided",
+                #},
+                #{
+                #    "path": "general>loading rate",
+                #    "mandatory": (FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "") == "FA") 
+                #                and (not self.experiment.get("fatigue", {}).get("frequency")),
+                #    "mandatory_condition": "when experiment type is 'FA' and 'fatigue>frequency' is not provided",
+                #},
                 {
                     "path": "general>qs experiment type",
                     "mandatory": FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "") == "QS",
@@ -772,7 +782,7 @@ class FilippoExperiment:
                     "type": float,
                 },
                 {
-                    "path": "fatigue>loading rate",
+                    "path": "general>loading rate",
                     "type": float,
                 },
             ):
@@ -1058,15 +1068,15 @@ class FilippoExperiment:
                         "type": float,
                         "mandatory": False,
                     },
-                    "e_xx": {
+                    "exx": {
                         "type": float,
                         "mandatory": False,
                     },
-                    "e_yy": {
+                    "eyy": {
                         "type": float,
                         "mandatory": False,
                     },
-                    "e_xy": {
+                    "exy": {
                         "type": float,
                         "mandatory": False,
                     },
