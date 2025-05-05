@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from ccfatigue.experiment.common import DATA_DIRECTORY, get_test_fields
-from ccfatigue.models.database import Experiment, Test
+from ccfatigue.models.database_v2 import Experiment, Test
 
 INTERVAL: int = 10
 LOOP_SPACING: int = 1000
