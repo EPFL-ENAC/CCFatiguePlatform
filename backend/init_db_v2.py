@@ -133,12 +133,16 @@ def run_init_db():
     session = Session()
 
     empty_database(session)
-
+    '''
     for exp_folder in EXPERIMENTS_TO_INJECT:
         from ccfatigue.models.database import Experiment
         print("COLUMNS IN DB MODEL:")
         for col in Experiment.__table__.columns:
             print(" -", col.name)
+        inject_exp_from_folder(exp_folder, session)
+    '''
+
+    for exp_folder in EXPERIMENTS_TO_INJECT:
         inject_exp_from_folder(exp_folder, session)
 
     session.commit()
