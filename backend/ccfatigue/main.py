@@ -6,7 +6,8 @@ from ccfatigue import __name__, __version__
 from ccfatigue.config import settings
 from ccfatigue.routers import analysis, experiments, root, tests
 from ccfatigue.utils.fastapi import use_route_names_as_operation_ids
-from init_db import run_init_db
+#from init_db import run_init_db
+from init_db_v2 import run_init_db
 
 run_init_db()
 
