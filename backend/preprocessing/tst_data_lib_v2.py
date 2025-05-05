@@ -861,7 +861,7 @@ class Experiment:
                 d = df.to_dict(orient="index")
                 return {k: nest(v) for k, v in d.items()}
 
-            self.tests = df_to_nested_dict(tests_df)[0]
+            self.tests = self.tests = list(df_to_nested_dict(tests_df).values())
 
 
     def _cleanup_tests(self):
@@ -901,20 +901,23 @@ class Experiment:
                 {"path": "dic analysis>step size", "type": float},
             )
 
-            fixed_tests = {}
-            for constraint in expected_constraints:
-                try:
-                    val = Experiment.__get_val_at(self.tests, constraint["path"])
-                    if val is not None and not (isinstance(val, float) and np.isnan(val)):
-                        casted_val = CASTING[constraint["type"]](val)
-                        Experiment.__set_val_at(fixed_tests, constraint["path"], casted_val)
-                except (KeyError, ValueError) as e:
-                    self.logger.warning(f"Skipping field '{constraint['path']}': {e}")
+            fixed_tests = []
+            for i, test in enumerate(self.tests):
+                fixed_test = {}
+                for constraint in expected_constraints:
+                    try:
+                        val = Experiment.__get_val_at(test, constraint["path"])
+                        if val is not None and not (isinstance(val, float) and np.isnan(val)):
+                            casted_val = CASTING[constraint["type"]](val)
+                            Experiment.__set_val_at(fixed_test, constraint["path"], casted_val)
+                    except (KeyError, ValueError) as e:
+                        self.logger.warning(f"Test #{i+1} - Skipping field '{constraint['path']}': {e}")
+                fixed_tests.append(fixed_test)
+            self.tests = fixed_tests
 
-            self.tests = fixed_tests  # already a nested dict from __set_val_at
-            self.logger.info("Tests structure AFTER cleanup:")
-            import json
-            self.logger.info(json.dumps(self.tests, indent=2, ensure_ascii=False))
+            self.logger.info("Tests structure after cleanup:")
+            with self.logger.indent:
+                self.logger.info(json.dumps(self.tests, indent=2, ensure_ascii=False))
 
 
     def _validate_tests(self):
@@ -923,7 +926,6 @@ class Experiment:
         """
         self.logger.info("Validate tests")
         with self.logger.indent:
-            import json
             self.logger.info("Tests structure after cleanup:")
             self.logger.info(json.dumps(self.tests, indent=2, ensure_ascii=False))
 
@@ -959,14 +961,14 @@ class Experiment:
             if is_fracture:
                 mandatory_fields += ["geometry>initial crack length"]
 
-            for path in mandatory_fields:
-                try:
-                    val = Experiment.__get_val_at(self.tests, path)
-                    if val is None or (isinstance(val, float) and np.isnan(val)):
-                        self.logger.error(f"Missing mandatory value: '{path}'")
-                except KeyError:
-                    self.logger.error(f"Missing mandatory column: '{path}'")
-
+            for i, test in enumerate(self.tests):
+                for path in mandatory_fields:
+                    try:
+                        val = Experiment.__get_val_at(test, path)
+                        if val is None or (isinstance(val, float) and np.isnan(val)):
+                            self.logger.error(f"Test #{i+1} - Missing mandatory value: '{path}'")
+                    except KeyError:
+                        self.logger.error(f"Test #{i+1} - Missing mandatory column: '{path}'")
 
 
     def _save_preprocessed_tests(self):
@@ -975,17 +977,23 @@ class Experiment:
         """
         self.logger.info("Save tests preprocessed")
         with self.logger.indent:
+            # se è DataFrame lo salvo direttamente
             if isinstance(self.tests, pd.DataFrame):
-                self.tests.to_csv(
-                    self.exp_meta_meta["preprocessed_tests_csv_fp"],
-                    index=False,
-                )
+                df = self.tests
+            elif isinstance(self.tests, list):
+                df = pd.json_normalize(self.tests)
             else:
-                self.logger.error("self.tests is not a DataFrame; cannot save to CSV.")
+                df = pd.DataFrame([self.tests])
+            df.columns = [col.split('.')[-1] for col in df.columns]  # <-- Aggiungi questa riga
+            df.to_csv(
+                self.exp_meta_meta["preprocessed_tests_csv_fp"],
+                index=False,
+            )
             self.logger.info(
                 "saved "
                 + os.path.basename(self.exp_meta_meta["preprocessed_tests_csv_fp"])
             )
+
 
     def _read_measures(self):
         """
