@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from ccfatigue.experiment.common import DATA_DIRECTORY, get_test_fields
-from ccfatigue.models.database import Experiment, Test
+from ccfatigue.models.database_v2 import Experiment, Test
 
 
 class QuasiStaticTest(BaseModel):
@@ -30,7 +30,6 @@ def get_dataframe(
     """
     return extracted DataFrame related to that test from CSV
     """
-    # FIXME researcher_name from a column value
     researcher_name = exp["researcher"].split(" ")[-1]
     filepath = os.path.join(
         DATA_DIRECTORY,
@@ -48,7 +47,6 @@ def get_test_metadata(
     """
     return extracted metadata related to the test from CSV
     """
-    # FIXME researcher_name from a column value
     researcher_name = exp["researcher"].split(" ")[-1]
     filepath = os.path.join(
         DATA_DIRECTORY,
@@ -88,12 +86,18 @@ async def quasi_static_test(
                     Experiment.researcher,
                     Experiment.experiment_type,
                     Experiment.date,
-                    Experiment.fracture,
+                    Experiment.fa_experiment_type,
+                    Experiment.qs_experiment_type,
                 ).where(Experiment.id == experiment_id)
             )
         )
         .one()  # type: ignore
         ._asdict()
+    )
+
+    is_fracture = (
+        experiment.get("fa_experiment_type") == "fracture"
+        or experiment.get("qs_experiment_type") == "fracture"
     )
 
     test_meta = await get_test_fields(
@@ -107,16 +111,16 @@ async def quasi_static_test(
     )
     load = filter_columns(df, column_list, r"^(Machine_Load|MD_Load--\d+)$")
 
-    fracture = experiment["fracture"]
     crack_df = (
         df[["Crack_Displacement", "Crack_Load", "Crack_length"]].dropna()
-        if fracture
+        if is_fracture
         and {"Crack_Displacement", "Crack_Load", "Crack_length"}.issubset(df.columns)
         else pd.DataFrame(columns=["Crack_Displacement", "Crack_Load", "Crack_length"])
     )
+
     strain: Dict[str, List[float]] = {}
     stress: Dict[str, List[float]] = {}
-    if not fracture:
+    if not is_fracture:
         test = get_test_metadata(experiment, test_meta["specimen_number"])
         if "width" in test and "thickness" in test:
             strain = filter_columns(df, column_list, r"^(exx--\d+|eyy--\d+|exy--\d+)$")
@@ -127,6 +131,7 @@ async def quasi_static_test(
                 r"^(MD_Load--\d+|Machine_Load)$",
                 lambda value: value / area,
             )
+
     return QuasiStaticTest(
         specimen_name=test_meta["specimen_name"],
         crack_displacement=crack_df["Crack_Displacement"].to_list(),
