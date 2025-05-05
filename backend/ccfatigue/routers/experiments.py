@@ -24,7 +24,7 @@ from ccfatigue.models.database import Experiment
 from ccfatigue.services.database import get_session
 from ccfatigue.utils.routers import get_where_clauses
 from preprocessing import tst_data_lib
-from preprocessing import filippo_data_lib
+from preprocessing import tst_data_lib_v2
 
 
 router = APIRouter(
@@ -149,8 +149,8 @@ async def post_data_preprocess_check(
                     success=logger.error_count == 0,
                 )
 
-@router.post("/Filippo/data_preprocess_check", response_model=Experiment_Data_Preprocessed)
-async def post_Filippo_data_preprocess_check(
+@router.post("/data_preprocess_check_v2", response_model=Experiment_Data_Preprocessed)
+async def post_data_preprocess_check_v2(
     session: AsyncSession = Depends(get_session),
     file: UploadFile = File(...),
 ):
@@ -180,7 +180,7 @@ async def post_Filippo_data_preprocess_check(
                     for experiment_raw_fp_folder in exp_fp_folders:
                         if os.path.isdir(experiment_raw_fp_folder):
                             print(f"Parsing experiment {experiment_raw_fp_folder}")
-                            filippo_data_lib.FilippoExperiment(experiment_raw_fp_folder, logger)
+                            tst_data_lib_v2.Experiment(experiment_raw_fp_folder, logger)
                             at_least_one_experiment = True
                         else:
                             logger.warning(

@@ -197,7 +197,7 @@ export default {
 
       axios
         .post(
-          `${this.$experimentsApi.apiClient.basePath}/experiments/Filippo/data_preprocess_check`,
+          `${this.$experimentsApi.apiClient.basePath}/experiments/data_preprocess_check_v2`,
           formData,
           {
             headers: {

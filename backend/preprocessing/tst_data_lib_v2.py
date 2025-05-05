@@ -92,7 +92,7 @@ class Logger:
         self.write(message=message, prefix="ERROR: ", end=end)
 
 
-class FilippoExperiment:
+class Experiment:
     """
     Represent TST Experiment data
     contains:
@@ -293,7 +293,7 @@ class FilippoExperiment:
         self.logger.info("Cleanup experiment")
         with self.logger.indent:
 
-            FilippoExperiment.__dict_cleanup(self.experiment)
+            Experiment.__dict_cleanup(self.experiment)
 
             CASTING = {
                 bool: to_bool,
@@ -353,17 +353,17 @@ class FilippoExperiment:
                 try:
                     try:
                         isnan = np.isnan(
-                            FilippoExperiment.__get_val_at(self.experiment, constraint["path"])
+                            Experiment.__get_val_at(self.experiment, constraint["path"])
                         )
                     except TypeError:
                         isnan = False
                     if not isnan:
                         # cast and save expected values
-                        FilippoExperiment.__set_val_at(
+                        Experiment.__set_val_at(
                             fixed_experiment,
                             constraint["path"],
                             CASTING[constraint["type"]](
-                                FilippoExperiment.__get_val_at(
+                                Experiment.__get_val_at(
                                     self.experiment, constraint["path"]
                                 )
                             ),
@@ -401,7 +401,7 @@ class FilippoExperiment:
             self.logger.info(json.dumps(self.experiment, indent=2, ensure_ascii=False))
 
             # Normalizza il valore di experiment type per evitare problemi di spazi o case-sensitive
-            experiment_type_raw = FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "")
+            experiment_type_raw = Experiment.__get_val_at(self.experiment, "general>experiment type", "")
             experiment_type = experiment_type_raw.strip().upper()
             self.logger.info(f"Normalized experiment type: '{experiment_type}' (raw: '{experiment_type_raw}')")
 
@@ -461,48 +461,48 @@ class FilippoExperiment:
                 {
                     "path": "general>fracture mode (fm)",
                     "mandatory": (
-                        FilippoExperiment.__get_val_at(self.experiment, "general>qs experiment type", "") == "fracture"
-                        or FilippoExperiment.__get_val_at(self.experiment, "general>fa experiment type", "") == "fracture"
+                        Experiment.__get_val_at(self.experiment, "general>qs experiment type", "") == "fracture"
+                        or Experiment.__get_val_at(self.experiment, "general>fa experiment type", "") == "fracture"
                     ),
                     "mandatory_condition": "when quasi-static test type or fatigue test type is 'fracture'",
                 },
                 {
                     "path": "general>fa experiment type",
-                    "mandatory": FilippoExperiment.__get_val_at(
+                    "mandatory": Experiment.__get_val_at(
                         self.experiment, "general>experiment type", ""
                     ) == "FA",
                     "mandatory_condition": "when experiment type is 'FA'",
                 },
                 {
                     "path": "general>fatigue loading type (flt)",
-                    "mandatory": FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "") == "FA",
+                    "mandatory": Experiment.__get_val_at(self.experiment, "general>experiment type", "") == "FA",
                     "mandatory_condition": "quando experiment type è 'FA'",
                 },
                 {
                     "path": "fatigue>r ratio",
-                    "mandatory": FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "") == "FA",
+                    "mandatory": Experiment.__get_val_at(self.experiment, "general>experiment type", "") == "FA",
                     "mandatory_condition": "when experiment type is 'FA'",
                 },
                 #{
                 #    "path": "fatigue>frequency",
-                #    "mandatory": (FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "") == "FA") 
+                #    "mandatory": (Experiment.__get_val_at(self.experiment, "general>experiment type", "") == "FA") 
                 #                and (not self.experiment.get("general", {}).get("loading rate")),
                 #    "mandatory_condition": "when experiment type is 'FA' and 'general>loading rate' is not provided",
                 #},
                 #{
                 #    "path": "general>loading rate",
-                #    "mandatory": (FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "") == "FA") 
+                #    "mandatory": (Experiment.__get_val_at(self.experiment, "general>experiment type", "") == "FA") 
                 #                and (not self.experiment.get("fatigue", {}).get("frequency")),
                 #    "mandatory_condition": "when experiment type is 'FA' and 'fatigue>frequency' is not provided",
                 #},
                 {
                     "path": "general>qs experiment type",
-                    "mandatory": FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "") == "QS",
+                    "mandatory": Experiment.__get_val_at(self.experiment, "general>experiment type", "") == "QS",
                     "mandatory_condition": "when experiment type is 'QS'",
                 },
                 {
                     "path": "general>ot experiment type",
-                    "mandatory": FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "") == "OT",
+                    "mandatory": Experiment.__get_val_at(self.experiment, "general>experiment type", "") == "OT",
                     "mandatory_condition": "when experiment type is 'OT'",
                 },
                 {
@@ -515,7 +515,7 @@ class FilippoExperiment:
                 },
             ):
                 try:
-                    FilippoExperiment.__get_val_at(self.experiment, col_constraint["path"])
+                    Experiment.__get_val_at(self.experiment, col_constraint["path"])
                 except KeyError:
                     if col_constraint["mandatory"]:
                         self.logger.error(
@@ -527,11 +527,11 @@ class FilippoExperiment:
             # Block 2: Date Format Validation
             if not re.match(
                 r"\d{4}-\d{2}",
-                FilippoExperiment.__get_val_at(self.experiment, "general>date"),
+                Experiment.__get_val_at(self.experiment, "general>date"),
             ):
                 self.logger.error(
                     "Unrecognized Date : "
-                    f"'{FilippoExperiment.__get_val_at(self.experiment, 'general>date')}'"
+                    f"'{Experiment.__get_val_at(self.experiment, 'general>date')}'"
                 )
 
             # Block 3: Enum Values Check
@@ -549,8 +549,8 @@ class FilippoExperiment:
                     },
                     {
                         "check_needed": (
-                            FilippoExperiment.__get_val_at(self.experiment, "general>qs experiment type", "") == "fracture"
-                            or FilippoExperiment.__get_val_at(self.experiment, "general>fa experiment type", "") == "fracture"
+                            Experiment.__get_val_at(self.experiment, "general>qs experiment type", "") == "fracture"
+                            or Experiment.__get_val_at(self.experiment, "general>fa experiment type", "") == "fracture"
                         ),
                         "path": "general>fracture mode (fm)",
                         "enum": (
@@ -561,7 +561,7 @@ class FilippoExperiment:
                         ),
                     },
                     {
-                        "check_needed": FilippoExperiment.__get_val_at(
+                        "check_needed": Experiment.__get_val_at(
                             self.experiment,
                             "general>experiment type",
                             "",
@@ -576,7 +576,7 @@ class FilippoExperiment:
                         ),
                     },
                     {
-                        "check_needed": FilippoExperiment.__get_val_at(
+                        "check_needed": Experiment.__get_val_at(
                             self.experiment,
                             "general>experiment type",
                             "",
@@ -592,7 +592,7 @@ class FilippoExperiment:
                         ),
                     },
                     {
-                        "check_needed": FilippoExperiment.__get_val_at(
+                        "check_needed": Experiment.__get_val_at(
                             self.experiment,
                             "general>experiment type",
                             "",
@@ -608,7 +608,7 @@ class FilippoExperiment:
                         ),
                     },
                     {
-                        "check_needed": FilippoExperiment.__get_val_at(
+                        "check_needed": Experiment.__get_val_at(
                             self.experiment,
                             "general>experiment type",
                             "",
@@ -644,7 +644,7 @@ class FilippoExperiment:
                 ),
             ):
                 try:
-                    val = FilippoExperiment.__get_val_at(
+                    val = Experiment.__get_val_at(
                         self.experiment, col_constraint["path"]
                     )
                     if val not in col_constraint["enum"]:
@@ -787,7 +787,7 @@ class FilippoExperiment:
                 },
             ):
                 try:
-                    val = FilippoExperiment.__get_val_at(self.experiment, col_constraint["path"])
+                    val = Experiment.__get_val_at(self.experiment, col_constraint["path"])
                     if type(val) != col_constraint["type"]:
                         self.logger.error(
                             f"Wrong type for column {col_constraint['path']}: {val}"
@@ -904,10 +904,10 @@ class FilippoExperiment:
             fixed_tests = {}
             for constraint in expected_constraints:
                 try:
-                    val = FilippoExperiment.__get_val_at(self.tests, constraint["path"])
+                    val = Experiment.__get_val_at(self.tests, constraint["path"])
                     if val is not None and not (isinstance(val, float) and np.isnan(val)):
                         casted_val = CASTING[constraint["type"]](val)
-                        FilippoExperiment.__set_val_at(fixed_tests, constraint["path"], casted_val)
+                        Experiment.__set_val_at(fixed_tests, constraint["path"], casted_val)
                 except (KeyError, ValueError) as e:
                     self.logger.warning(f"Skipping field '{constraint['path']}': {e}")
 
@@ -938,9 +938,9 @@ class FilippoExperiment:
                 else:
                     self.logger.info("The number of tests matches the number of CSV files.")
 
-            test_type = FilippoExperiment.__get_val_at(self.experiment, "general>experiment type", "").strip().upper()
-            fa_type = FilippoExperiment.__get_val_at(self.experiment, "general>fa experiment type", "").strip().lower()
-            qs_type = FilippoExperiment.__get_val_at(self.experiment, "general>qs experiment type", "").strip().lower()
+            test_type = Experiment.__get_val_at(self.experiment, "general>experiment type", "").strip().upper()
+            fa_type = Experiment.__get_val_at(self.experiment, "general>fa experiment type", "").strip().lower()
+            qs_type = Experiment.__get_val_at(self.experiment, "general>qs experiment type", "").strip().lower()
             is_fracture = fa_type == "fracture" or qs_type == "fracture"
 
             mandatory_fields = [
@@ -961,7 +961,7 @@ class FilippoExperiment:
 
             for path in mandatory_fields:
                 try:
-                    val = FilippoExperiment.__get_val_at(self.tests, path)
+                    val = Experiment.__get_val_at(self.tests, path)
                     if val is None or (isinstance(val, float) and np.isnan(val)):
                         self.logger.error(f"Missing mandatory value: '{path}'")
                 except KeyError:
@@ -1026,7 +1026,7 @@ class FilippoExperiment:
                 for pattern in EXPECTED_COLUMNS:
                     found_matching_columns.update(
                         list(
-                            FilippoExperiment.__grep_matching_columns(
+                            Experiment.__grep_matching_columns(
                                 pattern, measures["df"].columns
                             )
                         )
@@ -1097,10 +1097,10 @@ class FilippoExperiment:
                 RELAXED_MANDATORY_COLUMNS = {"Specimen_name", "Test_Date"}
 
                 # Recupera i valori di test type per FA e QS
-                fa_experiment_type = FilippoExperiment.__get_val_at(
+                fa_experiment_type = Experiment.__get_val_at(
                     self.experiment, "general>fa experiment type", ""
                 )
-                qs_experiment_type = FilippoExperiment.__get_val_at(
+                qs_experiment_type = Experiment.__get_val_at(
                     self.experiment, "general>qs experiment type", ""
                 )
 
@@ -1133,10 +1133,10 @@ class FilippoExperiment:
                 }
 
                 COLUMN_TYPE_CHECK = {
-                    int: FilippoExperiment.__check_int_column,
-                    float: FilippoExperiment.__check_float_column,
-                    str: FilippoExperiment.__check_str_column,
-                    datetime: FilippoExperiment.__check_datetime_column,  # 👈 nuovo
+                    int: Experiment.__check_int_column,
+                    float: Experiment.__check_float_column,
+                    str: Experiment.__check_str_column,
+                    datetime: Experiment.__check_datetime_column,  # 👈 nuovo
                 }
                 TYPE_NAMES = {
                     int: "integer",
@@ -1147,7 +1147,7 @@ class FilippoExperiment:
 
             # --- Controllo presenza colonne mandatory da EXPECTED_COLUMNS
             for mandatory_col_pattern in filter(lambda c: EXPECTED_COLUMNS[c]["mandatory"], EXPECTED_COLUMNS):
-                mandatory_col_found = list(FilippoExperiment.__grep_matching_columns(mandatory_col_pattern, measures["df"].columns))
+                mandatory_col_found = list(Experiment.__grep_matching_columns(mandatory_col_pattern, measures["df"].columns))
                 if len(mandatory_col_found) == 0:
                     self.logger.error(f"mandatory column not found: '{mandatory_col_pattern}'")
                 else:
@@ -1165,13 +1165,13 @@ class FilippoExperiment:
                 lambda c: EXPECTED_COLUMNS[c]["mandatory"] and c not in RELAXED_MANDATORY_COLUMNS,
                 EXPECTED_COLUMNS
             ):
-                found_cols = list(FilippoExperiment.__grep_matching_columns(col_pattern, measures["df"].columns))
+                found_cols = list(Experiment.__grep_matching_columns(col_pattern, measures["df"].columns))
                 for col in found_cols:
                     strict_mandatory_lengths[col] = measures["df"][col].notnull().sum()
 
             # --- Informazioni per le colonne opzionali non trovate
             for optional_col_pattern in filter(lambda c: not EXPECTED_COLUMNS[c]["mandatory"], EXPECTED_COLUMNS):
-                optional_col_found = list(FilippoExperiment.__grep_matching_columns(optional_col_pattern, measures["df"].columns))
+                optional_col_found = list(Experiment.__grep_matching_columns(optional_col_pattern, measures["df"].columns))
                 if len(optional_col_found) == 0:
                     self.logger.info(f"optional column not found: '{optional_col_pattern}'")
 
@@ -1193,7 +1193,7 @@ class FilippoExperiment:
 
             # --- Validazione specifica per test type (FA o QS) con logica "fracture"
             try:
-                experiment_type = FilippoExperiment.__get_val_at(self.experiment, "general>experiment type")
+                experiment_type = Experiment.__get_val_at(self.experiment, "general>experiment type")
             except KeyError:
                 self.logger.error(
                     "XLS file seems broken. Please double check it follows "
@@ -1217,7 +1217,7 @@ class FilippoExperiment:
                 group_found = []
                 for pattern in group:
                     group_found.extend(
-                        list(FilippoExperiment.__grep_matching_columns(pattern, measures["df"].columns))
+                        list(Experiment.__grep_matching_columns(pattern, measures["df"].columns))
                     )
                 if len(group_found) == 0:
                     self.logger.error(
@@ -1380,6 +1380,6 @@ class FilippoExperiment:
             if re.match(r"Unnamed: \d+_level_\d+", k):
                 del dic[k]
             elif type(v) == dict:
-                FilippoExperiment.__dict_cleanup(v)
+                Experiment.__dict_cleanup(v)
             elif type(v) == str:
                 dic[k] = v.strip(" \n")

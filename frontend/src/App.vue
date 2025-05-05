@@ -41,9 +41,9 @@
                   <v-btn
                     color="secondary"
                     elevation="0"
-                    :to="{ name: 'DataUpload_V2' }"
+                    :to="{ name: 'DataUpload_v2' }"
                   >
-                    Data upload V2 Filippo
+                    Data upload v2
                   </v-btn>
                 </v-list-item-title>
               </v-list-item>

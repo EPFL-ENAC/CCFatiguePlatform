@@ -18,8 +18,8 @@ const TestsDashboard = () =>
 const DataUpload = () =>
   import(/* webpackChunkName: "data_upload" */ "../views/DataUpload.vue");
 
-const DataUpload_V2 = () =>
-  import(/* webpackChunkName: "data_upload_V2" */ "../views/DataUpload_V2.vue");
+const DataUpload_v2 = () =>
+  import(/* webpackChunkName: "data_upload_v2" */ "../views/DataUpload_v2.vue");
 
 const CCFatigueAnalysis = () =>
   import(
@@ -81,9 +81,9 @@ const routes = [
     component: DataUpload,
   },
   {
-    path: "/material_database/data_upload_V2",
-    name: "DataUpload_V2",
-    component: DataUpload_V2,
+    path: "/material_database/data_upload_v2",
+    name: "DataUpload_v2",
+    component: DataUpload_v2,
   },
   {
     path: "/ccfatigue_analysis",
