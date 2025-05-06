@@ -1,14 +1,16 @@
 import os
 from re import Pattern, search
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Any
 
 import pandas as pd
 from pandas import DataFrame
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from ccfatigue.experiment.common import extract_experiment_metadata
 
 from ccfatigue.experiment.common import DATA_DIRECTORY, get_test_fields
+from ccfatigue.experiment.common import extract_experiment_metadata, flatten_metadata
 from ccfatigue.models.database_v2 import Experiment, Test
 
 
@@ -21,15 +23,13 @@ class QuasiStaticTest(BaseModel):
     load: Dict[str, List[float]]
     strain: Dict[str, List[float]]
     stress: Dict[str, List[float]]
+    experiment_metadata: Dict[str, Any]  # new term
 
 
 def get_dataframe(
     exp: Dict[str, str],
     specimen_id: int,
 ) -> DataFrame:
-    """
-    return extracted DataFrame related to that test from CSV
-    """
     researcher_name = exp["researcher"].split(" ")[-1]
     filepath = os.path.join(
         DATA_DIRECTORY,
@@ -44,9 +44,6 @@ def get_test_metadata(
     exp: Dict[str, str],
     specimen_id: int,
 ) -> Dict:
-    """
-    return extracted metadata related to the test from CSV
-    """
     researcher_name = exp["researcher"].split(" ")[-1]
     filepath = os.path.join(
         DATA_DIRECTORY,
@@ -55,7 +52,7 @@ def get_test_metadata(
     )
     abspath = os.path.abspath(filepath)
     df = pd.read_csv(abspath)
-    return df[df["specimen number"] == specimen_id].to_dict("records")[0]
+    return df[df["sequential number"] == specimen_id].to_dict("records")[0]
 
 
 def filter_regex(values: List[str], pattern: str | Pattern[str]) -> List[str]:
@@ -78,22 +75,38 @@ async def quasi_static_test(
     session: AsyncSession,
     experiment_id: int,
     test_id: int,
-) -> QuasiStaticTest:
-    experiment: Dict[str, str] = (
-        (
-            await session.execute(
-                select(
-                    Experiment.researcher,
-                    Experiment.experiment_type,
-                    Experiment.date,
-                    Experiment.fa_experiment_type,
-                    Experiment.qs_experiment_type,
-                ).where(Experiment.id == experiment_id)
-            )
+) -> Dict:
+    experiment = (
+        await session.execute(
+            select(
+                Experiment.laboratory,
+                Experiment.researcher,
+                Experiment.date,
+                Experiment.experiment_type,
+                Experiment.qs_experiment_type,
+                Experiment.fa_experiment_type,
+                Experiment.fracture_mode_fm,
+                Experiment.loading_rate,
+                Experiment.material_tested,
+                Experiment.material_type_sample_type,
+                Experiment.material_type_fiber_form,
+                Experiment.material_type_resin,
+                Experiment.laminates_and_assemblies_stacking_sequence,
+                Experiment.curing_time,
+                Experiment.curing_temperature,
+                Experiment.curing_pressure,
+                Experiment.postcuring_time,
+                Experiment.postcuring_temperature,
+                Experiment.postcuring_pressure,
+                Experiment.publication_doi,
+                Experiment.control_mode,
+                Experiment.fatigue_r_ratio,
+                Experiment.fatigue_frequency,
+                Experiment.fatigue_loading_type_flt,
+                Experiment.measuring_equipment,
+            ).where(Experiment.id == experiment_id)
         )
-        .one()  # type: ignore
-        ._asdict()
-    )
+    ).one()._asdict()
 
     is_fracture = (
         experiment.get("fa_experiment_type") == "fracture"
@@ -101,44 +114,55 @@ async def quasi_static_test(
     )
 
     test_meta = await get_test_fields(
-        session, experiment_id, test_id, (Test.specimen_number, Test.specimen_name)
+        session, experiment_id, test_id, (Test.sequential_number, Test.specimen_name)
     )
-    df = get_dataframe(experiment, test_meta["specimen_number"])
-    column_list = df.columns.to_list()
+    specimen_id = test_meta["sequential_number"]
+    df = get_dataframe(experiment, specimen_id)
 
-    displacement = filter_columns(
-        df, column_list, r"^(Machine_Displacement|MD_Displacement--\d+|u--\d+|v--\d+)$"
-    )
-    load = filter_columns(df, column_list, r"^(Machine_Load|MD_Load--\d+)$")
+    test_info = get_test_metadata(experiment, specimen_id)
+    width = test_info.get("width")
+    thickness = test_info.get("thickness")
 
-    crack_df = (
-        df[["Crack_Displacement", "Crack_Load", "Crack_length"]].dropna()
-        if is_fracture
-        and {"Crack_Displacement", "Crack_Load", "Crack_length"}.issubset(df.columns)
-        else pd.DataFrame(columns=["Crack_Displacement", "Crack_Load", "Crack_length"])
-    )
+    crack_displacement = df["u"].dropna().tolist() if is_fracture and "u" in df.columns else []
+    crack_load = df["Load"].dropna().tolist() if is_fracture and "Load" in df.columns else []
+    crack_length = df["Crack length"].dropna().tolist() if is_fracture and "Crack length" in df.columns else []
 
-    strain: Dict[str, List[float]] = {}
-    stress: Dict[str, List[float]] = {}
-    if not is_fracture:
-        test = get_test_metadata(experiment, test_meta["specimen_number"])
-        if "width" in test and "thickness" in test:
-            strain = filter_columns(df, column_list, r"^(exx--\d+|eyy--\d+|exy--\d+)$")
-            area = test["width"] * test["thickness"]
-            stress = filter_columns(
-                df,
-                column_list,
-                r"^(MD_Load--\d+|Machine_Load)$",
-                lambda value: value / area,
-            )
+    displacement = {"u": df["u"].dropna().tolist()} if not is_fracture and "u" in df.columns else {}
+    load = {"Load": df["Load"].dropna().tolist()} if not is_fracture and "Load" in df.columns else {}
 
-    return QuasiStaticTest(
-        specimen_name=test_meta["specimen_name"],
-        crack_displacement=crack_df["Crack_Displacement"].to_list(),
-        crack_load=crack_df["Crack_Load"].to_list(),
-        crack_length=crack_df["Crack_length"].to_list(),
-        displacement=displacement,
-        load=load,
-        strain=strain,
-        stress=stress,
-    )
+    strain = {}
+    for col in ["exx", "eyy", "exy"]:
+        if col in df.columns:
+            strain[col] = df[col].dropna().tolist()
+
+    stress = {}
+    if "Load" in df.columns and width and thickness:
+        area = width * thickness
+        stress["nominal"] = (df["Load"] / area).dropna().tolist()
+
+    metadata_flat = flatten_metadata(extract_experiment_metadata(experiment))
+    import json
+    print("✅ experiment_metadata FLAT (to be sent to frontend):")
+    print(json.dumps(metadata_flat, indent=2))
+
+
+
+    output = {
+        "specimen_name": test_meta["specimen_name"],
+        "crack_displacement": crack_displacement,
+        "crack_load": crack_load,
+        "crack_length": crack_length,
+        "displacement": displacement,
+        "load": load,
+        "strain": strain,
+        "stress": stress,
+        # "experiment_metadata": extract_experiment_metadata(experiment),
+            # ✅ flattened, single‐level metadata
+        # "experiment_metadata": flatten_metadata(extract_experiment_metadata(experiment)),
+        # "experiment_metadata": extract_experiment_metadata(experiment),
+        "experiment_metadata": metadata_flat,
+    }
+
+    import json
+    print("✅ FINAL OUTPUT", json.dumps(output, indent=2))
+    return output
