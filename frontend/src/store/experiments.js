@@ -2,29 +2,29 @@ export default {
   namespaced: true,
   state: {
     filteredExperiments: {
-      filters: {}, // filters in UI
-      experiments: [], // the experiments fetched from API
+      filters: {},
+      experiments: [],
       pagination: {
-        page: 1, // page number of current fetched experiments. Overwrirten by UI
-        size: 0, // max number of fetched experiments returned per request. Overwrirten by UI
-        total: 0, // number of experiments in DB matching the filters. Given by backend
+        page: 1,
+        size: 0,
+        total: 0,
       },
-      loading: false, // used to let the user know that data is loading
+      loading: false,
     },
     allFractureMode: [],
     allMaterialTypeFiberMaterial: [],
     allMaterialTypeResin: [],
     allLaminatesAndAssembliesStackingSequence: [],
     oneExperiment: {
-      experimentId: null, // id of experiment
-      experiment: {}, // the experiment itself
-      tests: [], // list of tests fetched from API for that experiment
+      experimentId: null,
+      experiment: {},
+      tests: [],
       pagination: {
-        page: 1, // page number of current fetched tests. Overwrirten by UI
-        size: 0, // max number of fetched tests returned per request. Overwrirten by UI
-        total: 0, // number of tests in DB matching the filters. Given by backend
+        page: 1,
+        size: 0,
+        total: 0,
       },
-      loading: false, // used to let the user know that data is loading
+      loading: false,
       loadingTests: false,
     },
     units: {},
@@ -111,6 +111,12 @@ export default {
         loadingTests: false,
       };
     },
+    storeExperimentMetadata(state, metadata) {
+      state.oneExperiment.experiment = {
+        ...state.oneExperiment.experiment,
+        ...metadata,
+      };
+    },
     storeUnits(state, data) {
       state.units = data.reduce((acc, item) => {
         acc[item.subject] = item.unit;
@@ -123,28 +129,46 @@ export default {
       if (Object.keys(state.units).length === 0) {
         this._vm.$defaultApi.getUnits().then(
           (data) => commit("storeUnits", data),
-          // eslint-disable-next-line no-console
           (error) => console.error(error)
         );
       }
     },
     fetchOneExperimentWithTests({ commit, state }, payload) {
       commit("nowWeLoadOneExperiment", payload);
+
+      // 1. Fetch basic experiment info
       this._vm.$experimentsApi
         .getExperiments({ query: `id:${payload.experimentId}` })
         .then(
           (data) => commit("storeOneExperiment", data),
-          // eslint-disable-next-line no-console
           (error) => console.error(error)
         );
+
+      // 2. Fetch tests
       this._vm.$testsApi
         .getTests(payload.experimentId, {
           page: state.oneExperiment.pagination.page,
           size: state.oneExperiment.pagination.size,
         })
         .then(
-          (data) => commit("storeOneExperimentTests", data),
-          // eslint-disable-next-line no-console
+          (data) => {
+            commit("storeOneExperimentTests", data);
+
+            // 3. Fetch metadata from first test if available
+            if (data.items.length > 0) {
+              const firstTestId = data.items[0].id;
+              this._vm.$experimentsApi
+                .getQuasiStaticTest(payload.experimentId, firstTestId)
+                .then((qsData) => {
+                  if (qsData && qsData.experiment_metadata) {
+                    commit(
+                      "storeExperimentMetadata",
+                      qsData.experiment_metadata
+                    );
+                  }
+                });
+            }
+          },
           (error) => console.error(error)
         );
     },
@@ -153,7 +177,6 @@ export default {
 
       const queryElements = [];
 
-      // type (FA|QS)
       const types = [
         payload.filters.typeFA ? "FA" : null,
         payload.filters.typeQS ? "QS" : null,
@@ -166,8 +189,6 @@ export default {
       }
       queryElements.push("experiment_type:" + types);
 
-      // fracture (true|false)
-      // fracture_mode (All modes|Mode I|Mode II|Mode III|Combined)
       if (payload.filters.withFracture && !payload.filters.withoutFracture) {
         queryElements.push("fracture:1");
         if (payload.filters.fractureMode !== null) {
@@ -186,19 +207,16 @@ export default {
         return;
       }
 
-      // material_type_fiber_material
       if (payload.filters.fiberMaterial !== null) {
         queryElements.push(
           `material_type_fiber_material:${payload.filters.fiberMaterial}`
         );
       }
 
-      // material_type_resin
       if (payload.filters.resin !== null) {
         queryElements.push(`material_type_resin:${payload.filters.resin}`);
       }
 
-      // laminates_and_assemblies_stacking_sequence
       if (payload.filters.stackingSequence !== null) {
         queryElements.push(
           `laminates_and_assemblies_stacking_sequence:${payload.filters.stackingSequence}`
@@ -213,26 +231,22 @@ export default {
       };
       this._vm.$experimentsApi.getExperiments(opts).then(
         (data) => commit("storeFilteredExperiments", data),
-        // eslint-disable-next-line no-console
         (error) => console.error(error)
       );
     },
     fetchAllFiltersValues({ commit }) {
       this._vm.$experimentsApi.getFieldDistinct("fracture_mode").then(
         (data) => commit("storeAllFractureMode", data),
-        // eslint-disable-next-line no-console
         (error) => console.error(error)
       );
       this._vm.$experimentsApi
         .getFieldDistinct("material_type_fiber_material")
         .then(
           (data) => commit("storeAllMaterialTypeFiberMaterial", data),
-          // eslint-disable-next-line no-console
           (error) => console.error(error)
         );
       this._vm.$experimentsApi.getFieldDistinct("material_type_resin").then(
         (data) => commit("storeAllMaterialTypeResin", data),
-        // eslint-disable-next-line no-console
         (error) => console.error(error)
       );
       this._vm.$experimentsApi
@@ -240,7 +254,6 @@ export default {
         .then(
           (data) =>
             commit("storeAllLaminatesAndAssembliesStackingSequence", data),
-          // eslint-disable-next-line no-console
           (error) => console.error(error)
         );
     },
