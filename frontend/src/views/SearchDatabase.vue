@@ -223,7 +223,7 @@ export default {
         { text: "Experiment Type", value: "experiment_type" },
         { text: "Researcher", value: "researcher" },
         { text: "Date", value: "date" },
-        { text: "Fracture", value: "fracture" },
+        { text: "Fracture", value: "fracture_display" }, // <--- the new datastructure fracture
         { text: "Publication", value: "publication_doi" },
       ],
       experimentSelected: [],

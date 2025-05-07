@@ -59,7 +59,14 @@ export default {
     storeFilteredExperiments(state, data) {
       state.filteredExperiments = {
         ...state.filteredExperiments,
-        experiments: data.items,
+        experiments: data.items.map((exp) => ({
+          ...exp,
+          fracture_display:
+            exp.fa_experiment_type === "fracture" ||
+            exp.qs_experiment_type === "fracture"
+              ? "Yes"
+              : "No",
+        })),
         pagination: {
           page: data.page,
           size: data.size,
