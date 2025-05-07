@@ -16,6 +16,7 @@ from ccfatigue.models.database_v2 import Experiment, Test
 
 class QuasiStaticTest(BaseModel):
     specimen_name: str
+    specimen_id: int
     crack_displacement: List[float]
     crack_load: List[float]
     crack_length: List[float]
@@ -142,27 +143,21 @@ async def quasi_static_test(
 
     metadata_flat = flatten_metadata(extract_experiment_metadata(experiment))
     import json
-    print("✅ experiment_metadata FLAT (to be sent to frontend):")
-    print(json.dumps(metadata_flat, indent=2))
+    #print("✅ experiment_metadata FLAT (to be sent to frontend):")
+    #print(json.dumps(metadata_flat, indent=2))
+
+    print("✅ SPECIMEN ID:", specimen_id)
 
 
-
-    output = {
-        "specimen_name": test_meta["specimen_name"],
-        "crack_displacement": crack_displacement,
-        "crack_load": crack_load,
-        "crack_length": crack_length,
-        "displacement": displacement,
-        "load": load,
-        "strain": strain,
-        "stress": stress,
-        # "experiment_metadata": extract_experiment_metadata(experiment),
-            # ✅ flattened, single‐level metadata
-        # "experiment_metadata": flatten_metadata(extract_experiment_metadata(experiment)),
-        # "experiment_metadata": extract_experiment_metadata(experiment),
-        "experiment_metadata": metadata_flat,
-    }
-
-    import json
-    print("✅ FINAL OUTPUT", json.dumps(output, indent=2))
-    return output
+    return QuasiStaticTest(
+        specimen_name=test_meta["specimen_name"],
+        specimen_id=test_meta["sequential_number"],
+        crack_displacement=crack_displacement,
+        crack_load=crack_load,
+        crack_length=crack_length,
+        displacement=displacement,
+        load=load,
+        strain=strain,
+        stress=stress,
+        experiment_metadata=metadata_flat
+    )
