@@ -36,6 +36,7 @@
 <script>
 import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
 import { mapState } from "vuex";
+
 export default {
   name: "TestsSelection",
   components: {
@@ -51,18 +52,6 @@ export default {
         page: 1,
         itemsPerPage: 10,
       },
-
-      headers: [
-        { text: "Specimen ID", value: "sequential_number" },
-        { text: "Specimen Name", value: "specimen_name" },
-        { text: "Stress Ratio", value: "stress_ratio" },
-        { text: "Maximum Stress", value: "maximum_stress" },
-        { text: "Loading Rate", value: "loading_rate" },
-        { text: "Run Out", value: "run_out" },
-        { text: "Length", value: "length" },
-        { text: "Width", value: "width" },
-        { text: "Thickness", value: "thickness" },
-      ],
     };
   },
   computed: {
@@ -70,10 +59,47 @@ export default {
       experiment: "oneExperiment",
     }),
     numberedTests() {
-      return this.experiment.tests.map((test) => ({
-        ...test,
-        specimen_number: test.sequential_number || test.specimen_id, // usa il valore backend
-      }));
+      const mapped = this.experiment.tests.map((test) => {
+        const hasLoadData = test.maximum_load && test.width && test.thickness;
+        const calculatedStress = hasLoadData
+          ? test.maximum_load / (test.width * test.thickness)
+          : null;
+
+        return {
+          ...test,
+          specimen_number: test.sequential_number,
+          maximum_stress:
+            calculatedStress !== null
+              ? parseFloat(calculatedStress.toFixed(2))
+              : null,
+        };
+      });
+
+      return mapped;
+    },
+    headers() {
+      const baseHeaders = [
+        { text: "Specimen Number", value: "specimen_number" },
+        { text: "Specimen Name", value: "specimen_name" },
+        { text: "Length", value: "length" },
+        { text: "Width", value: "width" },
+        { text: "Thickness", value: "thickness" },
+      ];
+
+      const type = this.experiment?.experiment?.experiment_type;
+
+      if (type !== "QS") {
+        baseHeaders.splice(2, 0, {
+          text: "Maximum Stress",
+          value: "maximum_stress",
+        });
+        baseHeaders.splice(3, 0, {
+          text: "Run Out",
+          value: "run_out",
+        });
+      }
+
+      return baseHeaders;
     },
   },
   watch: {
@@ -82,6 +108,18 @@ export default {
         this.fetchOneExperimentWithTests();
       },
       deep: true,
+    },
+    "experiment.tests": {
+      handler(tests) {
+        if (tests.length > 0) {
+          console.log("✅ Test caricati:", tests);
+          console.log(
+            "🧪 Maximum stress:",
+            this.numberedTests.map((t) => t.maximum_stress)
+          );
+        }
+      },
+      immediate: true,
     },
   },
   created() {

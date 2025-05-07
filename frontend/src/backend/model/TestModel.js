@@ -49,6 +49,7 @@ class TestModel {
    */
   static constructFromObject(data, obj) {
     if (data) {
+      console.log("TestModel received data:", data);
       obj = obj || new TestModel();
 
       if (data.hasOwnProperty("id")) {
@@ -78,9 +79,9 @@ class TestModel {
           "Number"
         );
       }
-      if (data.hasOwnProperty("maximum_stress")) {
-        obj["maximum_stress"] = ApiClient.convertToType(
-          data["maximum_stress"],
+      if (data.hasOwnProperty("maximum_load")) {
+        obj["maximum_load"] = ApiClient.convertToType(
+          data["maximum_load"],
           "Number"
         );
       }
