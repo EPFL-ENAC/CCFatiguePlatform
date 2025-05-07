@@ -10,40 +10,39 @@
     </v-card-title>
     <v-card-text>
       <v-skeleton-loader v-if="!readyToDisplay" type="article" />
-      <!-- <pre v-if="experiment">{{ experiment }}</pre> -->
       <v-row v-else>
         <!-- Column 1: General -->
         <v-col>
           <h4>GENERAL INFORMATIONS</h4>
           <ul>
-            <li>
+            <li v-if="experiment.laboratory">
               <experiment-s-v
                 subject="Laboratory"
                 :values="[experiment.laboratory]"
               />
             </li>
-            <li>
+            <li v-if="experiment.researcher">
               <experiment-s-v
                 subject="Author"
                 :values="[experiment.researcher]"
               />
             </li>
-            <li>
+            <li v-if="experiment.date">
               <experiment-s-v subject="Date" :values="[experiment.date]" />
             </li>
-            <li>
+            <li v-if="experiment.experiment_type">
               <experiment-s-v
                 subject="Type"
                 :values="[experiment.experiment_type]"
               />
             </li>
-            <li>
+            <li v-if="experiment.measuring_equipment">
               <experiment-s-v
                 subject="Measuring equipment"
                 :values="[experiment.measuring_equipment]"
               />
             </li>
-            <li>
+            <li v-if="experiment.publication_doi">
               <experiment-s-v
                 subject="Publication DOI"
                 :values="[experiment.publication_doi]"
@@ -56,31 +55,31 @@
         <v-col>
           <h4>MATERIALS</h4>
           <ul>
-            <li>
+            <li v-if="experiment.material_tested">
               <experiment-s-v
                 subject="Materials tested"
                 :values="[experiment.material_tested]"
               />
             </li>
-            <li>
+            <li v-if="experiment.material_type_sample_type">
               <experiment-s-v
                 subject="Sample type"
                 :values="[experiment.material_type_sample_type]"
               />
             </li>
-            <li>
+            <li v-if="experiment.material_type_fiber_form">
               <experiment-s-v
                 subject="Fiber form"
                 :values="[experiment.material_type_fiber_form]"
               />
             </li>
-            <li>
+            <li v-if="experiment.material_type_resin">
               <experiment-s-v
                 subject="Resin"
                 :values="[experiment.material_type_resin]"
               />
             </li>
-            <li>
+            <li v-if="experiment.laminates_and_assemblies_stacking_sequence">
               <experiment-s-v
                 subject="Stacking sequence"
                 :values="[
@@ -88,28 +87,28 @@
                 ]"
               />
             </li>
-            <li>
+            <li v-if="experiment.curing_time">
               <experiment-s-v
                 subject="Curing time"
                 :values="[experiment.curing_time]"
-                unit="s"
+                unit="min"
               />
             </li>
-            <li>
+            <li v-if="experiment.curing_temperature">
               <experiment-s-v
                 subject="Curing temperature"
                 :values="[experiment.curing_temperature]"
                 unit="°C"
               />
             </li>
-            <li>
+            <li v-if="experiment.curing_pressure">
               <experiment-s-v
                 subject="Curing pressure"
                 :values="[experiment.curing_pressure]"
                 unit="bar"
               />
             </li>
-            <li>
+            <li v-if="experiment.postcuring_applied !== undefined">
               <experiment-s-v
                 subject="Post-curing applied"
                 :values="[experiment.postcuring_applied ? 'True' : 'False']"
@@ -122,20 +121,20 @@
         <v-col>
           <h4>CONTROL</h4>
           <ul>
-            <li>
+            <li v-if="experiment.control_mode">
               <experiment-s-v
                 subject="Control mode"
                 :values="[experiment.control_mode]"
               />
             </li>
-            <li>
+            <li v-if="experiment.loading_rate">
               <experiment-s-v
                 subject="Loading rate"
                 :values="[experiment.loading_rate]"
-                unit="mm/s"
+                :unit="loadingRateUnit"
               />
             </li>
-            <li v-if="isFracture">
+            <li v-if="isFracture && experiment.fracture_mode_fm">
               <experiment-s-v
                 subject="Fracture mode"
                 :values="[experiment.fracture_mode_fm]"
@@ -146,20 +145,20 @@
           <template v-if="experiment.experiment_type === 'FA'">
             <h4>FATIGUE</h4>
             <ul>
-              <li>
+              <li v-if="experiment.fatigue_r_ratio">
                 <experiment-s-v
                   subject="R ratio"
                   :values="[experiment.fatigue_r_ratio]"
                 />
               </li>
-              <li>
+              <li v-if="experiment.fatigue_frequency">
                 <experiment-s-v
                   subject="Fatigue frequency"
                   :values="[experiment.fatigue_frequency]"
                   unit="Hz"
                 />
               </li>
-              <li>
+              <li v-if="experiment.fatigue_loading_type">
                 <experiment-s-v
                   subject="Fatigue control mode"
                   :values="[experiment.fatigue_loading_type]"
@@ -205,6 +204,13 @@ export default {
         this.experiment.qs_experiment_type === "fracture" ||
         this.experiment.fa_experiment_type === "fracture"
       );
+    },
+    loadingRateUnit() {
+      const mode = this.experiment.control_mode;
+      if (mode === "Displacement Controlled") return "mm/min";
+      if (mode === "Load Controlled") return "kN/s";
+      if (mode === "Strain Controlled") return "[-]/s";
+      return ""; // fallback
     },
   },
   mounted() {
