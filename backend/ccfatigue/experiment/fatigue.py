@@ -146,13 +146,99 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
 
     std_df = get_dataframe("TST", experiment, test_meta["sequential_number"])
     hyst_df = get_dataframe("HYS", experiment, test_meta["sequential_number"]).fillna(0)
+    specimen_name = test_meta.get("specimen_name") or test_meta["sequential_number"]
+    '''
+    def smooth_outliers(data: List[float], threshold: float = 10) -> List[float]:
+        """
+        Rimuove outlier con filtro a finestra mobile di 5 elementi.
+        L'elemento centrale viene sostituito con la media degli altri 4 se è un outlier.
+        """
+        smoothed = data.copy()
+        for i in range(2, len(data) - 2):
+            window = data[i-2:i+3]
+            center = window[2]
+            others = window[:2] + window[3:]
+            mean_others = np.mean(others)
+            std_others = np.std(others)
+            if abs(center - mean_others) > threshold * std_others:
+                smoothed[i] = mean_others
+        return smoothed
 
+    def log_if_modified(original: List[float], filtered: List[float], field: str, specimen_name: str):
+        diffs = [i for i, (o, f) in enumerate(zip(original, filtered)) if o != f]
+        if diffs:
+            print(
+                f"[Filtro outlier] Provino '{specimen_name}' – colonna '{field}' modificata in {len(diffs)} cicli "
+                f"(posizioni: {diffs})"
+            )
+
+
+    original_creep = hyst_df["creep"].tolist()
+    filtered_creep = smooth_outliers(original_creep)
+    log_if_modified(original_creep, filtered_creep, "creep", specimen_name)
+    hyst_df["creep"] = filtered_creep
+    original_area = hyst_df["hysteresis_area"].tolist()
+    filtered_area = smooth_outliers(original_area)
+    log_if_modified(original_area, filtered_area, "hysteresis_area", specimen_name)
+    hyst_df["hysteresis_area"] = filtered_area
+    original_stiffness = hyst_df["stiffness"].tolist()
+    filtered_stiffness = smooth_outliers(original_stiffness)
+    log_if_modified(original_stiffness, filtered_stiffness, "stiffness", specimen_name)
+    hyst_df["stiffness"] = filtered_stiffness
+    '''
+    def smooth_spikes(data: List[float], threshold: float = 0.1) -> List[float]:
+        """
+        Rimuove spike/drop locali in una finestra mobile di 5 elementi.
+        Il valore centrale viene sostituito se è molto diverso dalla media delle due mezze finestre,
+        ma le mezze finestre sono tra loro coerenti.
+        """
+        smoothed = data.copy()
+        for i in range(2, len(data) - 2):
+            v0, v1, v2, v3, v4 = data[i-2:i+3]
+            m1 = (v0 + v1) / 2
+            m2 = (v3 + v4) / 2
+            avg_context = (m1 + m2) / 2
+
+            if avg_context == 0:
+                continue
+
+            diff_between_halves = abs(m1 - m2) / avg_context
+            center_diff = abs(v2 - avg_context) / avg_context
+
+            if diff_between_halves < threshold and center_diff > threshold:
+                smoothed[i] = avg_context
+        return smoothed
+
+
+    def log_if_modified(original: List[float], filtered: List[float], field: str, specimen_name: str):
+        diffs = [i for i, (o, f) in enumerate(zip(original, filtered)) if o != f]
+        if diffs:
+            print(
+                f"[Filtro spike] Provino '{specimen_name}' – colonna '{field}' modificata in {len(diffs)} cicli "
+                f"(posizioni: {diffs})"
+            )
+
+
+    original_creep = hyst_df["creep"].tolist()
+    filtered_creep = smooth_spikes(original_creep)
+    log_if_modified(original_creep, filtered_creep, "creep", specimen_name)
+    hyst_df["creep"] = filtered_creep
+
+    original_area = hyst_df["hysteresis_area"].tolist()
+    filtered_area = smooth_spikes(original_area)
+    log_if_modified(original_area, filtered_area, "hysteresis_area", specimen_name)
+    hyst_df["hysteresis_area"] = filtered_area
+
+    original_stiffness = hyst_df["stiffness"].tolist()
+    filtered_stiffness = smooth_spikes(original_stiffness)
+    log_if_modified(original_stiffness, filtered_stiffness, "stiffness", specimen_name)
+    hyst_df["stiffness"] = filtered_stiffness
     fatigue_processed = fatigue_processing(std_df, compute_sub_indexes(hyst_df), test_meta)
 
     max_stress = test_meta["maximum_load"] / (test_meta["width"] * test_meta["thickness"])
     strain_at_failure = hyst_df["creep"].iloc[-1]
 
-    specimen_name = test_meta.get("specimen_name") or test_meta["sequential_number"]
+
 
     return FatigueTest(
         specimen_id=test_meta["sequential_number"],
