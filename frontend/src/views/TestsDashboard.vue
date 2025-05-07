@@ -277,6 +277,15 @@
                   tooltip="Maximum strain recorded in the test."
                 />
               </li>
+              <li>
+                <experiment-s-v
+                  subject="Toughness"
+                  :values="formattedToughnessValues"
+                  :colors="valueColors"
+                  :unit="'N/mm²'"
+                  tooltip="Area under the stress-strain curve..."
+                />
+              </li>
             </ul>
           </v-card-text>
         </v-card>
@@ -337,6 +346,7 @@ export default {
       stressOptions: [],
       stressOption: null,
       experimentMetadata: {},
+      toughnessValues: [],
     };
   },
   computed: {
@@ -389,6 +399,11 @@ export default {
     formattedStrainAtFailure() {
       return this.strainAtFailure.map((e) =>
         e != null ? Number(e).toFixed(4) : "-"
+      );
+    },
+    formattedToughnessValues() {
+      return this.toughnessValues.map((t) =>
+        t != null ? Number(t).toFixed(2) : "-"
       );
     },
   },
@@ -491,6 +506,7 @@ export default {
       this.specimenIds = [];
       this.stressAtFailure = [];
       this.strainAtFailure = [];
+      this.toughnessValues = []; // new
 
       dataList.forEach((d, i) => {
         const tid = this.testIds[i];
@@ -536,6 +552,9 @@ export default {
           .filter(Number.isFinite);
         this.stressAtFailure.push(Math.max(...stressValues));
         this.strainAtFailure.push(Math.max(...strainValues));
+        this.toughnessValues.push(
+          isFinite(d.toughness) ? Number(d.toughness) : null
+        );
       });
 
       this.loadOptions = Array.from(this.loadOptions);

@@ -19,7 +19,8 @@ class QuasiStaticTest {
     strain,
     stress,
     experimentMetadata,
-    specimenId
+    specimenId,
+    toughness,
   ) {
     QuasiStaticTest.initialize(
       this,
@@ -32,7 +33,8 @@ class QuasiStaticTest {
       strain,
       stress,
       experimentMetadata,
-      specimenId
+      specimenId,
+      toughness
     );
   }
 
@@ -47,7 +49,8 @@ class QuasiStaticTest {
     strain,
     stress,
     experimentMetadata,
-    specimenId
+    specimenId,
+    toughness
   ) {
     obj["specimen_name"] = specimenName;
     obj["crack_displacement"] = crackDisplacement;
@@ -59,6 +62,7 @@ class QuasiStaticTest {
     obj["stress"] = stress;
     obj["experiment_metadata"] = experimentMetadata;
     obj["specimen_id"] = specimenId;
+    obj["toughness"] = toughness;
   }
 
   static constructFromObject(data, obj) {
@@ -96,6 +100,9 @@ class QuasiStaticTest {
       if (data.hasOwnProperty("specimen_id")) {
         obj["specimen_id"] = ApiClient.convertToType(data["specimen_id"], "Number");
       }
+      if (data.hasOwnProperty("toughness")) {
+        obj["toughness"] = ApiClient.convertToType(data["toughness"], "Number");
+      }
     }
     return obj;
   }
@@ -112,5 +119,6 @@ QuasiStaticTest.prototype["strain"] = undefined;
 QuasiStaticTest.prototype["stress"] = undefined;
 QuasiStaticTest.prototype["experiment_metadata"] = undefined;
 QuasiStaticTest.prototype["specimen_id"] = undefined;
+QuasiStaticTest.prototype["toughness"] = undefined;
 
 export default QuasiStaticTest;

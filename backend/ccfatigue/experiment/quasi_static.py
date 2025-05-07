@@ -1,6 +1,7 @@
 import os
 from re import Pattern, search
 from typing import Callable, Dict, List, Any
+import numpy as np
 
 import pandas as pd
 from pandas import DataFrame
@@ -25,6 +26,7 @@ class QuasiStaticTest(BaseModel):
     strain: Dict[str, List[float]]
     stress: Dict[str, List[float]]
     experiment_metadata: Dict[str, Any]  # new term
+    toughness: float | None  # new feature
 
 
 def get_dataframe(
@@ -141,6 +143,17 @@ async def quasi_static_test(
         area = width * thickness
         stress["nominal"] = (df["Load"] / area).dropna().tolist()
 
+    # Calcolo della toughness (area sotto la curva stress-strain)
+    toughness = None
+    if "nominal" in stress and "exx" in strain:
+        stress_values = stress["nominal"]
+        strain_values = strain["exx"]
+        min_len = min(len(stress_values), len(strain_values))
+        if min_len > 1:
+            # Allineiamo i dati e calcoliamo l'area
+            toughness = float(np.trapz(stress_values[:min_len], strain_values[:min_len]))
+
+
     metadata_flat = flatten_metadata(extract_experiment_metadata(experiment))
     import json
     #print("✅ experiment_metadata FLAT (to be sent to frontend):")
@@ -159,5 +172,6 @@ async def quasi_static_test(
         load=load,
         strain=strain,
         stress=stress,
-        experiment_metadata=metadata_flat
+        experiment_metadata=metadata_flat,
+        toughness=toughness  # 👈 nuova proprietà
     )
