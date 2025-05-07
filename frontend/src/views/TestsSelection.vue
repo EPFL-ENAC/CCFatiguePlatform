@@ -6,7 +6,7 @@
       <v-data-table
         v-model="testsSelected"
         :headers="headers"
-        :items="experiment.tests"
+        :items="numberedTests"
         :options.sync="options"
         :server-items-length="experiment.pagination.total"
         :loading="experiment.loadingTests"
@@ -53,7 +53,7 @@ export default {
       },
 
       headers: [
-        { text: "Specimen Number", value: "specimen_number" },
+        { text: "Specimen ID", value: "sequential_number" },
         { text: "Specimen Name", value: "specimen_name" },
         { text: "Stress Ratio", value: "stress_ratio" },
         { text: "Maximum Stress", value: "maximum_stress" },
@@ -69,6 +69,12 @@ export default {
     ...mapState("experiments", {
       experiment: "oneExperiment",
     }),
+    numberedTests() {
+      return this.experiment.tests.map((test) => ({
+        ...test,
+        specimen_number: test.sequential_number || test.specimen_id, // usa il valore backend
+      }));
+    },
   },
   watch: {
     options: {

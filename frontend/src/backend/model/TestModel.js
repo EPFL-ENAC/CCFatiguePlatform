@@ -60,9 +60,9 @@ class TestModel {
           "Number"
         );
       }
-      if (data.hasOwnProperty("specimen_number")) {
-        obj["specimen_number"] = ApiClient.convertToType(
-          data["specimen_number"],
+      if (data.hasOwnProperty("sequential_number")) {
+        obj["sequential_number"] = ApiClient.convertToType(
+          data["sequential_number"],
           "Number"
         );
       }
@@ -142,9 +142,9 @@ TestModel.prototype["id"] = undefined;
 TestModel.prototype["experiment_id"] = undefined;
 
 /**
- * @member {Number} specimen_number
+ * @member {Number} sequential_number
  */
-TestModel.prototype["specimen_number"] = undefined;
+TestModel.prototype["sequential_number"] = undefined;
 
 /**
  * @member {String} specimen_name
