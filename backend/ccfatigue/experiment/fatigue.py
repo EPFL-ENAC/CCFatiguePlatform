@@ -25,7 +25,7 @@ class HysteresisLoop(BaseModel):
 class FatigueTest(BaseModel):
     specimen_id: int
     specimen_name: str
-    total_dissipated_energy: int
+    total_dissipated_energy: float
     run_out: bool
     #stress_ratio: float
     hysteresis_loops: List[HysteresisLoop]
@@ -59,7 +59,7 @@ def get_dataframe(data_in: str, exp: Dict[str, str], specimen_id: int) -> DataFr
     return pd.read_csv(abspath)
 
 
-def get_total_dissipated_energy(hyst_df: DataFrame) -> int:
+def get_total_dissipated_energy(hyst_df: DataFrame) -> float:
     return np.sum(hyst_df["hysteresis_area"])
 
 
@@ -77,7 +77,7 @@ def fatigue_processing(df: DataFrame, sub_indexes: List[int], test_meta) -> Dict
     strain_field = "exx"  # or "exx" depending on setup
 
     df = df.assign(
-        stress=(df[load_field] * 1000) / (test_meta["width"] * test_meta["thickness"]),
+        stress=(df[load_field]) / (test_meta["width"] * test_meta["thickness"]),
         strain=df[strain_field],
     )
 
@@ -136,6 +136,7 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
             Test.sequential_number,
             Test.specimen_name,
             Test.run_out,
+            Test.number_of_cycles,
             #Test.stress_ratio,
             Test.width,
             Test.thickness,
@@ -253,5 +254,6 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
         stiffness=hyst_df["stiffness"].to_list(),
         stress_at_failure=max_stress,
         strain_at_failure=strain_at_failure,
-        n_fail=fatigue_processed["n_fail"],
+        # n_fail=fatigue_processed["n_fail"],
+        n_fail=test_meta["number_of_cycles"]
     )

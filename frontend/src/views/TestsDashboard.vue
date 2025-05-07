@@ -143,6 +143,7 @@
                   tooltip="No fatigue failure."
                 />
               </li>
+              <!--
               <li>
                 <experiment-s-v
                   subject="R ratio"
@@ -151,12 +152,12 @@
                   tooltip="Stress ratio (σ_min/σ_max)."
                 />
               </li>
+              -->
               <li>
                 <experiment-s-v
                   subject="Total dissipated energy (TDE)"
-                  :values="totalDissipatedEnergies"
+                  :values="formattedTotalDissipatedEnergies"
                   :colors="valueColors"
-                  value-type="bigNumber"
                   tooltip="Sum of all hysteresis areas."
                 />
               </li>
@@ -404,6 +405,11 @@ export default {
     formattedToughnessValues() {
       return this.toughnessValues.map((t) =>
         t != null ? Number(t).toFixed(2) : "-"
+      );
+    },
+    formattedTotalDissipatedEnergies() {
+      return this.totalDissipatedEnergies.map((e) =>
+        e != null ? Number(e).toFixed(4) : "-"
       );
     },
   },
