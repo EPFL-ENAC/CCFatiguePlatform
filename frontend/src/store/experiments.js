@@ -197,15 +197,20 @@ export default {
       queryElements.push("experiment_type:" + types);
 
       if (payload.filters.withFracture && !payload.filters.withoutFracture) {
-        queryElements.push("fracture:1");
-        if (payload.filters.fractureMode !== null) {
-          queryElements.push(`fracture_mode:${payload.filters.fractureMode}`);
+        queryElements.push("fracture:true");
+        if (
+          payload.filters.fractureMode !== null &&
+          payload.filters.fractureMode !== "All fracture modes"
+        ) {
+          queryElements.push(
+            `fracture_mode_fm:${payload.filters.fractureMode}`
+          );
         }
       } else if (
         !payload.filters.withFracture &&
         payload.filters.withoutFracture
       ) {
-        queryElements.push("fracture:0");
+        queryElements.push("fracture:false");
       } else if (
         !payload.filters.withFracture &&
         !payload.filters.withoutFracture
@@ -236,13 +241,16 @@ export default {
         query: queryElements.join(";"),
         textSearch: payload.filters.textSearch,
       };
+
+      console.log("Filtri applicati:", opts.query);
+
       this._vm.$experimentsApi.getExperiments(opts).then(
         (data) => commit("storeFilteredExperiments", data),
         (error) => console.error(error)
       );
     },
     fetchAllFiltersValues({ commit }) {
-      this._vm.$experimentsApi.getFieldDistinct("fracture_mode").then(
+      this._vm.$experimentsApi.getFieldDistinct("fracture_mode_fm").then(
         (data) => commit("storeAllFractureMode", data),
         (error) => console.error(error)
       );
