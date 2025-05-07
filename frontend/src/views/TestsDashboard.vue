@@ -2,7 +2,6 @@
   <v-container>
     <v-row>
       <v-col>
-        <!-- Pass the correct metadata object -->
         <experiment-specifications :experiment="displayMetadata" />
       </v-col>
     </v-row>
@@ -105,13 +104,15 @@
                 <experiment-s-v
                   subject="Specimen number"
                   :values="specimenIds"
+                  :colors="valueColors"
                   value-type="bigNumber"
                 />
               </li>
               <li>
                 <experiment-s-v
                   subject="Stress at failure"
-                  :values="stressAtFailure"
+                  :values="formattedStressAtFailure"
+                  :colors="valueColors"
                   :unit="units.stress"
                   tooltip="σ_fail is the stress level that induced failure..."
                 />
@@ -119,7 +120,8 @@
               <li>
                 <experiment-s-v
                   subject="Strain at failure"
-                  :values="strainAtFailure"
+                  :values="formattedStrainAtFailure"
+                  :colors="valueColors"
                   unit="%"
                   tooltip="ε_fail is the deformation at the time of failure..."
                 />
@@ -128,6 +130,7 @@
                 <experiment-s-v
                   subject="Cycle at failure"
                   :values="cycleAtFailure"
+                  :colors="valueColors"
                   value-type="bigNumber"
                   tooltip="Number of cycles to failure."
                 />
@@ -136,6 +139,7 @@
                 <experiment-s-v
                   subject="Run out"
                   :values="runOuts"
+                  :colors="valueColors"
                   tooltip="No fatigue failure."
                 />
               </li>
@@ -143,6 +147,7 @@
                 <experiment-s-v
                   subject="R ratio"
                   :values="stressRatios"
+                  :colors="valueColors"
                   tooltip="Stress ratio (σ_min/σ_max)."
                 />
               </li>
@@ -150,6 +155,7 @@
                 <experiment-s-v
                   subject="Total dissipated energy (TDE)"
                   :values="totalDissipatedEnergies"
+                  :colors="valueColors"
                   value-type="bigNumber"
                   tooltip="Sum of all hysteresis areas."
                 />
@@ -240,6 +246,41 @@
           </v-card-text>
         </v-card>
       </v-col>
+
+      <v-col cols="2">
+        <v-card :loading="loading">
+          <v-card-text>
+            <ul>
+              <li>
+                <experiment-s-v
+                  subject="Specimen number"
+                  :values="specimenIds"
+                  :colors="valueColors"
+                  value-type="bigNumber"
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="Max stress"
+                  :values="formattedStressAtFailure"
+                  :colors="valueColors"
+                  :unit="units.stress"
+                  tooltip="Maximum stress recorded in the test."
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="Max strain"
+                  :values="formattedStrainAtFailure"
+                  :colors="valueColors"
+                  unit="%"
+                  tooltip="Maximum strain recorded in the test."
+                />
+              </li>
+            </ul>
+          </v-card-text>
+        </v-card>
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -271,7 +312,6 @@ export default {
     return {
       loading: false,
       colors: colorPalette,
-      // FA fields
       cycleAtFailure: [],
       stressAtFailure: [],
       strainAtFailure: [],
@@ -283,7 +323,6 @@ export default {
       hysteresisAreaSeries: [],
       creepSeries: [],
       stiffnessSeries: [],
-      // QS fields
       crackSeries: [],
       loadData: {},
       loadOptions: [],
@@ -297,7 +336,6 @@ export default {
       stressData: {},
       stressOptions: [],
       stressOption: null,
-      // metadata to pass down
       experimentMetadata: {},
     };
   },
@@ -309,12 +347,11 @@ export default {
     experimentType() {
       return this.experiment.experiment.experiment_type;
     },
-    // pick the right metadata to hand to the child
     displayMetadata() {
       if (this.experimentType === "QS" && this.experimentMetadata) {
         return {
-          ...this.experiment.experiment, // campi di base
-          ...this.experimentMetadata, // flatten dei metadati
+          ...this.experiment.experiment,
+          ...this.experimentMetadata,
         };
       }
       return this.experiment.experiment;
@@ -340,6 +377,19 @@ export default {
           ),
         }))
         .filter((s) => s.data.length);
+    },
+    valueColors() {
+      return this.testIds.map((_, i) => this.colors[i % this.colors.length]);
+    },
+    formattedStressAtFailure() {
+      return this.stressAtFailure.map((s) =>
+        s != null ? Number(s).toFixed(2) : "-"
+      );
+    },
+    formattedStrainAtFailure() {
+      return this.strainAtFailure.map((e) =>
+        e != null ? Number(e).toFixed(4) : "-"
+      );
     },
   },
   watch: {
@@ -369,7 +419,6 @@ export default {
           this.$experimentsApi.getFatigueTest(this.experimentId, tid)
         )
       );
-      // reset
       this.specimenName = {};
       this.cycleAtFailure = [];
       this.stressAtFailure = [];
@@ -427,12 +476,8 @@ export default {
           this.$experimentsApi.getQuasiStaticTest(this.experimentId, tid)
         )
       );
-      // grab metadata from first test
-      console.log("🎯 full API response", dataList[0]);
       this.experimentMetadata = dataList[0].experiment_metadata;
-      console.log("📦 experimentMetadata FLAT", this.experimentMetadata);
 
-      // reset
       this.specimenName = {};
       this.crackSeries = [];
       this.loadData = {};
@@ -443,12 +488,14 @@ export default {
       this.strainOptions = new Set();
       this.stressData = {};
       this.stressOptions = new Set();
+      this.specimenIds = [];
+      this.stressAtFailure = [];
+      this.strainAtFailure = [];
 
       dataList.forEach((d, i) => {
         const tid = this.testIds[i];
         this.specimenName[tid] = d.specimen_name;
-
-        // crack plot
+        console.log("🧪 Quasi-static specimen ID:", d.specimen_id);
         if (d.crack_displacement.length) {
           this.crackSeries.push({
             type: "line",
@@ -464,7 +511,6 @@ export default {
           });
         }
 
-        // load / displacement
         Object.keys(d.load).forEach((k) => this.loadOptions.add(k));
         Object.keys(d.displacement).forEach((k) =>
           this.displacementOptions.add(k)
@@ -472,14 +518,26 @@ export default {
         this.loadData[tid] = d.load;
         this.displacementData[tid] = d.displacement;
 
-        // strain / stress
         Object.keys(d.strain).forEach((k) => this.strainOptions.add(k));
         Object.keys(d.stress).forEach((k) => this.stressOptions.add(k));
         this.strainData[tid] = d.strain;
         this.stressData[tid] = d.stress;
+        if (typeof d.specimen_id !== "undefined") {
+          this.specimenIds.push(String(d.specimen_id));
+        } else {
+          console.warn("⚠️ specimen_id mancante per test", tid);
+          this.specimenIds.push("–"); // oppure "N/A" per chiarezza visiva
+        }
+        const stressValues = Object.values(d.stress)
+          .flat()
+          .filter(Number.isFinite);
+        const strainValues = Object.values(d.strain)
+          .flat()
+          .filter(Number.isFinite);
+        this.stressAtFailure.push(Math.max(...stressValues));
+        this.strainAtFailure.push(Math.max(...strainValues));
       });
 
-      // finalize options
       this.loadOptions = Array.from(this.loadOptions);
       this.loadOption = this.loadOptions[0] || null;
       this.displacementOptions = Array.from(this.displacementOptions);
