@@ -23,14 +23,31 @@
           <v-col cols="6">
             <v-card :loading="loading">
               <v-card-title>
-                Stress - Strain
-                <info-tooltip>
-                  This graph shows a selection of loading/unloading loops...
-                </info-tooltip>
+                <v-row align="center" class="w-100">
+                  <v-col class="d-flex align-center" cols="auto">
+                    <span>Hysteresis Loops</span>
+                    <info-tooltip>
+                      This graph shows a selection of loading/unloading loops.
+                      10 loops are selected so that they are evenly spaced
+                      throughout the specimen’s lifetime.
+                    </info-tooltip>
+                  </v-col>
+                  <v-spacer />
+                  <v-col cols="auto">
+                    <v-select
+                      v-model="selectedLoopIndex"
+                      :items="loopIndexOptions"
+                      label="Cycle index"
+                      dense
+                      hide-details
+                      style="max-width: 180px"
+                    />
+                  </v-col>
+                </v-row>
               </v-card-title>
               <v-card-text>
                 <simple-chart
-                  :series="stressStrainSeries"
+                  :series="strainStressSeriesFA"
                   :aspect-ratio="2"
                   x-axis-name="Strain [-]"
                   y-axis-name="Stress [MPa]"
@@ -319,7 +336,7 @@
               </v-col>
             </v-row>
             <simple-chart
-              :series="strainStressSeries"
+              :series="strainStressSeriesQS"
               :aspect-ratio="2"
               x-axis-name="Strain [-]"
               y-axis-name="Stress [MPa]"
@@ -412,8 +429,9 @@ export default {
       totalDissipatedEnergies: [],
       runOuts: [],
       stressRatios: [],
-      stressStrainSeries: [],
+      selectedLoopIndex: null,
       /*
+      stressStrainSeries: [],
       hysteresisAreaSeries: [],
       creepSeries: [],
       stiffnessSeries: [],
@@ -463,7 +481,7 @@ export default {
         ),
       }));
     },
-    strainStressSeries() {
+    strainStressSeriesQS() {
       return this.testIds
         .map((id) => ({
           type: "line",
@@ -474,6 +492,49 @@ export default {
           ),
         }))
         .filter((s) => s.data.length);
+    },
+
+    strainStressSeriesFA() {
+      return this.fatigueData.flatMap((test, testIndex) => {
+        const loops = test.hysteresis_loops || [];
+        const name = test.specimen_name;
+        const color = this.colors[testIndex % this.colors.length];
+
+        if (!loops.length) return [];
+
+        if (
+          Number.isInteger(this.selectedLoopIndex) &&
+          this.selectedLoopIndex >= 0 &&
+          this.selectedLoopIndex < loops.length
+        ) {
+          const loop = loops[this.selectedLoopIndex];
+          return [
+            {
+              type: "line",
+              name: `${name} - cycle ${this.selectedLoopIndex}`,
+              data: zip(loop.strain, loop.stress),
+              lineStyle: { color },
+            },
+          ];
+        }
+
+        // Mostra tutti i cicli, ma solo il primo va in legenda
+        return loops.map((loop, i) => ({
+          type: "line",
+          name: i === 0 ? name : null, // solo il primo nella legenda
+          data: zip(loop.strain, loop.stress),
+          lineStyle: { color },
+        }));
+      });
+    },
+    loopIndexOptions() {
+      return [
+        { text: "All cycles", value: null },
+        ...Array.from({ length: 10 }, (_, i) => ({
+          text: `Cycle ${i + 1}`,
+          value: i,
+        })),
+      ];
     },
     valueColors() {
       return this.testIds.map((_, i) => this.colors[i % this.colors.length]);
@@ -578,8 +639,8 @@ export default {
       this.totalDissipatedEnergies = [];
       this.runOuts = [];
       this.stressRatios = [];
-      this.stressStrainSeries = [];
-      /*this.hysteresisAreaSeries = [];
+      /*this.stressStrainSeries = [];
+      this.hysteresisAreaSeries = [];
       this.creepSeries = [];
       this.stiffnessSeries = [];
       */
@@ -594,7 +655,7 @@ export default {
         this.runOuts.push(d.run_out);
         this.stressRatios.push(d.stress_ratio);
         this.fatigueWarnings.push(d.warning_messages || false);
-
+        /*  
         d.hysteresis_loops.forEach((loop) =>
           this.stressStrainSeries.push({
             type: "line",
@@ -602,7 +663,6 @@ export default {
             data: zip(loop.strain, loop.stress),
           })
         );
-        /*
         this.hysteresisAreaSeries.push({
           type: "line",
           name: d.specimen_name,
