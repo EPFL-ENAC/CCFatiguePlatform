@@ -36,6 +36,7 @@ class FatigueTest(BaseModel):
     stress_at_failure: float  # actually max_stress now
     strain_at_failure: float  # last value of creep
     n_fail: int
+    warning_messages: bool
 
 
 def get_dataframe(data_in: str, exp: Dict[str, str], specimen_id: int) -> DataFrame:
@@ -144,7 +145,7 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
             Test.maximum_load,  # <- nuovo campo per max_stress
         ),
     )
-
+    warning_triggered = False
     std_df = get_dataframe("TST", experiment, test_meta["sequential_number"])
     hyst_df = get_dataframe("HYS", experiment, test_meta["sequential_number"]).fillna(0)
     specimen_name = test_meta.get("specimen_name") or test_meta["sequential_number"]
@@ -212,8 +213,10 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
 
 
     def log_if_modified(original: List[float], filtered: List[float], field: str, specimen_name: str):
+        nonlocal warning_triggered
         diffs = [i for i, (o, f) in enumerate(zip(original, filtered)) if o != f]
         if diffs:
+            warning_triggered = True
             print(
                 f"[Filtro spike] Provino '{specimen_name}' – colonna '{field}' modificata in {len(diffs)} cicli "
                 f"(posizioni: {diffs})"
@@ -255,5 +258,6 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
         stress_at_failure=max_stress,
         strain_at_failure=strain_at_failure,
         # n_fail=fatigue_processed["n_fail"],
-        n_fail=test_meta["number_of_cycles"]
+        n_fail=test_meta["number_of_cycles"],
+        warning_messages = warning_triggered
     )

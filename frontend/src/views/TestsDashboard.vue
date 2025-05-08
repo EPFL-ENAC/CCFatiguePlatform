@@ -162,6 +162,16 @@
                 />
               </li>
             </ul>
+            <!-- warning messages -->
+            <v-alert
+              v-if="hasWarnings"
+              type="warning"
+              dense
+              outlined
+              class="mt-4"
+            >
+              Smooth spikes and drop function has been activated!
+            </v-alert>
           </v-card-text>
         </v-card>
       </v-col>
@@ -348,6 +358,7 @@ export default {
       stressOption: null,
       experimentMetadata: {},
       toughnessValues: [],
+      fatigueWarnings: [],
     };
   },
   computed: {
@@ -412,6 +423,9 @@ export default {
         e != null ? Number(e).toFixed(4) : "-"
       );
     },
+    hasWarnings() {
+      return this.testIds.some((_, i) => this.fatigueWarnings?.[i]);
+    },
   },
   watch: {
     experimentType: {
@@ -463,6 +477,7 @@ export default {
         this.totalDissipatedEnergies.push(d.total_dissipated_energy);
         this.runOuts.push(d.run_out);
         this.stressRatios.push(d.stress_ratio);
+        this.fatigueWarnings.push(d.warning_messages || false);
 
         d.hysteresis_loops.forEach((loop) =>
           this.stressStrainSeries.push({

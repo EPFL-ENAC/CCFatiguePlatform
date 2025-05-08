@@ -36,6 +36,7 @@ class FatigueTest {
    * @param stressAtFailure {Number}
    * @param strainAtFailure {Number}
    * @param nFail {Number}
+   * @param warningMessages {Boolean}
    */
   constructor(
     specimenId,
@@ -50,7 +51,8 @@ class FatigueTest {
     stiffness,
     stressAtFailure,
     strainAtFailure,
-    nFail
+    nFail,
+    warningMessages
   ) {
     FatigueTest.initialize(
       this,
@@ -66,7 +68,8 @@ class FatigueTest {
       stiffness,
       stressAtFailure,
       strainAtFailure,
-      nFail
+      nFail,
+      warningMessages
     );
   }
 
@@ -89,7 +92,8 @@ class FatigueTest {
     stiffness,
     stressAtFailure,
     strainAtFailure,
-    nFail
+    nFail,
+    warningMessages
   ) {
     obj["specimen_id"] = specimenId;
     obj["specimen_name"] = specimenName;
@@ -104,6 +108,7 @@ class FatigueTest {
     obj["stress_at_failure"] = stressAtFailure;
     obj["strain_at_failure"] = strainAtFailure;
     obj["n_fail"] = nFail;
+    obj["warning_messages"] = warningMessages;
   }
 
   /**
@@ -182,6 +187,12 @@ class FatigueTest {
       if (data.hasOwnProperty("n_fail")) {
         obj["n_fail"] = ApiClient.convertToType(data["n_fail"], "Number");
       }
+      if (data.hasOwnProperty("warning_messages")) {
+        obj["warning_messages"] = ApiClient.convertToType(
+          data["warning_messages"],
+          "Boolean"
+        );
+      }
     }
     return obj;
   }
@@ -251,5 +262,10 @@ FatigueTest.prototype["strain_at_failure"] = undefined;
  * @member {Number} n_fail
  */
 FatigueTest.prototype["n_fail"] = undefined;
+
+/**
+ * @member {Boolean} warning_messages
+ */
+FatigueTest.prototype["warning_messages"] = undefined;
 
 export default FatigueTest;
