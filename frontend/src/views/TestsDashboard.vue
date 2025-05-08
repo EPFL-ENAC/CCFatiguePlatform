@@ -41,16 +41,37 @@
           <v-col cols="6">
             <v-card :loading="loading">
               <v-card-title>
-                Hysteresis loop area evolution
-                <info-tooltip>
-                  On this graph, we show the evolution of the hysteresis area...
-                </info-tooltip>
+                <v-row align="center" class="w-100">
+                  <v-col class="d-flex align-center" cols="auto">
+                    <span>Hysteresis loop area evolution</span>
+                    <info-tooltip
+                      >On this graph, we show the evolution of the hysteresis
+                      area...</info-tooltip
+                    >
+                  </v-col>
+                  <v-spacer />
+                  <v-col cols="auto" class="d-flex">
+                    <v-select
+                      v-model="xAxisMode"
+                      :items="[
+                        { text: 'Cycle count', value: 'normal' },
+                        { text: 'Log(Cycle count)', value: 'log' },
+                        { text: 'Normalized cycle count', value: 'normalized' },
+                      ]"
+                      dense
+                      hide-details
+                      label="X-Axis scale"
+                      style="max-width: 220px"
+                    />
+                  </v-col>
+                </v-row>
               </v-card-title>
               <v-card-text>
                 <simple-chart
                   :series="hysteresisAreaSeries"
                   :aspect-ratio="2"
-                  x-axis-name="Number of cycles [-]"
+                  :x-axis-name="computedXAxisLabel"
+                  :x-axis-type="xAxisChartType"
                   y-axis-name="Hysteresis area [N/mm²]"
                 />
               </v-card-text>
@@ -59,17 +80,37 @@
           <v-col cols="6">
             <v-card :loading="loading">
               <v-card-title>
-                Creep evolution
-                <info-tooltip>
-                  Creep is defined as the average deformation during each
-                  cycle...
-                </info-tooltip>
+                <v-row align="center" class="w-100">
+                  <v-col class="d-flex align-center" cols="auto">
+                    <span>Creep evolution</span>
+                    <info-tooltip>
+                      Creep is defined as the average deformation during each
+                      cycle...
+                    </info-tooltip>
+                  </v-col>
+                  <v-spacer />
+                  <v-col cols="auto" class="d-flex">
+                    <v-select
+                      v-model="xAxisMode"
+                      :items="[
+                        { text: 'Cycle count', value: 'normal' },
+                        { text: 'Log(Cycle count)', value: 'log' },
+                        { text: 'Normalized cycle count', value: 'normalized' },
+                      ]"
+                      dense
+                      hide-details
+                      label="X-Axis scale"
+                      style="max-width: 220px"
+                    />
+                  </v-col>
+                </v-row>
               </v-card-title>
               <v-card-text>
                 <simple-chart
                   :series="creepSeries"
                   :aspect-ratio="2"
-                  x-axis-name="Number of cycles [-]"
+                  :x-axis-name="computedXAxisLabel"
+                  :x-axis-type="xAxisChartType"
                   y-axis-name="Creep [-]"
                 />
               </v-card-text>
@@ -78,17 +119,37 @@
           <v-col cols="6">
             <v-card :loading="loading">
               <v-card-title>
-                Stiffness evolution under cyclic loading
-                <info-tooltip>
-                  Stiffness is representative of the resistance an object
-                  opposes...
-                </info-tooltip>
+                <v-row align="center" class="w-100">
+                  <v-col class="d-flex align-center" cols="auto">
+                    <span>Stiffness evolution under cyclic loading</span>
+                    <info-tooltip>
+                      Stiffness is representative of the resistance an object
+                      opposes...
+                    </info-tooltip>
+                  </v-col>
+                  <v-spacer />
+                  <v-col cols="auto" class="d-flex">
+                    <v-select
+                      v-model="xAxisMode"
+                      :items="[
+                        { text: 'Cycle count', value: 'normal' },
+                        { text: 'Log(Cycle count)', value: 'log' },
+                        { text: 'Normalized cycle count', value: 'normalized' },
+                      ]"
+                      dense
+                      hide-details
+                      label="X-Axis scale"
+                      style="max-width: 220px"
+                    />
+                  </v-col>
+                </v-row>
               </v-card-title>
               <v-card-text>
                 <simple-chart
                   :series="stiffnessSeries"
                   :aspect-ratio="2"
-                  x-axis-name="Number of cycles [-]"
+                  :x-axis-name="computedXAxisLabel"
+                  :x-axis-type="xAxisChartType"
                   y-axis-name="Stiffness [N/mm²]"
                 />
               </v-card-text>
@@ -331,7 +392,9 @@ export default {
   data() {
     return {
       loading: false,
+      xAxisMode: "normal", // 'normal', 'log', 'normalized'
       colors: colorPalette,
+      fatigueData: [],
       cycleAtFailure: [],
       stressAtFailure: [],
       strainAtFailure: [],
@@ -340,9 +403,11 @@ export default {
       runOuts: [],
       stressRatios: [],
       stressStrainSeries: [],
+      /*
       hysteresisAreaSeries: [],
       creepSeries: [],
       stiffnessSeries: [],
+      */
       crackSeries: [],
       loadData: {},
       loadOptions: [],
@@ -426,6 +491,40 @@ export default {
     hasWarnings() {
       return this.testIds.some((_, i) => this.fatigueWarnings?.[i]);
     },
+    computedXAxisLabel() {
+      switch (this.xAxisMode) {
+        case "log":
+          return "log₁₀(Number of cycles) [-]";
+        case "normalized":
+          return "Normalized cycles (N / N_fail) [-]";
+        default:
+          return "Number of cycles [-]";
+      }
+    },
+    xAxisChartType() {
+      return this.xAxisMode === "log" ? "log" : "value";
+    },
+    hysteresisAreaSeries() {
+      return this.fatigueData.map((d) => ({
+        type: "line",
+        name: d.specimen_name,
+        data: zip(this.transformXAxis(d.n_cycles, d.n_fail), d.hysteresis_area),
+      }));
+    },
+    creepSeries() {
+      return this.fatigueData.map((d) => ({
+        type: "line",
+        name: d.specimen_name,
+        data: zip(this.transformXAxis(d.n_cycles, d.n_fail), d.creep),
+      }));
+    },
+    stiffnessSeries() {
+      return this.fatigueData.map((d) => ({
+        type: "line",
+        name: d.specimen_name,
+        data: zip(this.transformXAxis(d.n_cycles, d.n_fail), d.stiffness),
+      }));
+    },
   },
   watch: {
     experimentType: {
@@ -463,10 +562,10 @@ export default {
       this.runOuts = [];
       this.stressRatios = [];
       this.stressStrainSeries = [];
-      this.hysteresisAreaSeries = [];
+      /*this.hysteresisAreaSeries = [];
       this.creepSeries = [];
       this.stiffnessSeries = [];
-
+      */
       dataList.forEach((d, i) => {
         const tid = this.testIds[i];
         this.specimenName[tid] = d.specimen_name;
@@ -486,10 +585,14 @@ export default {
             data: zip(loop.strain, loop.stress),
           })
         );
+        /*
         this.hysteresisAreaSeries.push({
           type: "line",
           name: d.specimen_name,
-          data: zip(d.n_cycles, d.hysteresis_area),
+          data: zip(
+            this.transformXAxis(d.n_cycles, d.n_fail),
+            d.hysteresis_area
+          ),
         });
         this.creepSeries.push({
           type: "line",
@@ -501,6 +604,8 @@ export default {
           name: d.specimen_name,
           data: zip(d.n_cycles, d.stiffness),
         });
+        */
+        this.fatigueData = dataList;
       });
 
       this.loading = false;
@@ -592,6 +697,13 @@ export default {
 
     goBack() {
       this.$router.go(-1);
+    },
+    transformXAxis(xValues, nFail) {
+      if (this.xAxisMode === "normalized") {
+        return xValues.map((x) => x / (nFail || 1)); // evita divisione per 0
+      }
+      // 'normal' e 'log': ritorna i dati grezzi (il log è gestito da SimpleChart.vue)
+      return xValues;
     },
   },
 };

@@ -46,7 +46,7 @@ export default {
     title: { type: String, default: "" },
     xAxisName: { type: String, default: "" },
     yAxisName: { type: String, default: "" },
-    xAxisType: { type: String, default: "" },
+    xAxisType: { type: String, default: "value" },
     dataZoom: { type: String, default: "" },
     color: { type: Array, default: () => colorPalette },
   },
