@@ -43,6 +43,7 @@
                   />
                 </v-col>
               </v-row>
+              <!--
               <v-row v-if="filters.withFracture && !filters.withoutFracture">
                 <v-col>
                   <v-overflow-btn
@@ -56,6 +57,7 @@
                   </v-overflow-btn>
                 </v-col>
               </v-row>
+              -->
             </v-card-text>
           </v-card>
           <v-card flat>
@@ -256,18 +258,24 @@ export default {
       row.select(!row.isSelected);
     },
     fetchExperiments() {
+      const typeFA =
+        this.filters.typeFA || (!this.filters.typeFA && !this.filters.typeQS);
+      const typeQS =
+        this.filters.typeQS || (!this.filters.typeFA && !this.filters.typeQS);
+
+      const withFracture =
+        this.filters.withFracture ||
+        (!this.filters.withFracture && !this.filters.withoutFracture);
+      const withoutFracture =
+        this.filters.withoutFracture ||
+        (!this.filters.withFracture && !this.filters.withoutFracture);
+
       this.$store.dispatch("experiments/fetchFilteredExperiments", {
         filters: {
-          typeFA: this.filters.typeFA,
-          typeQS: this.filters.typeQS,
-          withFracture: this.filters.withFracture,
-          withoutFracture: this.filters.withoutFracture,
-          fractureMode:
-            this.filters.withFracture &&
-            !this.filters.withoutFracture &&
-            this.filters.fractureMode !== this.fractureModeAll
-              ? this.filters.fractureMode
-              : null,
+          typeFA,
+          typeQS,
+          withFracture,
+          withoutFracture,
           fiberMaterial:
             this.filters.fiberMaterial !== this.fiberMaterialsAll
               ? this.filters.fiberMaterial
@@ -279,6 +287,7 @@ export default {
               ? this.filters.stackingSequence
               : null,
           textSearch: this.filters.textSearch,
+          fractureMode: null, // disattivato per ora
         },
         pagination: {
           page: this.options.page,
@@ -286,6 +295,7 @@ export default {
         },
       });
     },
+
     downloadRawFiles() {
       // Download Raw files for experiment ${this.experimentSelected[0].id} : not implemented yet.
     },
