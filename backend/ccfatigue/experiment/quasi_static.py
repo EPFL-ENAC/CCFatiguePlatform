@@ -146,9 +146,9 @@ async def quasi_static_test(
 
     # Calcolo della toughness (area sotto la curva stress-strain)
     toughness = None
-    if "engineering stress" in stress and "exx" in strain:
+    if "engineering stress" in stress and "engineering strain" in strain:
         stress_values = stress["engineering stress"]
-        strain_values = strain["exx"]
+        strain_values = strain["engineering strain"]
         min_len = min(len(stress_values), len(strain_values))
         if min_len > 1:
             # Allineiamo i dati e calcoliamo l'area
