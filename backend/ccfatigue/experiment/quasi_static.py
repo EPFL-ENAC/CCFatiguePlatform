@@ -136,17 +136,18 @@ async def quasi_static_test(
     strain = {}
     for col in ["exx", "eyy", "exy"]:
         if col in df.columns:
-            strain[col] = df[col].dropna().tolist()
+            label = "engineering strain" if col == "exx" else col
+            strain[label] = df[col].dropna().tolist()
 
     stress = {}
     if "Load" in df.columns and width and thickness:
         area = width * thickness
-        stress["nominal"] = (df["Load"] / area).dropna().tolist()
+        stress["engineering stress"] = (df["Load"] / area).dropna().tolist()
 
     # Calcolo della toughness (area sotto la curva stress-strain)
     toughness = None
-    if "nominal" in stress and "exx" in strain:
-        stress_values = stress["nominal"]
+    if "engineering stress" in stress and "exx" in strain:
+        stress_values = stress["engineering stress"]
         strain_values = strain["exx"]
         min_len = min(len(stress_values), len(strain_values))
         if min_len > 1:
