@@ -119,16 +119,15 @@
           <v-col cols="6">
             <v-card :loading="loading">
               <v-card-title>
-                <v-row align="center" class="w-100">
-                  <v-col class="d-flex align-center" cols="auto">
-                    <span>Stiffness evolution under cyclic loading</span>
-                    <info-tooltip>
-                      Stiffness is representative of the resistance an object
-                      opposes...
-                    </info-tooltip>
-                  </v-col>
-                  <v-spacer />
-                  <v-col cols="auto" class="d-flex">
+                Stiffness evolution under cyclic loading
+                <info-tooltip>
+                  Stiffness is representative of the resistance an object
+                  opposes...
+                </info-tooltip>
+              </v-card-title>
+              <v-card-text>
+                <v-row class="mb-6">
+                  <v-col>
                     <v-select
                       v-model="xAxisMode"
                       :items="[
@@ -139,12 +138,22 @@
                       dense
                       hide-details
                       label="X-Axis scale"
-                      style="max-width: 220px"
+                    />
+                  </v-col>
+                  <v-col>
+                    <v-select
+                      v-model="yAxisStiffnessMode"
+                      :items="[
+                        { text: 'Absolute', value: 'absolute' },
+                        { text: 'Normalized', value: 'normalized' },
+                      ]"
+                      dense
+                      hide-details
+                      label="Y-Axis scale"
                     />
                   </v-col>
                 </v-row>
-              </v-card-title>
-              <v-card-text>
+
                 <simple-chart
                   :series="stiffnessSeries"
                   :aspect-ratio="2"
@@ -393,6 +402,7 @@ export default {
     return {
       loading: false,
       xAxisMode: "normal", // 'normal', 'log', 'normalized'
+      yAxisStiffnessMode: "absolute", // oppure 'normalized'
       colors: colorPalette,
       fatigueData: [],
       cycleAtFailure: [],
@@ -519,11 +529,18 @@ export default {
       }));
     },
     stiffnessSeries() {
-      return this.fatigueData.map((d) => ({
-        type: "line",
-        name: d.specimen_name,
-        data: zip(this.transformXAxis(d.n_cycles, d.n_fail), d.stiffness),
-      }));
+      return this.fatigueData.map((d) => {
+        const yValues =
+          this.yAxisStiffnessMode === "normalized"
+            ? this.normalizeYAxis(d.stiffness)
+            : d.stiffness;
+
+        return {
+          type: "line",
+          name: d.specimen_name,
+          data: zip(this.transformXAxis(d.n_cycles, d.n_fail), yValues),
+        };
+      });
     },
   },
   watch: {
@@ -704,6 +721,12 @@ export default {
       }
       // 'normal' e 'log': ritorna i dati grezzi (il log è gestito da SimpleChart.vue)
       return xValues;
+    },
+    normalizeYAxis(values) {
+      if (!Array.isArray(values) || values.length === 0) return values;
+      const base = values.find((v) => typeof v === "number" && isFinite(v));
+      if (!base || base === 0) return values;
+      return values.map((v) => (isFinite(v) ? v / base : v));
     },
   },
 };
