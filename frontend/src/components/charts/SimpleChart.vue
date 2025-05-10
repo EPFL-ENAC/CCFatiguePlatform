@@ -105,7 +105,8 @@ export default {
           name: this.yAxisName,
           nameLocation: "middle",
           nameGap: 50,
-          min: "dataMin",
+          /* min: "dataMin", */
+          min: 0,
           max: "dataMax",
           axisLabel: {
             formatter: formatNumber,
