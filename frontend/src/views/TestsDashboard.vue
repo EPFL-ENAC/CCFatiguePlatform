@@ -89,7 +89,7 @@
                   :aspect-ratio="2"
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
-                  y-axis-name="Hysteresis area [N/mm²]"
+                  y-axis-name="Hysteresis area MPa"
                   :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
                   :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
                 />
@@ -180,7 +180,7 @@
                   :aspect-ratio="2"
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
-                  y-axis-name="Stiffness [N/mm²]"
+                  :y-axis-name="computedYAxisStiffnessLabel"
                   :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
                   :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
                 />
@@ -596,7 +596,33 @@ export default {
         data: zip(this.transformXAxis(d.n_cycles, d.n_fail), d.creep),
       }));
     },
+    computedYAxisStiffnessLabel() {
+      return this.yAxisStiffnessMode === "normalized"
+        ? "Normalized stiffness [-]"
+        : "Stiffness [GPa]";
+    },
     stiffnessSeries() {
+      return this.fatigueData.map((d) => {
+        let yValues;
+
+        if (this.yAxisStiffnessMode === "normalized") {
+          // Normalizzati: non si toccano (rimangono adimensionali)
+          yValues = this.normalizeYAxis(d.stiffness);
+        } else {
+          // Assoluti: converti da MPa a GPa
+          yValues = d.stiffness.map((v) =>
+            typeof v === "number" ? v / 1000 : v
+          );
+        }
+
+        return {
+          type: "line",
+          name: d.specimen_name,
+          data: zip(this.transformXAxis(d.n_cycles, d.n_fail), yValues),
+        };
+      });
+    },
+    /* stiffnessSeries() {
       return this.fatigueData.map((d) => {
         const yValues =
           this.yAxisStiffnessMode === "normalized"
@@ -609,7 +635,7 @@ export default {
           data: zip(this.transformXAxis(d.n_cycles, d.n_fail), yValues),
         };
       });
-    },
+    }, */
   },
   watch: {
     experimentType: {
