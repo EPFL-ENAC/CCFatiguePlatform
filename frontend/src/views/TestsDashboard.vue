@@ -27,9 +27,8 @@
                   <v-col class="d-flex align-center" cols="auto">
                     <span>Hysteresis Loops</span>
                     <info-tooltip>
-                      This graph shows a selection of loading/unloading loops.
-                      10 loops are selected so that they are evenly spaced
-                      throughout the specimen’s lifetime.
+                      Ten hysteresis loops selected at intervals corresponding
+                      to one-tenth of the specimen’s fatigue life.
                     </info-tooltip>
                   </v-col>
                   <v-spacer />
@@ -89,7 +88,7 @@
                   :aspect-ratio="2"
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
-                  y-axis-name="Hysteresis area MPa"
+                  y-axis-name="Hysteresis area [MPa]"
                   :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
                   :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
                 />
@@ -563,7 +562,7 @@ export default {
     },
     formattedTotalDissipatedEnergies() {
       return this.totalDissipatedEnergies.map((e) =>
-        e != null ? Number(e).toFixed(4) : "-"
+        e != null ? Number(e).toFixed(2) : "-"
       );
     },
     hasWarnings() {
