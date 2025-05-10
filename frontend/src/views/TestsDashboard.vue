@@ -90,6 +90,8 @@
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
                   y-axis-name="Hysteresis area [N/mm²]"
+                  :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
+                  :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
                 />
               </v-card-text>
             </v-card>
@@ -129,6 +131,8 @@
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
                   y-axis-name="Creep [-]"
+                  :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
+                  :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
                 />
               </v-card-text>
             </v-card>
@@ -177,6 +181,8 @@
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
                   y-axis-name="Stiffness [N/mm²]"
+                  :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
+                  :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
                 />
               </v-card-text>
             </v-card>
@@ -245,6 +251,7 @@
                   subject="Total dissipated energy (TDE)"
                   :values="formattedTotalDissipatedEnergies"
                   :colors="valueColors"
+                  :unit="units.stress"
                   tooltip="Sum of all hysteresis areas."
                 />
               </li>

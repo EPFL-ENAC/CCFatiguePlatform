@@ -49,6 +49,8 @@ export default {
     xAxisType: { type: String, default: "value" },
     dataZoom: { type: String, default: "" },
     color: { type: Array, default: () => colorPalette },
+    xAxisMin: { type: [Number, null], default: null },
+    xAxisMax: { type: [Number, null], default: null },
   },
   data() {
     return {
@@ -73,6 +75,7 @@ export default {
           bottom: 20,
           containLabel: true,
         },
+        /*
         xAxis: {
           type: this.xAxisType,
           name: this.xAxisName,
@@ -80,6 +83,19 @@ export default {
           nameGap: 26,
           min: "dataMin",
           max: "dataMax",
+          axisLabel: {
+            formatter: formatNumber,
+            hideOverlap: true,
+          },
+        },
+        */
+        xAxis: {
+          type: this.xAxisType,
+          name: this.xAxisName,
+          nameLocation: "middle",
+          nameGap: 26,
+          min: this.xAxisMin != null ? this.xAxisMin : "dataMin",
+          max: this.xAxisMax != null ? this.xAxisMax : "dataMax",
           axisLabel: {
             formatter: formatNumber,
             hideOverlap: true,
