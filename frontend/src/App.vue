@@ -1,15 +1,27 @@
 <template>
   <v-app>
-    <v-app-bar app color="secondary" dense dark>
+    <v-app-bar app class="custom-app-bar text-white" dense color="secondary">
+      <v-img
+        src="/img/GR_MecLogo.png"
+        max-height="60"
+        max-width="200"
+        contain
+        class="ml-2 mr-6"
+      ></v-img>
       <v-tabs align-with-title fixed-tabs>
-        <v-tab :to="{ name: 'Home' }" exact>
+        <v-tab :to="{ name: 'Home' }" exact class="text-white">
           <v-icon>mdi-home</v-icon>
         </v-tab>
 
         <v-tab :to="{ name: 'MaterialDatabase' }">
           <v-menu offset-y open-on-hover>
             <template #activator="{ on }">
-              <v-btn color="secondary" elevation="0" v-on="on">
+              <v-btn
+                class="text-white"
+                color="secondary"
+                elevation="0"
+                v-on="on"
+              >
                 Material database
               </v-btn>
             </template>
@@ -51,11 +63,11 @@
           </v-menu>
         </v-tab>
 
-        <v-tab :to="{ name: 'CCFatigueAnalysis' }" exact>
+        <v-tab :to="{ name: 'CCFatigueAnalysis' }" exact class="text-white">
           CCFatigue analysis
         </v-tab>
 
-        <v-tab :to="{ name: 'About' }" exact>
+        <v-tab :to="{ name: 'About' }" exact class="text-white">
           <v-icon>mdi-information</v-icon>
         </v-tab>
       </v-tabs>
@@ -84,4 +96,11 @@ export default {
 };
 </script>
 
-<style scoped lang="scss"></style>
+<!-- <style scoped lang="scss"></style> -->
+
+<style lang="scss">
+.custom-app-bar,
+.custom-app-bar * {
+  color: white !important;
+}
+</style>
