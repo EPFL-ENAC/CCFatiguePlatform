@@ -133,3 +133,7 @@ class ExperimentFieldNames(str, Enum):
     fatigue_r_ratio = "fatigue_r_ratio"
     fatigue_frequency = "fatigue_frequency"
 
+    curing_time = "curing_time"
+    curing_temperature = "curing_temperature"
+    curing_pressure = "curing_pressure"
+

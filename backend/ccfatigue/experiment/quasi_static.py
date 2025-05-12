@@ -25,7 +25,7 @@ class QuasiStaticTest(BaseModel):
     load: Dict[str, List[float]]
     strain: Dict[str, List[float]]
     stress: Dict[str, List[float]]
-    experiment_metadata: Dict[str, Any]  # new term
+    # experiment_metadata: Dict[str, Any]  # new term
     toughness: float | None  # new feature
 
 
@@ -88,33 +88,11 @@ async def quasi_static_test(
                 Experiment.experiment_type,
                 Experiment.qs_experiment_type,
                 Experiment.fa_experiment_type,
-                Experiment.fracture_mode_fm,
-                Experiment.loading_rate,
-                Experiment.material_tested,
-                Experiment.material_type_sample_type,
-                Experiment.material_type_fiber_form,
-                Experiment.material_type_resin,
-                Experiment.laminates_and_assemblies_stacking_sequence,
-                Experiment.curing_time,
-                Experiment.curing_temperature,
-                Experiment.curing_pressure,
-                Experiment.postcuring_time,
-                Experiment.postcuring_temperature,
-                Experiment.postcuring_pressure,
-                Experiment.publication_doi,
-                Experiment.control_mode,
-                Experiment.fatigue_r_ratio,
-                Experiment.fatigue_frequency,
-                Experiment.fatigue_loading_type_flt,
-                Experiment.measuring_equipment,
             ).where(Experiment.id == experiment_id)
         )
     ).one()._asdict()
 
-    is_fracture = (
-        experiment.get("fa_experiment_type") == "fracture"
-        or experiment.get("qs_experiment_type") == "fracture"
-    )
+    is_fracture = experiment.get("qs_experiment_type") == "fracture"
 
     test_meta = await get_test_fields(
         session, experiment_id, test_id, (Test.sequential_number, Test.specimen_name)
@@ -173,6 +151,6 @@ async def quasi_static_test(
         load=load,
         strain=strain,
         stress=stress,
-        experiment_metadata=metadata_flat,
+        #experiment_metadata=metadata_flat,
         toughness=toughness  # 👈 nuova proprietà
     )
