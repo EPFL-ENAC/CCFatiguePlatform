@@ -7,11 +7,12 @@
         v-model="testsSelected"
         :headers="headers"
         :items="numberedTests"
-        :options.sync="options"
+        :options="options"
         :server-items-length="experiment.pagination.total"
         :loading="experiment.loadingTests"
         :footer-props="{ 'items-per-page-options': [5, 10, 15, 20, 40] }"
         item-key="id"
+        @update:options="onOptionsChange"
         @click:row="rowClick"
       >
         <template #no-data>No test for this experiment</template>
@@ -103,12 +104,6 @@ export default {
     },
   },
   watch: {
-    options: {
-      handler() {
-        this.fetchOneExperimentWithTests();
-      },
-      deep: true,
-    },
     "experiment.tests": {
       handler(tests) {
         if (tests.length > 0) {
@@ -149,6 +144,17 @@ export default {
           size: this.options.itemsPerPage,
         },
       });
+    },
+    onOptionsChange(newOptions) {
+      const optionsChanged =
+        newOptions.page !== this.options.page ||
+        newOptions.itemsPerPage !== this.options.itemsPerPage;
+
+      this.options = newOptions;
+
+      if (optionsChanged) {
+        this.fetchOneExperimentWithTests();
+      }
     },
   },
 };
