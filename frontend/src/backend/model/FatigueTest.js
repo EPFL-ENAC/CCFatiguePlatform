@@ -120,6 +120,7 @@ class FatigueTest {
    */
   static constructFromObject(data, obj) {
     if (data) {
+      console.log("Raw FatigueTest data:", data); // useful logs
       obj = obj || new FatigueTest();
 
       if (data.hasOwnProperty("specimen_id")) {
@@ -194,6 +195,7 @@ class FatigueTest {
         );
       }
     }
+    console.log("Constructed FatigueTest object:", obj); // useful logs
     return obj;
   }
 }

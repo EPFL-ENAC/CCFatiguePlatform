@@ -63,7 +63,7 @@ class QuasiStaticTest {
 
   static constructFromObject(data, obj) {
     if (data) {
-      console.log("📦 Raw QuasiStaticTest data:", data); // 👈 VERIFICA AGGIUNTA
+      console.log("📦 Raw QuasiStaticTest data:", data); // useful logs
       obj = obj || new QuasiStaticTest();
 
       if (data.hasOwnProperty("specimen_name")) {
@@ -97,6 +97,7 @@ class QuasiStaticTest {
         obj["toughness"] = ApiClient.convertToType(data["toughness"], "Number");
       }
     }
+    console.log("Constructed QuasiStaticTest object:", obj); // useful logs
     return obj;
   }
 }
