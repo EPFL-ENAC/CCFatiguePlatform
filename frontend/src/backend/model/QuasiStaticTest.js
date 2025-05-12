@@ -63,7 +63,7 @@ class QuasiStaticTest {
 
   static constructFromObject(data, obj) {
     if (data) {
-      console.log("📦 Raw QuasiStaticTest data:", data); // useful logs
+      console.log("Raw QuasiStaticTest data:", data); // useful logs
       obj = obj || new QuasiStaticTest();
 
       if (data.hasOwnProperty("specimen_name")) {
