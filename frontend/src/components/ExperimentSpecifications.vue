@@ -108,10 +108,10 @@
                 unit="bar"
               />
             </li>
-            <li v-if="experiment.postcuring_applied !== undefined">
+            <li v-if="isPostCuringApplied">
               <experiment-s-v
                 subject="Post-curing applied"
-                :values="[experiment.postcuring_applied ? 'True' : 'False']"
+                :values="['True']"
               />
             </li>
           </ul>
@@ -158,10 +158,10 @@
                   unit="Hz"
                 />
               </li>
-              <li v-if="experiment.fatigue_loading_type">
+              <li v-if="experiment.fatigue_loading_type_flt">
                 <experiment-s-v
                   subject="Fatigue control mode"
-                  :values="[experiment.fatigue_loading_type]"
+                  :values="[experiment.fatigue_loading_type_flt]"
                 />
               </li>
             </ul>
@@ -212,50 +212,17 @@ export default {
       if (mode === "Strain Controlled") return "[-]/s";
       return ""; // fallback
     },
+    isPostCuringApplied() {
+      const { postcuring_time, postcuring_temperature, postcuring_pressure } =
+        this.experiment;
+      return (
+        postcuring_time != null ||
+        postcuring_temperature != null ||
+        postcuring_pressure != null
+      );
+    },
   },
-  mounted() {
-    console.log(
-      "📦 ExperimentSpecifications received experiment =",
-      this.experiment
-    );
-    console.log(
-      "📩 ExperimentSpecifications received experimentMetadata =",
-      this.experimentMetadata
-    );
-    console.log("✅ experiment =", this.experiment);
-    console.log(
-      "📂 experiment_metadata =",
-      this.experiment?.experiment_metadata
-    );
-    console.log(
-      "🔍 curing_time =",
-      this.experiment?.experiment_metadata?.curing_time
-    );
-    console.log(
-      "🔍 curing_temperature =",
-      this.experiment?.experiment_metadata?.curing_temperature
-    );
-    console.log(
-      "🔍 loading_rate =",
-      this.experiment?.experiment_metadata?.loading_rate
-    );
-    console.log(
-      "🔍 fatigue_frequency =",
-      this.experiment?.experiment_metadata?.fatigue_frequency
-    );
-    console.log(
-      "🔍 fatigue_r_ratio =",
-      this.experiment?.experiment_metadata?.fatigue_r_ratio
-    );
-    console.log(
-      "🔍 fatigue_loading_type_flt =",
-      this.experiment?.experiment_metadata?.fatigue_loading_type_flt
-    );
-    console.log(
-      "🔍 fracture_mode_fm =",
-      this.experiment?.experiment_metadata?.fracture_mode_fm
-    );
-  },
+  mounted() {},
   created() {
     this.$store.dispatch("experiments/fetchUnits");
   },

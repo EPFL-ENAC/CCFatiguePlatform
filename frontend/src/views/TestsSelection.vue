@@ -112,7 +112,7 @@ export default {
     "experiment.tests": {
       handler(tests) {
         if (tests.length > 0) {
-          console.log("✅ Test caricati:", tests);
+          console.log("✅ Loaded tests:", tests);
           console.log(
             "🧪 Maximum stress:",
             this.numberedTests.map((t) => t.maximum_stress)

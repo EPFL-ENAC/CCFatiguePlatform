@@ -224,7 +224,7 @@ export default {
         textSearch: payload.filters.textSearch,
       };
 
-      console.log("Filtri applicati:", opts.query);
+      console.log("Applied filters:", opts.query);
 
       this._vm.$experimentsApi.getExperiments(opts).then(
         (data) => commit("storeFilteredExperiments", data),

@@ -95,6 +95,7 @@ export default class ExperimentsApi {
 
   getFatigueTest(experimentId, testId) {
     return this.getFatigueTestWithHttpInfo(experimentId, testId).then(function (response_and_data) {
+      console.log("📡 RAW API RESPONSE FATIGUE TEST", response_and_data);
       return response_and_data.data;
     });
   }
@@ -160,7 +161,7 @@ export default class ExperimentsApi {
     let authNames = [];
     let contentTypes = [];
     let accepts = ["application/json"];
-    let returnType = QuasiStaticTest; // ✅ FIX QUI
+    let returnType = QuasiStaticTest;
 
     return this.apiClient.callApi(
       "/experiments/{experiment_id}/quasi-static/{test_id}",
@@ -180,7 +181,7 @@ export default class ExperimentsApi {
 
   getQuasiStaticTest(experimentId, testId) {
     return this.getQuasiStaticTestWithHttpInfo(experimentId, testId).then(function (response_and_data) {
-      console.log("📡 RAW API RESPONSE", response_and_data);
+      console.log("📡 RAW API RESPONSE QUASI STATIC TEST", response_and_data);
       return response_and_data.data;
     });
   }
