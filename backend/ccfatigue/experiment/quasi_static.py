@@ -8,10 +8,10 @@ from pandas import DataFrame
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-#from ccfatigue.experiment.common import extract_experiment_metadata
+from ccfatigue.experiment.common import extract_experiment_metadata
 
 from ccfatigue.experiment.common import DATA_DIRECTORY, get_test_fields
-#from ccfatigue.experiment.common import extract_experiment_metadata, flatten_metadata
+from ccfatigue.experiment.common import extract_experiment_metadata, flatten_metadata
 from ccfatigue.models.database_v2 import Experiment, Test
 
 
