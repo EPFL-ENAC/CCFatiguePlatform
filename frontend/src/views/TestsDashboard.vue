@@ -2,137 +2,81 @@
   <v-container>
     <v-row>
       <v-col>
-        <experiment-specifications :experiment="displayMetadata" />
+        <experiment-specifications :experiment="experiment.experiment" />
       </v-col>
     </v-row>
-
     <v-row>
       <v-col cols="auto">
         <h2>Test results</h2>
       </v-col>
-      <v-spacer />
+      <v-spacer></v-spacer>
       <v-col cols="auto">
         <v-btn @click="goBack">Add test(s)</v-btn>
       </v-col>
     </v-row>
-
-    <!-- Fatigue branch -->
-    <v-row v-if="experimentType === 'FA'">
+    <v-row v-if="experimentType == 'FA'">
       <v-col cols="10">
         <v-row>
           <v-col cols="6">
             <v-card :loading="loading">
               <v-card-title>
-                <v-row align="center" class="w-100">
-                  <v-col class="d-flex align-center" cols="auto">
-                    <span>Hysteresis Loops</span>
-                    <info-tooltip>
-                      Ten hysteresis loops selected at intervals corresponding
-                      to one-tenth of the specimen’s fatigue life.
-                    </info-tooltip>
-                  </v-col>
-                  <v-spacer />
-                  <v-col cols="auto">
-                    <v-select
-                      v-model="selectedLoopIndex"
-                      :items="loopIndexOptions"
-                      label="Cycle index"
-                      dense
-                      hide-details
-                      style="max-width: 180px"
-                    />
-                  </v-col>
-                </v-row>
+                Stress - Strain
+                <info-tooltip>
+                  This graph shows a selection of loading/unloading loops. These
+                  loops, also known as hysteresis loops are important because
+                  they provide a visual representation of what is being plotted
+                  in the next three graphs.
+                </info-tooltip>
               </v-card-title>
               <v-card-text>
                 <simple-chart
-                  :series="strainStressSeriesFA"
+                  :series="stressStrainSeries"
                   :aspect-ratio="2"
                   x-axis-name="Strain [-]"
                   y-axis-name="Stress [MPa]"
-                />
+                ></simple-chart>
               </v-card-text>
             </v-card>
           </v-col>
           <v-col cols="6">
             <v-card :loading="loading">
               <v-card-title>
-                <v-row align="center" class="w-100">
-                  <v-col class="d-flex align-center" cols="auto">
-                    <span>Hysteresis loop area evolution</span>
-                    <info-tooltip
-                      >On this graph, we show the evolution of the hysteresis
-                      area...</info-tooltip
-                    >
-                  </v-col>
-                  <v-spacer />
-                  <v-col cols="auto" class="d-flex">
-                    <v-select
-                      v-model="xAxisMode"
-                      :items="[
-                        { text: 'Cycle count', value: 'normal' },
-                        { text: 'Log(Cycle count)', value: 'log' },
-                        { text: 'Normalized cycle count', value: 'normalized' },
-                      ]"
-                      dense
-                      hide-details
-                      label="X-Axis scale"
-                      style="max-width: 220px"
-                    />
-                  </v-col>
-                </v-row>
+                Hysteresis loop area evolution
+                <info-tooltip>
+                  On this graph, we show the evolution of the hysteresis area.
+                  This value is defined as the area contained within a
+                  hysteresis loop. For visual representation, it represents the
+                  area defined by each closed loop on the (stress-strain) plane
+                  in graph 1.
+                </info-tooltip>
               </v-card-title>
               <v-card-text>
                 <simple-chart
                   :series="hysteresisAreaSeries"
                   :aspect-ratio="2"
-                  :x-axis-name="computedXAxisLabel"
-                  :x-axis-type="xAxisChartType"
-                  y-axis-name="Hysteresis area [MPa]"
-                  :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
-                  :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
-                />
+                  x-axis-name="Number of cycles [-]"
+                  y-axis-name="Hysteresis area [N/mm²]"
+                ></simple-chart>
               </v-card-text>
             </v-card>
           </v-col>
           <v-col cols="6">
             <v-card :loading="loading">
               <v-card-title>
-                <v-row align="center" class="w-100">
-                  <v-col class="d-flex align-center" cols="auto">
-                    <span>Creep evolution</span>
-                    <info-tooltip>
-                      Creep is defined as the average deformation during each
-                      cycle...
-                    </info-tooltip>
-                  </v-col>
-                  <v-spacer />
-                  <v-col cols="auto" class="d-flex">
-                    <v-select
-                      v-model="xAxisMode"
-                      :items="[
-                        { text: 'Cycle count', value: 'normal' },
-                        { text: 'Log(Cycle count)', value: 'log' },
-                        { text: 'Normalized cycle count', value: 'normalized' },
-                      ]"
-                      dense
-                      hide-details
-                      label="X-Axis scale"
-                      style="max-width: 220px"
-                    />
-                  </v-col>
-                </v-row>
+                Creep evolution
+                <info-tooltip>
+                  Creep is defined as the average deformation during each
+                  loading/unloading cycle. It gives an understanding of how much
+                  deformation occurs at each cycle.
+                </info-tooltip>
               </v-card-title>
               <v-card-text>
                 <simple-chart
                   :series="creepSeries"
                   :aspect-ratio="2"
-                  :x-axis-name="computedXAxisLabel"
-                  :x-axis-type="xAxisChartType"
+                  x-axis-name="Number of cycles [-]"
                   y-axis-name="Creep [-]"
-                  :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
-                  :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
-                />
+                ></simple-chart>
               </v-card-text>
             </v-card>
           </v-col>
@@ -142,47 +86,17 @@
                 Stiffness evolution under cyclic loading
                 <info-tooltip>
                   Stiffness is representative of the resistance an object
-                  opposes...
+                  opposes to an applied force. On this graph, we show how this
+                  capacity evolves over a fatigue life cycle.
                 </info-tooltip>
               </v-card-title>
               <v-card-text>
-                <v-row class="mb-6">
-                  <v-col>
-                    <v-select
-                      v-model="xAxisMode"
-                      :items="[
-                        { text: 'Cycle count', value: 'normal' },
-                        { text: 'Log(Cycle count)', value: 'log' },
-                        { text: 'Normalized cycle count', value: 'normalized' },
-                      ]"
-                      dense
-                      hide-details
-                      label="X-Axis scale"
-                    />
-                  </v-col>
-                  <v-col>
-                    <v-select
-                      v-model="yAxisStiffnessMode"
-                      :items="[
-                        { text: 'Absolute', value: 'absolute' },
-                        { text: 'Normalized', value: 'normalized' },
-                      ]"
-                      dense
-                      hide-details
-                      label="Y-Axis scale"
-                    />
-                  </v-col>
-                </v-row>
-
                 <simple-chart
                   :series="stiffnessSeries"
                   :aspect-ratio="2"
-                  :x-axis-name="computedXAxisLabel"
-                  :x-axis-type="xAxisChartType"
-                  :y-axis-name="computedYAxisStiffnessLabel"
-                  :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
-                  :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
-                />
+                  x-axis-name="Number of cycles [-]"
+                  y-axis-name="Stiffness [N/mm²]"
+                ></simple-chart>
               </v-card-text>
             </v-card>
           </v-col>
@@ -194,85 +108,71 @@
             <ul>
               <li>
                 <experiment-s-v
+                  :colors="colors"
                   subject="Specimen number"
                   :values="specimenIds"
-                  :colors="valueColors"
                   value-type="bigNumber"
                 />
               </li>
               <li>
                 <experiment-s-v
+                  :colors="colors"
                   subject="Stress at failure"
-                  :values="formattedStressAtFailure"
-                  :colors="valueColors"
+                  :values="stressAtFailure"
                   :unit="units.stress"
-                  tooltip="σ_fail is the stress level that induced failure..."
+                  tooltip="σ_fail is defined as the stress level that induced failure from the tested specimen and is measured in [MPa]"
                 />
               </li>
               <li>
                 <experiment-s-v
+                  :colors="colors"
                   subject="Strain at failure"
-                  :values="formattedStrainAtFailure"
-                  :colors="valueColors"
+                  :values="strainAtFailure"
                   unit="%"
-                  tooltip="ε_fail is the deformation at the time of failure..."
+                  tooltip="ε_fail is defined as the deformation at the time of failure and is measured in [%]"
                 />
               </li>
               <li>
                 <experiment-s-v
-                  subject="Cycle at failure"
+                  :colors="colors"
+                  subject="cycle at failure"
                   :values="cycleAtFailure"
-                  :colors="valueColors"
                   value-type="bigNumber"
-                  tooltip="Number of cycles to failure."
+                  tooltip="defined as the number of cycles to failure [-]"
                 />
               </li>
               <li>
                 <experiment-s-v
+                  :colors="colors"
                   subject="Run out"
                   :values="runOuts"
-                  :colors="valueColors"
-                  tooltip="No fatigue failure."
+                  tooltip="no fatigue failure"
                 />
               </li>
-              <!--
               <li>
                 <experiment-s-v
-                  subject="R ratio"
+                  :colors="colors"
+                  subject="R"
                   :values="stressRatios"
-                  :colors="valueColors"
-                  tooltip="Stress ratio (σ_min/σ_max)."
+                  tooltip="defined as the stress ratio (σ_min/σ_max) [-] and has relevance in the context of constant amplitude experiments."
                 />
               </li>
-              -->
               <li>
                 <experiment-s-v
+                  :colors="colors"
                   subject="Total dissipated energy (TDE)"
-                  :values="formattedTotalDissipatedEnergies"
-                  :colors="valueColors"
-                  :unit="units.stress"
-                  tooltip="Sum of all hysteresis areas."
+                  :values="totalDissipatedEnergies"
+                  value-type="bigNumber"
+                  tooltip="defined as the sum of all the hysteresis areas over the course of an experiment. It gives a good measure of the amount of energy that has been dissipated in deformation and heat over the course of an experiment."
                 />
               </li>
             </ul>
-            <!-- warning messages -->
-            <v-alert
-              v-if="hasWarnings"
-              type="warning"
-              dense
-              outlined
-              class="mt-4"
-            >
-              Smooth spikes and drop function has been activated!
-            </v-alert>
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
-
-    <!-- Quasi‐static branch -->
     <v-row v-else>
-      <v-col v-if="crackSeries.length" cols="6">
+      <v-col v-if="crackSeries.length > 0" cols="6">
         <v-card :loading="loading">
           <v-card-title>Crack Load vs Crack Displacement</v-card-title>
           <v-card-text>
@@ -280,14 +180,16 @@
               :series="crackSeries"
               :aspect-ratio="2"
               x-axis-name="Crack Displacement [mm]"
-              :y1-axis-name="'Crack Load — [N]'"
-              :y2-axis-name="'Crack Length • [mm]'"
-            />
+              :y1-axis-name="'Crack Load ⎯⎯⎯ [N]'"
+              :y2-axis-name="'Crack Length ••• [mm]'"
+            ></double-chart>
           </v-card-text>
         </v-card>
       </v-col>
-
-      <v-col v-if="loadOptions.length && displacementOptions.length" cols="6">
+      <v-col
+        v-if="loadOptions.length > 0 && displacementOptions.length > 0"
+        cols="6"
+      >
         <v-card :loading="loading">
           <v-card-title>Load vs Displacement</v-card-title>
           <v-card-text>
@@ -295,18 +197,18 @@
               <v-col>
                 <v-select
                   v-model="loadOption"
-                  :items="loadOptions"
                   :disabled="loadOptions.length < 2"
+                  :items="loadOptions"
                   label="Load"
-                />
+                ></v-select>
               </v-col>
               <v-col>
                 <v-select
                   v-model="displacementOption"
-                  :items="displacementOptions"
                   :disabled="displacementOptions.length < 2"
+                  :items="displacementOptions"
                   label="Displacement"
-                />
+                ></v-select>
               </v-col>
             </v-row>
             <simple-chart
@@ -314,12 +216,14 @@
               :aspect-ratio="2"
               x-axis-name="Machine Displacement [mm]"
               y-axis-name="Machine Load [N]"
-            />
+            ></simple-chart>
           </v-card-text>
         </v-card>
       </v-col>
-
-      <v-col v-if="strainOptions.length && stressOptions.length" cols="6">
+      <v-col
+        v-if="strainOptions.length > 0 && stressOptions.length > 0"
+        cols="6"
+      >
         <v-card :loading="loading">
           <v-card-title>Strain vs Stress</v-card-title>
           <v-card-text>
@@ -327,70 +231,26 @@
               <v-col>
                 <v-select
                   v-model="strainOption"
-                  :items="strainOptions"
                   :disabled="strainOptions.length < 2"
+                  :items="strainOptions"
                   label="Strain"
-                />
+                ></v-select>
               </v-col>
               <v-col>
                 <v-select
                   v-model="stressOption"
-                  :items="stressOptions"
                   :disabled="stressOptions.length < 2"
+                  :items="stressOptions"
                   label="Stress"
-                />
+                ></v-select>
               </v-col>
             </v-row>
             <simple-chart
-              :series="strainStressSeriesQS"
+              :series="strainStressSeries"
               :aspect-ratio="2"
               x-axis-name="Strain [-]"
               y-axis-name="Stress [MPa]"
-            />
-          </v-card-text>
-        </v-card>
-      </v-col>
-
-      <v-col cols="2">
-        <v-card :loading="loading">
-          <v-card-text>
-            <ul>
-              <li>
-                <experiment-s-v
-                  subject="Specimen number"
-                  :values="specimenIds"
-                  :colors="valueColors"
-                  value-type="bigNumber"
-                />
-              </li>
-              <li>
-                <experiment-s-v
-                  subject="Max stress"
-                  :values="formattedStressAtFailure"
-                  :colors="valueColors"
-                  :unit="units.stress"
-                  tooltip="Maximum stress recorded in the test."
-                />
-              </li>
-              <li>
-                <experiment-s-v
-                  subject="Max strain"
-                  :values="formattedStrainAtFailure"
-                  :colors="valueColors"
-                  unit="%"
-                  tooltip="Maximum strain recorded in the test."
-                />
-              </li>
-              <li>
-                <experiment-s-v
-                  subject="Toughness"
-                  :values="formattedToughnessValues"
-                  :colors="valueColors"
-                  :unit="'N/mm²'"
-                  tooltip="Area under the stress-strain curve..."
-                />
-              </li>
-            </ul>
+            ></simple-chart>
           </v-card-text>
         </v-card>
       </v-col>
@@ -403,7 +263,8 @@ import DoubleChart from "@/components/charts/DoubleChart.vue";
 import SimpleChart from "@/components/charts/SimpleChart.vue";
 import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
 import ExperimentSV from "@/components/ExperimentSV.vue";
-import InfoTooltip from "@/components/InfoTooltip.vue";
+import InfoTooltip from "@/components/InfoTooltip";
+import { formatNumber } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
 import { zip } from "lodash";
 import { mapState } from "vuex";
@@ -412,52 +273,46 @@ export default {
   name: "TestsDashboard",
   components: {
     DoubleChart,
-    SimpleChart,
     ExperimentSpecifications,
     ExperimentSV,
     InfoTooltip,
+    SimpleChart,
   },
   props: {
     experimentId: { type: Number, required: true },
-    testIds: { type: Array, required: true },
+    testIds: Array[Number],
   },
   data() {
     return {
       loading: false,
-      xAxisMode: "normal", // 'normal', 'log', 'normalized'
-      yAxisStiffnessMode: "absolute", // oppure 'normalized'
       colors: colorPalette,
-      fatigueData: [],
+      specimenName: {},
+      // FA
       cycleAtFailure: [],
       stressAtFailure: [],
       strainAtFailure: [],
-      specimenIds: [],
-      totalDissipatedEnergies: [],
-      runOuts: [],
-      stressRatios: [],
-      selectedLoopIndex: null,
-      /*
       stressStrainSeries: [],
       hysteresisAreaSeries: [],
       creepSeries: [],
       stiffnessSeries: [],
-      */
+      specimenIds: [],
+      totalDissipatedEnergies: [],
+      runOuts: [],
+      stressRatios: [],
+      // QS
       crackSeries: [],
       loadData: {},
-      loadOptions: [],
       loadOption: null,
+      loadOptions: [],
       displacementData: {},
-      displacementOptions: [],
       displacementOption: null,
+      displacementOptions: [],
       strainData: {},
-      strainOptions: [],
       strainOption: null,
+      strainOptions: [],
       stressData: {},
-      stressOptions: [],
       stressOption: null,
-      experimentMetadata: {},
-      toughnessValues: [],
-      fatigueWarnings: [],
+      stressOptions: [],
     };
   },
   computed: {
@@ -465,360 +320,184 @@ export default {
       experiment: "oneExperiment",
       units: "units",
     }),
-    experimentType() {
+    experimentType: function () {
       return this.experiment.experiment.experiment_type;
     },
-    displayMetadata() {
-      if (this.experimentType === "QS" && this.experimentMetadata) {
-        return {
-          ...this.experiment.experiment,
-          ...this.experimentMetadata,
-        };
-      }
-      return this.experiment.experiment;
-    },
-    loadDisplacementSeries() {
-      return this.testIds.map((id) => ({
+    loadDisplacementSeries: function () {
+      return this.testIds.map((testId) => ({
         type: "line",
-        name: this.specimenName[id],
+        name: this.specimenName[testId],
         data: zip(
-          this.displacementData[id]?.[this.displacementOption] || [],
-          this.loadData[id]?.[this.loadOption] || []
+          this.displacementData[testId]?.[this.displacementOption] ?? [],
+          this.loadData[testId]?.[this.loadOption] ?? []
         ),
       }));
     },
-    strainStressSeriesQS() {
+    strainStressSeries: function () {
       return this.testIds
-        .map((id) => ({
+        .map((testId) => ({
           type: "line",
-          name: this.specimenName[id],
+          name: this.specimenName[testId],
           data: zip(
-            this.strainData[id]?.[this.strainOption] || [],
-            this.stressData[id]?.[this.stressOption] || []
+            this.strainData[testId]?.[this.strainOption] ?? [],
+            this.stressData[testId]?.[this.stressOption] ?? []
           ),
         }))
-        .filter((s) => s.data.length);
+        .filter((line) => line.data.length > 0);
     },
-
-    strainStressSeriesFA() {
-      return this.fatigueData.flatMap((test, testIndex) => {
-        const loops = test.hysteresis_loops || [];
-        const name = test.specimen_name;
-        const color = this.colors[testIndex % this.colors.length];
-
-        if (!loops.length) return [];
-
-        if (
-          Number.isInteger(this.selectedLoopIndex) &&
-          this.selectedLoopIndex >= 0 &&
-          this.selectedLoopIndex < loops.length
-        ) {
-          const loop = loops[this.selectedLoopIndex];
-          return [
-            {
-              type: "line",
-              name: `${name} - cycle ${this.selectedLoopIndex}`,
-              data: zip(loop.strain, loop.stress),
-              lineStyle: { color },
-            },
-          ];
-        }
-
-        // Mostra tutti i cicli, ma solo il primo va in legenda
-        return loops.map((loop, i) => ({
-          type: "line",
-          name: i === 0 ? name : null, // solo il primo nella legenda
-          data: zip(loop.strain, loop.stress),
-          lineStyle: { color },
-        }));
-      });
-    },
-    loopIndexOptions() {
-      return [
-        { text: "All cycles", value: null },
-        ...Array.from({ length: 10 }, (_, i) => ({
-          text: `Cycle ${i + 1}`,
-          value: i,
-        })),
-      ];
-    },
-    valueColors() {
-      return this.testIds.map((_, i) => this.colors[i % this.colors.length]);
-    },
-    formattedStressAtFailure() {
-      return this.stressAtFailure.map((s) =>
-        s != null ? Number(s).toFixed(2) : "-"
-      );
-    },
-    formattedStrainAtFailure() {
-      return this.strainAtFailure.map((e) =>
-        e != null ? Number(e).toFixed(4) : "-"
-      );
-    },
-    formattedToughnessValues() {
-      return this.toughnessValues.map((t) =>
-        t != null ? Number(t).toFixed(2) : "-"
-      );
-    },
-    formattedTotalDissipatedEnergies() {
-      return this.totalDissipatedEnergies.map((e) =>
-        e != null ? Number(e).toFixed(2) : "-"
-      );
-    },
-    hasWarnings() {
-      return this.testIds.some((_, i) => this.fatigueWarnings?.[i]);
-    },
-    computedXAxisLabel() {
-      switch (this.xAxisMode) {
-        case "log":
-          return "log₁₀(Number of cycles) [-]";
-        case "normalized":
-          return "Normalized cycles (N / N_fail) [-]";
-        default:
-          return "Number of cycles [-]";
-      }
-    },
-    xAxisChartType() {
-      return this.xAxisMode === "log" ? "log" : "value";
-    },
-    hysteresisAreaSeries() {
-      return this.fatigueData.map((d) => ({
-        type: "line",
-        name: d.specimen_name,
-        data: zip(this.transformXAxis(d.n_cycles, d.n_fail), d.hysteresis_area),
-      }));
-    },
-    creepSeries() {
-      return this.fatigueData.map((d) => ({
-        type: "line",
-        name: d.specimen_name,
-        data: zip(this.transformXAxis(d.n_cycles, d.n_fail), d.creep),
-      }));
-    },
-    computedYAxisStiffnessLabel() {
-      return this.yAxisStiffnessMode === "normalized"
-        ? "Normalized stiffness [-]"
-        : "Stiffness [GPa]";
-    },
-    stiffnessSeries() {
-      return this.fatigueData.map((d) => {
-        let yValues;
-
-        if (this.yAxisStiffnessMode === "normalized") {
-          // Normalizzati: non si toccano (rimangono adimensionali)
-          yValues = this.normalizeYAxis(d.stiffness);
-        } else {
-          // Assoluti: converti da MPa a GPa
-          yValues = d.stiffness.map((v) =>
-            typeof v === "number" ? v / 1000 : v
-          );
-        }
-
-        return {
-          type: "line",
-          name: d.specimen_name,
-          data: zip(this.transformXAxis(d.n_cycles, d.n_fail), yValues),
-        };
-      });
-    },
-    /* stiffnessSeries() {
-      return this.fatigueData.map((d) => {
-        const yValues =
-          this.yAxisStiffnessMode === "normalized"
-            ? this.normalizeYAxis(d.stiffness)
-            : d.stiffness;
-
-        return {
-          type: "line",
-          name: d.specimen_name,
-          data: zip(this.transformXAxis(d.n_cycles, d.n_fail), yValues),
-        };
-      });
-    }, */
   },
   watch: {
-    experimentType: {
-      immediate: true,
-      handler(val) {
-        if (!val) return;
-        this.loading = true;
-        if (val === "FA") {
-          this.loadFatigue();
-        } else if (val === "QS") {
-          this.loadQuasiStatic();
-        }
-      },
+    experimentType: function (val) {
+      switch (val) {
+        case "FA":
+          this.loading = true;
+          Promise.all(
+            this.testIds.map((testId) =>
+              this.$experimentsApi.getFatigueTest(this.experimentId, testId)
+            )
+          )
+            .then((dataList) => {
+              zip(this.testIds, dataList).forEach(([testId, data]) => {
+                this.specimenName[testId] = data.specimen_name;
+              });
+              this.cycleAtFailure = dataList.map((data) => data.n_fail);
+              this.stressAtFailure = dataList.map((data) =>
+                formatNumber(data.stress_at_failure)
+              );
+              this.strainAtFailure = dataList.map((data) =>
+                formatNumber(data.strain_at_failure)
+              );
+              this.specimenIds = dataList.map((data) => data.specimen_id);
+              this.totalDissipatedEnergies = dataList.map(
+                (data) => data.total_dissipated_energy
+              );
+              this.runOuts = dataList.map((data) => data.run_out);
+              this.stressRatios = dataList.map((data) => data.stress_ratio);
+              this.stressStrainSeries = [];
+              this.hysteresisAreaSeries = [];
+              this.creepSeries = [];
+              this.stiffnessSeries = [];
+              zip(this.testIds, dataList).forEach(([, data]) => {
+                this.stressStrainSeries.push(
+                  ...data.hysteresis_loops.map((loop) => ({
+                    type: "line",
+                    name: data.specimen_name,
+                    data: zip(loop.strain, loop.stress),
+                  }))
+                );
+                this.hysteresisAreaSeries.push({
+                  type: "line",
+                  name: data.specimen_name,
+                  data: zip(data.n_cycles, data.hysteresis_area),
+                });
+                this.creepSeries.push({
+                  type: "line",
+                  name: data.specimen_name,
+                  data: zip(data.n_cycles, data.creep),
+                });
+                this.stiffnessSeries.push({
+                  type: "line",
+                  name: data.specimen_name,
+                  data: zip(data.n_cycles, data.stiffness),
+                });
+              });
+            })
+            .finally(() => (this.loading = false));
+          break;
+        case "QS":
+          this.loading = true;
+          Promise.all(
+            this.testIds.map((testId) =>
+              this.$experimentsApi.getQuasiStaticTest(this.experimentId, testId)
+            )
+          )
+            .then((dataList) => {
+              this.crackSeries = [];
+              this.loadData = {};
+              this.displacementData = {};
+              this.strainData = {};
+              this.stressData = {};
+              const loadOptions = new Set();
+              const displacementOptions = new Set();
+              const strainOptions = new Set();
+              const stressOptions = new Set();
+              zip(this.testIds, dataList).forEach(([testId, data]) => {
+                this.specimenName[testId] = data.specimen_name;
+                if (
+                  data.crack_displacement.length > 0 &&
+                  data.crack_load.length > 0 &&
+                  data.crack_length.length > 0
+                ) {
+                  this.crackSeries.push({
+                    type: "line",
+                    name: data.specimen_name,
+                    data: zip(data.crack_displacement, data.crack_load),
+                  });
+                  this.crackSeries.push({
+                    type: "scatter",
+                    name: data.specimen_name,
+                    yAxisIndex: 1,
+                    symbolSize: 6,
+                    data: zip(data.crack_displacement, data.crack_length),
+                  });
+                }
+                if (
+                  Object.keys(data.load).length > 0 &&
+                  Object.keys(data.displacement).length > 0
+                ) {
+                  Object.keys(data.load).forEach((item) =>
+                    loadOptions.add(item)
+                  );
+                  Object.keys(data.displacement).forEach((item) =>
+                    displacementOptions.add(item)
+                  );
+                  this.loadData[testId] = data.load;
+                  this.displacementData[testId] = data.displacement;
+                }
+                if (
+                  Object.keys(data.strain).length > 0 &&
+                  Object.keys(data.stress).length > 0
+                ) {
+                  Object.keys(data.strain).forEach((item) =>
+                    strainOptions.add(item)
+                  );
+                  Object.keys(data.stress).forEach((item) =>
+                    stressOptions.add(item)
+                  );
+                  this.strainData[testId] = data.strain;
+                  this.stressData[testId] = data.stress;
+                }
+              });
+              this.loadOptions = Array.from(loadOptions);
+              this.loadOption = this.loadOptions[0];
+              this.displacementOptions = Array.from(displacementOptions);
+              this.displacementOption = this.displacementOptions[0];
+              this.strainOptions = Array.from(strainOptions);
+              this.strainOption = this.strainOptions[0];
+              this.stressOptions = Array.from(stressOptions);
+              this.stressOption = this.stressOptions[0];
+            })
+            .finally(() => (this.loading = false));
+          break;
+        case undefined:
+          break;
+        default:
+          throw new Error(`unknown experiment type ${val}`);
+      }
     },
   },
   created() {
     this.$store.dispatch("experiments/fetchOneExperimentWithTests", {
       experimentId: this.experimentId,
-      pagination: { page: 1, size: 20 },
+      pagination: {
+        page: 1,
+        size: 20,
+      },
     });
   },
   methods: {
-    async loadFatigue() {
-      const dataList = await Promise.all(
-        this.testIds.map((tid) =>
-          this.$experimentsApi.getFatigueTest(this.experimentId, tid)
-        )
-      );
-      this.specimenName = {};
-      this.cycleAtFailure = [];
-      this.stressAtFailure = [];
-      this.strainAtFailure = [];
-      this.specimenIds = [];
-      this.totalDissipatedEnergies = [];
-      this.runOuts = [];
-      this.stressRatios = [];
-      /*this.stressStrainSeries = [];
-      this.hysteresisAreaSeries = [];
-      this.creepSeries = [];
-      this.stiffnessSeries = [];
-      */
-      dataList.forEach((d, i) => {
-        const tid = this.testIds[i];
-        this.specimenName[tid] = d.specimen_name;
-        this.cycleAtFailure.push(d.n_fail);
-        this.stressAtFailure.push(d.stress_at_failure);
-        this.strainAtFailure.push(d.strain_at_failure);
-        this.specimenIds.push(d.specimen_id);
-        this.totalDissipatedEnergies.push(d.total_dissipated_energy);
-        this.runOuts.push(d.run_out);
-        this.stressRatios.push(d.stress_ratio);
-        this.fatigueWarnings.push(d.warning_messages || false);
-        /*  
-        d.hysteresis_loops.forEach((loop) =>
-          this.stressStrainSeries.push({
-            type: "line",
-            name: d.specimen_name,
-            data: zip(loop.strain, loop.stress),
-          })
-        );
-        this.hysteresisAreaSeries.push({
-          type: "line",
-          name: d.specimen_name,
-          data: zip(
-            this.transformXAxis(d.n_cycles, d.n_fail),
-            d.hysteresis_area
-          ),
-        });
-        this.creepSeries.push({
-          type: "line",
-          name: d.specimen_name,
-          data: zip(d.n_cycles, d.creep),
-        });
-        this.stiffnessSeries.push({
-          type: "line",
-          name: d.specimen_name,
-          data: zip(d.n_cycles, d.stiffness),
-        });
-        */
-        this.fatigueData = dataList;
-      });
-
-      this.loading = false;
-    },
-
-    async loadQuasiStatic() {
-      const dataList = await Promise.all(
-        this.testIds.map((tid) =>
-          this.$experimentsApi.getQuasiStaticTest(this.experimentId, tid)
-        )
-      );
-      this.experimentMetadata = dataList[0].experiment_metadata;
-
-      this.specimenName = {};
-      this.crackSeries = [];
-      this.loadData = {};
-      this.loadOptions = new Set();
-      this.displacementData = {};
-      this.displacementOptions = new Set();
-      this.strainData = {};
-      this.strainOptions = new Set();
-      this.stressData = {};
-      this.stressOptions = new Set();
-      this.specimenIds = [];
-      this.stressAtFailure = [];
-      this.strainAtFailure = [];
-      this.toughnessValues = []; // new
-
-      dataList.forEach((d, i) => {
-        const tid = this.testIds[i];
-        this.specimenName[tid] = d.specimen_name;
-        console.log("🧪 Quasi-static specimen ID:", d.specimen_id);
-        if (d.crack_displacement.length) {
-          this.crackSeries.push({
-            type: "line",
-            name: d.specimen_name,
-            data: zip(d.crack_displacement, d.crack_load),
-          });
-          this.crackSeries.push({
-            type: "scatter",
-            name: d.specimen_name,
-            yAxisIndex: 1,
-            symbolSize: 6,
-            data: zip(d.crack_displacement, d.crack_length),
-          });
-        }
-
-        Object.keys(d.load).forEach((k) => this.loadOptions.add(k));
-        Object.keys(d.displacement).forEach((k) =>
-          this.displacementOptions.add(k)
-        );
-        this.loadData[tid] = d.load;
-        this.displacementData[tid] = d.displacement;
-
-        Object.keys(d.strain).forEach((k) => this.strainOptions.add(k));
-        Object.keys(d.stress).forEach((k) => this.stressOptions.add(k));
-        this.strainData[tid] = d.strain;
-        this.stressData[tid] = d.stress;
-        if (typeof d.specimen_id !== "undefined") {
-          this.specimenIds.push(String(d.specimen_id));
-        } else {
-          console.warn("⚠️ specimen_id mancante per test", tid);
-          this.specimenIds.push("–"); // oppure "N/A" per chiarezza visiva
-        }
-        const stressValues = Object.values(d.stress)
-          .flat()
-          .filter(Number.isFinite);
-        const strainValues = Object.values(d.strain)
-          .flat()
-          .filter(Number.isFinite);
-        this.stressAtFailure.push(Math.max(...stressValues));
-        this.strainAtFailure.push(Math.max(...strainValues));
-        this.toughnessValues.push(
-          isFinite(d.toughness) ? Number(d.toughness) : null
-        );
-      });
-
-      this.loadOptions = Array.from(this.loadOptions);
-      this.loadOption = this.loadOptions[0] || null;
-      this.displacementOptions = Array.from(this.displacementOptions);
-      this.displacementOption = this.displacementOptions[0] || null;
-      this.strainOptions = Array.from(this.strainOptions);
-      this.strainOption = this.strainOptions[0] || null;
-      this.stressOptions = Array.from(this.stressOptions);
-      this.stressOption = this.stressOptions[0] || null;
-
-      this.loading = false;
-    },
-
     goBack() {
       this.$router.go(-1);
-    },
-    transformXAxis(xValues, nFail) {
-      if (this.xAxisMode === "normalized") {
-        return xValues.map((x) => x / (nFail || 1)); // evita divisione per 0
-      }
-      // 'normal' e 'log': ritorna i dati grezzi (il log è gestito da SimpleChart.vue)
-      return xValues;
-    },
-    normalizeYAxis(values) {
-      if (!Array.isArray(values) || values.length === 0) return values;
-      const base = values.find((v) => typeof v === "number" && isFinite(v));
-      if (!base || base === 0) return values;
-      return values.map((v) => (isFinite(v) ? v / base : v));
     },
   },
 };
