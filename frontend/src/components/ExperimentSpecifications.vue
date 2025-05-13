@@ -36,6 +36,18 @@
                 :values="[experiment.experiment_type]"
               />
             </li>
+            <li v-if="experiment.qs_experiment_type">
+              <experiment-s-v
+                subject="QS Experiment Type"
+                :values="[experiment.qs_experiment_type]"
+              />
+            </li>
+            <li v-if="experiment.fa_experiment_type">
+              <experiment-s-v
+                subject="FA Experiment Type"
+                :values="[experiment.fa_experiment_type]"
+              />
+            </li>
             <li v-if="experiment.measuring_equipment">
               <experiment-s-v
                 subject="Measuring equipment"
