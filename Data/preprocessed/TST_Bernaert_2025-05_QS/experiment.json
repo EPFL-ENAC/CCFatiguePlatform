@@ -1,0 +1,22 @@
+{
+  "general": {
+    "laboratory": "GR-MeC",
+    "researcher": "Joseph Bernaert",
+    "date": "2025-05",
+    "experiment type": "QS",
+    "qs experiment type": "fracture",
+    "fracture mode (fm)": "Mode I",
+    "control mode": "Displacement Controlled",
+    "measuring equipment": "MTS Acumen",
+    "loading rate": 1.0
+  },
+  "publication": {
+    "doi": "123"
+  },
+  "material info": {
+    "material tested": "Adhesive joints",
+    "sample type": "DCB",
+    "fiber form": "[Unidirectional]",
+    "resin": "Epoxy Sikapower 830"
+  }
+}
