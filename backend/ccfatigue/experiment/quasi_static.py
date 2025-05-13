@@ -27,6 +27,7 @@ class QuasiStaticTest(BaseModel):
     stress: Dict[str, List[float]]
     # experiment_metadata: Dict[str, Any]  # new term
     toughness: float | None  # new feature
+    initial_crack_length: float | None 
 
 
 def get_dataframe(
@@ -95,7 +96,7 @@ async def quasi_static_test(
     is_fracture = experiment.get("qs_experiment_type") == "fracture"
 
     test_meta = await get_test_fields(
-        session, experiment_id, test_id, (Test.sequential_number, Test.specimen_name)
+        session, experiment_id, test_id, (Test.sequential_number, Test.specimen_name, Test.initial_crack_length)
     )
     specimen_id = test_meta["sequential_number"]
     df = get_dataframe(experiment, specimen_id)
@@ -106,7 +107,7 @@ async def quasi_static_test(
 
     crack_displacement = df["u"].dropna().tolist() if is_fracture and "u" in df.columns else []
     crack_load = df["Load"].dropna().tolist() if is_fracture and "Load" in df.columns else []
-    crack_length = df["Crack length"].dropna().tolist() if is_fracture and "Crack length" in df.columns else []
+    crack_length = df["Crack_length"].dropna().tolist() if is_fracture and "Crack_length" in df.columns else []
 
     displacement = {"u": df["u"].dropna().tolist()} if not is_fracture and "u" in df.columns else {}
     load = {"Load": df["Load"].dropna().tolist()} if not is_fracture and "Load" in df.columns else {}
@@ -148,5 +149,6 @@ async def quasi_static_test(
         strain=strain,
         stress=stress,
         #experiment_metadata=metadata_flat,
-        toughness=toughness  # 👈 nuova proprietà
+        toughness=toughness,  # 👈 nuova proprietà
+        initial_crack_length=test_meta["initial_crack_length"],
     )

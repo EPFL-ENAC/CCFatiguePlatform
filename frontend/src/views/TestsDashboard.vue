@@ -390,6 +390,15 @@
                   tooltip="Area under the stress-strain curve..."
                 />
               </li>
+              <li>
+                <experiment-s-v
+                  subject="Initial crack length"
+                  :values="formattedInitialCrackLengths"
+                  :colors="valueColors"
+                  :unit="'mm'"
+                  tooltip="Initial crack length measured before testing."
+                />
+              </li>
             </ul>
           </v-card-text>
         </v-card>
@@ -457,6 +466,7 @@ export default {
       stressOption: null,
       experimentMetadata: {},
       toughnessValues: [],
+      initialCrackLength: [],
       fatigueWarnings: [],
     };
   },
@@ -558,6 +568,11 @@ export default {
     formattedToughnessValues() {
       return this.toughnessValues.map((t) =>
         t != null ? Number(t).toFixed(2) : "-"
+      );
+    },
+    formattedInitialCrackLengths() {
+      return this.initialCrackLengths.map((v) =>
+        v != null ? Number(v).toFixed(2) : "-"
       );
     },
     formattedTotalDissipatedEnergies() {
@@ -742,6 +757,7 @@ export default {
       this.stressAtFailure = [];
       this.strainAtFailure = [];
       this.toughnessValues = []; // new
+      this.initialCrackLengths = []; // new
 
       dataList.forEach((d, i) => {
         const tid = this.testIds[i];
@@ -789,6 +805,11 @@ export default {
         this.strainAtFailure.push(Math.max(...strainValues));
         this.toughnessValues.push(
           isFinite(d.toughness) ? Number(d.toughness) : null
+        );
+        this.initialCrackLengths.push(
+          isFinite(d.initial_crack_length)
+            ? Number(d.initial_crack_length)
+            : null
         );
       });
 
