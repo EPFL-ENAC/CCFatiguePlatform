@@ -350,11 +350,11 @@
           </v-card-text>
         </v-card>
       </v-col>
-
       <v-col cols="2">
         <v-card :loading="loading">
           <v-card-text>
             <ul>
+              <!-- Always show Specimen number -->
               <li>
                 <experiment-s-v
                   subject="Specimen number"
@@ -363,42 +363,48 @@
                   value-type="bigNumber"
                 />
               </li>
-              <li>
-                <experiment-s-v
-                  subject="Max stress"
-                  :values="formattedStressAtFailure"
-                  :colors="valueColors"
-                  :unit="units.stress"
-                  tooltip="Maximum stress recorded in the test."
-                />
-              </li>
-              <li>
-                <experiment-s-v
-                  subject="Max strain"
-                  :values="formattedStrainAtFailure"
-                  :colors="valueColors"
-                  unit="%"
-                  tooltip="Maximum strain recorded in the test."
-                />
-              </li>
-              <li>
-                <experiment-s-v
-                  subject="Toughness"
-                  :values="formattedToughnessValues"
-                  :colors="valueColors"
-                  :unit="'N/mm²'"
-                  tooltip="Area under the stress-strain curve..."
-                />
-              </li>
-              <li>
-                <experiment-s-v
-                  subject="Initial crack length"
-                  :values="formattedInitialCrackLengths"
-                  :colors="valueColors"
-                  :unit="'mm'"
-                  tooltip="Initial crack length measured before testing."
-                />
-              </li>
+              <!-- QS non-fracture block -->
+              <template v-if="isQS && !isFracture">
+                <li>
+                  <experiment-s-v
+                    subject="Max stress"
+                    :values="formattedStressAtFailure"
+                    :colors="valueColors"
+                    :unit="units.stress"
+                    tooltip="Maximum stress recorded in the test."
+                  />
+                </li>
+                <li>
+                  <experiment-s-v
+                    subject="Max strain"
+                    :values="formattedStrainAtFailure"
+                    :colors="valueColors"
+                    unit="%"
+                    tooltip="Maximum strain recorded in the test."
+                  />
+                </li>
+                <li>
+                  <experiment-s-v
+                    subject="Toughness"
+                    :values="formattedToughnessValues"
+                    :colors="valueColors"
+                    :unit="'N/mm²'"
+                    tooltip="Area under the stress-strain curve..."
+                  />
+                </li>
+              </template>
+              <!-- QS fracture block -->
+              <template v-else-if="isQS && isFracture">
+                <li>
+                  <experiment-s-v
+                    subject="Initial crack length"
+                    :values="formattedInitialCrackLengths"
+                    :colors="valueColors"
+                    :unit="'mm'"
+                    tooltip="Initial crack length measured before testing."
+                  />
+                </li>
+              </template>
             </ul>
           </v-card-text>
         </v-card>
@@ -477,6 +483,14 @@ export default {
     }),
     experimentType() {
       return this.experiment.experiment.experiment_type;
+    },
+    isQS() {
+      return this.experimentType === "QS";
+    },
+    isFracture() {
+      const qsType =
+        this.experiment?.experiment?.qs_experiment_type?.toLowerCase();
+      return qsType === "fracture";
     },
     displayMetadata() {
       if (this.experimentType === "QS" && this.experimentMetadata) {
