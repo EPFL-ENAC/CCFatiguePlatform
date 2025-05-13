@@ -121,7 +121,7 @@ async def post_data_preprocess_check(
             )
             print(tree_process_completed.stdout.decode())
             # run preprocessing script on it
-            with tst_data_lib.Logger(write_to_stdout=False) as logger:
+            with tst_data_lib_v2.Logger(write_to_stdout=False) as logger:
                 logger.info(f"Parsing experiment {file.filename}")
 
                 try:
@@ -130,7 +130,7 @@ async def post_data_preprocess_check(
                     for experiment_raw_fp_folder in exp_fp_folders:
                         if os.path.isdir(experiment_raw_fp_folder):
                             print(f"Parsing experiment {experiment_raw_fp_folder}")
-                            tst_data_lib.Experiment(experiment_raw_fp_folder, logger)
+                            tst_data_lib_v2.Experiment(experiment_raw_fp_folder, logger)
                             at_least_one_experiment = True
                         else:
                             logger.warning(
@@ -171,7 +171,7 @@ async def post_data_preprocess_check_v2(
             )
             print(tree_process_completed.stdout.decode())
             # run preprocessing script on it
-            with tst_data_lib.Logger(write_to_stdout=False) as logger:
+            with tst_data_lib_v2.Logger(write_to_stdout=False) as logger:
                 logger.info(f"Parsing experiment {file.filename}")
 
                 try:
