@@ -16,6 +16,7 @@
   "material info": {
     "material tested": "Adhesive joints",
     "sample type": "DCB",
+    "fiber material": "[GFRP, Glue, GFRP]",
     "fiber form": "[UD, NA, UD]",
     "resin": "Polyester",
     "glue": "Epoxy Sikapower 830"
