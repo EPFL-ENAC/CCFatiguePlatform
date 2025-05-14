@@ -73,6 +73,10 @@ export default {
             calculatedStress !== null
               ? parseFloat(calculatedStress.toFixed(2))
               : null,
+          /* maximum displacement with 2 decimal points */
+          maximum_displacement: test.maximum_load
+            ? parseFloat(test.maximum_load.toFixed(2))
+            : null,
         };
       });
 
@@ -90,16 +94,26 @@ export default {
       const type = this.experiment?.experiment?.experiment_type;
 
       if (type !== "QS") {
-        baseHeaders.splice(2, 0, {
-          text: "Maximum Stress",
-          value: "maximum_stress",
-        });
+        const controlMode =
+          this.experiment?.experiment?.control_mode?.toLowerCase();
+
+        if (controlMode === "displacement controlled") {
+          baseHeaders.splice(2, 0, {
+            text: "Maximum Displacement [mm]",
+            value: "maximum_displacement",
+          });
+        } else {
+          baseHeaders.splice(2, 0, {
+            text: "Maximum Stress [MPa]",
+            value: "maximum_stress",
+          });
+        }
+
         baseHeaders.splice(3, 0, {
           text: "Run Out",
           value: "run_out",
         });
       }
-
       return baseHeaders;
     },
   },
@@ -107,11 +121,11 @@ export default {
     "experiment.tests": {
       handler(tests) {
         if (tests.length > 0) {
-          console.log("✅ Loaded tests:", tests);
+          /* console.log("✅ Loaded tests:", tests);
           console.log(
             "🧪 Maximum stress:",
-            this.numberedTests.map((t) => t.maximum_stress)
-          );
+            this.numberedTests.map((t) => t.maximum_load)
+          );*/
         }
       },
       immediate: true,
