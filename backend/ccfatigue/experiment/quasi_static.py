@@ -8,10 +8,8 @@ from pandas import DataFrame
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-#from ccfatigue.experiment.common import extract_experiment_metadata
 
 from ccfatigue.experiment.common import DATA_DIRECTORY, get_test_fields
-#from ccfatigue.experiment.common import extract_experiment_metadata, flatten_metadata
 from ccfatigue.models.database_v2 import Experiment, Test
 
 
@@ -26,7 +24,6 @@ class QuasiStaticTest(BaseModel):
     load: Dict[str, List[float]]
     strain: Dict[str, List[float]]
     stress: Dict[str, List[float]]
-    # experiment_metadata: Dict[str, Any]  # new term
     toughness: float | None  # new feature
     initial_crack_length: float | None 
 
@@ -155,8 +152,7 @@ async def quasi_static_test(
         load=load,
         strain=strain,
         stress=stress,
-        #experiment_metadata=metadata_flat,
-        toughness=toughness,  # 👈 nuova proprietà
+        toughness=toughness,  # new property
         initial_crack_length=test_meta["initial_crack_length"],
         crack_fractureenergy=crack_fractureenergy,
     )
