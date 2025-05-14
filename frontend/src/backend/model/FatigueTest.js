@@ -37,6 +37,10 @@ class FatigueTest {
    * @param strainAtFailure {Number}
    * @param nFail {Number}
    * @param warningMessages {Boolean}
+   * @param crackLength {Array.<Number>}
+   * @param crackDisplacement {Array.<Number>}
+   * @param crackLoad {Array.<Number>tring}
+   * @param crackNCycles {Array.<Number>}
    */
   constructor(
     specimenId,
@@ -52,7 +56,11 @@ class FatigueTest {
     stressAtFailure,
     strainAtFailure,
     nFail,
-    warningMessages
+    warningMessages,
+    crackLength,
+    crackDisplacement,
+    crackLoad,
+    crackNCycles
   ) {
     FatigueTest.initialize(
       this,
@@ -69,7 +77,11 @@ class FatigueTest {
       stressAtFailure,
       strainAtFailure,
       nFail,
-      warningMessages
+      warningMessages,
+      crackLength,
+      crackDisplacement,
+      crackLoad,
+      crackNCycles
     );
   }
 
@@ -93,7 +105,11 @@ class FatigueTest {
     stressAtFailure,
     strainAtFailure,
     nFail,
-    warningMessages
+    warningMessages,
+    crackLength,
+    crackDisplacement,
+    crackLoad,
+    crackNCycles
   ) {
     obj["specimen_id"] = specimenId;
     obj["specimen_name"] = specimenName;
@@ -109,6 +125,10 @@ class FatigueTest {
     obj["strain_at_failure"] = strainAtFailure;
     obj["n_fail"] = nFail;
     obj["warning_messages"] = warningMessages;
+    obj["crack_length"] = crackLength;
+    obj["crack_displacement"] = crackDisplacement;
+    obj["crack_load"] = crackLoad;
+    obj["crack_n_cycles"] = crackNCycles;
   }
 
   /**
@@ -194,6 +214,30 @@ class FatigueTest {
           "Boolean"
         );
       }
+      if (data.hasOwnProperty("crack_length")) {
+        obj["crack_length"] = ApiClient.convertToType(
+          data["crack_length"],
+          ["Number"]
+        );
+      }
+      if (data.hasOwnProperty("crack_displacement")) {
+        obj["crack_displacement"] = ApiClient.convertToType(
+          data["crack_displacement"],
+          ["Number"]
+        );
+      }
+      if (data.hasOwnProperty("crack_load")) {
+        obj["crack_load"] = ApiClient.convertToType(
+          data["crack_load"],
+          ["Number"]
+        );
+      }
+      if (data.hasOwnProperty("crack_n_cycles")) {
+        obj["crack_n_cycles"] = ApiClient.convertToType(
+          data["crack_n_cycles"],
+          ["Number"]
+        );
+      }
     }
     console.log("Constructed FatigueTest object:", obj); // useful logs
     return obj;
@@ -269,5 +313,22 @@ FatigueTest.prototype["n_fail"] = undefined;
  * @member {Boolean} warning_messages
  */
 FatigueTest.prototype["warning_messages"] = undefined;
+
+/**
+ * @member {Array.<Number>} crack_length
+ */
+FatigueTest.prototype["crack_length"] = undefined;
+/**
+ * @member {Array.<Number>} crack_displacement
+ */
+FatigueTest.prototype["crack_displacement"] = undefined;
+/**
+ * @member {Array.<Number>} crack_load
+ */
+FatigueTest.prototype["crack_load"] = undefined;
+/**
+ * @member {Array.<Number>} crack_n_cycles
+ */
+FatigueTest.prototype["crack_n_cycles"] = undefined;
 
 export default FatigueTest;
