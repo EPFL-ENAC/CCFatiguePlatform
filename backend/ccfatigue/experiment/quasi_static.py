@@ -21,6 +21,7 @@ class QuasiStaticTest(BaseModel):
     crack_displacement: List[float]
     crack_load: List[float]
     crack_length: List[float]
+    crack_fractureenergy: List[float]
     displacement: Dict[str, List[float]]
     load: Dict[str, List[float]]
     strain: Dict[str, List[float]]
@@ -108,6 +109,12 @@ async def quasi_static_test(
     crack_displacement = df["u"].dropna().tolist() if is_fracture and "u" in df.columns else []
     crack_load = df["Load"].dropna().tolist() if is_fracture and "Load" in df.columns else []
     crack_length = df["Crack_length"].dropna().tolist() if is_fracture and "Crack_length" in df.columns else []
+    
+    # Placeholder for actual calculation of crack_fractureenergy
+    # This should be replaced with the actual calculation logic
+    # based on the specific requirements of the experiment
+    # For now, we will just copy the crack_length for demonstration purposes
+    crack_fractureenergy = crack_length.copy()  # Placeholder for actual calculation
 
     displacement = {"u": df["u"].dropna().tolist()} if not is_fracture and "u" in df.columns else {}
     load = {"Load": df["Load"].dropna().tolist()} if not is_fracture and "Load" in df.columns else {}
@@ -151,4 +158,5 @@ async def quasi_static_test(
         #experiment_metadata=metadata_flat,
         toughness=toughness,  # 👈 nuova proprietà
         initial_crack_length=test_meta["initial_crack_length"],
+        crack_fractureenergy=crack_fractureenergy,
     )

@@ -272,83 +272,104 @@
 
     <!-- Quasi‐static branch -->
     <v-row v-else>
-      <v-col v-if="crackSeries.length" cols="6">
-        <v-card :loading="loading">
-          <v-card-title>Crack Load vs Crack Displacement</v-card-title>
-          <v-card-text>
-            <double-chart
-              :series="crackSeries"
-              :aspect-ratio="2"
-              x-axis-name="Crack Displacement [mm]"
-              :y1-axis-name="'Crack Load — [N]'"
-              :y2-axis-name="'Crack Length • [mm]'"
-            />
-          </v-card-text>
-        </v-card>
-      </v-col>
+      <v-col cols="10">
+        <v-row>
+          <v-col v-if="crackSeries.length" cols="6">
+            <v-card :loading="loading">
+              <v-card-title>Crack Load vs Crack Displacement</v-card-title>
+              <v-card-text>
+                <double-chart
+                  :series="crackSeries"
+                  :aspect-ratio="2"
+                  x-axis-name="Crack Displacement [mm]"
+                  :y1-axis-name="'Crack Load — [N]'"
+                  :y2-axis-name="'Crack Length • [mm]'"
+                />
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col v-if="isFracture && fractureEnergySeries.length" cols="6">
+            <v-card :loading="loading">
+              <v-card-title>Crack Length vs Fracture Energy</v-card-title>
+              <v-card-text>
+                <simple-chart
+                  :series="fractureEnergySeries"
+                  :aspect-ratio="2"
+                  x-axis-name="Crack Length [mm]"
+                  y-axis-name="Fracture Energy [J]"
+                />
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col
+            v-if="loadOptions.length && displacementOptions.length"
+            cols="6"
+          >
+            <v-card :loading="loading">
+              <v-card-title>Load vs Displacement</v-card-title>
+              <v-card-text>
+                <v-row>
+                  <v-col>
+                    <v-select
+                      v-model="loadOption"
+                      :items="loadOptions"
+                      :disabled="loadOptions.length < 2"
+                      label="Load"
+                    />
+                  </v-col>
+                  <v-col>
+                    <v-select
+                      v-model="displacementOption"
+                      :items="displacementOptions"
+                      :disabled="displacementOptions.length < 2"
+                      label="Displacement"
+                    />
+                  </v-col>
+                </v-row>
+                <simple-chart
+                  :series="loadDisplacementSeries"
+                  :aspect-ratio="2"
+                  x-axis-name="Machine Displacement [mm]"
+                  y-axis-name="Machine Load [N]"
+                />
+              </v-card-text>
+            </v-card>
+          </v-col>
 
-      <v-col v-if="loadOptions.length && displacementOptions.length" cols="6">
-        <v-card :loading="loading">
-          <v-card-title>Load vs Displacement</v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col>
-                <v-select
-                  v-model="loadOption"
-                  :items="loadOptions"
-                  :disabled="loadOptions.length < 2"
-                  label="Load"
+          <v-col v-if="strainOptions.length && stressOptions.length" cols="6">
+            <v-card :loading="loading">
+              <v-card-title>Strain vs Stress</v-card-title>
+              <v-card-text>
+                <v-row>
+                  <v-col>
+                    <v-select
+                      v-model="strainOption"
+                      :items="strainOptions"
+                      :disabled="strainOptions.length < 2"
+                      label="Strain"
+                    />
+                  </v-col>
+                  <v-col>
+                    <v-select
+                      v-model="stressOption"
+                      :items="stressOptions"
+                      :disabled="stressOptions.length < 2"
+                      label="Stress"
+                    />
+                  </v-col>
+                </v-row>
+                <simple-chart
+                  :series="strainStressSeriesQS"
+                  :aspect-ratio="2"
+                  x-axis-name="Strain [-]"
+                  y-axis-name="Stress [MPa]"
                 />
-              </v-col>
-              <v-col>
-                <v-select
-                  v-model="displacementOption"
-                  :items="displacementOptions"
-                  :disabled="displacementOptions.length < 2"
-                  label="Displacement"
-                />
-              </v-col>
-            </v-row>
-            <simple-chart
-              :series="loadDisplacementSeries"
-              :aspect-ratio="2"
-              x-axis-name="Machine Displacement [mm]"
-              y-axis-name="Machine Load [N]"
-            />
-          </v-card-text>
-        </v-card>
-      </v-col>
-
-      <v-col v-if="strainOptions.length && stressOptions.length" cols="6">
-        <v-card :loading="loading">
-          <v-card-title>Strain vs Stress</v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col>
-                <v-select
-                  v-model="strainOption"
-                  :items="strainOptions"
-                  :disabled="strainOptions.length < 2"
-                  label="Strain"
-                />
-              </v-col>
-              <v-col>
-                <v-select
-                  v-model="stressOption"
-                  :items="stressOptions"
-                  :disabled="stressOptions.length < 2"
-                  label="Stress"
-                />
-              </v-col>
-            </v-row>
-            <simple-chart
-              :series="strainStressSeriesQS"
-              :aspect-ratio="2"
-              x-axis-name="Strain [-]"
-              y-axis-name="Stress [MPa]"
-            />
-          </v-card-text>
-        </v-card>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
       </v-col>
       <v-col cols="2">
         <v-card :loading="loading">
@@ -474,6 +495,8 @@ export default {
       toughnessValues: [],
       initialCrackLength: [],
       fatigueWarnings: [],
+      fractureEnergyData: {},
+      crackLengthData: {},
     };
   },
   computed: {
@@ -650,6 +673,22 @@ export default {
         };
       });
     },
+    fractureEnergySeries() {
+      return this.testIds
+        .map((id) => {
+          const crackLength = this.crackLengthData[id];
+          const fractureEnergy = this.fractureEnergyData[id];
+          if (!crackLength || !fractureEnergy) return null;
+
+          return {
+            type: "line",
+            name: this.specimenName[id],
+            data: zip(crackLength, fractureEnergy),
+          };
+        })
+        .filter((s) => s !== null);
+    },
+
     /* stiffnessSeries() {
       return this.fatigueData.map((d) => {
         const yValues =
@@ -772,11 +811,15 @@ export default {
       this.strainAtFailure = [];
       this.toughnessValues = []; // new
       this.initialCrackLengths = []; // new
+      this.fractureEnergyData = {};
+      this.crackLengthData = {};
 
       dataList.forEach((d, i) => {
         const tid = this.testIds[i];
         this.specimenName[tid] = d.specimen_name;
         console.log("🧪 Quasi-static specimen ID:", d.specimen_id);
+        this.fractureEnergyData[tid] = d.crack_fractureenergy;
+        this.crackLengthData[tid] = d.crack_length;
         if (d.crack_displacement.length) {
           this.crackSeries.push({
             type: "line",
