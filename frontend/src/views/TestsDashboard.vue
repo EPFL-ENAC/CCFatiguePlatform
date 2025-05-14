@@ -17,7 +17,7 @@
     </v-row>
 
     <!-- Fatigue branch -->
-    <v-row v-if="experimentType === 'FA'">
+    <v-row v-if="experimentType === 'FA' && !isFracture">
       <v-col cols="10">
         <v-row>
           <v-col cols="6">
@@ -269,12 +269,139 @@
         </v-card>
       </v-col>
     </v-row>
+    <!-- Fatigue fracture -->
+    <v-row v-else-if="experimentType === 'FA' && isFracture">
+      <v-col cols="10">
+        <v-card :loading="loading">
+          <v-card-title
+            >Crack Load vs Crack Length (over N_cycles)</v-card-title
+          >
+          <v-card-text>
+            <double-chart
+              :series="crackFaFractureSeries"
+              :aspect-ratio="2"
+              x-axis-name="Number of cycles"
+              :y1-axis-name="'Crack Load [N]'"
+              :y2-axis-name="'Crack Length [mm]'"
+            />
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col cols="2">
+        <v-card :loading="loading">
+          <v-card-text>
+            <ul>
+              <li>
+                <experiment-s-v
+                  subject="Specimen number"
+                  :values="specimenIds"
+                  :colors="valueColors"
+                  value-type="bigNumber"
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="Cycle at failure"
+                  :values="cycleAtFailure"
+                  :colors="valueColors"
+                  value-type="bigNumber"
+                  tooltip="Number of cycles to failure."
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="Run out"
+                  :values="runOuts"
+                  :colors="valueColors"
+                  tooltip="No fatigue failure."
+                />
+              </li>
+            </ul>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-row v-if="experimentType === 'QS' && !isFracture">
+      <v-col cols="10">
+        <v-card :loading="loading">
+          <v-card-title>Strain vs Stress</v-card-title>
+          <v-card-text>
+            <v-row>
+              <v-col>
+                <v-select
+                  v-model="strainOption"
+                  :items="strainOptions"
+                  :disabled="strainOptions.length < 2"
+                  label="Strain"
+                />
+              </v-col>
+              <v-col>
+                <v-select
+                  v-model="stressOption"
+                  :items="stressOptions"
+                  :disabled="stressOptions.length < 2"
+                  label="Stress"
+                />
+              </v-col>
+            </v-row>
+            <simple-chart
+              :series="strainStressSeriesQS"
+              :aspect-ratio="2"
+              x-axis-name="Strain [-]"
+              y-axis-name="Stress [MPa]"
+            />
+          </v-card-text>
+        </v-card>
+      </v-col>
 
-    <!-- Quasi‐static branch -->
-    <v-row v-else>
+      <v-col cols="2">
+        <v-card :loading="loading">
+          <v-card-text>
+            <ul>
+              <li>
+                <experiment-s-v
+                  subject="Specimen number"
+                  :values="specimenIds"
+                  :colors="valueColors"
+                  value-type="bigNumber"
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="Max stress"
+                  :values="formattedStressAtFailure"
+                  :colors="valueColors"
+                  :unit="units.stress"
+                  tooltip="Maximum stress recorded in the test."
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="Max strain"
+                  :values="formattedStrainAtFailure"
+                  :colors="valueColors"
+                  unit="%"
+                  tooltip="Maximum strain recorded in the test."
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="Toughness"
+                  :values="formattedToughnessValues"
+                  :colors="valueColors"
+                  :unit="'N/mm²'"
+                  tooltip="Area under the stress-strain curve..."
+                />
+              </li>
+            </ul>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-row v-else-if="experimentType === 'QS' && isFracture">
       <v-col cols="10">
         <v-row>
-          <v-col v-if="crackSeries.length" cols="6">
+          <v-col cols="6">
             <v-card :loading="loading">
               <v-card-title>Crack Load vs Crack Displacement</v-card-title>
               <v-card-text>
@@ -288,7 +415,8 @@
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col v-if="isFracture && fractureEnergySeries.length" cols="6">
+
+          <v-col v-if="fractureEnergySeries.length" cols="6">
             <v-card :loading="loading">
               <v-card-title>Crack Length vs Fracture Energy</v-card-title>
               <v-card-text>
@@ -302,80 +430,12 @@
             </v-card>
           </v-col>
         </v-row>
-        <v-row>
-          <v-col
-            v-if="loadOptions.length && displacementOptions.length"
-            cols="6"
-          >
-            <v-card :loading="loading">
-              <v-card-title>Load vs Displacement</v-card-title>
-              <v-card-text>
-                <v-row>
-                  <v-col>
-                    <v-select
-                      v-model="loadOption"
-                      :items="loadOptions"
-                      :disabled="loadOptions.length < 2"
-                      label="Load"
-                    />
-                  </v-col>
-                  <v-col>
-                    <v-select
-                      v-model="displacementOption"
-                      :items="displacementOptions"
-                      :disabled="displacementOptions.length < 2"
-                      label="Displacement"
-                    />
-                  </v-col>
-                </v-row>
-                <simple-chart
-                  :series="loadDisplacementSeries"
-                  :aspect-ratio="2"
-                  x-axis-name="Machine Displacement [mm]"
-                  y-axis-name="Machine Load [N]"
-                />
-              </v-card-text>
-            </v-card>
-          </v-col>
-
-          <v-col v-if="strainOptions.length && stressOptions.length" cols="6">
-            <v-card :loading="loading">
-              <v-card-title>Strain vs Stress</v-card-title>
-              <v-card-text>
-                <v-row>
-                  <v-col>
-                    <v-select
-                      v-model="strainOption"
-                      :items="strainOptions"
-                      :disabled="strainOptions.length < 2"
-                      label="Strain"
-                    />
-                  </v-col>
-                  <v-col>
-                    <v-select
-                      v-model="stressOption"
-                      :items="stressOptions"
-                      :disabled="stressOptions.length < 2"
-                      label="Stress"
-                    />
-                  </v-col>
-                </v-row>
-                <simple-chart
-                  :series="strainStressSeriesQS"
-                  :aspect-ratio="2"
-                  x-axis-name="Strain [-]"
-                  y-axis-name="Stress [MPa]"
-                />
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
       </v-col>
+
       <v-col cols="2">
         <v-card :loading="loading">
           <v-card-text>
             <ul>
-              <!-- Always show Specimen number -->
               <li>
                 <experiment-s-v
                   subject="Specimen number"
@@ -384,48 +444,15 @@
                   value-type="bigNumber"
                 />
               </li>
-              <!-- QS non-fracture block -->
-              <template v-if="isQS && !isFracture">
-                <li>
-                  <experiment-s-v
-                    subject="Max stress"
-                    :values="formattedStressAtFailure"
-                    :colors="valueColors"
-                    :unit="units.stress"
-                    tooltip="Maximum stress recorded in the test."
-                  />
-                </li>
-                <li>
-                  <experiment-s-v
-                    subject="Max strain"
-                    :values="formattedStrainAtFailure"
-                    :colors="valueColors"
-                    unit="%"
-                    tooltip="Maximum strain recorded in the test."
-                  />
-                </li>
-                <li>
-                  <experiment-s-v
-                    subject="Toughness"
-                    :values="formattedToughnessValues"
-                    :colors="valueColors"
-                    :unit="'N/mm²'"
-                    tooltip="Area under the stress-strain curve..."
-                  />
-                </li>
-              </template>
-              <!-- QS fracture block -->
-              <template v-else-if="isQS && isFracture">
-                <li>
-                  <experiment-s-v
-                    subject="Initial crack length"
-                    :values="formattedInitialCrackLengths"
-                    :colors="valueColors"
-                    :unit="'mm'"
-                    tooltip="Initial crack length measured before testing."
-                  />
-                </li>
-              </template>
+              <li>
+                <experiment-s-v
+                  subject="Initial crack length"
+                  :values="formattedInitialCrackLengths"
+                  :colors="valueColors"
+                  :unit="'mm'"
+                  tooltip="Initial crack length measured before testing."
+                />
+              </li>
             </ul>
           </v-card-text>
         </v-card>
@@ -479,12 +506,6 @@ export default {
       stiffnessSeries: [],
       */
       crackSeries: [],
-      loadData: {},
-      loadOptions: [],
-      loadOption: null,
-      displacementData: {},
-      displacementOptions: [],
-      displacementOption: null,
       strainData: {},
       strainOptions: [],
       strainOption: null,
@@ -496,6 +517,7 @@ export default {
       fatigueWarnings: [],
       fractureEnergyData: {},
       crackLengthData: {},
+      specimenName: {},
     };
   },
   computed: {
@@ -506,23 +528,19 @@ export default {
     experimentType() {
       return this.experiment.experiment.experiment_type;
     },
-    isQS() {
-      return this.experimentType === "QS";
-    },
     isFracture() {
-      const qsType =
-        this.experiment?.experiment?.qs_experiment_type?.toLowerCase();
-      return qsType === "fracture";
-    },
-    loadDisplacementSeries() {
-      return this.testIds.map((id) => ({
-        type: "line",
-        name: this.specimenName[id],
-        data: zip(
-          this.displacementData[id]?.[this.displacementOption] || [],
-          this.loadData[id]?.[this.loadOption] || []
-        ),
-      }));
+      const exp = this.experiment?.experiment;
+      const type = exp?.experiment_type?.toLowerCase();
+
+      if (type === "qs") {
+        return exp.qs_experiment_type?.toLowerCase() === "fracture";
+      }
+
+      if (type === "fa") {
+        return exp.fa_experiment_type?.toLowerCase() === "fracture";
+      }
+
+      return false;
     },
     strainStressSeriesQS() {
       return this.testIds
@@ -678,21 +696,37 @@ export default {
         })
         .filter((s) => s !== null);
     },
+    crackFaFractureSeries() {
+      return this.fatigueData.flatMap((d, i) => {
+        const id = d.specimen_id;
+        const name = d.specimen_name || `Specimen ${id}`;
+        const color = this.colors[i % this.colors.length];
 
-    /* stiffnessSeries() {
-      return this.fatigueData.map((d) => {
-        const yValues =
-          this.yAxisStiffnessMode === "normalized"
-            ? this.normalizeYAxis(d.stiffness)
-            : d.stiffness;
+        if (!d.crack_n_cycles?.length || !d.crack_load?.length) {
+          console.warn("⚠️ Missing crack data for specimen", id);
+          return [];
+        }
 
-        return {
-          type: "line",
-          name: d.specimen_name,
-          data: zip(this.transformXAxis(d.n_cycles, d.n_fail), yValues),
-        };
+        return [
+          {
+            type: "line",
+            name, // solo nel primo dataset (linea)
+            data: zip(d.crack_n_cycles, d.crack_load),
+            yAxisIndex: 0,
+            lineStyle: { color },
+            itemStyle: { color },
+          },
+          {
+            type: "scatter",
+            name: null, // non va in legenda
+            data: zip(d.crack_n_cycles, d.crack_length || []),
+            yAxisIndex: 1,
+            symbolSize: 6,
+            itemStyle: { color },
+          },
+        ];
       });
-    }, */
+    },
   },
   watch: {
     experimentType: {
@@ -734,6 +768,7 @@ export default {
       this.creepSeries = [];
       this.stiffnessSeries = [];
       */
+      this.fatigueData = dataList;
       dataList.forEach((d, i) => {
         const tid = this.testIds[i];
         this.specimenName[tid] = d.specimen_name;
@@ -745,34 +780,9 @@ export default {
         this.runOuts.push(d.run_out);
         this.stressRatios.push(d.stress_ratio);
         this.fatigueWarnings.push(d.warning_messages || false);
-        /*  
-        d.hysteresis_loops.forEach((loop) =>
-          this.stressStrainSeries.push({
-            type: "line",
-            name: d.specimen_name,
-            data: zip(loop.strain, loop.stress),
-          })
-        );
-        this.hysteresisAreaSeries.push({
-          type: "line",
-          name: d.specimen_name,
-          data: zip(
-            this.transformXAxis(d.n_cycles, d.n_fail),
-            d.hysteresis_area
-          ),
-        });
-        this.creepSeries.push({
-          type: "line",
-          name: d.specimen_name,
-          data: zip(d.n_cycles, d.creep),
-        });
-        this.stiffnessSeries.push({
-          type: "line",
-          name: d.specimen_name,
-          data: zip(d.n_cycles, d.stiffness),
-        });
-        */
-        this.fatigueData = dataList;
+        d.crack_length = d.crack_length || [];
+        d.crack_n_cycles = d.crack_n_cycles || [];
+        d.crack_load = d.crack_load || [];
       });
 
       this.loading = false;
@@ -787,10 +797,6 @@ export default {
 
       this.specimenName = {};
       this.crackSeries = [];
-      this.loadData = {};
-      this.loadOptions = new Set();
-      this.displacementData = {};
-      this.displacementOptions = new Set();
       this.strainData = {};
       this.strainOptions = new Set();
       this.stressData = {};
@@ -824,13 +830,6 @@ export default {
           });
         }
 
-        Object.keys(d.load).forEach((k) => this.loadOptions.add(k));
-        Object.keys(d.displacement).forEach((k) =>
-          this.displacementOptions.add(k)
-        );
-        this.loadData[tid] = d.load;
-        this.displacementData[tid] = d.displacement;
-
         Object.keys(d.strain).forEach((k) => this.strainOptions.add(k));
         Object.keys(d.stress).forEach((k) => this.stressOptions.add(k));
         this.strainData[tid] = d.strain;
@@ -859,10 +858,6 @@ export default {
         );
       });
 
-      this.loadOptions = Array.from(this.loadOptions);
-      this.loadOption = this.loadOptions[0] || null;
-      this.displacementOptions = Array.from(this.displacementOptions);
-      this.displacementOption = this.displacementOptions[0] || null;
       this.strainOptions = Array.from(this.strainOptions);
       this.strainOption = this.strainOptions[0] || null;
       this.stressOptions = Array.from(this.stressOptions);
