@@ -1,0 +1,25 @@
+{
+  "general": {
+    "laboratory": "GR-MeC",
+    "researcher": "Joseph Bernaert",
+    "date": "2024-09",
+    "experiment type": "FA",
+    "fa experiment type": "fracture",
+    "fracture mode (fm)": "Mode I",
+    "control mode": "Displacement Controlled",
+    "fatigue loading type (flt)": "CA",
+    "loading rate": 5.0
+  },
+  "publication": {
+    "doi": "123"
+  },
+  "material info": {
+    "material tested": "Adhesive joints",
+    "sample type": "DCB",
+    "resin": "Epoxy Sikapower 830"
+  },
+  "fatigue": {
+    "r ratio": 0.1,
+    "frequency": 5.0
+  }
+}
