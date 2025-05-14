@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col>
-        <experiment-specifications :experiment="displayMetadata" />
+        <experiment-specifications :experiment="experiment.experiment" />
       </v-col>
     </v-row>
 
@@ -491,7 +491,6 @@ export default {
       stressData: {},
       stressOptions: [],
       stressOption: null,
-      experimentMetadata: {},
       toughnessValues: [],
       initialCrackLength: [],
       fatigueWarnings: [],
@@ -514,15 +513,6 @@ export default {
       const qsType =
         this.experiment?.experiment?.qs_experiment_type?.toLowerCase();
       return qsType === "fracture";
-    },
-    displayMetadata() {
-      if (this.experimentType === "QS" && this.experimentMetadata) {
-        return {
-          ...this.experiment.experiment,
-          ...this.experimentMetadata,
-        };
-      }
-      return this.experiment.experiment;
     },
     loadDisplacementSeries() {
       return this.testIds.map((id) => ({
@@ -794,7 +784,6 @@ export default {
           this.$experimentsApi.getQuasiStaticTest(this.experimentId, tid)
         )
       );
-      this.experimentMetadata = dataList[0].experiment_metadata;
 
       this.specimenName = {};
       this.crackSeries = [];

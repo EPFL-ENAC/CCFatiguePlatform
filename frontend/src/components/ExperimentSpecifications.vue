@@ -199,9 +199,6 @@ export default {
     experiment: { type: Object, required: true, default: () => ({}) },
   },
   computed: {
-    experimentMetadata() {
-      return this.experiment.experiment_metadata || {};
-    },
     readyToDisplay() {
       return (
         Object.keys(this.units).length !== 0 &&
@@ -234,7 +231,6 @@ export default {
       );
     },
   },
-  mounted() {},
   created() {
     this.$store.dispatch("experiments/fetchUnits");
   },
