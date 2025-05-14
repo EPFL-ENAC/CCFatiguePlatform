@@ -2,7 +2,7 @@
   "general": {
     "laboratory": "GR-MeC",
     "researcher": "Joseph Bernaert",
-    "date": "2025-05",
+    "date": "2024-09",
     "experiment type": "QS",
     "qs experiment type": "fracture",
     "fracture mode (fm)": "Mode I",
@@ -16,7 +16,8 @@
   "material info": {
     "material tested": "Adhesive joints",
     "sample type": "DCB",
-    "fiber form": "[Unidirectional]",
-    "resin": "Epoxy Sikapower 830"
+    "fiber form": "[UD, NA, UD]",
+    "resin": "Polyester",
+    "glue": "Epoxy Sikapower 830"
   }
 }
