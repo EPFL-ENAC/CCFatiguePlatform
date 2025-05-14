@@ -79,6 +79,12 @@
                 :values="[experiment.material_type_sample_type]"
               />
             </li>
+            <li v-if="experiment.material_type_fiber_material">
+              <experiment-s-v
+                subject="Fiber material"
+                :values="[experiment.material_type_fiber_material]"
+              />
+            </li>
             <li v-if="experiment.material_type_fiber_form">
               <experiment-s-v
                 subject="Fiber form"
