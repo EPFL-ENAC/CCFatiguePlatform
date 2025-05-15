@@ -393,6 +393,15 @@
                   tooltip="Area under the stress-strain curve..."
                 />
               </li>
+              <li>
+                <experiment-s-v
+                  subject="Young's modulus"
+                  :values="formattedYoungModulusValues"
+                  :colors="valueColors"
+                  :unit="'GPa'"
+                  tooltip="Linear slope of the stress-strain curve between 0.0015 and 0.0035 strain."
+                />
+              </li>
             </ul>
           </v-card-text>
         </v-card>
@@ -513,6 +522,7 @@ export default {
       stressOptions: [],
       stressOption: null,
       toughnessValues: [],
+      youngModulusValues: [],
       initialCrackLength: [],
       fatigueWarnings: [],
       fractureEnergyData: {},
@@ -617,6 +627,11 @@ export default {
     },
     formattedInitialCrackLengths() {
       return this.initialCrackLengths.map((v) =>
+        v != null ? Number(v).toFixed(2) : "-"
+      );
+    },
+    formattedYoungModulusValues() {
+      return this.youngModulusValues.map((v) =>
         v != null ? Number(v).toFixed(2) : "-"
       );
     },
@@ -805,6 +820,7 @@ export default {
       this.stressAtFailure = [];
       this.strainAtFailure = [];
       this.toughnessValues = []; // new
+      this.youngModulusValues = []; // new
       this.initialCrackLengths = []; // new
       this.fractureEnergyData = {};
       this.crackLengthData = {};
@@ -855,6 +871,9 @@ export default {
           isFinite(d.initial_crack_length)
             ? Number(d.initial_crack_length)
             : null
+        );
+        this.youngModulusValues.push(
+          isFinite(d.young_modulus) ? Number(d.young_modulus) : null
         );
       });
 

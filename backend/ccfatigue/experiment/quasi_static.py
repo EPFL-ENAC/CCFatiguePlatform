@@ -26,6 +26,7 @@ class QuasiStaticTest(BaseModel):
     stress: Dict[str, List[float]]
     toughness: float | None  # new feature
     initial_crack_length: float | None 
+    young_modulus: float | None
 
 
 def get_dataframe(
@@ -87,6 +88,7 @@ async def quasi_static_test(
                 Experiment.experiment_type,
                 Experiment.qs_experiment_type,
                 Experiment.fa_experiment_type,
+                Experiment.material_tested,
             ).where(Experiment.id == experiment_id)
         )
     ).one()._asdict()
@@ -94,7 +96,8 @@ async def quasi_static_test(
     is_fracture = experiment.get("qs_experiment_type") == "fracture"
 
     test_meta = await get_test_fields(
-        session, experiment_id, test_id, (Test.sequential_number, Test.specimen_name, Test.initial_crack_length)
+        session, experiment_id, test_id,
+        (Test.sequential_number, Test.specimen_name, Test.initial_crack_length)
     )
     specimen_id = test_meta["sequential_number"]
     df = get_dataframe(experiment, specimen_id)
@@ -103,56 +106,77 @@ async def quasi_static_test(
     width = test_info.get("width")
     thickness = test_info.get("thickness")
 
-    crack_displacement = df["u"].dropna().tolist() if is_fracture and "u" in df.columns else []
-    crack_load = df["Load"].dropna().tolist() if is_fracture and "Load" in df.columns else []
-    crack_length = df["Crack_length"].dropna().tolist() if is_fracture and "Crack_length" in df.columns else []
-    
-    # Placeholder for actual calculation of crack_fractureenergy
-    # This should be replaced with the actual calculation logic
-    # based on the specific requirements of the experiment
-    # For now, we will just copy the crack_length for demonstration purposes
-    crack_fractureenergy = crack_length.copy()  # Placeholder for actual calculation
+    if is_fracture:
+        crack_displacement = df["u"].dropna().tolist() if "u" in df.columns else []
+        crack_load = df["Load"].dropna().tolist() if "Load" in df.columns else []
+        crack_length = df["Crack_length"].dropna().tolist() if "Crack_length" in df.columns else []
 
-    displacement = {"u": df["u"].dropna().tolist()} if not is_fracture and "u" in df.columns else {}
-    load = {"Load": df["Load"].dropna().tolist()} if not is_fracture and "Load" in df.columns else {}
+        # Placeholder per crack_fractureenergy
+        crack_fractureenergy = crack_length.copy()
 
-    strain = {}
-    for col in ["exx", "eyy", "exy"]:
-        if col in df.columns:
-            label = "engineering strain" if col == "exx" else col
-            strain[label] = df[col].dropna().tolist()
+        return QuasiStaticTest(
+            specimen_name=test_meta["specimen_name"],
+            specimen_id=specimen_id,
+            crack_displacement=crack_displacement,
+            crack_load=crack_load,
+            crack_length=crack_length,
+            crack_fractureenergy=crack_fractureenergy,
+            displacement={},
+            load={},
+            strain={},
+            stress={},
+            toughness=None,
+            initial_crack_length=test_meta["initial_crack_length"],
+            young_modulus=None,
+        )
 
-    stress = {}
-    if "Load" in df.columns and width and thickness:
-        area = width * thickness
-        stress["engineering stress"] = (df["Load"] / area).dropna().tolist()
+    else:
+        displacement = {"u": df["u"].dropna().tolist()} if "u" in df.columns else {}
+        load = {"Load": df["Load"].dropna().tolist()} if "Load" in df.columns else {}
 
-    # Calcolo della toughness (area sotto la curva stress-strain)
-    toughness = None
-    if "engineering stress" in stress and "engineering strain" in strain:
-        stress_values = stress["engineering stress"]
-        strain_values = strain["engineering strain"]
-        min_len = min(len(stress_values), len(strain_values))
-        if min_len > 1:
-            # Allineiamo i dati e calcoliamo l'area
-            toughness = float(np.trapz(stress_values[:min_len], strain_values[:min_len]))
+        strain = {}
+        for col in ["exx", "eyy", "exy"]:
+            if col in df.columns:
+                label = "engineering strain" if col == "exx" else col
+                strain[label] = df[col].dropna().tolist()
 
+        stress = {}
+        if "Load" in df.columns and width and thickness:
+            area = width * thickness
+            stress["engineering stress"] = (df["Load"] / area).dropna().tolist()
 
+        toughness = None
+        if "engineering stress" in stress and "engineering strain" in strain:
+            stress_values = stress["engineering stress"]
+            strain_values = strain["engineering strain"]
+            min_len = min(len(stress_values), len(strain_values))
+            if min_len > 1:
+                toughness = float(np.trapz(stress_values[:min_len], strain_values[:min_len]))
 
-    print("✅ SPECIMEN ID:", specimen_id)
+        young_modulus = None
+        if experiment.get("material_tested", "").lower() == "bulk adhesives":
+            if "engineering stress" in stress and "engineering strain" in strain:
+                stress_values = np.array(stress["engineering stress"])
+                strain_values = np.array(strain["engineering strain"])
+                mask = (strain_values >= 0.0015) & (strain_values <= 0.0035)
+                if np.sum(mask) >= 2:
+                    x = strain_values[mask]
+                    y = stress_values[mask]
+                    coeffs = np.polyfit(x, y, 1)
+                    young_modulus = float(coeffs[0]) / 1000  # MPa → GPa
 
-
-    return QuasiStaticTest(
-        specimen_name=test_meta["specimen_name"],
-        specimen_id=test_meta["sequential_number"],
-        crack_displacement=crack_displacement,
-        crack_load=crack_load,
-        crack_length=crack_length,
-        displacement=displacement,
-        load=load,
-        strain=strain,
-        stress=stress,
-        toughness=toughness,  # new property
-        initial_crack_length=test_meta["initial_crack_length"],
-        crack_fractureenergy=crack_fractureenergy,
-    )
+        return QuasiStaticTest(
+            specimen_name=test_meta["specimen_name"],
+            specimen_id=specimen_id,
+            crack_displacement=[],
+            crack_load=[],
+            crack_length=[],
+            crack_fractureenergy=[],
+            displacement=displacement,
+            load=load,
+            strain=strain,
+            stress=stress,
+            toughness=toughness,
+            initial_crack_length=None,
+            young_modulus=young_modulus,
+        )
