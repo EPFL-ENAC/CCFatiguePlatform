@@ -215,7 +215,7 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
         log_if_modified(original_stiffness, filtered_stiffness, "stiffness", specimen_name)
         hyst_df["stiffness"] = filtered_stiffness
         '''
-        def smooth_spikes(data: List[float], threshold: float = 0.1) -> List[float]:
+        def smooth_spikes(data: List[float], threshold: float = 0.05) -> List[float]:
             """
             Rimuove spike/drop locali in una finestra mobile di 5 elementi.
             Il valore centrale viene sostituito se è molto diverso dalla media delle due mezze finestre,
