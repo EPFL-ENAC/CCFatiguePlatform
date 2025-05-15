@@ -27,7 +27,6 @@ class FatigueTest(BaseModel):
     specimen_name: str
     total_dissipated_energy: Optional[float] = None
     run_out: bool
-    #stress_ratio: float
     hysteresis_loops: List[HysteresisLoop]
     n_cycles: List[float]
     creep: List[float]
@@ -144,11 +143,10 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
             Test.specimen_name,
             Test.run_out,
             Test.number_of_cycles,
-            #Test.stress_ratio,
             Test.width,
             Test.thickness,
             Test.length,
-            Test.maximum_load,  # <- nuovo campo per max_stress
+            Test.maximum_load,  # new field
         ),
     )
     warning_triggered = False
@@ -270,29 +268,6 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
         strain_at_failure = hyst_df["creep"].iloc[-1]
         total_dissipated_energy = get_total_dissipated_energy(hyst_df)
 
-    '''
-    return FatigueTest(
-        specimen_id=test_meta["sequential_number"],
-        specimen_name=specimen_name,
-        run_out=test_meta["run_out"],
-        # stress_ratio=test_meta["stress_ratio"],
-        total_dissipated_energy=total_dissipated_energy,
-        hysteresis_loops=fatigue_processed["sub_hystloops"],
-        n_cycles=hyst_df["n_cycles"].to_list(),
-        creep=hyst_df["creep"].to_list(),
-        hysteresis_area=hyst_df["hysteresis_area"].to_list(),
-        stiffness=hyst_df["stiffness"].to_list(),
-        stress_at_failure=max_stress,
-        strain_at_failure=strain_at_failure,
-        # n_fail=fatigue_processed["n_fail"],
-        n_fail=test_meta["number_of_cycles"],
-        warning_messages = warning_triggered,
-        crack_displacement=crack_displacement,
-        crack_load=crack_load,
-        crack_length=crack_length,
-        crack_n_cycles=crack_n_cycles,
-    )
-    '''
     if is_fracture:
         return FatigueTest(
             specimen_id=test_meta["sequential_number"],
