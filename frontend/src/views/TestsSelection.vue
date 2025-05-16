@@ -174,4 +174,9 @@ export default {
 };
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+:deep(.v-data-table__selected) {
+  background-color: #bbdefb !important;
+  /* light blue */
+}
+</style>
