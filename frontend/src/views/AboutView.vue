@@ -33,8 +33,10 @@
                 <a :href="contributor.url" target="_blank">
                   {{ contributor.name }}
                 </a>
+                <!--
                 -
                 {{ contributor.title }}
+                -->
               </li>
             </ul>
           </v-col>
@@ -78,13 +80,13 @@ export default {
           name: "Tassos Vassilopoulos",
           url: "https://people.epfl.ch/anastasios.vassilopoulos",
           unit: "GR-MeC",
-          title: "professor",
+          /* title: "professor",*/
         },
         {
           name: "Filippo Mannino",
           url: "https://people.epfl.ch/filippo.mannino",
           unit: "GR-MeC",
-          title: "Scientific Assistant",
+          /* title: "Scientific Assistant",*/
         },
         /*
         {
