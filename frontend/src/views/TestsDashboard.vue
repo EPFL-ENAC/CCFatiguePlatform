@@ -34,12 +34,13 @@
                   <v-spacer />
                   <v-col cols="auto">
                     <v-select
-                      v-model="selectedLoopIndex"
+                      v-model="selectedLoopIndices"
                       :items="loopIndexOptions"
                       label="Cycle index"
                       dense
                       hide-details
-                      style="max-width: 180px"
+                      multiple
+                      style="max-width: 220px"
                     />
                   </v-col>
                 </v-row>
@@ -433,7 +434,7 @@
                   :series="fractureEnergySeries"
                   :aspect-ratio="2"
                   x-axis-name="Crack Length [mm]"
-                  y-axis-name="Fracture Energy [J]"
+                  y-axis-name="Fracture Energy [J/m²]"
                 />
               </v-card-text>
             </v-card>
@@ -507,13 +508,7 @@ export default {
       totalDissipatedEnergies: [],
       runOuts: [],
       stressRatios: [],
-      selectedLoopIndex: null,
-      /*
-      stressStrainSeries: [],
-      hysteresisAreaSeries: [],
-      creepSeries: [],
-      stiffnessSeries: [],
-      */
+      selectedLoopIndices: [], // { value }
       crackSeries: [],
       strainData: {},
       strainOptions: [],
@@ -564,7 +559,6 @@ export default {
         }))
         .filter((s) => s.data.length);
     },
-
     strainStressSeriesFA() {
       return this.fatigueData.flatMap((test, testIndex) => {
         const loops = test.hysteresis_loops || [];
@@ -573,39 +567,31 @@ export default {
 
         if (!loops.length) return [];
 
-        if (
-          Number.isInteger(this.selectedLoopIndex) &&
-          this.selectedLoopIndex >= 0 &&
-          this.selectedLoopIndex < loops.length
-        ) {
-          const loop = loops[this.selectedLoopIndex];
-          return [
-            {
-              type: "line",
-              name: `${name} - cycle ${this.selectedLoopIndex}`,
-              data: zip(loop.strain, loop.stress),
-              lineStyle: { color },
-            },
-          ];
-        }
+        const indices =
+          this.selectedLoopIndices.length > 0
+            ? this.selectedLoopIndices
+            : Array.from({ length: loops.length }, (_, i) => i); // default: tutti
 
-        // Mostra tutti i cicli, ma solo il primo va in legenda
-        return loops.map((loop, i) => ({
-          type: "line",
-          name: i === 0 ? name : null, // solo il primo nella legenda
-          data: zip(loop.strain, loop.stress),
-          lineStyle: { color },
-        }));
+        return indices
+          .map((i) => ({
+            type: "line",
+            name: null, // ❗️non cambia la legenda
+            data: zip(loops[i]?.strain || [], loops[i]?.stress || []),
+            lineStyle: { color },
+          }))
+          .map((series, i) => ({
+            ...series,
+            // Solo il primo ciclo ha il nome per la legenda
+            name: i === 0 ? name : null,
+          }));
       });
     },
     loopIndexOptions() {
-      return [
-        { text: "All cycles", value: null },
-        ...Array.from({ length: 10 }, (_, i) => ({
-          text: `Cycle ${i + 1}`,
-          value: i,
-        })),
-      ];
+      // Mostra sempre i cicli da 1 a 10 (0–9 come valori interni)
+      return Array.from({ length: 10 }, (_, i) => ({
+        text: `Cycle ${i + 1}`,
+        value: i,
+      }));
     },
     valueColors() {
       return this.testIds.map((_, i) => this.colors[i % this.colors.length]);
