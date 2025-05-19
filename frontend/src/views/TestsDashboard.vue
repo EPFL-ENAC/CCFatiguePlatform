@@ -304,6 +304,7 @@
               :x-axis-type="xAxisChartType"
               :y1-axis-name="'Crack Load [N]'"
               :y2-axis-name="'Crack Length [mm]'"
+              :axis-label-formatter="axisLabelFormatter"
             />
           </v-card-text>
         </v-card>
@@ -443,6 +444,7 @@
                   x-axis-name="Crack Displacement [mm]"
                   :y1-axis-name="'Load [N]'"
                   :y2-axis-name="'Crack Length [mm]'"
+                  :axis-label-formatter="axisLabelFormatter"
                 />
               </v-card-text>
             </v-card>
@@ -499,6 +501,7 @@ import SimpleChart from "@/components/charts/SimpleChart.vue";
 import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
 import ExperimentSV from "@/components/ExperimentSV.vue";
 import InfoTooltip from "@/components/InfoTooltip.vue";
+import { formatNumber2 } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
 import { zip } from "lodash";
 import { mapState } from "vuex";
@@ -647,6 +650,9 @@ export default {
       return this.totalDissipatedEnergies.map((e) =>
         e != null ? Number(e).toFixed(2) : "-"
       );
+    },
+    axisLabelFormatter() {
+      return formatNumber2;
     },
     hasWarnings() {
       return this.testIds.some((_, i) => this.fatigueWarnings?.[i]);

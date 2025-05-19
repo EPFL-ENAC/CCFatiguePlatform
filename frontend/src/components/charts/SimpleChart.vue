@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { formatNumber } from "@/utils/formatters";
+import { formatNumber3 } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
 import { LineChart, ScatterChart } from "echarts/charts";
 import {
@@ -51,6 +51,10 @@ export default {
     color: { type: Array, default: () => colorPalette },
     xAxisMin: { type: [Number, null], default: null },
     xAxisMax: { type: [Number, null], default: null },
+    axisLabelFormatter: {
+      type: Function,
+      default: formatNumber3,
+    },
   },
   data() {
     return {
@@ -97,7 +101,7 @@ export default {
           min: this.xAxisMin != null ? this.xAxisMin : "dataMin",
           max: this.xAxisMax != null ? this.xAxisMax : "dataMax",
           axisLabel: {
-            formatter: formatNumber,
+            formatter: this.axisLabelFormatter,
             hideOverlap: true,
           },
         },
@@ -109,14 +113,14 @@ export default {
           min: 0,
           max: "dataMax",
           axisLabel: {
-            formatter: formatNumber,
+            formatter: this.axisLabelFormatter,
             hideOverlap: true,
           },
         },
         tooltip: {
           trigger: "axis",
           confine: true,
-          valueFormatter: formatNumber,
+          formatter: this.axisLabelFormatter,
         },
         dataZoom: [
           {
