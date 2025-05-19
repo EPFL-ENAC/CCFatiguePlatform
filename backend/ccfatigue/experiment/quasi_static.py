@@ -108,6 +108,8 @@ async def quasi_static_test(
 
     if is_fracture:
         crack_displacement = df["u"].dropna().tolist() if "u" in df.columns else []
+        if crack_displacement:
+            crack_displacement = [v - crack_displacement[0] for v in crack_displacement]
         crack_load = df["Load"].dropna().tolist() if "Load" in df.columns else []
         crack_length = df["Crack_length"].dropna().tolist() if "Crack_length" in df.columns else []
 

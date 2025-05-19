@@ -170,6 +170,8 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
     if is_fracture:
         crack_load = std_df["Load"].tolist() if "Load" in std_df.columns else []
         crack_displacement = std_df["u"].tolist() if "u" in std_df.columns else []
+        if crack_displacement:
+            crack_displacement = [v - crack_displacement[0] for v in crack_displacement]
         crack_length = std_df["Crack_length"].tolist() if "Crack_length" in std_df.columns else []
         crack_n_cycles = std_df["N_cycles"].tolist() if "N_cycles" in std_df.columns else []
     else:
