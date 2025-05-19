@@ -41,7 +41,16 @@
                       hide-details
                       multiple
                       style="max-width: 220px"
-                    />
+                    >
+                      <template #prepend-item>
+                        <v-list-item @click="selectedLoopIndices = []">
+                          <v-list-item-title class="text-primary"
+                            >Clear all</v-list-item-title
+                          >
+                        </v-list-item>
+                        <v-divider />
+                      </template>
+                    </v-select>
                   </v-col>
                 </v-row>
               </v-card-title>
