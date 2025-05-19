@@ -274,14 +274,34 @@
     <v-row v-else-if="experimentType === 'FA' && isFracture">
       <v-col cols="10">
         <v-card :loading="loading">
-          <v-card-title
-            >Crack Load vs Crack Length (over N_cycles)</v-card-title
-          >
+          <v-card-title>
+            <v-row align="center" class="w-100">
+              <v-col class="d-flex align-center" cols="auto">
+                Crack Load vs Crack Length (over N_cycles)
+              </v-col>
+              <v-spacer />
+              <v-col cols="auto" class="d-flex">
+                <v-select
+                  v-model="xAxisMode"
+                  :items="[
+                    { text: 'Cycle count', value: 'normal' },
+                    { text: 'Log(Cycle count)', value: 'log' },
+                    { text: 'Normalized cycle count', value: 'normalized' },
+                  ]"
+                  dense
+                  hide-details
+                  label="X-Axis scale"
+                  style="max-width: 220px"
+                />
+              </v-col>
+            </v-row>
+          </v-card-title>
           <v-card-text>
             <double-chart
               :series="crackFaFractureSeries"
               :aspect-ratio="2"
-              x-axis-name="Number of cycles"
+              :x-axis-name="computedXAxisLabel"
+              :x-axis-type="xAxisChartType"
               :y1-axis-name="'Crack Load [N]'"
               :y2-axis-name="'Crack Length [mm]'"
             />
@@ -712,7 +732,10 @@ export default {
           {
             type: "line",
             name, // solo nel primo dataset (linea)
-            data: zip(d.crack_n_cycles, d.crack_load),
+            data: zip(
+              this.transformXAxis(d.crack_n_cycles, d.n_fail),
+              d.crack_load
+            ),
             yAxisIndex: 0,
             lineStyle: { color },
             itemStyle: { color },
@@ -720,7 +743,10 @@ export default {
           {
             type: "scatter",
             name: null, // non va in legenda
-            data: zip(d.crack_n_cycles, d.crack_length || []),
+            data: zip(
+              this.transformXAxis(d.crack_n_cycles, d.n_fail),
+              d.crack_length || []
+            ),
             yAxisIndex: 1,
             symbolSize: 6,
             itemStyle: { color },
