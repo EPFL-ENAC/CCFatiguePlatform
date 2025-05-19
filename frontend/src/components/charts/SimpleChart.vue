@@ -1,6 +1,7 @@
 <template>
-  <v-responsive :aspect-ratio="aspectRatio">
+  <v-responsive ref="chartContainer" :aspect-ratio="aspectRatio">
     <v-chart
+      :key="autoFontSize"
       autoresize
       :option="actualOption"
       :update-options="updateOptions"
@@ -61,16 +62,27 @@ export default {
       updateOptions: {
         notMerge: true,
       },
+      containerWidth: 400,
     };
   },
   computed: {
+    autoFontSize() {
+      return Math.max(10, Math.round(this.containerWidth / 50));
+    },
     actualOption() {
       return {
         title: {
+          show: true,
           text: this.title,
+          textStyle: {
+            fontSize: this.autoFontSize,
+          },
         },
         legend: {
           type: "scroll",
+          textStyle: {
+            fontSize: this.autoFontSize,
+          },
         },
         grid: {
           left: 50,
@@ -79,20 +91,6 @@ export default {
           bottom: 20,
           containLabel: true,
         },
-        /*
-        xAxis: {
-          type: this.xAxisType,
-          name: this.xAxisName,
-          nameLocation: "middle",
-          nameGap: 26,
-          min: "dataMin",
-          max: "dataMax",
-          axisLabel: {
-            formatter: formatNumber,
-            hideOverlap: true,
-          },
-        },
-        */
         xAxis: {
           type: this.xAxisType,
           name: this.xAxisName,
@@ -100,21 +98,28 @@ export default {
           nameGap: 26,
           min: this.xAxisMin != null ? this.xAxisMin : "dataMin",
           max: this.xAxisMax != null ? this.xAxisMax : "dataMax",
+          nameTextStyle: {
+            fontSize: this.autoFontSize,
+          },
           axisLabel: {
             formatter: this.axisLabelFormatter,
             hideOverlap: true,
+            fontSize: this.autoFontSize, // added feature
           },
         },
         yAxis: {
           name: this.yAxisName,
           nameLocation: "middle",
           nameGap: 50,
-          /* min: "dataMin", */
           min: 0,
           max: "dataMax",
+          nameTextStyle: {
+            fontSize: this.autoFontSize,
+          },
           axisLabel: {
             formatter: this.axisLabelFormatter,
             hideOverlap: true,
+            fontSize: this.autoFontSize, // added feature
           },
         },
         tooltip: {
@@ -139,6 +144,26 @@ export default {
         series: this.series.map((serie) => merge(serie, { showSymbol: false })),
         color: this.color,
       };
+    },
+  },
+  mounted() {
+    this.handleResize();
+    window.addEventListener("resize", this.handleResize);
+
+    // ✅ Usa ResizeObserver per osservare cambiamenti di dimensione
+    this.observer = new ResizeObserver(this.handleResize);
+    this.observer.observe(this.$refs.chartContainer.$el);
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.handleResize);
+  },
+  methods: {
+    handleResize() {
+      const width =
+        this.$refs.chartContainer?.$el?.getBoundingClientRect?.().width;
+      if (width) {
+        this.containerWidth = width; // reactive change
+      }
     },
   },
 };
