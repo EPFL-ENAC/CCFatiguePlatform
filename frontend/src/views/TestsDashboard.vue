@@ -656,7 +656,7 @@ export default {
         case "log":
           return "log₁₀(Number of cycles) [-]";
         case "normalized":
-          return "Normalized cycles (N / N_fail) [-]";
+          return "Normalized cycles (Number of cycles / Cycles at failure) [-]";
         default:
           return "Number of cycles [-]";
       }
