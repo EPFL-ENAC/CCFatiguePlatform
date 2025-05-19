@@ -434,14 +434,12 @@
         <v-row>
           <v-col cols="6">
             <v-card :loading="loading">
-              <v-card-title
-                >Load & Crack length vs Crack Displacement</v-card-title
-              >
+              <v-card-title>Load & Crack length vs Displacement</v-card-title>
               <v-card-text>
                 <double-chart
                   :series="crackSeries"
                   :aspect-ratio="2"
-                  x-axis-name="Crack Displacement [mm]"
+                  x-axis-name="Displacement [mm]"
                   :y1-axis-name="'Load [N]'"
                   :y2-axis-name="'Crack Length [mm]'"
                   :axis-label-formatter="axisLabelFormatter"
