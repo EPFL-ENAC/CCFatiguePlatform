@@ -5,6 +5,13 @@
       <v-row>
         <v-col>
           <v-card flat>
+            <v-card-text class="d-flex justify-end">
+              <v-btn small text color="primary" @click="resetFilters">
+                Reset filters
+              </v-btn>
+            </v-card-text>
+          </v-card>
+          <v-card flat>
             <v-card-title>Experiment type</v-card-title>
             <v-card-text>
               <v-row>
@@ -256,6 +263,20 @@ export default {
   methods: {
     rowClick(_item, row) {
       row.select(!row.isSelected);
+    },
+    resetFilters() {
+      this.filters = {
+        typeFA: true,
+        typeQS: true,
+        withFracture: true,
+        withoutFracture: true,
+        fractureMode: "All fracture modes",
+        fiberMaterial: "All materials",
+        resin: "All resins",
+        stackingSequence: "All stacking sequences",
+        textSearch: "",
+      };
+      this.fetchExperiments();
     },
     fetchExperiments() {
       const typeFA =
