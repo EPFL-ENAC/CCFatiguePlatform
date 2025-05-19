@@ -277,7 +277,7 @@
           <v-card-title>
             <v-row align="center" class="w-100">
               <v-col class="d-flex align-center" cols="auto">
-                Crack Load vs Crack Length (over N_cycles)
+                Load & Crack Length vs Number of cycles
               </v-col>
               <v-spacer />
               <v-col cols="auto" class="d-flex">
@@ -433,14 +433,16 @@
         <v-row>
           <v-col cols="6">
             <v-card :loading="loading">
-              <v-card-title>Crack Load vs Crack Displacement</v-card-title>
+              <v-card-title
+                >Load & Crack length vs Crack Displacement</v-card-title
+              >
               <v-card-text>
                 <double-chart
                   :series="crackSeries"
                   :aspect-ratio="2"
                   x-axis-name="Crack Displacement [mm]"
-                  :y1-axis-name="'Crack Load — [N]'"
-                  :y2-axis-name="'Crack Length • [mm]'"
+                  :y1-axis-name="'Load [N]'"
+                  :y2-axis-name="'Crack Length [mm]'"
                 />
               </v-card-text>
             </v-card>
