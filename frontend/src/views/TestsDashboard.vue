@@ -277,7 +277,11 @@
           <v-card-title>
             <v-row align="center" class="w-100">
               <v-col class="d-flex align-center" cols="auto">
-                Load & Crack Length vs Number of cycles
+                <v-span> Crack length & Load vs Number of cycles </v-span>
+                <info-tooltip>
+                  The graph shows the evolution of the crack length (dotted
+                  lines) and load (straight line) during the test.
+                </info-tooltip>
               </v-col>
               <v-spacer />
               <v-col cols="auto" class="d-flex">
@@ -302,7 +306,7 @@
               :aspect-ratio="2"
               :x-axis-name="computedXAxisLabel"
               :x-axis-type="xAxisChartType"
-              :y1-axis-name="'Crack Load [N]'"
+              :y1-axis-name="'Load [N]'"
               :y2-axis-name="'Crack Length [mm]'"
               :axis-label-formatter="axisLabelFormatter"
             />
@@ -434,7 +438,13 @@
         <v-row>
           <v-col cols="6">
             <v-card :loading="loading">
-              <v-card-title>Load & Crack length vs Displacement</v-card-title>
+              <v-card-title>
+                <v-span>Load & Crack length vs Displacement</v-span>
+                <info-tooltip>
+                  The graph shows the evolution of the crack length (dotted
+                  lines) and load (straight line) during the test.
+                </info-tooltip>
+              </v-card-title>
               <v-card-text>
                 <double-chart
                   :series="crackSeries"
