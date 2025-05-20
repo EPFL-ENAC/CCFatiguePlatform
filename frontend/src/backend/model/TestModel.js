@@ -127,6 +127,13 @@ class TestModel {
           "Number"
         );
       }
+      /* add number of cycles */
+      if (data.hasOwnProperty("number_of_cycles")) {
+        obj["number_of_cycles"] = ApiClient.convertToType(
+          data["number_of_cycles"],
+          "Number"
+        );
+      }
     }
     return obj;
   }
@@ -211,5 +218,11 @@ TestModel.prototype["humidity"] = undefined;
  * @member {Number} initial_crack_length
  */
 TestModel.prototype["initial_crack_length"] = undefined;
+
+/**
+ * @member {Number} number_of_cycles
+ */
+TestModel.prototype["number_of_cycles"] = undefined;
+
 
 export default TestModel;

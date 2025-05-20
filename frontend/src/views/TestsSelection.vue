@@ -113,6 +113,11 @@ export default {
           text: "Run Out",
           value: "run_out",
         });
+
+        baseHeaders.splice(3, 0, {
+          text: "Cycles",
+          value: "number_of_cycles",
+        });
       }
       return baseHeaders;
     },
