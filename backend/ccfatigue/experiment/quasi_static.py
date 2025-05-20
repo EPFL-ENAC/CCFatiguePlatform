@@ -25,8 +25,9 @@ class QuasiStaticTest(BaseModel):
     strain: Dict[str, List[float]]
     stress: Dict[str, List[float]]
     toughness: float | None  # new feature
-    initial_crack_length: float | None 
-    young_modulus: float | None
+    initial_crack_length: float | None # new feature
+    young_modulus: float | None # new feature
+    poisson_ratio: float | None # new feature
 
 
 def get_dataframe(
@@ -130,42 +131,55 @@ async def quasi_static_test(
             toughness=None,
             initial_crack_length=test_meta["initial_crack_length"],
             young_modulus=None,
+            poisson_ratio=None,
         )
 
     else:
+        poisson_ratio = None
         displacement = {"u": df["u"].dropna().tolist()} if "u" in df.columns else {}
         load = {"Load": df["Load"].dropna().tolist()} if "Load" in df.columns else {}
 
         strain = {}
         for col in ["exx", "eyy", "exy"]:
             if col in df.columns:
-                label = "engineering strain" if col == "exx" else col
+                label = "Engineering strain" if col == "exx" else col
                 strain[label] = df[col].dropna().tolist()
 
         stress = {}
         if "Load" in df.columns and width and thickness:
             area = width * thickness
-            stress["engineering stress"] = (df["Load"] / area).dropna().tolist()
+            stress["Engineering stress"] = (df["Load"] / area).dropna().tolist()
 
         toughness = None
-        if "engineering stress" in stress and "engineering strain" in strain:
-            stress_values = stress["engineering stress"]
-            strain_values = strain["engineering strain"]
+        if "Engineering stress" in stress and "Engineering strain" in strain:
+            stress_values = stress["Engineering stress"]
+            strain_values = strain["Engineering strain"]
             min_len = min(len(stress_values), len(strain_values))
             if min_len > 1:
                 toughness = float(np.trapz(stress_values[:min_len], strain_values[:min_len]))
 
         young_modulus = None
         if experiment.get("material_tested", "").lower() == "bulk adhesives":
-            if "engineering stress" in stress and "engineering strain" in strain:
-                stress_values = np.array(stress["engineering stress"])
-                strain_values = np.array(strain["engineering strain"])
+            if "Engineering stress" in stress and "Engineering strain" in strain:
+                stress_values = np.array(stress["Engineering stress"])
+                strain_values = np.array(strain["Engineering strain"])
                 mask = (strain_values >= 0.0015) & (strain_values <= 0.0035)
                 if np.sum(mask) >= 2:
                     x = strain_values[mask]
                     y = stress_values[mask]
                     coeffs = np.polyfit(x, y, 1)
                     young_modulus = float(coeffs[0]) / 1000  # MPa → GPa
+
+                
+                if "eyy" in df.columns:
+                    eyy_values = np.array(df["eyy"].dropna())
+                    if len(eyy_values) == len(strain_values):  # assicurati che le lunghezze corrispondano
+                        eyy_range = eyy_values[mask]
+                        exx_range = strain_values[mask]
+                        if len(exx_range) >= 2:
+                            # Fit lineare: y = m * x + q → m = poisson_ratio
+                            coeffs = np.polyfit(exx_range, -eyy_range, 1)
+                            poisson_ratio = float(coeffs[0])
 
         return QuasiStaticTest(
             specimen_name=test_meta["specimen_name"],
@@ -181,4 +195,5 @@ async def quasi_static_test(
             toughness=toughness,
             initial_crack_length=None,
             young_modulus=young_modulus,
+            poisson_ratio=poisson_ratio,
         )

@@ -437,6 +437,15 @@
                   tooltip="Linear slope of the stress-strain curve between 0.0015 and 0.0035 strain."
                 />
               </li>
+              <li>
+                <experiment-s-v
+                  subject="Poisson ratio"
+                  :values="formattedPoissonRatioValues"
+                  :colors="valueColors"
+                  :unit="'[-]'"
+                  tooltip="Slope of the -eyy vs exx linear fit between 0.0015 and 0.0035 strain."
+                />
+              </li>
             </ul>
           </v-card-text>
         </v-card>
@@ -560,6 +569,7 @@ export default {
       stressOption: null,
       toughnessValues: [],
       youngModulusValues: [],
+      quasiStaticPoissonRatios: [],
       initialCrackLength: [],
       fatigueWarnings: [],
       fractureEnergyData: {},
@@ -661,6 +671,11 @@ export default {
     formattedYoungModulusValues() {
       return this.youngModulusValues.map((v) =>
         v != null ? Number(v).toFixed(2) : "-"
+      );
+    },
+    formattedPoissonRatioValues() {
+      return this.quasiStaticPoissonRatios?.map((v) =>
+        v != null && isFinite(v) ? Number(v).toFixed(3) : "-"
       );
     },
     formattedTotalDissipatedEnergies() {
@@ -858,6 +873,7 @@ export default {
       this.strainAtFailure = [];
       this.toughnessValues = []; // new
       this.youngModulusValues = []; // new
+      this.quasiStaticPoissonRatios = []; // new
       this.initialCrackLengths = []; // new
       this.fractureEnergyData = {};
       this.crackLengthData = {};
@@ -912,6 +928,7 @@ export default {
         this.youngModulusValues.push(
           isFinite(d.young_modulus) ? Number(d.young_modulus) : null
         );
+        this.quasiStaticPoissonRatios.push(d.poisson_ratio);
       });
 
       this.strainOptions = Array.from(this.strainOptions);
