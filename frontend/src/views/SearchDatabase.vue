@@ -5,13 +5,6 @@
       <v-row>
         <v-col>
           <v-card flat>
-            <v-card-text class="d-flex justify-end">
-              <v-btn small text color="primary" @click="resetFilters">
-                Reset filters
-              </v-btn>
-            </v-card-text>
-          </v-card>
-          <v-card flat>
             <v-card-title>Experiment type</v-card-title>
             <v-card-text>
               <v-row>
@@ -119,6 +112,7 @@
               </v-row>
             </v-card-text>
           </v-card>
+          <!--
           <v-card flat>
             <v-card-title>Filter by text</v-card-title>
             <v-card-text>
@@ -133,6 +127,14 @@
                   </v-text-field>
                 </v-col>
               </v-row>
+            </v-card-text>
+          </v-card>
+          -->
+          <v-card flat>
+            <v-card-text class="d-flex justify-end">
+              <v-btn text color="primary" @click="resetFilters">
+                Reset filters
+              </v-btn>
             </v-card-text>
           </v-card>
         </v-col>
@@ -333,4 +335,8 @@ export default {
 };
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+:deep(.v-data-table__selected) {
+  background-color: #bbdefb !important;
+}
+</style>
