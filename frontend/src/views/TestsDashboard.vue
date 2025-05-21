@@ -71,8 +71,9 @@
                   <v-col class="d-flex align-center" cols="auto">
                     <span>Hysteresis loop area evolution</span>
                     <info-tooltip
-                      >On this graph, we show the evolution of the hysteresis
-                      area...</info-tooltip
+                      >The hysteresis area, i.e., the area enclosed by the
+                      hysteresis loop, evolution throughout specimens' fatigue
+                      lives</info-tooltip
                     >
                   </v-col>
                   <v-spacer />
@@ -113,7 +114,8 @@
                     <span>Creep evolution</span>
                     <info-tooltip>
                       Creep is defined as the average deformation during each
-                      cycle...
+                      cycle, it is calculated as the center of the hysteresis
+                      loop ellipse
                     </info-tooltip>
                   </v-col>
                   <v-spacer />
@@ -151,8 +153,8 @@
               <v-card-title>
                 Stiffness evolution under cyclic loading
                 <info-tooltip>
-                  Stiffness is representative of the resistance an object
-                  opposes...
+                  Stiffness is calculated as the slope of the linear fit of the
+                  points forming the hysteresis loop ellipse
                 </info-tooltip>
               </v-card-title>
               <v-card-text>
