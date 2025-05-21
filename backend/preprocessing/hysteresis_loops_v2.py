@@ -3,7 +3,7 @@ import re
 import numpy as np
 import pandas as pd
 
-PREPROCESSED_FOLDER = "Data/preprocessed/TST_Mannino_2023-10_FA"
+PREPROCESSED_FOLDER = "../Data/preprocessed/TST_Mannino_2023-10_FA"
 
 def poly_area(x, y):
     return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
@@ -76,7 +76,7 @@ def process_hysteresis(df, test_meta):
         params = fit_ellipse_matlab(strain, stress, num_points=50)
         fit_x = params["fit_x"]
         fit_y = params["fit_y"]
-
+        '''
         smax = fit_y.max()
         smin = fit_y.min()
         e_at_smax = fit_x[np.argmax(fit_y)]
@@ -90,7 +90,13 @@ def process_hysteresis(df, test_meta):
         stiff1 = (smax - smin) / (e_at_smax - e_at_smin) if (e_at_smax - e_at_smin) != 0 else np.nan
         stiff2 = (s_at_emax - s_at_emin) / (emax - emin) if (emax - emin) != 0 else np.nan
         stiffness = 0.5 * (stiff1 + stiff2)
-
+        '''
+        # New stiffness calculation with linear fit of all the 50 points
+        if len(fit_x) >= 2:
+            coeffs = np.polyfit(fit_x, fit_y, 1)
+            stiffness = coeffs[0]
+        else:
+            stiffness = np.nan
         hyst_area = poly_area(fit_x, fit_y)
         mean_strain = round(params["X0_in"], 6)
 
@@ -127,7 +133,7 @@ def main():
                 hys_fp = "HYS_" + fname
                 hyst_df.to_csv(os.path.join(PREPROCESSED_FOLDER, hys_fp), index=False)
         except Exception as e:
-            print(f"Errore con {fname}: {e}")
+            print(f"Error with {fname}: {e}")
 
 if __name__ == "__main__":
     main()
