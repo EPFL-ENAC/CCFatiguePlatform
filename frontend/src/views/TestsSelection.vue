@@ -2,7 +2,45 @@
   <v-container>
     <v-card elevation="0">
       <experiment-specifications :experiment="experiment.experiment" />
-
+      <v-row justify="center" class="mt-4 mb-5">
+        <v-col cols="5">
+          <v-card>
+            <v-card-title>
+              <v-row align="center" class="w-100">
+                <v-col cols="auto" class="d-flex align-center">
+                  <span class="text-h6">Test Overview</span>
+                </v-col>
+                <v-spacer />
+                <v-col cols="auto">
+                  <v-select
+                    v-model="xAxisMode"
+                    :items="[
+                      { text: 'Cycle count', value: 'normal' },
+                      { text: 'Log(Cycle count)', value: 'log' },
+                    ]"
+                    dense
+                    hide-details
+                    label="X-Axis scale"
+                    style="max-width: 220px"
+                  />
+                </v-col>
+              </v-row>
+            </v-card-title>
+            <v-card-text>
+              <simple-chart
+                ref="chartComponent"
+                :key="chartKey"
+                :show-legend="false"
+                :series="chartSeries"
+                :aspect-ratio="2"
+                :x-axis-name="computedXAxisLabel"
+                :x-axis-type="xAxisChartType"
+                :y-axis-name="yAxisLabel"
+              />
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
       <v-data-table
         v-model="testsSelected"
         :headers="headers"
@@ -35,6 +73,7 @@
 </template>
 
 <script>
+import SimpleChart from "@/components/charts/SimpleChart.vue";
 import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
 import { mapState } from "vuex";
 
@@ -42,6 +81,7 @@ export default {
   name: "TestsSelection",
   components: {
     ExperimentSpecifications,
+    SimpleChart,
   },
   props: {
     experimentId: { type: Number, required: true },
@@ -53,6 +93,7 @@ export default {
         page: 1,
         itemsPerPage: 10,
       },
+      xAxisMode: "normal",
     };
   },
   computed: {
@@ -121,6 +162,71 @@ export default {
       }
       return baseHeaders;
     },
+    chartSeries() {
+      const controlMode =
+        this.experiment?.experiment?.control_mode?.toLowerCase();
+      const isDisplacement = controlMode === "displacement controlled";
+
+      return [
+        {
+          type: "scatter",
+          name: isDisplacement
+            ? "Maximum Displacement [mm]"
+            : "Maximum Stress [MPa]",
+          data: this.numberedTests
+            .filter((test) => {
+              const y = isDisplacement
+                ? test.maximum_displacement
+                : test.maximum_stress;
+              return (
+                typeof test.number_of_cycles === "number" &&
+                typeof y === "number"
+              );
+            })
+            .map((test) => {
+              const selected = this.testsSelected.some((t) => t.id === test.id);
+              return {
+                value: [
+                  test.number_of_cycles,
+                  isDisplacement
+                    ? test.maximum_displacement
+                    : test.maximum_stress,
+                ],
+                id: test.id,
+                itemStyle: {
+                  color: selected ? "#1976d2" : "#90caf9",
+                },
+                symbolSize: selected ? 14 : 8,
+              };
+            }),
+        },
+      ];
+    },
+    chartKey() {
+      // Forza il re-render del grafico se cambia la selezione
+      return this.testsSelected.map((t) => t.id).join("-");
+    },
+    yAxisLabel() {
+      const controlMode =
+        this.experiment?.experiment?.control_mode?.toLowerCase();
+
+      return controlMode === "displacement controlled"
+        ? "Maximum Displacement [mm]"
+        : "Maximum Stress [MPa]";
+    },
+    computedXAxisLabel() {
+      switch (this.xAxisMode) {
+        case "log":
+          return "log₁₀(Number of cycles)";
+        case "normalized":
+          return "Normalized cycles";
+        default:
+          return "Number of cycles";
+      }
+    },
+    xAxisChartType() {
+      return this.xAxisMode === "log" ? "log" : "value";
+    },
   },
   watch: {
     "experiment.tests": {
@@ -135,9 +241,15 @@ export default {
       },
       immediate: true,
     },
+    chartKey() {
+      this.attachChartClickHandler();
+    },
   },
   created() {
     this.fetchOneExperimentWithTests();
+  },
+  mounted() {
+    this.attachChartClickHandler();
   },
   methods: {
     rowClick(_item, row) {
@@ -175,6 +287,78 @@ export default {
         this.fetchOneExperimentWithTests();
       }
     },
+    onChartClick(event) {
+      const ec = event?.target?.__ecComponent__;
+      if (!ec) return;
+
+      const pointInPixel = [event.offsetX, event.offsetY];
+      const pointInGrid = ec.convertFromPixel({ seriesIndex: 0 }, pointInPixel);
+      const [xVal, yVal] = pointInGrid;
+
+      const controlMode =
+        this.experiment?.experiment?.control_mode?.toLowerCase();
+      const isDisplacement = controlMode === "displacement controlled";
+
+      const clickedTest = this.numberedTests.find((t) => {
+        const y = isDisplacement ? t.maximum_displacement : t.maximum_stress;
+        return (
+          Math.abs(t.number_of_cycles - xVal) < 1e-1 &&
+          Math.abs(y - yVal) < 1e-1
+        );
+      });
+
+      if (!clickedTest) return;
+
+      const index = this.testsSelected.findIndex(
+        (t) => t.id === clickedTest.id
+      );
+      if (index >= 0) {
+        this.testsSelected.splice(index, 1); // Deseleziona
+      } else {
+        this.testsSelected.push(clickedTest); // Seleziona
+      }
+    },
+    attachChartClickHandler() {
+      this.$nextTick(() => {
+        const chartInstance =
+          this.$refs.chartComponent?.$refs?.chartContainer?.$children?.[0]
+            ?.chart;
+
+        if (!chartInstance) return;
+
+        chartInstance.off("click"); // per evitare duplicazioni
+        chartInstance.on("click", (params) => {
+          if (!params?.data || !Array.isArray(params.data.value)) return;
+
+          const [xVal, yVal] = params.data.value;
+
+          const controlMode =
+            this.experiment?.experiment?.control_mode?.toLowerCase();
+          const isDisplacement = controlMode === "displacement controlled";
+
+          const clickedTest = this.numberedTests.find((t) => {
+            const y = isDisplacement
+              ? t.maximum_displacement
+              : t.maximum_stress;
+            return (
+              Math.abs(t.number_of_cycles - xVal) < 1e-1 &&
+              Math.abs(y - yVal) < 1e-1
+            );
+          });
+
+          if (!clickedTest) return;
+
+          const index = this.testsSelected.findIndex(
+            (t) => t.id === clickedTest.id
+          );
+          if (index >= 0) {
+            this.testsSelected.splice(index, 1); // Deseleziona
+          } else {
+            this.testsSelected.push(clickedTest); // Seleziona
+          }
+        });
+      });
+    },
   },
 };
 </script>
@@ -183,5 +367,11 @@ export default {
 :deep(.v-data-table__selected) {
   background-color: #bbdefb !important;
   /* light blue */
+}
+
+.chart-wrapper {
+  max-height: 250px;
+  margin-bottom: 16px;
+  overflow: hidden;
 }
 </style>

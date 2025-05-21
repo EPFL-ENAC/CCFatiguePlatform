@@ -56,6 +56,7 @@ export default {
       type: Function,
       default: formatNumber3,
     },
+    showLegend: { type: Boolean, default: true },
   },
   data() {
     return {
@@ -78,12 +79,16 @@ export default {
             fontSize: this.autoFontSize,
           },
         },
-        legend: {
-          type: "scroll",
-          textStyle: {
-            fontSize: this.autoFontSize,
-          },
-        },
+        legend: this.showLegend
+          ? {
+              type: "scroll",
+              textStyle: {
+                fontSize: this.autoFontSize,
+              },
+              top: "top",
+              left: "center",
+            }
+          : { show: false },
         grid: {
           left: 50,
           top: 40,
