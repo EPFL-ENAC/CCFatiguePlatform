@@ -3,7 +3,7 @@
     <v-card elevation="0">
       <experiment-specifications :experiment="experiment.experiment" />
       <v-row justify="center" class="mt-4 mb-5">
-        <v-col cols="5">
+        <v-col v-if="experiment?.experiment?.experiment_type === 'FA'" cols="5">
           <v-card>
             <v-card-title>
               <v-row align="center" class="w-100">
