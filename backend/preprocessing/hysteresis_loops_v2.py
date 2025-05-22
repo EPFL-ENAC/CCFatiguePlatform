@@ -2,8 +2,20 @@ import os
 import re
 import numpy as np
 import pandas as pd
+import json
 
-PREPROCESSED_FOLDER = "../Data/preprocessed/TST_Mannino_2023-10_FA"
+BASE_FOLDER = "../../Data/preprocessed"
+
+def is_fracture(folder_path):
+    experiment_fp = os.path.join(folder_path, "experiment.json")
+    if not os.path.exists(experiment_fp):
+        return True  # skip if the file is missing
+    with open(experiment_fp, "r") as f:
+        data = json.load(f)
+    fa_type = data.get("general", {}).get("fa experiment type")
+    if fa_type is None:
+        return True  # skip if the field is missing
+    return fa_type.lower() == "fracture"
 
 def poly_area(x, y):
     return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
@@ -76,22 +88,7 @@ def process_hysteresis(df, test_meta):
         params = fit_ellipse_matlab(strain, stress, num_points=50)
         fit_x = params["fit_x"]
         fit_y = params["fit_y"]
-        '''
-        smax = fit_y.max()
-        smin = fit_y.min()
-        e_at_smax = fit_x[np.argmax(fit_y)]
-        e_at_smin = fit_x[np.argmin(fit_y)]
 
-        emax = fit_x.max()
-        emin = fit_x.min()
-        s_at_emax = fit_y[np.argmax(fit_x)]
-        s_at_emin = fit_y[np.argmin(fit_x)]
-
-        stiff1 = (smax - smin) / (e_at_smax - e_at_smin) if (e_at_smax - e_at_smin) != 0 else np.nan
-        stiff2 = (s_at_emax - s_at_emin) / (emax - emin) if (emax - emin) != 0 else np.nan
-        stiffness = 0.5 * (stiff1 + stiff2)
-        '''
-        # New stiffness calculation with linear fit of all the 50 points
         if len(fit_x) >= 2:
             coeffs = np.polyfit(fit_x, fit_y, 1)
             stiffness = coeffs[0]
@@ -109,7 +106,7 @@ def process_hysteresis(df, test_meta):
 
     return pd.DataFrame(hys_records)
 
-def main():
+def run_on_folder(PREPROCESSED_FOLDER):
     tests_fp = os.path.join(PREPROCESSED_FOLDER, "tests.csv")
     if not os.path.exists(tests_fp):
         print("tests.csv non trovato.")
@@ -127,6 +124,7 @@ def main():
         test_meta = test_meta_row.to_dict(orient="records")[0]
 
         try:
+            print(f"   📄 Reading: {fname}")
             df = pd.read_csv(os.path.join(PREPROCESSED_FOLDER, fname), low_memory=False)
             hyst_df = process_hysteresis(df, test_meta)
             if not hyst_df.empty:
@@ -134,6 +132,17 @@ def main():
                 hyst_df.to_csv(os.path.join(PREPROCESSED_FOLDER, hys_fp), index=False)
         except Exception as e:
             print(f"Error with {fname}: {e}")
+
+def main():
+    for folder_name in os.listdir(BASE_FOLDER):
+        PREPROCESSED_FOLDER = os.path.join(BASE_FOLDER, folder_name)
+        if not os.path.isdir(PREPROCESSED_FOLDER):
+            continue
+        if is_fracture(PREPROCESSED_FOLDER):
+            print(f"❌ Skipping fracture experiment: {folder_name}")
+            continue
+        print(f"✅ Processing: {folder_name}")
+        run_on_folder(PREPROCESSED_FOLDER)
 
 if __name__ == "__main__":
     main()
