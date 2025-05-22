@@ -28,7 +28,7 @@
 import argparse
 import sys
 
-from tst_data_lib_v2 import (
+from tst_data_lib import (
     EXPERIMENTS_FOLDER,
     RAW_EXPERIMENT_FP_FOLDERS,
     Experiment,
