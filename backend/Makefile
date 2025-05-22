@@ -7,11 +7,8 @@ lint:
 alembic-upgrade:
 	DOTENV_PATH_FOR_DYNACONF="../secrets/.env" poetry run alembic upgrade head
 
-#init-database:
-#	DOTENV_PATH_FOR_DYNACONF="../secrets/.env" poetry run python init_db.py
-
 init-database:
-	DOTENV_PATH_FOR_DYNACONF="../secrets/.env" poetry run python init_db_v2.py
+	DOTENV_PATH_FOR_DYNACONF="../secrets/.env" poetry run python init_db.py
 
 api:
 	DOTENV_PATH_FOR_DYNACONF="../secrets/.env" poetry run python api.py ../openapi.json
