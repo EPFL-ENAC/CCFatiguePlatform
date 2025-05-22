@@ -1,20 +1,18 @@
 <template>
   <v-container>
+    <h1>About</h1>
     <v-card flat>
-      <v-card-title>About</v-card-title>
-      <v-card-text>
-        <p class="text-justify">
-          CCFatiguePlatform is an initiative from GR-MeC at EPFL that aims to
-          develop a open-source web application to harmonize, facilitate storage
-          and analysis of composite materials testing datasets.
-        </p>
-        <p class="text-justify">
-          The web app is under active development and at prototype stage. Please
-          report any bugs as Github Issues in the code repository.
-        </p>
-      </v-card-text>
+      <v-card-title>Disclaimer</v-card-title>
+      <p class="text-body-1 text-justify">
+        CCFatiguePlatform is an initiative from GR-MeC at EPFL that aims to
+        develop a open-source web application to harmonize, facilitate storage
+        and analysis of composite materials testing datasets.
+      </p>
+      <p class="text-body-1 text-justify">
+        The web app is under active development and at prototype stage. Please
+        report any bugs as Github Issues in the code repository.
+      </p>
     </v-card>
-
     <v-card flat>
       <v-card-title>Contributors</v-card-title>
       <v-card-text>
