@@ -245,8 +245,8 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
             if diffs:
                 warning_triggered = True
                 print(
-                    f"[Filtro spike] Provino '{specimen_name}' – colonna '{field}' modificata in {len(diffs)} cicli "
-                    f"(posizioni: {diffs})"
+                    f"[Spike Filter] Specimen '{specimen_name}' – column '{field}' modified in {len(diffs)} cycles "
+                    f"(number of cycles: {diffs})"
                 )
 
 

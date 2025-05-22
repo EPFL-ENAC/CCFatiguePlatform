@@ -69,48 +69,6 @@
               <v-card-title>
                 <v-row align="center" class="w-100">
                   <v-col class="d-flex align-center" cols="auto">
-                    <span>Hysteresis loop area evolution</span>
-                    <info-tooltip
-                      >The hysteresis area, i.e., the area enclosed by the
-                      hysteresis loop, evolution throughout specimens' fatigue
-                      lives</info-tooltip
-                    >
-                  </v-col>
-                  <v-spacer />
-                  <v-col cols="auto" class="d-flex">
-                    <v-select
-                      v-model="xAxisMode"
-                      :items="[
-                        { text: 'Cycle count', value: 'normal' },
-                        { text: 'Log(Cycle count)', value: 'log' },
-                        { text: 'Normalized cycle count', value: 'normalized' },
-                      ]"
-                      dense
-                      hide-details
-                      label="X-Axis scale"
-                      style="max-width: 220px"
-                    />
-                  </v-col>
-                </v-row>
-              </v-card-title>
-              <v-card-text>
-                <simple-chart
-                  :series="hysteresisAreaSeries"
-                  :aspect-ratio="2"
-                  :x-axis-name="computedXAxisLabel"
-                  :x-axis-type="xAxisChartType"
-                  y-axis-name="Hysteresis area [MPa]"
-                  :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
-                  :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
-                />
-              </v-card-text>
-            </v-card>
-          </v-col>
-          <v-col cols="6">
-            <v-card :loading="loading">
-              <v-card-title>
-                <v-row align="center" class="w-100">
-                  <v-col class="d-flex align-center" cols="auto">
                     <span>Creep evolution</span>
                     <info-tooltip>
                       Creep is defined as the average deformation during each
@@ -142,6 +100,48 @@
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
                   y-axis-name="Creep [-]"
+                  :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
+                  :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
+                />
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col cols="6">
+            <v-card :loading="loading">
+              <v-card-title>
+                <v-row align="center" class="w-100">
+                  <v-col class="d-flex align-center" cols="auto">
+                    <span>Hysteresis area evolution</span>
+                    <info-tooltip
+                      >The hysteresis area, i.e., the area enclosed by the
+                      hysteresis loop, evolution throughout specimens' fatigue
+                      lives</info-tooltip
+                    >
+                  </v-col>
+                  <v-spacer />
+                  <v-col cols="auto" class="d-flex">
+                    <v-select
+                      v-model="xAxisMode"
+                      :items="[
+                        { text: 'Cycle count', value: 'normal' },
+                        { text: 'Log(Cycle count)', value: 'log' },
+                        { text: 'Normalized cycle count', value: 'normalized' },
+                      ]"
+                      dense
+                      hide-details
+                      label="X-Axis scale"
+                      style="max-width: 220px"
+                    />
+                  </v-col>
+                </v-row>
+              </v-card-title>
+              <v-card-text>
+                <simple-chart
+                  :series="hysteresisAreaSeries"
+                  :aspect-ratio="2"
+                  :x-axis-name="computedXAxisLabel"
+                  :x-axis-type="xAxisChartType"
+                  y-axis-name="Hysteresis area [MPa]"
                   :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
                   :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
                 />
