@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends
 from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ccfatigue.models.api_v2 import TestModel
+from ccfatigue.models.api import TestModel
 from ccfatigue.models.database import Test
 from ccfatigue.services.database import get_session
 from ccfatigue.utils.fastapi import get_page

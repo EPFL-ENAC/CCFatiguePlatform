@@ -19,7 +19,7 @@ from sqlalchemy.future import select
 from ccfatigue.experiment.fatigue import FatigueTest, fatigue_test
 from ccfatigue.experiment.quasi_static import QuasiStaticTest, quasi_static_test
 from ccfatigue.model import Experiment_Data_Preprocessed
-from ccfatigue.models.api_v2 import ExperimentFieldNames, ExperimentModel
+from ccfatigue.models.api import ExperimentFieldNames, ExperimentModel
 from ccfatigue.models.database import Experiment
 from ccfatigue.services.database import get_session
 from ccfatigue.utils.routers import get_where_clauses

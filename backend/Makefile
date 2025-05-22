@@ -13,11 +13,8 @@ alembic-upgrade:
 init-database:
 	DOTENV_PATH_FOR_DYNACONF="../secrets/.env" poetry run python init_db_v2.py
 
-#api:
-#	DOTENV_PATH_FOR_DYNACONF="../secrets/.env" poetry run python api.py ../openapi.json
-
 api:
-	DOTENV_PATH_FOR_DYNACONF="../secrets/.env" poetry run python api_v2.py ../openapi.json
+	DOTENV_PATH_FOR_DYNACONF="../secrets/.env" poetry run python api.py ../openapi.json
 
 test:
 	poetry run pytest
