@@ -1,153 +1,148 @@
-#!/usr/bin/env python
-
-"""
-original author scottausor, revised by sbancal
-"""
-
 import os
 import re
-
 import numpy as np
 import pandas as pd
-from scipy import stats
+import json
 
-from preprocessing.tst_data_lib import RAW_EXPERIMENT_FP_FOLDERS, Experiment, Logger
+BASE_FOLDER = "../../Data/preprocessed"
 
+def is_fracture(folder_path):
+    experiment_fp = os.path.join(folder_path, "experiment.json")
+    if not os.path.exists(experiment_fp):
+        return True  # skip if the file is missing
+    with open(experiment_fp, "r") as f:
+        data = json.load(f)
+    fa_type = data.get("general", {}).get("fa experiment type")
+    if fa_type is None:
+        return True  # skip if the field is missing
+    return fa_type.lower() == "fracture"
+
+def poly_area(x, y):
+    return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
+
+def fit_ellipse_matlab(x: np.ndarray,
+                       y: np.ndarray,
+                       num_points: int = 50):
+    mean_x = np.round(x.mean(), 6)
+    mean_y = np.round(y.mean(), 4)
+
+    x0, y0 = x - mean_x, y - mean_y
+    X      = np.column_stack((x0**2, x0 * y0, y0**2, x0, y0))
+    a_row  = X.sum(axis=0) @ np.linalg.inv(X.T @ X)
+    A, B, C, D, E = a_row
+
+    phi = 0.5 * np.arctan(B / (C - A)) if abs(B) > 1e-19 else 0.0
+    cos_phi, sin_phi = np.cos(phi), np.sin(phi)
+    Ar = A * cos_phi**2 - B * cos_phi * sin_phi + C * sin_phi**2
+    Cr = A * sin_phi**2 + B * cos_phi * sin_phi + C * cos_phi**2
+    Dr = D * cos_phi - E * sin_phi
+    Er = D * sin_phi + E * cos_phi
+
+    X0r = -Dr / (2 * Ar)
+    Y0r = -Er / (2 * Cr)
+    F = 1 + Dr**2 / (4 * Ar) + Er**2 / (4 * Cr)
+    a_len, b_len = np.sqrt(abs(F / Ar)), np.sqrt(abs(F / Cr))
+
+    R = np.array([[cos_phi,  sin_phi],
+                  [-sin_phi, cos_phi]])
+    center = R @ np.array([X0r, Y0r]) + np.array([mean_x, mean_y])
+    X0_in, Y0_in = center
+
+    theta = np.linspace(0, 2 * np.pi, num_points)
+    ex    = a_len * np.cos(theta)
+    ey    = b_len * np.sin(theta)
+    rot   = (R @ np.vstack((ex, ey))).T + center
+
+    return {
+        "fit_x": rot[:, 0],
+        "fit_y": rot[:, 1],
+        "X0_in": X0_in,
+    }
 
 def process_hysteresis(df, test_meta):
+    cycle_field = "N_cycles"
+    load_field = "Load"
+    strain_field = "exx"
 
-    """
-    Arguments:
-        df: dataframe with raw data in standard format
-
-    Returns: {
-        "hyst_df": hyst_df,
-        "stress_at_failure": stress_at_failure,
-        "strain_at_failure": strain_at_failure,
-        "n_fail": n_fail,
-    }
-    """
-
-    def poly_area(x, y):
-        """
-        Definition of polyarea function
-        Arguments:
-            x: values measured along the x axis (strain)
-            y: values measured along the y axis (stress)
-
-        Returns:
-            Single value for the area of the loop
-
-        Description:
-            The PolyArea function computes the area of each hysteresis loops
-            using a shoelace algorithm
-        """
-        return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
-
-    hyst_df = pd.DataFrame(
-        columns=["n_cycles", "hysteresis_area", "stiffness", "creep"]
-    )
-
-    # NB CYCLES
-    # Extract number of cycles without repeating values in other table,
-    # and store number of measurements per cycle
-    if "Machine_N_cycles" in df.columns and df.count().Machine_N_cycles > 0:
-        n_cycles = np.sort(df["Machine_N_cycles"].unique())
-        cycle_field = "Machine_N_cycles"
-        load_field = "Machine_Load"
-        displacement_field = "Machine_Displacement"
-    else:
-        n_cycles = np.sort(df["MD_N_cycles--1"].unique())
-        cycle_field = "MD_N_cycles--1"
-        load_field = "MD_Load--1"
-        displacement_field = "MD_Displacement--1"
-
-    # calculate Stress and Strain
     df = df.assign(
-        stress=(df[load_field] * 1000) / (test_meta["width"] * test_meta["thickness"]),
-        strain=df[displacement_field] / test_meta["length"],
+        stress=df[load_field] / (test_meta["width"] * test_meta["thickness"]),
+        strain=df[strain_field],
     )
 
-    hyst_df.n_cycles = n_cycles
-    n_fail = np.max(n_cycles)
+    n_cycles = np.sort(df[cycle_field].unique())
+    hys_records = []
+    max_load_nominal = test_meta.get("maximum load")
 
-    last_cycle = df[cycle_field].unique()[-1]
+    for n in n_cycles:
+        cycle_df = df[df[cycle_field] == n]
+        load_max = cycle_df[load_field].max()
+        if not (0.9 * max_load_nominal <= load_max <= 1.1 * max_load_nominal):
+            continue
 
-    hysteresis_area = np.full(n_cycles.size, np.nan)
-    stiffness = np.full(n_cycles.size, np.nan)
-    creep = np.full(n_cycles.size, np.nan)
-    stress_at_failure = np.max(df[df[cycle_field] == last_cycle].stress)
-    strain_at_failure = np.max(df[df[cycle_field] == last_cycle].strain)
-    for i in range(n_cycles.size):
-        cycle_mask = df[cycle_field] == n_cycles[i]
-        cycle_stress = df[cycle_mask].stress
-        cycle_strain = df[cycle_mask].strain
-        if i < (n_cycles.size - 1):
-            hysteresis_area[i] = poly_area(cycle_stress, cycle_strain) * (
-                n_cycles[i + 1] - n_cycles[i]
-            )
+        stress = cycle_df["stress"].values
+        strain = cycle_df["strain"].values
+
+        if stress.size < 2:
+            continue
+
+        params = fit_ellipse_matlab(strain, stress, num_points=50)
+        fit_x = params["fit_x"]
+        fit_y = params["fit_y"]
+
+        if len(fit_x) >= 2:
+            coeffs = np.polyfit(fit_x, fit_y, 1)
+            stiffness = coeffs[0]
         else:
-            hysteresis_area[i] = poly_area(cycle_stress, cycle_strain) * (
-                n_fail - n_cycles[i]
-            )
+            stiffness = np.nan
+        hyst_area = poly_area(fit_x, fit_y)
+        mean_strain = round(params["X0_in"], 6)
 
-        # Stiffness & Creep
-        if i > 0:
-            slope, _, _, _, _ = stats.linregress(cycle_strain, cycle_stress)
-            stiffness[i] = slope
-            creep[i] = (np.max(cycle_strain) + np.min(cycle_strain)) / 2
+        hys_records.append({
+            "n_cycles": n,
+            "hysteresis_area": round(hyst_area, 6),
+            "stiffness": round(stiffness, 6),
+            "creep": round(mean_strain, 6)
+        })
 
-    hyst_df.hysteresis_area = hysteresis_area
-    hyst_df.stiffness = stiffness
-    hyst_df.creep = creep
-    answer = {
-        "hyst_df": hyst_df,
-        "stress_at_failure": stress_at_failure,
-        "strain_at_failure": strain_at_failure,
-        "n_fail": n_fail,
-    }
-    return answer
+    return pd.DataFrame(hys_records)
 
+def run_on_folder(PREPROCESSED_FOLDER):
+    tests_fp = os.path.join(PREPROCESSED_FOLDER, "tests.csv")
+    if not os.path.exists(tests_fp):
+        print("tests.csv not found")
+        return
+
+    tests_df = pd.read_csv(tests_fp)
+    for fname in os.listdir(PREPROCESSED_FOLDER):
+        if not fname.startswith("measure") or not fname.endswith(".csv"):
+            continue
+
+        file_number = int(re.search(r"(\d+)\.csv", fname).group(1))
+        test_meta_row = tests_df[tests_df["sequential number"] == file_number]
+        if test_meta_row.empty:
+            continue
+        test_meta = test_meta_row.to_dict(orient="records")[0]
+
+        try:
+            print(f"   📄 Reading: {fname}")
+            df = pd.read_csv(os.path.join(PREPROCESSED_FOLDER, fname), low_memory=False)
+            hyst_df = process_hysteresis(df, test_meta)
+            if not hyst_df.empty:
+                hys_fp = "HYS_" + fname
+                hyst_df.to_csv(os.path.join(PREPROCESSED_FOLDER, hys_fp), index=False)
+        except Exception as e:
+            print(f"Error with {fname}: {e}")
 
 def main():
-    with Logger(None) as logger:
-        for experiment_raw_fp_folder in RAW_EXPERIMENT_FP_FOLDERS:
-            if not experiment_raw_fp_folder.endswith("_FA"):
-                continue
-            experiment_metadata = Experiment(experiment_raw_fp_folder, logger)
-            logger.write(f"parsing {experiment_raw_fp_folder}")
-            for measures in experiment_metadata.exp_meta_meta["measures"]:
-                file_number = int(re.search(r"(\d+).csv", measures["raw_fp"]).group(1))
-                test_meta = experiment_metadata.tests[
-                    experiment_metadata.tests["specimen number"] == file_number
-                ].to_dict(orient="list")
-                for k in test_meta:
-                    # only one value, so take it directly
-                    test_meta[k] = test_meta[k][0]
-                try:
-                    logger.info(
-                        f"Read measures {os.path.basename(measures['preprocessed_fp'])}"
-                    )
-                    with logger.indent:
-                        df = pd.read_csv(measures["preprocessed_fp"], low_memory=False)
-
-                    hyst_df = process_hysteresis(df, test_meta)["hyst_df"]
-                    # Drop last line
-                    # The value that is calculated is invalid
-                    hyst_df = hyst_df[:-1]
-                    hys_fp = "HYS_" + os.path.basename(measures["preprocessed_fp"])
-                    hyst_df.round(
-                        {"hysteresis_area": 5, "stiffness": 10, "creep": 10}
-                    ).to_csv(
-                        os.path.join(
-                            experiment_metadata.exp_meta_meta["preprocessed_folder"],
-                            hys_fp,
-                        ),
-                        index=False,
-                    )
-                except (ValueError, AttributeError):
-                    pass  # missing data to produce HYS -> skip for now
-
+    for folder_name in os.listdir(BASE_FOLDER):
+        PREPROCESSED_FOLDER = os.path.join(BASE_FOLDER, folder_name)
+        if not os.path.isdir(PREPROCESSED_FOLDER):
+            continue
+        if is_fracture(PREPROCESSED_FOLDER):
+            print(f"❌ Skipping fracture experiment: {folder_name}")
+            continue
+        print(f"✅ Processing: {folder_name}")
+        run_on_folder(PREPROCESSED_FOLDER)
 
 if __name__ == "__main__":
     main()

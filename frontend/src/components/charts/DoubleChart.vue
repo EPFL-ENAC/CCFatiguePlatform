@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { formatNumber } from "@/utils/formatters";
+import { formatNumber3 } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
 import { LineChart, ScatterChart } from "echarts/charts";
 import {
@@ -47,6 +47,10 @@ export default {
     y2AxisName: { type: String, default: "" },
     xAxisType: { type: String, default: "" },
     color: { type: Array, default: () => colorPalette },
+    axisLabelFormatter: {
+      type: Function,
+      default: formatNumber3,
+    },
   },
   data() {
     return {
@@ -79,7 +83,7 @@ export default {
           min: "dataMin",
           max: "dataMax",
           axisLabel: {
-            formatter: formatNumber,
+            formatter: this.axisLabelFormatter,
             fontSize: 10,
           },
         },
@@ -91,7 +95,7 @@ export default {
             min: "dataMin",
             max: "dataMax",
             axisLabel: {
-              formatter: formatNumber,
+              formatter: this.axisLabelFormatter,
               fontSize: 10,
             },
           },
@@ -102,7 +106,7 @@ export default {
             min: "dataMin",
             max: "dataMax",
             axisLabel: {
-              formatter: formatNumber,
+              formatter: this.axisLabelFormatter,
               fontSize: 10,
             },
           },
@@ -110,7 +114,7 @@ export default {
         tooltip: {
           trigger: "axis",
           confine: true,
-          valueFormatter: formatNumber,
+          valueFormatter: this.axisLabelFormatter,
         },
         series: this.series.map((serie) => merge(serie, { showSymbol: false })),
         color: this.color,

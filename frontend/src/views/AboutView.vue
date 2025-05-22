@@ -1,20 +1,18 @@
 <template>
   <v-container>
+    <h1>About</h1>
     <v-card flat>
-      <v-card-title>About</v-card-title>
-      <v-card-text>
-        <p class="text-justify">
-          CCFatiguePlatform is an initiative from GR-MeC at EPFL that aims to
-          develop a open-source web application to harmonize, facilitate storage
-          and analysis of composite materials testing datasets.
-        </p>
-        <p class="text-justify">
-          The web app is under active development and at prototype stage. Please
-          report any bugs as Github Issues in the code repository.
-        </p>
-      </v-card-text>
+      <v-card-title>Disclaimer</v-card-title>
+      <p class="text-body-1 text-justify">
+        CCFatiguePlatform is an initiative from GR-MeC at EPFL that aims to
+        develop a open-source web application to harmonize, facilitate storage
+        and analysis of composite materials testing datasets.
+      </p>
+      <p class="text-body-1 text-justify">
+        The web app is under active development and at prototype stage. Please
+        report any bugs as Github Issues in the code repository.
+      </p>
     </v-card>
-
     <v-card flat>
       <v-card-title>Contributors</v-card-title>
       <v-card-text>
@@ -33,21 +31,27 @@
                 <a :href="contributor.url" target="_blank">
                   {{ contributor.name }}
                 </a>
+                <!--
                 -
                 {{ contributor.title }}
+                -->
               </li>
             </ul>
           </v-col>
         </v-row>
       </v-card-text>
     </v-card>
-
-    <p class="py-5">
+    <div class="logo-row py-5">
       <img
         src="/img/epfl-logo.svg"
         alt="Logo EPFL, École polytechnique fédérale de Lausanne"
       />
-    </p>
+      <img
+        src="/img/GR_MecLogo.png"
+        alt="Logo GR-Mec"
+        class="ml-6 grmec-logo"
+      />
+    </div>
   </v-container>
 </template>
 
@@ -57,39 +61,19 @@ export default {
   data() {
     return {
       units: [
-        { name: "CCLAB", url: "https://cclab.epfl.ch" },
+        { name: "GR-MeC", url: "https://gr-mec.epfl.ch" },
         { name: "ENAC-IT4R", url: "https://enacit4r.epfl.ch/" },
       ],
       contributors: [
         {
           name: "Tassos Vassilopoulos",
           url: "https://people.epfl.ch/anastasios.vassilopoulos",
-          unit: "CCLAB",
-          title: "professor",
+          unit: "GR-MeC",
         },
         {
-          name: "Congzhe Wang",
-          url: "https://people.epfl.ch/congzhe.wang",
-          unit: "CCLAB",
-          title: "PhD",
-        },
-        {
-          name: "Dharun Vadugappatty Srinivasan",
-          url: "https://people.epfl.ch/dharun.srinivasan",
-          unit: "CCLAB",
-          title: "PhD",
-        },
-        {
-          name: "Seyed Shayan Khalooei Tafti",
-          url: "https://people.epfl.ch/shayan.khalooei",
-          unit: "CCLAB",
-          title: "PhD",
-        },
-        {
-          name: "Scott Salmon",
-          url: "https://people.epfl.ch/scott.matthewssalmon",
-          unit: "CCLAB",
-          title: "master student",
+          name: "Filippo Mannino",
+          url: "https://people.epfl.ch/filippo.mannino",
+          unit: "GR-MeC",
         },
         {
           name: "Charlie Weil",
@@ -140,8 +124,23 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 ul {
   list-style-type: none;
+}
+
+.logo-row {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.logo-row img {
+  max-height: 50px;
+  object-fit: contain;
+}
+
+.grmec-logo {
+  max-height: 70px !important;
 }
 </style>

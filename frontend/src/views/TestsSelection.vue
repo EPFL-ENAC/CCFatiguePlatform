@@ -2,16 +2,55 @@
   <v-container>
     <v-card elevation="0">
       <experiment-specifications :experiment="experiment.experiment" />
-
+      <v-row justify="center" class="mt-4 mb-5">
+        <v-col v-if="experiment?.experiment?.experiment_type === 'FA'" cols="5">
+          <v-card>
+            <v-card-title>
+              <v-row align="center" class="w-100">
+                <v-col cols="auto" class="d-flex align-center">
+                  <span class="text-h6">Test Overview</span>
+                </v-col>
+                <v-spacer />
+                <v-col cols="auto">
+                  <v-select
+                    v-model="xAxisMode"
+                    :items="[
+                      { text: 'Cycle count', value: 'normal' },
+                      { text: 'Log(Cycle count)', value: 'log' },
+                    ]"
+                    dense
+                    hide-details
+                    label="X-Axis scale"
+                    style="max-width: 220px"
+                  />
+                </v-col>
+              </v-row>
+            </v-card-title>
+            <v-card-text>
+              <simple-chart
+                ref="chartComponent"
+                :key="chartKey"
+                :show-legend="false"
+                :series="chartSeries"
+                :aspect-ratio="2"
+                :x-axis-name="computedXAxisLabel"
+                :x-axis-type="xAxisChartType"
+                :y-axis-name="yAxisLabel"
+              />
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
       <v-data-table
         v-model="testsSelected"
         :headers="headers"
-        :items="experiment.tests"
-        :options.sync="options"
+        :items="numberedTests"
+        :options="options"
         :server-items-length="experiment.pagination.total"
         :loading="experiment.loadingTests"
         :footer-props="{ 'items-per-page-options': [5, 10, 15, 20, 40] }"
         item-key="id"
+        @update:options="onOptionsChange"
         @click:row="rowClick"
       >
         <template #no-data>No test for this experiment</template>
@@ -34,12 +73,15 @@
 </template>
 
 <script>
+import SimpleChart from "@/components/charts/SimpleChart.vue";
 import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
 import { mapState } from "vuex";
+
 export default {
   name: "TestsSelection",
   components: {
     ExperimentSpecifications,
+    SimpleChart,
   },
   props: {
     experimentId: { type: Number, required: true },
@@ -51,35 +93,154 @@ export default {
         page: 1,
         itemsPerPage: 10,
       },
-
-      headers: [
-        { text: "Specimen Number", value: "specimen_number" },
-        { text: "Specimen Name", value: "specimen_name" },
-        { text: "Stress Ratio", value: "stress_ratio" },
-        { text: "Maximum Stress", value: "maximum_stress" },
-        { text: "Loading Rate", value: "loading_rate" },
-        { text: "Run Out", value: "run_out" },
-        { text: "Length", value: "length" },
-        { text: "Width", value: "width" },
-        { text: "Thickness", value: "thickness" },
-      ],
+      xAxisMode: "normal",
     };
   },
   computed: {
     ...mapState("experiments", {
       experiment: "oneExperiment",
     }),
+    numberedTests() {
+      const mapped = this.experiment.tests.map((test) => {
+        const hasLoadData = test.maximum_load && test.width && test.thickness;
+        const calculatedStress = hasLoadData
+          ? test.maximum_load / (test.width * test.thickness)
+          : null;
+
+        return {
+          ...test,
+          specimen_number: test.sequential_number,
+          maximum_stress:
+            calculatedStress !== null
+              ? parseFloat(calculatedStress.toFixed(2))
+              : null,
+          /* maximum displacement with 2 decimal points */
+          maximum_displacement: test.maximum_load
+            ? parseFloat(test.maximum_load.toFixed(2))
+            : null,
+        };
+      });
+
+      return mapped;
+    },
+    headers() {
+      const baseHeaders = [
+        { text: "Specimen Number", value: "specimen_number" },
+        { text: "Specimen Name", value: "specimen_name" },
+        { text: "Length", value: "length" },
+        { text: "Width", value: "width" },
+        { text: "Thickness", value: "thickness" },
+      ];
+
+      const type = this.experiment?.experiment?.experiment_type;
+
+      if (type !== "QS") {
+        const controlMode =
+          this.experiment?.experiment?.control_mode?.toLowerCase();
+
+        if (controlMode === "displacement controlled") {
+          baseHeaders.splice(2, 0, {
+            text: "Maximum Displacement [mm]",
+            value: "maximum_displacement",
+          });
+        } else {
+          baseHeaders.splice(2, 0, {
+            text: "Maximum Stress [MPa]",
+            value: "maximum_stress",
+          });
+        }
+
+        baseHeaders.splice(3, 0, {
+          text: "Run Out",
+          value: "run_out",
+        });
+
+        baseHeaders.splice(3, 0, {
+          text: "Cycles",
+          value: "number_of_cycles",
+        });
+      }
+      return baseHeaders;
+    },
+    chartSeries() {
+      const controlMode =
+        this.experiment?.experiment?.control_mode?.toLowerCase();
+      const isDisplacement = controlMode === "displacement controlled";
+
+      return [
+        {
+          type: "scatter",
+          name: isDisplacement
+            ? "Maximum Displacement [mm]"
+            : "Maximum Stress [MPa]",
+          data: this.numberedTests
+            .filter((test) => {
+              const y = isDisplacement
+                ? test.maximum_displacement
+                : test.maximum_stress;
+              return (
+                typeof test.number_of_cycles === "number" &&
+                typeof y === "number"
+              );
+            })
+            .map((test) => {
+              const selected = this.testsSelected.some((t) => t.id === test.id);
+              return {
+                value: [
+                  test.number_of_cycles,
+                  isDisplacement
+                    ? test.maximum_displacement
+                    : test.maximum_stress,
+                ],
+                id: test.id,
+                itemStyle: {
+                  color: selected ? "#1976d2" : "#90caf9",
+                },
+                symbolSize: selected ? 14 : 8,
+              };
+            }),
+        },
+      ];
+    },
+    chartKey() {
+      // Force the chart to re-render when the selection changes
+      return this.testsSelected.map((t) => t.id).join("-");
+    },
+    yAxisLabel() {
+      const controlMode =
+        this.experiment?.experiment?.control_mode?.toLowerCase();
+
+      return controlMode === "displacement controlled"
+        ? "Maximum Displacement [mm]"
+        : "Maximum Stress [MPa]";
+    },
+    computedXAxisLabel() {
+      switch (this.xAxisMode) {
+        case "log":
+          return "log₁₀(Number of cycles)";
+        case "normalized":
+          return "Normalized cycles";
+        default:
+          return "Number of cycles";
+      }
+    },
+    xAxisChartType() {
+      return this.xAxisMode === "log" ? "log" : "value";
+    },
   },
   watch: {
-    options: {
-      handler() {
-        this.fetchOneExperimentWithTests();
-      },
-      deep: true,
+    "experiment.tests": {
+      immediate: true,
+    },
+    chartKey() {
+      this.attachChartClickHandler();
     },
   },
   created() {
     this.fetchOneExperimentWithTests();
+  },
+  mounted() {
+    this.attachChartClickHandler();
   },
   methods: {
     rowClick(_item, row) {
@@ -106,8 +267,102 @@ export default {
         },
       });
     },
+    onOptionsChange(newOptions) {
+      const optionsChanged =
+        newOptions.page !== this.options.page ||
+        newOptions.itemsPerPage !== this.options.itemsPerPage;
+
+      this.options = newOptions;
+
+      if (optionsChanged) {
+        this.fetchOneExperimentWithTests();
+      }
+    },
+    onChartClick(event) {
+      const ec = event?.target?.__ecComponent__;
+      if (!ec) return;
+
+      const pointInPixel = [event.offsetX, event.offsetY];
+      const pointInGrid = ec.convertFromPixel({ seriesIndex: 0 }, pointInPixel);
+      const [xVal, yVal] = pointInGrid;
+
+      const controlMode =
+        this.experiment?.experiment?.control_mode?.toLowerCase();
+      const isDisplacement = controlMode === "displacement controlled";
+
+      const clickedTest = this.numberedTests.find((t) => {
+        const y = isDisplacement ? t.maximum_displacement : t.maximum_stress;
+        return (
+          Math.abs(t.number_of_cycles - xVal) < 1e-1 &&
+          Math.abs(y - yVal) < 1e-1
+        );
+      });
+
+      if (!clickedTest) return;
+
+      const index = this.testsSelected.findIndex(
+        (t) => t.id === clickedTest.id
+      );
+      if (index >= 0) {
+        this.testsSelected.splice(index, 1); // Deselect
+      } else {
+        this.testsSelected.push(clickedTest); // Select
+      }
+    },
+    attachChartClickHandler() {
+      this.$nextTick(() => {
+        const chartInstance =
+          this.$refs.chartComponent?.$refs?.chartContainer?.$children?.[0]
+            ?.chart;
+
+        if (!chartInstance) return;
+
+        chartInstance.off("click"); // to avoid duplicates
+        chartInstance.on("click", (params) => {
+          if (!params?.data || !Array.isArray(params.data.value)) return;
+
+          const [xVal, yVal] = params.data.value;
+
+          const controlMode =
+            this.experiment?.experiment?.control_mode?.toLowerCase();
+          const isDisplacement = controlMode === "displacement controlled";
+
+          const clickedTest = this.numberedTests.find((t) => {
+            const y = isDisplacement
+              ? t.maximum_displacement
+              : t.maximum_stress;
+            return (
+              Math.abs(t.number_of_cycles - xVal) < 1e-1 &&
+              Math.abs(y - yVal) < 1e-1
+            );
+          });
+
+          if (!clickedTest) return;
+
+          const index = this.testsSelected.findIndex(
+            (t) => t.id === clickedTest.id
+          );
+          if (index >= 0) {
+            this.testsSelected.splice(index, 1); // Deselect
+          } else {
+            this.testsSelected.push(clickedTest); // Select
+          }
+        });
+      });
+    },
   },
 };
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+:deep(.v-data-table__selected) {
+  background-color: #bbdefb !important;
+  /* light blue */
+}
+
+.chart-wrapper {
+  max-height: 250px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+</style>

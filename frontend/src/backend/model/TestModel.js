@@ -49,6 +49,7 @@ class TestModel {
    */
   static constructFromObject(data, obj) {
     if (data) {
+      console.log("TestModel received data:", data);
       obj = obj || new TestModel();
 
       if (data.hasOwnProperty("id")) {
@@ -60,9 +61,9 @@ class TestModel {
           "Number"
         );
       }
-      if (data.hasOwnProperty("specimen_number")) {
-        obj["specimen_number"] = ApiClient.convertToType(
-          data["specimen_number"],
+      if (data.hasOwnProperty("sequential_number")) {
+        obj["sequential_number"] = ApiClient.convertToType(
+          data["sequential_number"],
           "Number"
         );
       }
@@ -78,9 +79,9 @@ class TestModel {
           "Number"
         );
       }
-      if (data.hasOwnProperty("maximum_stress")) {
-        obj["maximum_stress"] = ApiClient.convertToType(
-          data["maximum_stress"],
+      if (data.hasOwnProperty("maximum_load")) {
+        obj["maximum_load"] = ApiClient.convertToType(
+          data["maximum_load"],
           "Number"
         );
       }
@@ -126,6 +127,13 @@ class TestModel {
           "Number"
         );
       }
+      /* add number of cycles */
+      if (data.hasOwnProperty("number_of_cycles")) {
+        obj["number_of_cycles"] = ApiClient.convertToType(
+          data["number_of_cycles"],
+          "Number"
+        );
+      }
     }
     return obj;
   }
@@ -142,9 +150,9 @@ TestModel.prototype["id"] = undefined;
 TestModel.prototype["experiment_id"] = undefined;
 
 /**
- * @member {Number} specimen_number
+ * @member {Number} sequential_number
  */
-TestModel.prototype["specimen_number"] = undefined;
+TestModel.prototype["sequential_number"] = undefined;
 
 /**
  * @member {String} specimen_name
@@ -210,5 +218,11 @@ TestModel.prototype["humidity"] = undefined;
  * @member {Number} initial_crack_length
  */
 TestModel.prototype["initial_crack_length"] = undefined;
+
+/**
+ * @member {Number} number_of_cycles
+ */
+TestModel.prototype["number_of_cycles"] = undefined;
+
 
 export default TestModel;
