@@ -173,11 +173,11 @@ async def quasi_static_test(
                 
                 if "eyy" in df.columns:
                     eyy_values = np.array(df["eyy"].dropna())
-                    if len(eyy_values) == len(strain_values):  # assicurati che le lunghezze corrispondano
+                    if len(eyy_values) == len(strain_values):  # Make sure the lengths match
                         eyy_range = eyy_values[mask]
                         exx_range = strain_values[mask]
                         if len(exx_range) >= 2:
-                            # Fit lineare: y = m * x + q → m = poisson_ratio
+                            # Linear fit: y = m * x + q → m = poisson_ratio
                             coeffs = np.polyfit(exx_range, -eyy_range, 1)
                             poisson_ratio = float(coeffs[0])
 

@@ -109,7 +109,7 @@ def process_hysteresis(df, test_meta):
 def run_on_folder(PREPROCESSED_FOLDER):
     tests_fp = os.path.join(PREPROCESSED_FOLDER, "tests.csv")
     if not os.path.exists(tests_fp):
-        print("tests.csv non trovato.")
+        print("tests.csv not found")
         return
 
     tests_df = pd.read_csv(tests_fp)

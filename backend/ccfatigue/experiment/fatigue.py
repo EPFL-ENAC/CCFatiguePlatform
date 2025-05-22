@@ -176,50 +176,12 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
         crack_n_cycles = std_df["N_cycles"].tolist() if "N_cycles" in std_df.columns else []
     else:
         hyst_df = get_dataframe("HYS", experiment, test_meta["sequential_number"]).fillna(0)
-        '''
-        def smooth_outliers(data: List[float], threshold: float = 10) -> List[float]:
-            """
-            Rimuove outlier con filtro a finestra mobile di 5 elementi.
-            L'elemento centrale viene sostituito con la media degli altri 4 se è un outlier.
-            """
-            smoothed = data.copy()
-            for i in range(2, len(data) - 2):
-                window = data[i-2:i+3]
-                center = window[2]
-                others = window[:2] + window[3:]
-                mean_others = np.mean(others)
-                std_others = np.std(others)
-                if abs(center - mean_others) > threshold * std_others:
-                    smoothed[i] = mean_others
-            return smoothed
 
-        def log_if_modified(original: List[float], filtered: List[float], field: str, specimen_name: str):
-            diffs = [i for i, (o, f) in enumerate(zip(original, filtered)) if o != f]
-            if diffs:
-                print(
-                    f"[Filtro outlier] Provino '{specimen_name}' – colonna '{field}' modificata in {len(diffs)} cicli "
-                    f"(posizioni: {diffs})"
-                )
-
-
-        original_creep = hyst_df["creep"].tolist()
-        filtered_creep = smooth_outliers(original_creep)
-        log_if_modified(original_creep, filtered_creep, "creep", specimen_name)
-        hyst_df["creep"] = filtered_creep
-        original_area = hyst_df["hysteresis_area"].tolist()
-        filtered_area = smooth_outliers(original_area)
-        log_if_modified(original_area, filtered_area, "hysteresis_area", specimen_name)
-        hyst_df["hysteresis_area"] = filtered_area
-        original_stiffness = hyst_df["stiffness"].tolist()
-        filtered_stiffness = smooth_outliers(original_stiffness)
-        log_if_modified(original_stiffness, filtered_stiffness, "stiffness", specimen_name)
-        hyst_df["stiffness"] = filtered_stiffness
-        '''
         def smooth_spikes(data: List[float], threshold: float = 0.05) -> List[float]:
             """
-            Rimuove spike/drop locali in una finestra mobile di 5 elementi.
-            Il valore centrale viene sostituito se è molto diverso dalla media delle due mezze finestre,
-            ma le mezze finestre sono tra loro coerenti.
+            Removes local spikes/drops within a moving window of 5 elements.
+            The central value is replaced if it differs significantly from the average of the two half-windows,
+            provided that the half-windows are consistent with each other.
             """
             smoothed = data.copy()
             for i in range(2, len(data) - 2):

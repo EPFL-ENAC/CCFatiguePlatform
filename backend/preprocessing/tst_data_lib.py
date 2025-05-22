@@ -373,14 +373,14 @@ class Experiment:
                 except ValueError as e:
                     self.logger.error(f"exception: {e}")
 
-            # Converte il dizionario flat in una struttura annidata
+            # Converts the flat dictionary into a nested structure
             def nest_dict(flat_dict):
                 nested = {}
                 for compound_key, value in flat_dict.items():
                     keys = compound_key.split(">")
                     d = nested
                     for key in keys[:-1]:
-                        key = key.strip()  # Rimuove spazi indesiderati
+                        key = key.strip()  # Removes unwanted spaces
                         if key not in d:
                             d[key] = {}
                         d = d[key]
@@ -395,17 +395,17 @@ class Experiment:
         """
         self.logger.info("Validate experiment")
         with self.logger.indent:
-            # Stampo l'intera struttura dell'esperimento
+            # Print the entire experiment structure
             import json
             self.logger.info("Experiment structure after cleanup:")
             self.logger.info(json.dumps(self.experiment, indent=2, ensure_ascii=False))
 
-            # Normalizza il valore di experiment type per evitare problemi di spazi o case-sensitive
+            # Normalize the value of experiment type to avoid issues with spaces or case sensitivity
             experiment_type_raw = Experiment.__get_val_at(self.experiment, "general>experiment type", "")
             experiment_type = experiment_type_raw.strip().upper()
             self.logger.info(f"Normalized experiment type: '{experiment_type}' (raw: '{experiment_type_raw}')")
 
-            # Se l'experiment type è FA, controlla i campi specifici
+            # If the experiment type is FA, check the specific fields
             if experiment_type == "FA":
                 general_section = self.experiment.get("general", {})
                 if "fa experiment type" not in general_section:
@@ -1104,7 +1104,7 @@ class Experiment:
 
                 RELAXED_MANDATORY_COLUMNS = {"Specimen_name", "Test_Date"}
 
-                # Recupera i valori di test type per FA e QS
+                # Retrieve test type values for FA and QS
                 fa_experiment_type = Experiment.__get_val_at(
                     self.experiment, "general>fa experiment type", ""
                 )
@@ -1112,29 +1112,29 @@ class Experiment:
                     self.experiment, "general>qs experiment type", ""
                 )
 
-                # Definisce le regole per FA in base alla selezione "fracture"
+                # Define FA rules based on "fracture" selection
                 if fa_experiment_type == "fracture":
                     mandatory_fa = [
-                        ["N_cycles"],       # "N_cycles" deve essere presente
-                        ["Crack_length"],   # e, in aggiunta, "Crack_length" diventa obbligatoria
+                        ["N_cycles"],       # "N_cycles" must be present
+                        ["Crack_length"],   # and, in addition, "Crack_length" becomes mandatory
                     ]
                 else:
                     mandatory_fa = [
                         ["N_cycles"],
                     ]
 
-                # Definisce le regole per QS in base alla selezione "fracture"
+                # Define QS rules based on "fracture" selection
                 if qs_experiment_type == "fracture":
                     mandatory_qs = [
-                        ["Crack_length"],   # "Crack_length" obbligatoria
-                        ["u", "exx"],       # e almeno una tra "u" o "exx"
+                        ["Crack_length"],   # "Crack_length" is mandatory
+                        ["u", "exx"],       # and at least one of "u" or "exx"
                     ]
                 else:
                     mandatory_qs = [
                         ["u", "exx"],
                     ]
 
-                # Raggruppa le regole specifiche per test type
+                # Group specific rules by test type
                 MANDATORY_TEST_TYPE_SPECIFIC = {
                     "FA": mandatory_fa,
                     "QS": mandatory_qs,
@@ -1144,7 +1144,7 @@ class Experiment:
                     int: Experiment.__check_int_column,
                     float: Experiment.__check_float_column,
                     str: Experiment.__check_str_column,
-                    datetime: Experiment.__check_datetime_column,  # 👈 nuovo
+                    datetime: Experiment.__check_datetime_column,  # 👈 new
                 }
                 TYPE_NAMES = {
                     int: "integer",
@@ -1153,7 +1153,7 @@ class Experiment:
                     datetime: "date (YYYY-MM-DD)",
                 }
 
-            # --- Controllo presenza colonne mandatory da EXPECTED_COLUMNS
+            # --- Check for presence of mandatory columns from EXPECTED_COLUMNS
             for mandatory_col_pattern in filter(lambda c: EXPECTED_COLUMNS[c]["mandatory"], EXPECTED_COLUMNS):
                 mandatory_col_found = list(Experiment.__grep_matching_columns(mandatory_col_pattern, measures["df"].columns))
                 if len(mandatory_col_found) == 0:
@@ -1167,7 +1167,7 @@ class Experiment:
                             if measures["df"][mandatory_col].isnull().values.any():
                                 self.logger.error(f"mandatory column has empty values: '{mandatory_col}'")
 
-            # --- Controllo lunghezza coerente per le colonne obbligatorie "strict"
+            # --- Check consistent length for "strict" mandatory columns
             strict_mandatory_lengths = {}
             for col_pattern in filter(
                 lambda c: EXPECTED_COLUMNS[c]["mandatory"] and c not in RELAXED_MANDATORY_COLUMNS,
@@ -1177,13 +1177,13 @@ class Experiment:
                 for col in found_cols:
                     strict_mandatory_lengths[col] = measures["df"][col].notnull().sum()
 
-            # --- Informazioni per le colonne opzionali non trovate
+            # --- Info for optional columns not found
             for optional_col_pattern in filter(lambda c: not EXPECTED_COLUMNS[c]["mandatory"], EXPECTED_COLUMNS):
                 optional_col_found = list(Experiment.__grep_matching_columns(optional_col_pattern, measures["df"].columns))
                 if len(optional_col_found) == 0:
                     self.logger.info(f"optional column not found: '{optional_col_pattern}'")
 
-            # --- Controllo tipo dati per ogni colonna
+            # --- Type checking for each column
             for col in measures["df"].columns:
                 for col_pattern in EXPECTED_COLUMNS:
                     if re.match(col_pattern, col):
@@ -1193,13 +1193,13 @@ class Experiment:
                                 f"column '{col}' is expected to be of type '{TYPE_NAMES[expected_type]}'"
                             )
 
-            # --- Controllo formato della data in Test_Date
+            # --- Check date format in Test_Date
             if "Test_Date" in measures["df"].columns:
                 for date_val in measures["df"]["Test_Date"].dropna().unique():
                     if not re.match(r"^\d{4}-\d{2}", str(date_val)):
                         self.logger.error(f"Unrecognized Test_Date: '{date_val}'")
 
-            # --- Validazione specifica per test type (FA o QS) con logica "fracture"
+            # --- Specific validation for test type (FA or QS) using "fracture" logic
             try:
                 experiment_type = Experiment.__get_val_at(self.experiment, "general>experiment type")
             except KeyError:
@@ -1209,7 +1209,7 @@ class Experiment:
                 )
                 return
 
-            # Determina se il test è in modalità fracture in base al campo specifico
+            # Determine if test is in fracture mode based on specific field
             if experiment_type == "FA":
                 is_fracture = (fa_experiment_type == "fracture")
                 groups = MANDATORY_TEST_TYPE_SPECIFIC.get("FA", [])
@@ -1219,6 +1219,7 @@ class Experiment:
             else:
                 groups = []
                 is_fracture = False
+
 
             test_type_cols_found = set()
             for group in groups:
@@ -1242,7 +1243,7 @@ class Experiment:
                             )
                     test_type_cols_found.update(group_found)
 
-            # --- Unione: strict mandatory + colonne trovate per test type
+            # --- Merge: strict mandatory + columns found for test type
             for col in test_type_cols_found:
                 if col not in strict_mandatory_lengths:
                     strict_mandatory_lengths[col] = measures["df"][col].notnull().sum()
@@ -1254,7 +1255,7 @@ class Experiment:
                         f"Inconsistent non-null counts among mandatory columns: {strict_mandatory_lengths}"
                     )
 
-            # --- Controllo che non ci siano righe completamente vuote
+            # --- Check that there are no completely empty rows
             if measures["df"].isnull().all(axis=1).any():
                 self.logger.error("found empty rows")   
 

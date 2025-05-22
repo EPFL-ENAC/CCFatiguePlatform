@@ -25,7 +25,7 @@ async def catch_exceptions_middleware(request: Request, call_next):
     try:
         return await call_next(request)
     except Exception as e:
-        traceback.print_exc()  # Stampa errore su terminale
+        traceback.print_exc()  # Print error in the terminal
         return JSONResponse(
             status_code=500,
             content={"detail": str(e)},
