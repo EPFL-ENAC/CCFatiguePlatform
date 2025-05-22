@@ -17,16 +17,6 @@
         </div>
       </v-card-text>
     </v-card>
-    <!-- Card con bottone per aprire il PDF in un'altra scheda
-    <v-card>
-    <v-card-title>Dataset Guidelines</v-card-title>
-    <v-card-text>
-    <v-btn :href="pdfURL" target="_blank" color="primary" outlined>
-    Apri PDF
-    </v-btn>
-    </v-card-text>
-    </v-card>
-    -->
     <!-- File Download Dropdown -->
     <v-card class="mt-4">
       <v-card-title>Select the experimental campaign type</v-card-title>
@@ -53,13 +43,6 @@
     <v-card class="mt-4">
       <v-card-title>Dataset checker</v-card-title>
       <v-card-text>
-        <!--  
-        <p>
-          Refer to the
-          <a :href="TSTDataConventionURL">TST Data Convention</a>
-          to prepare your Dataset.
-        </p>
-        -->
         <v-file-input
           v-model="experimentZip.file"
           chips
@@ -126,7 +109,7 @@ export default {
   data() {
     return {
       showPdf: false,
-      pdfURL: "/downloads/Upload_guide.pdf", // Assicurati che il file sia in public/downloads/
+      pdfURL: "/downloads/Upload_guide.pdf", // Make sure the file is in public/downloads/
 
       TSTDataConventionURL:
         "https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/main/Data/TST_Data_Convention.md",

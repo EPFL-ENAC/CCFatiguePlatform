@@ -43,14 +43,6 @@
         </v-row>
       </v-card-text>
     </v-card>
-    <!--
-    <p class="py-5">
-      <img
-        src="/img/epfl-logo.svg"
-        alt="Logo EPFL, École polytechnique fédérale de Lausanne"
-      />
-    </p>
-    -->
     <div class="logo-row py-5">
       <img
         src="/img/epfl-logo.svg"
@@ -71,7 +63,6 @@ export default {
   data() {
     return {
       units: [
-        /* { name: "CCLAB", url: "https://cclab.epfl.ch" }, */
         { name: "GR-MeC", url: "https://gr-mec.epfl.ch" },
         { name: "ENAC-IT4R", url: "https://enacit4r.epfl.ch/" },
       ],
@@ -80,40 +71,12 @@ export default {
           name: "Tassos Vassilopoulos",
           url: "https://people.epfl.ch/anastasios.vassilopoulos",
           unit: "GR-MeC",
-          /* title: "professor",*/
         },
         {
           name: "Filippo Mannino",
           url: "https://people.epfl.ch/filippo.mannino",
           unit: "GR-MeC",
-          /* title: "Scientific Assistant",*/
         },
-        /*
-        {
-          name: "Congzhe Wang",
-          url: "https://people.epfl.ch/congzhe.wang",
-          unit: "CCLAB",
-          title: "PhD",
-        },
-        {
-          name: "Dharun Vadugappatty Srinivasan",
-          url: "https://people.epfl.ch/dharun.srinivasan",
-          unit: "CCLAB",
-          title: "PhD",
-        },
-        {
-          name: "Seyed Shayan Khalooei Tafti",
-          url: "https://people.epfl.ch/shayan.khalooei",
-          unit: "CCLAB",
-          title: "PhD",
-        },
-        {
-          name: "Scott Salmon",
-          url: "https://people.epfl.ch/scott.matthewssalmon",
-          unit: "CCLAB",
-          title: "master student",
-        },
-        */
         {
           name: "Charlie Weil",
           url: "https://people.epfl.ch/charlotte.weil",
@@ -181,6 +144,5 @@ ul {
 
 .grmec-logo {
   max-height: 70px !important;
-  /* o anche 80px se vuoi esagerare */
 }
 </style>

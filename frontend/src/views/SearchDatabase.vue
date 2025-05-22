@@ -43,21 +43,6 @@
                   />
                 </v-col>
               </v-row>
-              <!--
-              <v-row v-if="filters.withFracture && !filters.withoutFracture">
-                <v-col>
-                  <v-overflow-btn
-                    v-model="filters.fractureMode"
-                    :items="[fractureModeAll, ...allFractureMode]"
-                    label="fracture mode"
-                    hide-details
-                    dense
-                    @change="fetchExperiments"
-                  >
-                  </v-overflow-btn>
-                </v-col>
-              </v-row>
-              -->
             </v-card-text>
           </v-card>
           <v-card flat>
@@ -112,24 +97,6 @@
               </v-row>
             </v-card-text>
           </v-card>
-          <!--
-          <v-card flat>
-            <v-card-title>Filter by text</v-card-title>
-            <v-card-text>
-              <v-row>
-                <v-col>
-                  <v-text-field
-                    v-model="filters.textSearch"
-                    placeholder="search"
-                    dense
-                    @change="fetchExperiments"
-                  >
-                  </v-text-field>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-          -->
           <v-card flat>
             <v-card-text class="d-flex justify-end">
               <v-btn text color="primary" @click="resetFilters">

@@ -247,16 +247,6 @@
                   tooltip="No fatigue failure."
                 />
               </li>
-              <!--
-              <li>
-                <experiment-s-v
-                  subject="R ratio"
-                  :values="stressRatios"
-                  :colors="valueColors"
-                  tooltip="Stress ratio (σ_min/σ_max)."
-                />
-              </li>
-              -->
               <li>
                 <experiment-s-v
                   subject="Total dissipated energy (TDE)"
@@ -551,7 +541,7 @@ export default {
     return {
       loading: false,
       xAxisMode: "normal", // 'normal', 'log', 'normalized'
-      yAxisStiffnessMode: "absolute", // oppure 'normalized'
+      yAxisStiffnessMode: "absolute", // 'absolute' or 'normalized'
       colors: colorPalette,
       fatigueData: [],
       cycleAtFailure: [],
@@ -624,24 +614,24 @@ export default {
         const indices =
           this.selectedLoopIndices.length > 0
             ? this.selectedLoopIndices
-            : Array.from({ length: loops.length }, (_, i) => i); // default: tutti
+            : Array.from({ length: loops.length }, (_, i) => i); // default: all
 
         return indices
           .map((i) => ({
             type: "line",
-            name: null, // ❗️non cambia la legenda
+            name: null, // the legend does not change
             data: zip(loops[i]?.strain || [], loops[i]?.stress || []),
             lineStyle: { color },
           }))
           .map((series, i) => ({
             ...series,
-            // Solo il primo ciclo ha il nome per la legenda
+            // Only the first cycle has a name for the legend
             name: i === 0 ? name : null,
           }));
       });
     },
     loopIndexOptions() {
-      // Mostra sempre i cicli da 1 a 10 (0–9 come valori interni)
+      // Always show cycles from 1 to 10 (0–9 as internal values)
       return Array.from({ length: 10 }, (_, i) => ({
         text: `Cycle ${i + 1}`,
         value: i,
@@ -728,10 +718,10 @@ export default {
         let yValues;
 
         if (this.yAxisStiffnessMode === "normalized") {
-          // Normalizzati: non si toccano (rimangono adimensionali)
+          // Normalized: do not modify (remain dimensionless)
           yValues = this.normalizeYAxis(d.stiffness);
         } else {
-          // Assoluti: converti da MPa a GPa
+          // Absolute values: convert from MPa to GPa
           yValues = d.stiffness.map((v) =>
             typeof v === "number" ? v / 1000 : v
           );
@@ -773,7 +763,7 @@ export default {
         return [
           {
             type: "line",
-            name, // solo nel primo dataset (linea)
+            name, // only in the first dataset (line)
             data: zip(
               this.transformXAxis(d.crack_n_cycles, d.n_fail),
               d.crack_load
@@ -784,7 +774,7 @@ export default {
           },
           {
             type: "scatter",
-            name: null, // non va in legenda
+            name: null, // does not appear in the legend
             data: zip(
               this.transformXAxis(d.crack_n_cycles, d.n_fail),
               d.crack_length || []
@@ -832,11 +822,6 @@ export default {
       this.totalDissipatedEnergies = [];
       this.runOuts = [];
       this.stressRatios = [];
-      /*this.stressStrainSeries = [];
-      this.hysteresisAreaSeries = [];
-      this.creepSeries = [];
-      this.stiffnessSeries = [];
-      */
       this.fatigueData = dataList;
       dataList.forEach((d, i) => {
         const tid = this.testIds[i];
@@ -908,8 +893,8 @@ export default {
         if (typeof d.specimen_id !== "undefined") {
           this.specimenIds.push(String(d.specimen_id));
         } else {
-          console.warn("⚠️ specimen_id mancante per test", tid);
-          this.specimenIds.push("–"); // oppure "N/A" per chiarezza visiva
+          console.warn("⚠️ specimen_id missing for test", tid);
+          this.specimenIds.push("–"); // or "N/A" for visual clarity
         }
         const stressValues = Object.values(d.stress)
           .flat()
@@ -946,9 +931,9 @@ export default {
     },
     transformXAxis(xValues, nFail) {
       if (this.xAxisMode === "normalized") {
-        return xValues.map((x) => x / (nFail || 1)); // evita divisione per 0
+        return xValues.map((x) => x / (nFail || 1)); // avoid division by zero
       }
-      // 'normal' e 'log': ritorna i dati grezzi (il log è gestito da SimpleChart.vue)
+      // 'normal' and 'log': return raw data (the log is handled by SimpleChart.vue)
       return xValues;
     },
     normalizeYAxis(values) {

@@ -155,7 +155,7 @@ export default {
     this.handleResize();
     window.addEventListener("resize", this.handleResize);
 
-    // ✅ Usa ResizeObserver per osservare cambiamenti di dimensione
+    // Use ResizeObserver to observe size changes
     this.observer = new ResizeObserver(this.handleResize);
     this.observer.observe(this.$refs.chartContainer.$el);
   },

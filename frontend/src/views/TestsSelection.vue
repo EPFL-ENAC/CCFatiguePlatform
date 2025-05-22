@@ -203,7 +203,7 @@ export default {
       ];
     },
     chartKey() {
-      // Forza il re-render del grafico se cambia la selezione
+      // Force the chart to re-render when the selection changes
       return this.testsSelected.map((t) => t.id).join("-");
     },
     yAxisLabel() {
@@ -230,15 +230,6 @@ export default {
   },
   watch: {
     "experiment.tests": {
-      handler(tests) {
-        if (tests.length > 0) {
-          /* console.log("✅ Loaded tests:", tests);
-          console.log(
-            "🧪 Maximum stress:",
-            this.numberedTests.map((t) => t.maximum_load)
-          );*/
-        }
-      },
       immediate: true,
     },
     chartKey() {
@@ -313,9 +304,9 @@ export default {
         (t) => t.id === clickedTest.id
       );
       if (index >= 0) {
-        this.testsSelected.splice(index, 1); // Deseleziona
+        this.testsSelected.splice(index, 1); // Deselect
       } else {
-        this.testsSelected.push(clickedTest); // Seleziona
+        this.testsSelected.push(clickedTest); // Select
       }
     },
     attachChartClickHandler() {
@@ -326,7 +317,7 @@ export default {
 
         if (!chartInstance) return;
 
-        chartInstance.off("click"); // per evitare duplicazioni
+        chartInstance.off("click"); // to avoid duplicates
         chartInstance.on("click", (params) => {
           if (!params?.data || !Array.isArray(params.data.value)) return;
 
@@ -352,9 +343,9 @@ export default {
             (t) => t.id === clickedTest.id
           );
           if (index >= 0) {
-            this.testsSelected.splice(index, 1); // Deseleziona
+            this.testsSelected.splice(index, 1); // Deselect
           } else {
-            this.testsSelected.push(clickedTest); // Seleziona
+            this.testsSelected.push(clickedTest); // Select
           }
         });
       });
