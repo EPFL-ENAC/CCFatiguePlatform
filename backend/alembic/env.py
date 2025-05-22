@@ -4,7 +4,7 @@ from sqlalchemy import engine_from_config, pool
 
 from alembic import context
 # from ccfatigue.models import database
-from ccfatigue.models.database_v2 import Base
+from ccfatigue.models.database import Base
 
 from ccfatigue.services.database import sync_url
 

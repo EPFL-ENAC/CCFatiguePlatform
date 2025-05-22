@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from ccfatigue.experiment.common import DATA_DIRECTORY, get_test_fields
-from ccfatigue.models.database_v2 import Experiment, Test
+from ccfatigue.models.database import Experiment, Test
 
 
 class QuasiStaticTest(BaseModel):

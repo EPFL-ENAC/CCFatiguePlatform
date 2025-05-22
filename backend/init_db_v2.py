@@ -10,7 +10,7 @@ from sqlalchemy.orm import sessionmaker
 
 from alembic.command import upgrade
 from alembic.config import Config
-from ccfatigue.models.database_v2 import Experiment, Test, Test_Measuring_Point
+from ccfatigue.models.database import Experiment, Test, Test_Measuring_Point
 from ccfatigue.services.database import sync_url
 
 DATA_DIR = os.path.abspath(f"{__file__}/../../Data/preprocessed")

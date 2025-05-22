@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from ccfatigue.config import settings
-from ccfatigue.models.database_v2 import Test
+from ccfatigue.models.database import Test
 
 DATA_DIRECTORY: str = os.path.join(settings.data_path, "preprocessed")  # type: ignore
 

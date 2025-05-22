@@ -1,124 +1,106 @@
-"""
-Define the model as it is in the DB
-"""
-
-from sqlalchemy import Boolean, Column, Enum, Float, ForeignKey, Integer, String
+from sqlalchemy import (
+    Boolean,
+    Column,
+    Enum,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+)
 from sqlalchemy.orm import relationship
-
 from ccfatigue.services.database import Base
 
 
 class Experiment(Base):
-    """
-    Defines how experiment data is structured in DB
-    """
-
     __tablename__ = "experiment"
+    __table_args__ = {'extend_existing': True}
     id = Column(Integer, primary_key=True)
-
-    laboratory = Column(String, default="")
+    ...
+    # General
+    laboratory = Column(String)
     researcher = Column(String)
     date = Column(String)
-    experiment_type = Column(Enum("FA", "QS", "TM", name="experiment_type"))
-
-    fracture = Column(Boolean)
-    fracture_mode = Column(
-        Enum("Mode I", "Mode II", "Mode III", "Mixed-Mode", "", name="fracture_mode"),
-        default="",
-    )
-
-    fatigue_test_type = Column(
-        Enum("CA", "VA", "BL", "Combined", "", name="fatigue_test_type"),
-        default="",
-    )
-    quasi_static_test_type = Column(
-        Enum(
-            "Tensile",
-            "Compressive",
-            "Shear",
-            "Bending",
-            "Fracture",
-            "Unspecified",
-            "",
-            name="quasi_static_test_type",
-        ),
-        default="",
-    )
-
-    temperature_test_type = Column(
-        Enum("DMA", "DSC", "FIRE", "Unspecified", "", name="temperature_test_type"),
-        default="",
-    )
+    experiment_type = Column(Enum("FA", "QS", "OT", name="experiment_type"))
+    fa_experiment_type = Column(String)
+    qs_experiment_type = Column(String)
+    ot_experiment_type = Column(String)
+    ot_add_info = Column(String)
+    fracture_mode_fm = Column(Enum("Mode I", "Mode II", "Mode III", "Mixed-Mode", name="fracture_mode_fm"))
+    fm_add_info = Column(String)
+    control_mode = Column(Enum("Load Controlled", "Displacement Controlled", "Strain controlled", name="control_mode"))
+    fatigue_loading_type_flt = Column(Enum("CA", "VA", "BL", "Other", name="fatigue_loading_type_flt"))
+    flt_add_info = Column(String)
     measuring_equipment = Column(String)
-    reliability_level = Column(Float)
+    loading_rate = Column(Float)
 
-    control_mode = Column(
-        Enum("Load Controlled", "Displacement Controlled", "", name="control_mode"),
-        default="",
-    )
-
-    publication_title = Column(String)
-    publication_author = Column(String)
-    publication_year = Column(String)
+    # Publication
     publication_doi = Column(String)
-    publication_images_repository = Column(String)
 
+    # Material Info
+    material_tested = Column(String)
     material_type_sample_type = Column(String)
+    sample_type_add_info = Column(String)
     material_type_fiber_material = Column(String)
     material_type_fiber_form = Column(String)
-    material_type_area_density = Column(Float)
+    material_type_area_density = Column(String)
     material_type_resin = Column(String)
     material_type_hardener = Column(String)
     material_type_mixing_ratio = Column(String)
+    other_polymers_add_info = Column(String)
 
-    laminates_and_assemblies_curing_time = Column(Float)
-    laminates_and_assemblies_curing_temperature = Column(Float)
-    laminates_and_assemblies_curing_pressure = Column(Float)
-    laminates_and_assemblies_fiber_volume_ratio = Column(Float)
+    curing_time = Column(Float)
+    curing_temperature = Column(Float)
+    curing_pressure = Column(Float)
+    postcuring_time = Column(Float)
+    postcuring_temperature = Column(Float)
+    postcuring_pressure = Column(Float)
+    glue = Column(String)
+    glue_curing_time = Column(Float)
+    glue_curing_temperature = Column(Float)
+    glue_curing_pressure = Column(Float)
+
+    # Laminates
     laminates_and_assemblies_stacking_sequence = Column(String)
+    laminates_and_assemblies_fiber_volume_ratio = Column(Float)
 
-    measurement_measuring_points = Column(Integer)
+    # Fatigue
+    fatigue_r_ratio = Column(Float)
+    fatigue_frequency = Column(Float)
 
-    dic_analysis_subset_size = Column(Integer)
-    dic_analysis_step_size = Column(Integer)
-
-    tests = relationship("Test", cascade="all, delete")
+    tests = relationship("Test", cascade="all, delete", back_populates="experiment")
 
 
 class Test(Base):
-    """
-    Defines how test part of experiment is structured in DB
-    """
-
     __tablename__ = "test"
+    __table_args__ = {'extend_existing': True}
     id = Column(Integer, primary_key=True)
 
     experiment_id = Column(Integer, ForeignKey("experiment.id"))
     experiment = relationship("Experiment", back_populates="tests")
 
-    specimen_number = Column(Integer)
+    sequential_number = Column(Integer)
     specimen_name = Column(String)
-    stress_ratio = Column(Float)
-    maximum_stress = Column(Float)
-    frequency = Column(Float)
+    number_of_cycles = Column(Integer)
+    maximum_load = Column(Float)
     run_out = Column(Boolean)
-    displacement_controlled_loading_rate = Column(Float)
-    load_controlled_loading_rate = Column(Float)
+
     length = Column(Float)
     width = Column(Float)
     thickness = Column(Float)
+    initial_crack_length = Column(Float)
+
     temperature = Column(Float)
     humidity = Column(Float)
-    initial_crack_length = Column(Float)
-    measuring_points = relationship("Test_Measuring_Point", cascade="all, delete")
+
+    subset_size = Column(Float)
+    step_size = Column(Float)
+
+    measuring_points = relationship("Test_Measuring_Point", cascade="all, delete", back_populates="test")
 
 
 class Test_Measuring_Point(Base):
-    """
-    Defines how a measuring point is strictured in DB
-    """
-
     __tablename__ = "test_measuring_point"
+    __table_args__ = {'extend_existing': True}
     id = Column(Integer, primary_key=True)
 
     test_id = Column(Integer, ForeignKey("test.id"))
