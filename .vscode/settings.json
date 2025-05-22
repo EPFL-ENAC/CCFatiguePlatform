@@ -1,5 +1,5 @@
 {
-  "editor.formatOnSave": true,
+  "editor.formatOnSave": false,
   "python.analysis.stubPath": "${workspaceFolder}/backend/",
   "python.analysis.extraPaths": [
     "${workspaceFolder}/backend/.venv/Lib/site-packages",
