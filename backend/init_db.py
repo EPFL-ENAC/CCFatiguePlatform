@@ -109,6 +109,8 @@ def inject_exp_from_folder(exp_folder, session):
             width=test_serie.get("width"),
             thickness=test_serie.get("thickness"),
             initial_crack_length=test_serie.get("initial crack length"),
+            t=test_serie.get("t"),
+            l_prime=test_serie.get("l'"),
             temperature=test_serie.get("temperature"),
             humidity=test_serie.get("humidity"),
             subset_size=test_serie.get("subset size"),
