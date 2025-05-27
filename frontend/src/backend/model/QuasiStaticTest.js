@@ -21,7 +21,9 @@ class QuasiStaticTest {
     specimenId,
     toughness,
     initial_crack_length,
-    crack_fractureenergy,
+    crack_fractureenergy_mbt,
+    crack_fractureenergy_mcc, 
+    crack_fractureenergy_eccm,
     young_modulus,
     poisson_ratio,
   ) {
@@ -38,7 +40,9 @@ class QuasiStaticTest {
       specimenId,
       toughness,
       initial_crack_length,
-      crack_fractureenergy,
+      crack_fractureenergy_mbt,
+      crack_fractureenergy_mcc,
+      crack_fractureenergy_eccm,
       young_modulus,
       poisson_ratio,
     );
@@ -57,7 +61,9 @@ class QuasiStaticTest {
     specimenId,
     toughness,
     initial_crack_length,
-    crack_fractureenergy,
+    crack_fractureenergy_mbt,
+    crack_fractureenergy_mcc,
+    crack_fractureenergy_eccm,
     young_modulus,
     poisson_ratio,
   ) {
@@ -72,7 +78,9 @@ class QuasiStaticTest {
     obj["specimen_id"] = specimenId;
     obj["toughness"] = toughness;
     obj["initial_crack_length"] = initial_crack_length;
-    obj["crack_fractureenergy"] = crack_fractureenergy;
+    obj["crack_fractureenergy_mbt"] = crack_fractureenergy_mbt;
+    obj["crack_fractureenergy_mcc"] = crack_fractureenergy_mcc;
+    obj["crack_fractureenergy_eccm"] = crack_fractureenergy_eccm;
     obj["young_modulus"] = young_modulus;
     obj["poisson_ratio"] = poisson_ratio;
   }
@@ -115,8 +123,14 @@ class QuasiStaticTest {
       if (data.hasOwnProperty("initial_crack_length")) {
         obj["initial_crack_length"] = ApiClient.convertToType(data["initial_crack_length"], "Number");
       }
-      if (data.hasOwnProperty("crack_fractureenergy")) {
-        obj["crack_fractureenergy"] = ApiClient.convertToType(data["crack_fractureenergy"], ["Number"]);
+      if (data.hasOwnProperty("crack_fractureenergy_mbt")) {
+        obj["crack_fractureenergy_mbt"] = ApiClient.convertToType(data["crack_fractureenergy_mbt"], ["Number"]);
+      }
+      if (data.hasOwnProperty("crack_fractureenergy_mcc")) {
+        obj["crack_fractureenergy_mcc"] = ApiClient.convertToType(data["crack_fractureenergy_mcc"], ["Number"]);
+      }
+      if (data.hasOwnProperty("crack_fractureenergy_eccm")) {
+        obj["crack_fractureenergy_eccm"] = ApiClient.convertToType(data["crack_fractureenergy_eccm"], ["Number"]);
       }
       if (data.hasOwnProperty("young_modulus")) {
         obj["young_modulus"] = ApiClient.convertToType(data["young_modulus"], "Number");
@@ -142,7 +156,9 @@ QuasiStaticTest.prototype["stress"] = undefined;
 QuasiStaticTest.prototype["specimen_id"] = undefined;
 QuasiStaticTest.prototype["toughness"] = undefined;
 QuasiStaticTest.prototype["initial_crack_length"] = undefined;
-QuasiStaticTest.prototype["crack_fractureenergy"] = undefined;
+QuasiStaticTest.prototype["crack_fractureenergy_mbt"] = undefined;
+QuasiStaticTest.prototype["crack_fractureenergy_mcc"] = undefined;
+QuasiStaticTest.prototype["crack_fractureenergy_eccm"] = undefined;
 QuasiStaticTest.prototype["young_modulus"] = undefined;
 QuasiStaticTest.prototype["poisson_ratio"] = undefined;
 

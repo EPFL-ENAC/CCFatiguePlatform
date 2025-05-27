@@ -467,13 +467,42 @@
               </v-card-text>
             </v-card>
           </v-col>
-
-          <v-col v-if="fractureEnergySeries.length" cols="6">
+          <v-col v-if="fractureEnergySeries_mbt.length" cols="6">
             <v-card :loading="loading">
-              <v-card-title>Crack Length vs Fracture Energy</v-card-title>
+              <v-card-title>Crack Length vs Fracture Energy (MBT)</v-card-title>
               <v-card-text>
                 <simple-chart
-                  :series="fractureEnergySeries"
+                  :series="fractureEnergySeries_mbt"
+                  :aspect-ratio="2"
+                  x-axis-name="Crack Length [mm]"
+                  y-axis-name="Fracture Energy [J/m²]"
+                />
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col v-if="fractureEnergySeries_mcc.length" cols="6">
+            <v-card :loading="loading">
+              <v-card-title>Crack Length vs Fracture Energy (MCC)</v-card-title>
+              <v-card-text>
+                <simple-chart
+                  :series="fractureEnergySeries_mcc"
+                  :aspect-ratio="2"
+                  x-axis-name="Crack Length [mm]"
+                  y-axis-name="Fracture Energy [J/m²]"
+                />
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col v-if="fractureEnergySeries_eccm.length" cols="6">
+            <v-card :loading="loading">
+              <v-card-title>
+                Crack Length vs Fracture Energy (ECCM)
+              </v-card-title>
+              <v-card-text>
+                <simple-chart
+                  :series="fractureEnergySeries_eccm"
                   :aspect-ratio="2"
                   x-axis-name="Crack Length [mm]"
                   y-axis-name="Fracture Energy [J/m²]"
@@ -483,7 +512,6 @@
           </v-col>
         </v-row>
       </v-col>
-
       <v-col cols="2">
         <v-card :loading="loading">
           <v-card-text>
@@ -564,7 +592,9 @@ export default {
       quasiStaticPoissonRatios: [],
       initialCrackLength: [],
       fatigueWarnings: [],
-      fractureEnergyData: {},
+      fractureEnergyData_mbt: {},
+      fractureEnergyData_mcc: {},
+      fractureEnergyData_eccm: {},
       crackLengthData: {},
       specimenName: {},
     };
@@ -734,17 +764,47 @@ export default {
         };
       });
     },
-    fractureEnergySeries() {
+    fractureEnergySeries_mbt() {
       return this.testIds
         .map((id) => {
           const crackLength = this.crackLengthData[id];
-          const fractureEnergy = this.fractureEnergyData[id];
-          if (!crackLength || !fractureEnergy) return null;
+          const fractureEnergy_mbt = this.fractureEnergyData_mbt[id];
+          if (!crackLength || !fractureEnergy_mbt) return null;
 
           return {
             type: "line",
             name: this.specimenName[id],
-            data: zip(crackLength, fractureEnergy),
+            data: zip(crackLength, fractureEnergy_mbt),
+          };
+        })
+        .filter((s) => s !== null);
+    },
+    fractureEnergySeries_mcc() {
+      return this.testIds
+        .map((id) => {
+          const crackLength = this.crackLengthData[id];
+          const fractureEnergy_mcc = this.fractureEnergyData_mcc[id];
+          if (!crackLength || !fractureEnergy_mcc) return null;
+
+          return {
+            type: "line",
+            name: this.specimenName[id],
+            data: zip(crackLength, fractureEnergy_mcc),
+          };
+        })
+        .filter((s) => s !== null);
+    },
+    fractureEnergySeries_eccm() {
+      return this.testIds
+        .map((id) => {
+          const crackLength = this.crackLengthData[id];
+          const fractureEnergy_eccm = this.fractureEnergyData_eccm[id];
+          if (!crackLength || !fractureEnergy_eccm) return null;
+
+          return {
+            type: "line",
+            name: this.specimenName[id],
+            data: zip(crackLength, fractureEnergy_eccm),
           };
         })
         .filter((s) => s !== null);
@@ -869,7 +929,9 @@ export default {
         const tid = this.testIds[i];
         this.specimenName[tid] = d.specimen_name;
         console.log("🧪 Quasi-static specimen ID:", d.specimen_id);
-        this.fractureEnergyData[tid] = d.crack_fractureenergy;
+        this.fractureEnergyData_mbt[tid] = d.crack_fractureenergy_mbt;
+        this.fractureEnergyData_mcc[tid] = d.crack_fractureenergy_mcc;
+        this.fractureEnergyData_eccm[tid] = d.crack_fractureenergy_eccm;
         this.crackLengthData[tid] = d.crack_length;
         if (d.crack_displacement.length) {
           this.crackSeries.push({
