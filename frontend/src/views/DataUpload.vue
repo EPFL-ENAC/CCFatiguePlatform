@@ -61,14 +61,9 @@
               {{ countWarnings }} {{ "warning" | pluralize(countWarnings) }}.
               <br />
               You can send your dataset for integration
-              <v-btn
-                href="https://github.com/EPFL-ENAC/CCFatiguePlatform/issues/new?assignees=sbancal&labels=Dataset%2Ctriage&template=dataset_integration_request.yml&title=%5BNew+Dataset%5D+%3A+%7B3LettersDataCode%7D_%7BResearcher%27s+lastname%7D_%7BDate%7D_%7BTest+type%7D"
-                outlined
-                small
-              >
+              <v-btn outlined small @click="handleIntegrationRequest">
                 here
               </v-btn>
-              .
             </v-alert>
           </template>
           <template v-else>
@@ -180,7 +175,7 @@ export default {
 
       axios
         .post(
-          `${this.$experimentsApi.apiClient.basePath}/experiments/data_preprocess_check_v2`,
+          `${this.$experimentsApi.apiClient.basePath}/experiments/data_preprocess_check`,
           formData,
           {
             headers: {
@@ -210,6 +205,28 @@ export default {
         });
 
       return true;
+    },
+    async handleIntegrationRequest() {
+      if (!this.experimentZip.file) return;
+
+      const formData = new FormData();
+      formData.append("file", this.experimentZip.file);
+
+      try {
+        await axios.post(
+          `${this.$experimentsApi.apiClient.basePath}/experiments/integrate_dataset`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        this.$toast?.success("Dataset copied to Data/raw successfully.");
+      } catch (error) {
+        console.error("Integration failed:", error);
+        this.$toast?.error("Failed to copy dataset.");
+      }
     },
   },
 };
