@@ -1,6 +1,7 @@
 <template>
-  <v-responsive :aspect-ratio="aspectRatio">
+  <v-responsive ref="chartContainer" :aspect-ratio="aspectRatio">
     <v-chart
+      ref="chartInstance"
       autoresize
       :option="actualOption"
       :update-options="updateOptions"
@@ -70,9 +71,7 @@ export default {
         title: {
           text: this.title,
         },
-        legend: {
-          type: "scroll",
-        },
+        legend: this.showLegend ? { type: "scroll" } : { show: false },
         grid: {
           left: 50,
           top: 40,
@@ -96,7 +95,6 @@ export default {
           name: this.yAxisName,
           nameLocation: "middle",
           nameGap: 50,
-          /* min: "dataMin", */
           min: 0,
           max: "dataMax",
           axisLabel: {
@@ -126,6 +124,11 @@ export default {
         series: this.series.map((serie) => merge(serie, { showSymbol: false })),
         color: this.color,
       };
+    },
+  },
+  methods: {
+    getChartInstance() {
+      return this.$refs.chartInstance?.chart;
     },
   },
 };

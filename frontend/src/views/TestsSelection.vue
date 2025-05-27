@@ -29,13 +29,13 @@
             <v-card-text>
               <simple-chart
                 ref="chartComponent"
-                :key="chartKey"
                 :show-legend="false"
                 :series="chartSeries"
                 :aspect-ratio="2"
                 :x-axis-name="computedXAxisLabel"
                 :x-axis-type="xAxisChartType"
                 :y-axis-name="yAxisLabel"
+                @chart-click="handleChartClick"
               />
             </v-card-text>
           </v-card>
@@ -114,7 +114,6 @@ export default {
             calculatedStress !== null
               ? parseFloat(calculatedStress.toFixed(2))
               : null,
-          /* maximum displacement with 2 decimal points */
           maximum_displacement: test.maximum_load
             ? parseFloat(test.maximum_load.toFixed(2))
             : null,
@@ -203,7 +202,6 @@ export default {
       ];
     },
     chartKey() {
-      // Force the chart to re-render when the selection changes
       return this.testsSelected.map((t) => t.id).join("-");
     },
     yAxisLabel() {
@@ -304,20 +302,23 @@ export default {
         (t) => t.id === clickedTest.id
       );
       if (index >= 0) {
-        this.testsSelected.splice(index, 1); // Deselect
+        this.testsSelected.splice(index, 1);
       } else {
-        this.testsSelected.push(clickedTest); // Select
+        this.testsSelected.push(clickedTest);
       }
     },
-    attachChartClickHandler() {
+    attachChartClickHandler(retries = 10) {
       this.$nextTick(() => {
-        const chartInstance =
-          this.$refs.chartComponent?.$refs?.chartContainer?.$children?.[0]
-            ?.chart;
+        const chartInstance = this.$refs.chartComponent?.getChartInstance?.();
 
-        if (!chartInstance) return;
+        if (!chartInstance) {
+          if (retries > 0) {
+            setTimeout(() => this.attachChartClickHandler(retries - 1), 100);
+          }
+          return;
+        }
 
-        chartInstance.off("click"); // to avoid duplicates
+        chartInstance.off("click");
         chartInstance.on("click", (params) => {
           if (!params?.data || !Array.isArray(params.data.value)) return;
 
@@ -343,10 +344,11 @@ export default {
             (t) => t.id === clickedTest.id
           );
           if (index >= 0) {
-            this.testsSelected.splice(index, 1); // Deselect
+            this.testsSelected.splice(index, 1);
           } else {
-            this.testsSelected.push(clickedTest); // Select
+            this.testsSelected.push(clickedTest);
           }
+          this.testsSelected = [...this.testsSelected];
         });
       });
     },
@@ -357,9 +359,7 @@ export default {
 <style scoped lang="scss">
 :deep(.v-data-table__selected) {
   background-color: #bbdefb !important;
-  /* light blue */
 }
-
 .chart-wrapper {
   max-height: 250px;
   margin-bottom: 16px;
