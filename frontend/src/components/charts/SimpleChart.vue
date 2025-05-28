@@ -106,7 +106,7 @@ export default {
         tooltip: {
           trigger: "axis",
           confine: true,
-          formatter: this.axisLabelFormatter,
+          valueFormatter: this.axisLabelFormatter,
         },
         dataZoom: [
           {
