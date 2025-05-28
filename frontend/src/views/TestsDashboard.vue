@@ -192,6 +192,7 @@
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
                   :y-axis-name="computedYAxisStiffnessLabel"
+                  :y-axis-max="yAxisMaxStiffness"
                   :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
                   :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
                 />
@@ -257,7 +258,6 @@
                 />
               </li>
             </ul>
-            <!-- warning messages -->
             <v-alert
               v-if="hasWarnings"
               type="warning"
@@ -271,7 +271,6 @@
         </v-card>
       </v-col>
     </v-row>
-    <!-- Fatigue fracture -->
     <v-row v-else-if="experimentType === 'FA' && isFracture">
       <v-col cols="10">
         <v-card :loading="loading">
@@ -376,6 +375,7 @@
               :aspect-ratio="2"
               x-axis-name="Strain [-]"
               y-axis-name="Stress [MPa]"
+              :y-axis-max="yAxisMaxStrainStressQS"
             />
           </v-card-text>
         </v-card>
@@ -547,7 +547,7 @@ import SimpleChart from "@/components/charts/SimpleChart.vue";
 import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
 import ExperimentSV from "@/components/ExperimentSV.vue";
 import InfoTooltip from "@/components/InfoTooltip.vue";
-import { formatNumber2 } from "@/utils/formatters";
+import { computeYAxisMax, formatNumber2 } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
 import { zip } from "lodash";
 import { mapState } from "vuex";
@@ -845,6 +845,12 @@ export default {
           },
         ];
       });
+    },
+    yAxisMaxStrainStressQS() {
+      return computeYAxisMax(this.strainStressSeriesQS);
+    },
+    yAxisMaxStiffness() {
+      return computeYAxisMax(this.stiffnessSeries);
     },
   },
   watch: {

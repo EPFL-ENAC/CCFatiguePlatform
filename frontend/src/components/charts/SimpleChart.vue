@@ -52,6 +52,7 @@ export default {
     color: { type: Array, default: () => colorPalette },
     xAxisMin: { type: [Number, null], default: null },
     xAxisMax: { type: [Number, null], default: null },
+    yAxisMax: { type: [Number, null], default: null },
     axisLabelFormatter: {
       type: Function,
       default: formatNumber3,
@@ -96,7 +97,7 @@ export default {
           nameLocation: "middle",
           nameGap: 50,
           min: 0,
-          max: "dataMax",
+          max: this.yAxisMax != null ? this.yAxisMax : "dataMax",
           axisLabel: {
             formatter: this.axisLabelFormatter,
             hideOverlap: true,
