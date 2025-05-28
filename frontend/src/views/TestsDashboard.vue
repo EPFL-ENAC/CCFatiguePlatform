@@ -477,6 +477,7 @@
                   x-axis-name="Crack Length [mm]"
                   y-axis-name="Fracture Energy [J/m²]"
                   :y-axis-max="yAxisMaxFractureEnergyMBT"
+                  :x-axis-max="xAxisMaxFractureEnergyMBT"
                 />
               </v-card-text>
             </v-card>
@@ -493,6 +494,7 @@
                   x-axis-name="Crack Length [mm]"
                   y-axis-name="Fracture Energy [J/m²]"
                   :y-axis-max="yAxisMaxFractureEnergyMCC"
+                  :x-axis-max="xAxisMaxFractureEnergyMCC"
                 />
               </v-card-text>
             </v-card>
@@ -509,6 +511,7 @@
                   x-axis-name="Crack Length [mm]"
                   y-axis-name="Fracture Energy [J/m²]"
                   :y-axis-max="yAxisMaxFractureEnergyECCM"
+                  :x-axis-max="xAxisMaxFractureEnergyECCM"
                 />
               </v-card-text>
             </v-card>
@@ -550,7 +553,11 @@ import SimpleChart from "@/components/charts/SimpleChart.vue";
 import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
 import ExperimentSV from "@/components/ExperimentSV.vue";
 import InfoTooltip from "@/components/InfoTooltip.vue";
-import { computeYAxisMax, formatNumber2 } from "@/utils/formatters";
+import {
+  computeXAxisMax,
+  computeYAxisMax,
+  formatNumber2,
+} from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
 import { zip } from "lodash";
 import { mapState } from "vuex";
@@ -863,6 +870,15 @@ export default {
     },
     yAxisMaxFractureEnergyECCM() {
       return computeYAxisMax(this.fractureEnergySeries_eccm);
+    },
+    xAxisMaxFractureEnergyMBT() {
+      return computeXAxisMax(this.fractureEnergySeries_mbt);
+    },
+    xAxisMaxFractureEnergyMCC() {
+      return computeXAxisMax(this.fractureEnergySeries_mcc);
+    },
+    xAxisMaxFractureEnergyECCM() {
+      return computeXAxisMax(this.fractureEnergySeries_eccm);
     },
   },
   watch: {

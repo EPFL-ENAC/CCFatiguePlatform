@@ -27,3 +27,21 @@ export function computeYAxisMax(series) {
   // Round up to the next convenient tick
   return Math.ceil(maxVal / tickStep) * tickStep;
 }
+
+export function computeXAxisMax(series) {
+  const allXValues = series
+    .flatMap((s) => s?.data || [])
+    .map(([x]) => x)
+    .filter((v) => typeof v === "number" && isFinite(v));
+
+  if (!allXValues.length) return null;
+
+  const maxVal = Math.max(...allXValues);
+
+  // Dynamic calculation of the "step" based on the order of magnitude
+  const magnitude = Math.pow(10, Math.floor(Math.log10(maxVal)));
+  const tickStep = magnitude / 2;
+
+  // Round up to the next convenient tick
+  return Math.ceil(maxVal / tickStep) * tickStep;
+}
