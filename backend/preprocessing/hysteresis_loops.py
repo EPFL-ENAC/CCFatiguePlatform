@@ -71,7 +71,14 @@ def process_hysteresis(df, test_meta):
 
     n_cycles = np.sort(df[cycle_field].unique())
     hys_records = []
+    loop_points_records = []
     max_load_nominal = test_meta.get("maximum load")
+
+    # Choose a subset of cycles to process
+    if len(n_cycles) <= 10:
+        selected_cycles = set(n_cycles)
+    else:
+        selected_cycles = set(n_cycles[np.linspace(0, len(n_cycles) - 1, 10, dtype=int)])
 
     for n in n_cycles:
         cycle_df = df[df[cycle_field] == n]
@@ -104,7 +111,16 @@ def process_hysteresis(df, test_meta):
             "creep": round(mean_strain, 6)
         })
 
-    return pd.DataFrame(hys_records)
+        if n in selected_cycles:
+            for i in range(50):
+                loop_points_records.append({
+                    "n_cycles": n,
+                    "point_index": i,
+                    "fit_x": fit_x[i],
+                    "fit_y": fit_y[i],
+                })
+
+    return pd.DataFrame(hys_records), pd.DataFrame(loop_points_records)
 
 def run_on_folder(PREPROCESSED_FOLDER):
     tests_fp = os.path.join(PREPROCESSED_FOLDER, "tests.csv")
@@ -126,10 +142,12 @@ def run_on_folder(PREPROCESSED_FOLDER):
         try:
             print(f"   📄 Reading: {fname}")
             df = pd.read_csv(os.path.join(PREPROCESSED_FOLDER, fname), low_memory=False)
-            hyst_df = process_hysteresis(df, test_meta)
+            hyst_df, loops_df = process_hysteresis(df, test_meta)
             if not hyst_df.empty:
-                hys_fp = "HYS_" + fname
-                hyst_df.to_csv(os.path.join(PREPROCESSED_FOLDER, hys_fp), index=False)
+                hyst_df.to_csv(os.path.join(PREPROCESSED_FOLDER, "HYS_" + fname), index=False)
+
+            if not loops_df.empty:
+                loops_df.to_csv(os.path.join(PREPROCESSED_FOLDER, "Loops_" + fname), index=False)
         except Exception as e:
             print(f"Error with {fname}: {e}")
 
