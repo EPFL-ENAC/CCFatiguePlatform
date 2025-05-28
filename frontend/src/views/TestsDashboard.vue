@@ -476,6 +476,7 @@
                   :aspect-ratio="2"
                   x-axis-name="Crack Length [mm]"
                   y-axis-name="Fracture Energy [J/m²]"
+                  :y-axis-max="yAxisMaxFractureEnergyMBT"
                 />
               </v-card-text>
             </v-card>
@@ -491,6 +492,7 @@
                   :aspect-ratio="2"
                   x-axis-name="Crack Length [mm]"
                   y-axis-name="Fracture Energy [J/m²]"
+                  :y-axis-max="yAxisMaxFractureEnergyMCC"
                 />
               </v-card-text>
             </v-card>
@@ -506,6 +508,7 @@
                   :aspect-ratio="2"
                   x-axis-name="Crack Length [mm]"
                   y-axis-name="Fracture Energy [J/m²]"
+                  :y-axis-max="yAxisMaxFractureEnergyECCM"
                 />
               </v-card-text>
             </v-card>
@@ -851,6 +854,15 @@ export default {
     },
     yAxisMaxStiffness() {
       return computeYAxisMax(this.stiffnessSeries);
+    },
+    yAxisMaxFractureEnergyMBT() {
+      return computeYAxisMax(this.fractureEnergySeries_mbt);
+    },
+    yAxisMaxFractureEnergyMCC() {
+      return computeYAxisMax(this.fractureEnergySeries_mcc);
+    },
+    yAxisMaxFractureEnergyECCM() {
+      return computeYAxisMax(this.fractureEnergySeries_eccm);
     },
   },
   watch: {
