@@ -6,7 +6,7 @@ import json
 
 BASE_FOLDER = "../../Data/preprocessed"
 
-def is_fracture(folder_path):
+def is_fawithoutfracture(folder_path):
     experiment_fp = os.path.join(folder_path, "experiment.json")
     if not os.path.exists(experiment_fp):
         return True  # skip if the file is missing
@@ -138,8 +138,8 @@ def main():
         PREPROCESSED_FOLDER = os.path.join(BASE_FOLDER, folder_name)
         if not os.path.isdir(PREPROCESSED_FOLDER):
             continue
-        if is_fracture(PREPROCESSED_FOLDER):
-            print(f"❌ Skipping fracture experiment: {folder_name}")
+        if is_fawithoutfracture(PREPROCESSED_FOLDER):
+            print(f"❌ Skipping experiment: {folder_name}")
             continue
         print(f"✅ Processing: {folder_name}")
         run_on_folder(PREPROCESSED_FOLDER)
