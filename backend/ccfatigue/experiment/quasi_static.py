@@ -2,6 +2,7 @@ import os
 from re import Pattern, search
 from typing import Callable, Dict, List, Any
 import numpy as np
+from scipy.optimize import curve_fit
 
 import pandas as pd
 from pandas import DataFrame
@@ -113,29 +114,39 @@ async def quasi_static_test(
 
     if is_fracture:
         crack_displacement = df["u"].dropna().tolist() if "u" in df.columns else []
-        if crack_displacement:
-            crack_displacement = [v - crack_displacement[0] for v in crack_displacement]
+        #if crack_displacement:
+        #    crack_displacement = [v - crack_displacement[0] for v in crack_displacement]
+
         crack_load = df["Load"].dropna().tolist() if "Load" in df.columns else []
         crack_length = df["Crack_length"].dropna().tolist() if "Crack_length" in df.columns else []
 
+        def fit_func(x, a, b):
+            return a * x + b
+
         def compute_factors(crack_displacement, crack_load, crack_length, thickness, t, l_prime):
-            total_distance = thickness / 4 + t # PAY ATTENTION: for Joseph datasets t = 22 is an error 
             print(f"t value read: {t} mm")
             print(f"l prime value read: {l_prime} mm")
             compliance = np.array(crack_displacement) / np.array(crack_load)
+            print
             crack = np.array(crack_length)
             displacement = np.array(crack_displacement)
             load = np.array(crack_load)
 
-            F = 1 - (3/10)*(displacement/crack)**2 - (3/2)*((displacement * total_distance)/(crack**2))
-            N = 1 - ((l_prime/crack)**3)-(9/8)*(1-((l_prime/crack)**2))*((displacement * total_distance)/(crack**2)) - (9/35)*(displacement/crack)**2
+            F = 1 - (3/10)*(displacement/crack)**2 - (3/2)*((displacement * t)/(crack**2))
+            N = 1 - ((l_prime/crack)**3)-(9/8)*(1-((l_prime/crack)**2))*((displacement * t)/(crack**2)) - (9/35)*(displacement/crack)**2
             return compliance, F, N
 
         def compute_g_mbt(crack_displacement, crack_load, crack_length, width, thickness, t, l_prime):
             compliance, F, N = compute_factors(crack_displacement, crack_load, crack_length, thickness, t, l_prime)
+            print(f"N: {N}")
             C_N_1_3 = (compliance / N)**(1/3)
-            a, b = np.polyfit(crack_length, C_N_1_3, 1)
+            # a, b = np.polyfit(crack_length, C_N_1_3, 1)
+            params, _ = curve_fit(fit_func, crack_length, C_N_1_3)
+            a, b = params
+            print(f"a: {a}, b: {b}")
             triangle = abs(b / a)
+            print(f"Triangle value: {triangle} mm")
+
             G = (3 * np.array(crack_load) * np.array(crack_displacement)) / (2 * width * (np.array(crack_length) + triangle)) * F / N * 1e6
             return G.tolist()
 
@@ -170,9 +181,10 @@ async def quasi_static_test(
     
 
         # Placeholder per crack_fractureenergy
-        crack_fractureenergy_mbt = compute_g_mbt(crack_displacement, crack_load, crack_length, width, thickness, t, l_prime)
-        crack_fractureenergy_mcc = compute_g_mcc(crack_displacement, crack_load, crack_length, width, thickness, t, l_prime)
-        crack_fractureenergy_eccm = compute_g_eccm(crack_displacement, crack_load, crack_length, width, thickness, t, l_prime)
+        crack_load_kN = np.array(crack_load) / 1000  # Convert to kN if needed
+        crack_fractureenergy_mbt = compute_g_mbt(crack_displacement, crack_load_kN, crack_length, width, thickness, t, l_prime)
+        crack_fractureenergy_mcc = compute_g_mcc(crack_displacement, crack_load_kN, crack_length, width, thickness, t, l_prime)
+        crack_fractureenergy_eccm = compute_g_eccm(crack_displacement, crack_load_kN, crack_length, width, thickness, t, l_prime)
 
 
         return QuasiStaticTest(
