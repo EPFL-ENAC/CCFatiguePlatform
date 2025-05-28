@@ -60,6 +60,7 @@
                   :aspect-ratio="2"
                   x-axis-name="Strain [-]"
                   y-axis-name="Stress [MPa]"
+                  :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
             </v-card>
@@ -102,6 +103,7 @@
                   y-axis-name="Creep [-]"
                   :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
                   :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
+                  :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
             </v-card>
@@ -144,6 +146,7 @@
                   y-axis-name="Hysteresis area [MPa]"
                   :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
                   :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
+                  :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
             </v-card>
@@ -195,6 +198,7 @@
                   :y-axis-max="yAxisMaxStiffness"
                   :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
                   :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
+                  :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
             </v-card>
@@ -308,7 +312,7 @@
               :x-axis-type="xAxisChartType"
               :y1-axis-name="'Load [N]'"
               :y2-axis-name="'Crack Length [mm]'"
-              :axis-label-formatter="axisLabelFormatter"
+              :axis-label-formatter="axisTickFormatter"
             />
           </v-card-text>
         </v-card>
@@ -376,6 +380,7 @@
               x-axis-name="Strain [-]"
               y-axis-name="Stress [MPa]"
               :y-axis-max="yAxisMaxStrainStressQS"
+              :axis-label-formatter="axisTickFormatter"
             />
           </v-card-text>
         </v-card>
@@ -462,7 +467,7 @@
                   x-axis-name="Displacement [mm]"
                   :y1-axis-name="'Load [N]'"
                   :y2-axis-name="'Crack Length [mm]'"
-                  :axis-label-formatter="axisLabelFormatter"
+                  :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
             </v-card>
@@ -478,7 +483,7 @@
                   y-axis-name="Fracture Energy [J/m²]"
                   :y-axis-max="yAxisMaxFractureEnergyMBT"
                   :x-axis-max="xAxisMaxFractureEnergyMBT"
-                  :axis-label-formatter="axisLabelFormatter"
+                  :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
             </v-card>
@@ -496,7 +501,7 @@
                   y-axis-name="Fracture Energy [J/m²]"
                   :y-axis-max="yAxisMaxFractureEnergyMCC"
                   :x-axis-max="xAxisMaxFractureEnergyMCC"
-                  :axis-label-formatter="axisLabelFormatter"
+                  :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
             </v-card>
@@ -514,7 +519,7 @@
                   y-axis-name="Fracture Energy [J/m²]"
                   :y-axis-max="yAxisMaxFractureEnergyECCM"
                   :x-axis-max="xAxisMaxFractureEnergyECCM"
-                  :axis-label-formatter="axisLabelFormatter"
+                  :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
             </v-card>
@@ -559,7 +564,8 @@ import InfoTooltip from "@/components/InfoTooltip.vue";
 import {
   computeXAxisMax,
   computeYAxisMax,
-  formatNumber2,
+  formatNumber3,
+  formatTick,
 } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
 import { zip } from "lodash";
@@ -719,7 +725,7 @@ export default {
       );
     },
     axisLabelFormatter() {
-      return formatNumber2;
+      return formatNumber3;
     },
     hasWarnings() {
       return this.testIds.some((_, i) => this.fatigueWarnings?.[i]);
@@ -882,6 +888,9 @@ export default {
     },
     xAxisMaxFractureEnergyECCM() {
       return computeXAxisMax(this.fractureEnergySeries_eccm);
+    },
+    axisTickFormatter() {
+      return formatTick;
     },
   },
   watch: {

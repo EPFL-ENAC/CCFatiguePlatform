@@ -1,16 +1,40 @@
 import { round } from "lodash";
 
 export const formatNumber3 = (value) => {
-  const rounded = round(value, 3);
-  return Math.abs(value) >= 1000 || (Math.abs(value) < 0.001 && value !== 0)
-    ? Number(rounded).toExponential(3) // force 3 decimals in exponential format
-    : rounded;
+  const num = Number(value);
+  if (isNaN(num)) return value;
+
+  const abs = Math.abs(num);
+
+  if (abs >= 1000 || (abs > 0 && abs < 0.001)) {
+    // Calcola esponente manualmente
+    const exponent = Math.floor(Math.log10(abs));
+    const mantissa = num / Math.pow(10, exponent);
+    const fixedMantissa = mantissa.toFixed(3);
+    return `${fixedMantissa}e${exponent >= 0 ? "+" : ""}${exponent}`;
+  }
+
+  return num.toLocaleString(undefined, {
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3,
+  });
 };
 
 export const formatNumber2 = (value) =>
   Math.abs(value) >= 1000 || (Math.abs(value) < 0.001 && value !== 0)
     ? round(value, 2).toExponential()
     : round(value, 2);
+
+export const formatTick = (value) => {
+  const num = Number(value);
+  if (!isFinite(num)) return value;
+
+  // No thousands separator, max 2 decimals
+  return num.toLocaleString(undefined, {
+    useGrouping: false, // ⬅️ removes the thousands separator
+    maximumFractionDigits: 3,
+  });
+};
 
 export function computeYAxisMax(series) {
   const allYValues = series

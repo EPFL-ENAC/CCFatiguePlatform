@@ -35,6 +35,7 @@
                 :x-axis-name="computedXAxisLabel"
                 :x-axis-type="xAxisChartType"
                 :y-axis-name="yAxisLabel"
+                :axis-label-formatter="axisTickFormatter"
                 @chart-click="handleChartClick"
               />
             </v-card-text>
@@ -75,6 +76,7 @@
 <script>
 import SimpleChart from "@/components/charts/SimpleChart.vue";
 import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
+import { formatTick } from "@/utils/formatters";
 import { mapState } from "vuex";
 
 export default {
@@ -224,6 +226,9 @@ export default {
     },
     xAxisChartType() {
       return this.xAxisMode === "log" ? "log" : "value";
+    },
+    axisTickFormatter() {
+      return formatTick;
     },
   },
   watch: {

@@ -106,7 +106,16 @@ export default {
         tooltip: {
           trigger: "axis",
           confine: true,
-          valueFormatter: this.axisLabelFormatter,
+          formatter: (params) => {
+            const xLabel = params[0].axisValueLabel;
+            const rows = [`<strong>${xLabel}</strong>`];
+            for (const p of params) {
+              const yVal = Array.isArray(p.value) ? p.value[1] : p.value;
+              const formattedY = this.axisLabelFormatter(yVal);
+              rows.push(`${p.marker}${p.seriesName}: ${formattedY}`);
+            }
+            return rows.join("<br/>");
+          },
         },
         dataZoom: [
           {
