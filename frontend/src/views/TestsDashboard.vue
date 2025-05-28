@@ -478,6 +478,7 @@
                   y-axis-name="Fracture Energy [J/m²]"
                   :y-axis-max="yAxisMaxFractureEnergyMBT"
                   :x-axis-max="xAxisMaxFractureEnergyMBT"
+                  :axis-label-formatter="axisLabelFormatter"
                 />
               </v-card-text>
             </v-card>
@@ -495,6 +496,7 @@
                   y-axis-name="Fracture Energy [J/m²]"
                   :y-axis-max="yAxisMaxFractureEnergyMCC"
                   :x-axis-max="xAxisMaxFractureEnergyMCC"
+                  :axis-label-formatter="axisLabelFormatter"
                 />
               </v-card-text>
             </v-card>
@@ -512,6 +514,7 @@
                   y-axis-name="Fracture Energy [J/m²]"
                   :y-axis-max="yAxisMaxFractureEnergyECCM"
                   :x-axis-max="xAxisMaxFractureEnergyECCM"
+                  :axis-label-formatter="axisLabelFormatter"
                 />
               </v-card-text>
             </v-card>

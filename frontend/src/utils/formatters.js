@@ -1,9 +1,11 @@
 import { round } from "lodash";
 
-export const formatNumber3 = (value) =>
-  Math.abs(value) >= 1000 || (Math.abs(value) < 0.001 && value !== 0)
-    ? round(value, 3).toExponential()
-    : round(value, 3);
+export const formatNumber3 = (value) => {
+  const rounded = round(value, 3);
+  return Math.abs(value) >= 1000 || (Math.abs(value) < 0.001 && value !== 0)
+    ? Number(rounded).toExponential(3) // force 3 decimals in exponential format
+    : rounded;
+};
 
 export const formatNumber2 = (value) =>
   Math.abs(value) >= 1000 || (Math.abs(value) < 0.001 && value !== 0)
