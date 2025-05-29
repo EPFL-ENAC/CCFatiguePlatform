@@ -35,6 +35,9 @@
                 :x-axis-name="computedXAxisLabel"
                 :x-axis-type="xAxisChartType"
                 :y-axis-name="yAxisLabel"
+                :x-axis-min="minX"
+                :x-axis-max="maxX"
+                :y-axis-max="maxY"
                 :axis-label-formatter="axisTickFormatter"
                 @chart-click="handleChartClick"
               />
@@ -230,6 +233,31 @@ export default {
     axisTickFormatter() {
       return formatTick;
     },
+    maxX() {
+      const max = Math.max(
+        ...this.numberedTests
+          .filter((t) => typeof t.number_of_cycles === "number")
+          .map((t) => t.number_of_cycles)
+      );
+      return this.roundUpTick(max);
+    },
+    minX() {
+      return this.xAxisMode === "log" ? 1 : 0;
+    },
+    maxY() {
+      const controlMode =
+        this.experiment?.experiment?.control_mode?.toLowerCase();
+      const isDisplacement = controlMode === "displacement controlled";
+
+      const max = Math.max(
+        ...this.numberedTests
+          .map((t) =>
+            isDisplacement ? t.maximum_displacement : t.maximum_stress
+          )
+          .filter((v) => typeof v === "number")
+      );
+      return this.roundUpTick(max);
+    },
   },
   watch: {
     "experiment.tests": {
@@ -356,6 +384,12 @@ export default {
           this.testsSelected = [...this.testsSelected];
         });
       });
+    },
+    roundUpTick(value) {
+      if (value <= 0) return 1;
+      const log = Math.floor(Math.log10(value));
+      const scale = Math.pow(10, log);
+      return Math.ceil(value / scale) * scale;
     },
   },
 };
