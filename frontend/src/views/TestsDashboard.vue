@@ -243,7 +243,7 @@
                   :values="cycleAtFailure"
                   :colors="valueColors"
                   value-type="bigNumber"
-                  tooltip="Number of cycles to failure."
+                  tooltip="Number of cycles to failure. Plotted values can be up to the last DIC recorded value"
                 />
               </li>
               <li>
@@ -343,7 +343,7 @@
                   :values="cycleAtFailure"
                   :colors="valueColors"
                   value-type="bigNumber"
-                  tooltip="Number of cycles to failure."
+                  tooltip="Number of cycles to failure. Plotted values can be up to the last DIC recorded value"
                 />
               </li>
               <li>
