@@ -7,7 +7,7 @@ export const formatNumber3 = (value) => {
   const abs = Math.abs(num);
 
   if (abs >= 1000 || (abs > 0 && abs < 0.001)) {
-    // Calcola esponente manualmente
+    // power calculated manually
     const exponent = Math.floor(Math.log10(abs));
     const mantissa = num / Math.pow(10, exponent);
     const fixedMantissa = mantissa.toFixed(3);
@@ -17,6 +17,46 @@ export const formatNumber3 = (value) => {
   return num.toLocaleString(undefined, {
     minimumFractionDigits: 3,
     maximumFractionDigits: 3,
+  });
+};
+
+export const formatNumber4 = (value) => {
+  const num = Number(value);
+  if (isNaN(num)) return value;
+
+  const abs = Math.abs(num);
+
+  if (abs >= 10000 || (abs > 0 && abs < 0.0001)) {
+    // power calculated manually
+    const exponent = Math.floor(Math.log10(abs));
+    const mantissa = num / Math.pow(10, exponent);
+    const fixedMantissa = mantissa.toFixed(4);
+    return `${fixedMantissa}e${exponent >= 0 ? "+" : ""}${exponent}`;
+  }
+
+  return num.toLocaleString(undefined, {
+    minimumFractionDigits: 4,
+    maximumFractionDigits: 4,
+  });
+};
+
+export const formatNumber5 = (value) => {
+  const num = Number(value);
+  if (isNaN(num)) return value;
+
+  const abs = Math.abs(num);
+
+  if (abs >= 100000 || (abs > 0 && abs < 0.00001)) {
+    // power calculated manually
+    const exponent = Math.floor(Math.log10(abs));
+    const mantissa = num / Math.pow(10, exponent);
+    const fixedMantissa = mantissa.toFixed(5);
+    return `${fixedMantissa}e${exponent >= 0 ? "+" : ""}${exponent}`;
+  }
+
+  return num.toLocaleString(undefined, {
+    minimumFractionDigits: 5,
+    maximumFractionDigits: 5,
   });
 };
 
