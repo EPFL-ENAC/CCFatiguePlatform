@@ -111,3 +111,38 @@ export function computeXAxisMax(series) {
   // Round up to the next convenient tick
   return Math.ceil(maxVal / tickStep) * tickStep;
 }
+export function computeYAxisMin(series) {
+  const allYValues = series
+    .flatMap((s) => s?.data || [])
+    .map(([, y]) => y)
+    .filter((v) => typeof v === "number" && isFinite(v));
+
+  if (!allYValues.length) return null;
+
+  const minVal = Math.min(...allYValues);
+
+  // Compute the order of magnitude of the minimum value
+  const magnitude = Math.pow(10, Math.floor(Math.log10(Math.abs(minVal) || 1)));
+  const tickStep = magnitude / 2;
+
+  // Round down to the nearest convenient tick step
+  return Math.floor(minVal / tickStep) * tickStep;
+}
+
+export function computeXAxisMin(series) {
+  const allXValues = series
+    .flatMap((s) => s?.data || [])
+    .map(([x]) => x)
+    .filter((v) => typeof v === "number" && isFinite(v));
+
+  if (!allXValues.length) return null;
+
+  const minVal = Math.min(...allXValues);
+
+  // Compute the order of magnitude of the minimum value
+  const magnitude = Math.pow(10, Math.floor(Math.log10(Math.abs(minVal) || 1)));
+  const tickStep = magnitude / 2;
+
+  // Round down to the nearest convenient tick step
+  return Math.floor(minVal / tickStep) * tickStep;
+}

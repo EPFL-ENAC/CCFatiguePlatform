@@ -312,8 +312,14 @@
               :aspect-ratio="2"
               :x-axis-name="computedXAxisLabel"
               :x-axis-type="xAxisChartType"
+              :x-axis-max="xAxisMaxDoubleChart"
+              :x-axis-min="xAxisMinDoubleChart"
               :y1-axis-name="'Load [N]'"
+              :y1-axis-max="y1AxisMaxDoubleChart"
+              :y1-axis-min="y1AxisMinDoubleChart"
               :y2-axis-name="'Crack Length [mm]'"
+              :y2-axis-max="y2AxisMaxDoubleChart"
+              :y2-axis-min="y2AxisMinDoubleChart"
               :axis-label-formatter="axisTickFormatter"
             />
           </v-card-text>
@@ -467,8 +473,14 @@
                   :series="crackSeries"
                   :aspect-ratio="2"
                   x-axis-name="Displacement [mm]"
+                  :x-axis-max="xAxisMaxDoubleChart"
+                  :x-axis-min="xAxisMinDoubleChart"
                   :y1-axis-name="'Load [N]'"
+                  :y1-axis-max="y1AxisMaxDoubleChart"
+                  :y1-axis-min="y1AxisMinDoubleChart"
                   :y2-axis-name="'Crack Length [mm]'"
+                  :y2-axis-max="y2AxisMaxDoubleChart"
+                  :y2-axis-min="y2AxisMinDoubleChart"
                   :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
@@ -582,7 +594,9 @@ import ExperimentSV from "@/components/ExperimentSV.vue";
 import InfoTooltip from "@/components/InfoTooltip.vue";
 import {
   computeXAxisMax,
+  computeXAxisMin,
   computeYAxisMax,
+  computeYAxisMin,
   formatNumber3,
   formatNumber5,
   formatTick,
@@ -911,6 +925,52 @@ export default {
     },
     xAxisMaxFractureEnergyECCM() {
       return computeXAxisMax(this.fractureEnergySeries_eccm);
+    },
+    xAxisMaxDoubleChart() {
+      const series =
+        this.isFracture && this.experimentType === "QS"
+          ? this.crackSeries
+          : this.crackFaFractureSeries;
+      return computeXAxisMax(series);
+    },
+    y1AxisMaxDoubleChart() {
+      const series =
+        this.isFracture && this.experimentType === "QS"
+          ? this.crackSeries
+          : this.crackFaFractureSeries;
+      const y1Series = series.filter((s) => s.yAxisIndex !== 1);
+      return computeYAxisMax(y1Series);
+    },
+    y2AxisMaxDoubleChart() {
+      const series =
+        this.isFracture && this.experimentType === "QS"
+          ? this.crackSeries
+          : this.crackFaFractureSeries;
+      const y2Series = series.filter((s) => s.yAxisIndex === 1);
+      return computeYAxisMax(y2Series);
+    },
+    xAxisMinDoubleChart() {
+      const series =
+        this.isFracture && this.experimentType === "QS"
+          ? this.crackSeries
+          : this.crackFaFractureSeries;
+      return computeXAxisMin(series);
+    },
+    y1AxisMinDoubleChart() {
+      const series =
+        this.isFracture && this.experimentType === "QS"
+          ? this.crackSeries
+          : this.crackFaFractureSeries;
+      const y1Series = series.filter((s) => s.yAxisIndex !== 1);
+      return computeYAxisMin(y1Series);
+    },
+    y2AxisMinDoubleChart() {
+      const series =
+        this.isFracture && this.experimentType === "QS"
+          ? this.crackSeries
+          : this.crackFaFractureSeries;
+      const y2Series = series.filter((s) => s.yAxisIndex === 1);
+      return computeYAxisMin(y2Series);
     },
     axisTickFormatter() {
       return formatTick;
