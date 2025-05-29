@@ -104,6 +104,7 @@
                   :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
                   :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
                   :axis-label-formatter="axisTickFormatter"
+                  :tooltip-formatter="TooltipFormatter_5"
                 />
               </v-card-text>
             </v-card>
@@ -147,6 +148,7 @@
                   :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
                   :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
                   :axis-label-formatter="axisTickFormatter"
+                  :tooltip-formatter="TooltipFormatter_5"
                 />
               </v-card-text>
             </v-card>
@@ -474,7 +476,13 @@
           </v-col>
           <v-col v-if="fractureEnergySeries_mbt.length" cols="6">
             <v-card :loading="loading">
-              <v-card-title>Crack Length vs Fracture Energy (MBT)</v-card-title>
+              <v-card-title>
+                Crack Length vs Fracture Energy (MBT)
+                <info-tooltip>
+                  The graph shows fracture energy calculated using Modified Beam
+                  Theory as a function of crack length.
+                </info-tooltip>
+              </v-card-title>
               <v-card-text>
                 <simple-chart
                   :series="fractureEnergySeries_mbt"
@@ -492,7 +500,13 @@
         <v-row>
           <v-col v-if="fractureEnergySeries_mcc.length" cols="6">
             <v-card :loading="loading">
-              <v-card-title>Crack Length vs Fracture Energy (MCC)</v-card-title>
+              <v-card-title>
+                Crack Length vs Fracture Energy (MCC)
+                <info-tooltip>
+                  The graph shows fracture energy calculated using Modified
+                  Compliance Calibration as a function of crack length.
+                </info-tooltip>
+              </v-card-title>
               <v-card-text>
                 <simple-chart
                   :series="fractureEnergySeries_mcc"
@@ -510,6 +524,11 @@
             <v-card :loading="loading">
               <v-card-title>
                 Crack Length vs Fracture Energy (ECCM)
+                <info-tooltip>
+                  The graph shows fracture energy calcualted using the
+                  Experimental Crack Compliance Method as a function of crack
+                  length.
+                </info-tooltip>
               </v-card-title>
               <v-card-text>
                 <simple-chart
@@ -565,6 +584,7 @@ import {
   computeXAxisMax,
   computeYAxisMax,
   formatNumber3,
+  formatNumber5,
   formatTick,
 } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
@@ -726,6 +746,9 @@ export default {
     },
     axisLabelFormatter() {
       return formatNumber3;
+    },
+    TooltipFormatter_5() {
+      return formatNumber5;
     },
     hasWarnings() {
       return this.testIds.some((_, i) => this.fatigueWarnings?.[i]);

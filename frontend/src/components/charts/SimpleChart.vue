@@ -58,6 +58,10 @@ export default {
       default: formatNumber3,
     },
     showLegend: { type: Boolean, default: true },
+    tooltipFormatter: {
+      type: Function,
+      default: formatNumber3,
+    },
   },
   data() {
     return {
@@ -107,11 +111,14 @@ export default {
           trigger: "axis",
           confine: true,
           formatter: (params) => {
+            const formatter = this.tooltipFormatter; // ✅ take from props
             const xLabel = params[0].axisValueLabel;
             const rows = [`<strong>${xLabel}</strong>`];
+
             for (const p of params) {
-              const yVal = Array.isArray(p.value) ? p.value[1] : p.value;
-              const formattedY = this.axisLabelFormatter(yVal);
+              const rawY = Array.isArray(p.value) ? p.value[1] : p.value;
+              const yVal = Number(rawY);
+              const formattedY = formatter(yVal);
               rows.push(`${p.marker}${p.seriesName}: ${formattedY}`);
             }
             return rows.join("<br/>");
