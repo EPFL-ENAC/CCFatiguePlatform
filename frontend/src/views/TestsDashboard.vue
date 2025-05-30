@@ -582,7 +582,6 @@ import {
   computeXAxisMin,
   computeYAxisMax,
   computeYAxisMin,
-  formatNumber3,
   formatNumber5,
   formatTick,
 } from "@/utils/formatters";
@@ -616,7 +615,6 @@ export default {
       specimenIds: [],
       totalDissipatedEnergies: [],
       runOuts: [],
-      stressRatios: [],
       selectedLoopIndices: [], // { value }
       crackSeries: [],
       strainData: {},
@@ -628,7 +626,6 @@ export default {
       toughnessValues: [],
       youngModulusValues: [],
       quasiStaticPoissonRatios: [],
-      initialCrackLength: [],
       fatigueWarnings: [],
       fractureEnergyData_mbt: {},
       fractureEnergyData_mcc: {},
@@ -749,9 +746,6 @@ export default {
         e != null ? Number(e).toFixed(2) : "-"
       );
     },
-    axisLabelFormatter() {
-      return formatNumber3;
-    },
     TooltipFormatter_5() {
       return formatNumber5;
     },
@@ -811,51 +805,6 @@ export default {
         };
       });
     },
-    fractureEnergySeries_mbt() {
-      return this.testIds
-        .map((id) => {
-          const crackLength = this.crackLengthData[id];
-          const fractureEnergy_mbt = this.fractureEnergyData_mbt[id];
-          if (!crackLength || !fractureEnergy_mbt) return null;
-
-          return {
-            type: "line",
-            name: this.specimenName[id],
-            data: zip(crackLength, fractureEnergy_mbt),
-          };
-        })
-        .filter((s) => s !== null);
-    },
-    fractureEnergySeries_mcc() {
-      return this.testIds
-        .map((id) => {
-          const crackLength = this.crackLengthData[id];
-          const fractureEnergy_mcc = this.fractureEnergyData_mcc[id];
-          if (!crackLength || !fractureEnergy_mcc) return null;
-
-          return {
-            type: "line",
-            name: this.specimenName[id],
-            data: zip(crackLength, fractureEnergy_mcc),
-          };
-        })
-        .filter((s) => s !== null);
-    },
-    fractureEnergySeries_ecm() {
-      return this.testIds
-        .map((id) => {
-          const crackLength = this.crackLengthData[id];
-          const fractureEnergy_ecm = this.fractureEnergyData_ecm[id];
-          if (!crackLength || !fractureEnergy_ecm) return null;
-
-          return {
-            type: "line",
-            name: this.specimenName[id],
-            data: zip(crackLength, fractureEnergy_ecm),
-          };
-        })
-        .filter((s) => s !== null);
-    },
     crackFaFractureSeries() {
       return this.fatigueData.flatMap((d, i) => {
         const id = d.specimen_id;
@@ -898,24 +847,6 @@ export default {
     },
     yAxisMaxStiffness() {
       return computeYAxisMax(this.stiffnessSeries);
-    },
-    yAxisMaxFractureEnergyMBT() {
-      return computeYAxisMax(this.fractureEnergySeries_mbt);
-    },
-    yAxisMaxFractureEnergyMCC() {
-      return computeYAxisMax(this.fractureEnergySeries_mcc);
-    },
-    yAxisMaxFractureEnergyecm() {
-      return computeYAxisMax(this.fractureEnergySeries_ecm);
-    },
-    xAxisMaxFractureEnergyMBT() {
-      return computeXAxisMax(this.fractureEnergySeries_mbt);
-    },
-    xAxisMaxFractureEnergyMCC() {
-      return computeXAxisMax(this.fractureEnergySeries_mcc);
-    },
-    xAxisMaxFractureEnergyecm() {
-      return computeXAxisMax(this.fractureEnergySeries_ecm);
     },
     xAxisMaxDoubleChart() {
       const series =
@@ -1046,7 +977,6 @@ export default {
       this.specimenIds = [];
       this.totalDissipatedEnergies = [];
       this.runOuts = [];
-      this.stressRatios = [];
       this.fatigueData = dataList;
       dataList.forEach((d, i) => {
         const tid = this.testIds[i];
@@ -1057,7 +987,6 @@ export default {
         this.specimenIds.push(d.specimen_id);
         this.totalDissipatedEnergies.push(d.total_dissipated_energy);
         this.runOuts.push(d.run_out);
-        this.stressRatios.push(d.stress_ratio);
         this.fatigueWarnings.push(d.warning_messages || false);
         d.crack_length = d.crack_length || [];
         d.crack_n_cycles = d.crack_n_cycles || [];
@@ -1087,13 +1016,11 @@ export default {
       this.youngModulusValues = []; // new
       this.quasiStaticPoissonRatios = []; // new
       this.initialCrackLengths = []; // new
-      this.fractureEnergyData = {};
       this.crackLengthData = {};
 
       dataList.forEach((d, i) => {
         const tid = this.testIds[i];
         this.specimenName[tid] = d.specimen_name;
-        console.log("🧪 Quasi-static specimen ID:", d.specimen_id);
         this.fractureEnergyData_mbt[tid] = d.crack_fractureenergy_mbt;
         this.fractureEnergyData_mcc[tid] = d.crack_fractureenergy_mcc;
         this.fractureEnergyData_ecm[tid] = d.crack_fractureenergy_ecm;
