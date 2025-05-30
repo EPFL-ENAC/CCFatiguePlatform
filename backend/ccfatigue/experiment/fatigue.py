@@ -44,6 +44,8 @@ class FatigueTest(BaseModel):
     crack_load: List[float]
     crack_length: List[float]
     crack_n_cycles: List[float]
+    da_dn: Optional[List[float]] = None
+    G_MBT: Optional[List[float]] = None
 
 
 # ==== Funzioni utili ====
@@ -179,12 +181,102 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
         crack_length = std_df["Crack_length"].tolist() if "Crack_length" in std_df else []
         crack_n_cycles = std_df["N_cycles"].tolist() if "N_cycles" in std_df else []
 
+        # Parametri geometrici
+        w = test_meta["width"]
+        h = test_meta["thickness"]
+        t = h / 4 + 22
+
+        # Calcoli preliminari
+        std_df["Force_kN"] = std_df["Load"] * 1e-3
+        std_df["compliance"] = std_df["u"] / std_df["Force_kN"]
+
+        # F factor
+        std_df["F"] = (
+            1
+            - 3/10 * (std_df["u"] / std_df["Crack_length"])**2
+            - 3/2 * ((std_df["u"] * t) / (std_df["Crack_length"])**2)
+        )
+
+        # N factor
+        std_df["N"] = (
+            1
+            - (LOOP_SPACING / std_df["Crack_length"])**3
+            - 9/8 * (1 - (LOOP_SPACING / std_df["Crack_length"])**2) * (std_df["u"] * t) / (std_df["Crack_length"]**2)
+            - 9/35 * (std_df["u"] / std_df["Crack_length"])**2
+        )
+
+        # MBT triangle fitting
+        from scipy.optimize import curve_fit
+
+        def fit_func(x, a, b):
+            return a * x + b
+
+        x_fit = std_df["Crack_length"]
+        y_fit = (std_df["compliance"] / std_df["N"])**(1/3)
+        params, _ = curve_fit(fit_func, x_fit, y_fit)
+        a_param, b_param = params
+        triangle = abs(b_param / a_param)
+
+        # G_MBT
+        std_df["G_MBT"] = (
+            (3 * std_df["Force_kN"] * std_df["u"])
+            / (2 * w * (std_df["Crack_length"] + triangle))
+            * std_df["F"] / std_df["N"]
+            * 1e6
+        )
+
+        # Calcolo da/dN (metodo polinomiale)
+        def func(x, b0, b1, b2):
+            return b0 + b1 * x + b2 * x**2
+
+        da_dn_new = []
+        a_estimated = []
+
+        # Punto iniziale
+        a_0 = 0.5 * (std_df["Crack_length"].iloc[1] + std_df["Crack_length"].iloc[0])
+        a_estimated.append(a_0)
+        da_dn_0 = (
+            (std_df["Crack_length"].iloc[1] - std_df["Crack_length"].iloc[0])
+            / (std_df["N_cycles"].iloc[1] - std_df["N_cycles"].iloc[0])
+        )
+        da_dn_new.append(da_dn_0)
+
+        # Punti intermedi con finestra mobile di 7 dati
+        for i in range(3, len(std_df) - 3):
+            C1 = 0.5 * (std_df["N_cycles"].iloc[i - 3] + std_df["N_cycles"].iloc[i + 3])
+            C2 = 0.5 * (std_df["N_cycles"].iloc[i + 3] - std_df["N_cycles"].iloc[i - 3])
+            x_vals = (std_df["N_cycles"].iloc[i - 3:i + 4] - C1) / C2
+            y_vals = std_df["Crack_length"].iloc[i - 3:i + 4]
+            popt, _ = curve_fit(func, x_vals, y_vals)
+            a_est = func(x_vals.iloc[3], *popt)
+            a_estimated.append(a_est)
+            da_dn = popt[1] / C2 + (2 * popt[2] * (std_df["N_cycles"].iloc[i] - C1)) / C2**2
+            da_dn_new.append(da_dn)
+
+        # Ultimi punti (usa differenze finite semplici)
+        for i in range(len(std_df) - 3, len(std_df)):
+            if i == len(std_df) - 1:
+                a_est = 0.5 * (std_df["Crack_length"].iloc[-2] + std_df["Crack_length"].iloc[-1])
+                da_dn = (
+                    (std_df["Crack_length"].iloc[-1] - std_df["Crack_length"].iloc[-2])
+                    / (std_df["N_cycles"].iloc[-1] - std_df["N_cycles"].iloc[-2])
+                )
+            else:
+                a_est = std_df["Crack_length"].iloc[i]
+                da_dn = (
+                    (std_df["Crack_length"].iloc[i + 1] - std_df["Crack_length"].iloc[i - 1])
+                    / (std_df["N_cycles"].iloc[i + 1] - std_df["N_cycles"].iloc[i - 1])
+                )
+            a_estimated.append(a_est)
+            da_dn_new.append(da_dn)
+
+        # Restituzione del FatigueTest (senza da_dn_new o G_MBT inclusi direttamente)
         return FatigueTest(
             specimen_id=specimen_id,
             specimen_name=specimen_name,
             run_out=test_meta["run_out"],
             hysteresis_loops=[],
-            n_cycles=[],
+            n_cycles=std_df["N_cycles"].tolist(),
             creep=[],
             hysteresis_area=[],
             stiffness=[],
@@ -196,7 +288,9 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
             crack_displacement=crack_displacement,
             crack_load=crack_load,
             crack_length=crack_length,
-            crack_n_cycles=crack_n_cycles
+            crack_n_cycles=crack_n_cycles,
+            da_dn = da_dn_new,
+            G_MBT=std_df["G_MBT"].tolist(),
         )
 
     hyst_df = get_dataframe("HYS", experiment, specimen_id).fillna(0)
@@ -235,5 +329,7 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
         crack_displacement=[],
         crack_load=[],
         crack_length=[],
-        crack_n_cycles=[]
+        crack_n_cycles=[], 
+        da_dn=[],
+        G_MBT=[],
     )

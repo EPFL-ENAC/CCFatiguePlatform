@@ -41,6 +41,8 @@ class FatigueTest {
    * @param crackDisplacement {Array.<Number>}
    * @param crackLoad {Array.<Number>tring}
    * @param crackNCycles {Array.<Number>}
+   * @param da_dN {Array.<Number>}
+   * @param G_MBT {Array.<Number>}
    */
   constructor(
     specimenId,
@@ -60,7 +62,9 @@ class FatigueTest {
     crackLength,
     crackDisplacement,
     crackLoad,
-    crackNCycles
+    crackNCycles, 
+    da_dN,
+    G_MBT
   ) {
     FatigueTest.initialize(
       this,
@@ -81,7 +85,9 @@ class FatigueTest {
       crackLength,
       crackDisplacement,
       crackLoad,
-      crackNCycles
+      crackNCycles,
+      da_dN,
+      G_MBT,
     );
   }
 
@@ -109,7 +115,9 @@ class FatigueTest {
     crackLength,
     crackDisplacement,
     crackLoad,
-    crackNCycles
+    crackNCycles, 
+    da_dN,
+    G_MBT
   ) {
     obj["specimen_id"] = specimenId;
     obj["specimen_name"] = specimenName;
@@ -129,6 +137,8 @@ class FatigueTest {
     obj["crack_displacement"] = crackDisplacement;
     obj["crack_load"] = crackLoad;
     obj["crack_n_cycles"] = crackNCycles;
+    obj["da_dN"] = da_dN;
+    obj["G_MBT"] = G_MBT;
   }
 
   /**
@@ -238,6 +248,12 @@ class FatigueTest {
           ["Number"]
         );
       }
+      if (data.hasOwnProperty("da_dN")) {
+        obj["da_dN"] = ApiClient.convertToType(data["da_dN"], ["Number"]);
+      }
+      if (data.hasOwnProperty("G_MBT")) {
+        obj["G_MBT"] = ApiClient.convertToType(data["G_MBT"], ["Number"]);
+      }
     }
     console.log("Constructed FatigueTest object:", obj); // useful logs
     return obj;
@@ -330,5 +346,13 @@ FatigueTest.prototype["crack_load"] = undefined;
  * @member {Array.<Number>} crack_n_cycles
  */
 FatigueTest.prototype["crack_n_cycles"] = undefined;
+/**
+ * @member {Array.<Number>} da_dN
+ */
+FatigueTest.prototype["da_dN"] = undefined;
+/**
+ * @member {Array.<Number>} G_MBT
+ */
+FatigueTest.prototype["G_MBT"] = undefined;
 
 export default FatigueTest;
