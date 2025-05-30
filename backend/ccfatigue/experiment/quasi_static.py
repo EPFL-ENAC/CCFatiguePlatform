@@ -30,7 +30,7 @@ class QuasiStaticTest(BaseModel):
     poisson_ratio: float | None # new feature
     crack_fractureenergy_mbt: List[float]
     crack_fractureenergy_mcc: List[float]
-    crack_fractureenergy_eccm: List[float]
+    crack_fractureenergy_ecm: List[float]
 
 
 def get_dataframe(
@@ -158,7 +158,7 @@ async def quasi_static_test(
             G = (3 * np.array(crack_load)**2 * (compliance / N)**(2/3)) / (2 * A1 * width * thickness) * F * 1e6
             return G.tolist()
 
-        def compute_g_eccm(crack_displacement, crack_load, crack_length, width, thickness, t, l_prime):
+        def compute_g_ecm(crack_displacement, crack_load, crack_length, width, thickness, t, l_prime):
             compliance, F, N = compute_factors(crack_displacement, crack_load, crack_length, thickness, t, l_prime)
 
             # Convert to NumPy array for masking
@@ -184,7 +184,7 @@ async def quasi_static_test(
         crack_load_kN = np.array(crack_load) / 1000  # Convert to kN if needed
         crack_fractureenergy_mbt = compute_g_mbt(crack_displacement, crack_load_kN, crack_length, width, thickness, t, l_prime)
         crack_fractureenergy_mcc = compute_g_mcc(crack_displacement, crack_load_kN, crack_length, width, thickness, t, l_prime)
-        crack_fractureenergy_eccm = compute_g_eccm(crack_displacement, crack_load_kN, crack_length, width, thickness, t, l_prime)
+        crack_fractureenergy_ecm = compute_g_ecm(crack_displacement, crack_load_kN, crack_length, width, thickness, t, l_prime)
 
 
         return QuasiStaticTest(
@@ -195,7 +195,7 @@ async def quasi_static_test(
             crack_length=crack_length,
             crack_fractureenergy_mbt=crack_fractureenergy_mbt,
             crack_fractureenergy_mcc=crack_fractureenergy_mcc,
-            crack_fractureenergy_eccm=crack_fractureenergy_eccm,
+            crack_fractureenergy_ecm=crack_fractureenergy_ecm,
             displacement={},
             load={},
             strain={},
@@ -261,7 +261,7 @@ async def quasi_static_test(
             crack_length=[],
             crack_fractureenergy_mbt=[],
             crack_fractureenergy_mcc=[],
-            crack_fractureenergy_eccm=[],
+            crack_fractureenergy_ecm=[],
             displacement=displacement,
             load=load,
             strain=strain,

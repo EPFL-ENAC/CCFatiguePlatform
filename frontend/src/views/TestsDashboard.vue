@@ -486,70 +486,55 @@
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col v-if="fractureEnergySeries_mbt.length" cols="6">
+          <v-col cols="6">
             <v-card :loading="loading">
               <v-card-title>
-                Crack Length vs Fracture Energy (MBT)
-                <info-tooltip>
-                  The graph shows fracture energy calculated using Modified Beam
-                  Theory as a function of crack length.
-                </info-tooltip>
+                <v-row align="center" class="w-100">
+                  <v-col class="d-flex align-center" cols="auto">
+                    Fracture Energy vs Crack Length
+                    <info-tooltip>
+                      The graph shows the evolution of the fracture energy
+                      calculated with different methods as a function of the
+                      <ul>
+                        <li><strong>MBT</strong> = solid line</li>
+                        <li><strong>MCC</strong> = dashed line</li>
+                        <li><strong>ECM</strong> = dotted line</li>
+                      </ul>
+                    </info-tooltip>
+                  </v-col>
+                  <v-spacer />
+                  <v-col cols="auto">
+                    <v-select
+                      v-model="selectedFractureEnergyMethods"
+                      :items="fractureEnergyMethodOptions"
+                      label="Fracture Energy Types"
+                      dense
+                      hide-details
+                      multiple
+                      style="max-width: 220px"
+                    >
+                      <template #prepend-item>
+                        <v-list-item
+                          @click="selectedFractureEnergyMethods = []"
+                        >
+                          <v-list-item-title class="text-primary"
+                            >Clear all</v-list-item-title
+                          >
+                        </v-list-item>
+                        <v-divider />
+                      </template>
+                    </v-select>
+                  </v-col>
+                </v-row>
               </v-card-title>
               <v-card-text>
                 <simple-chart
-                  :series="fractureEnergySeries_mbt"
+                  :series="fractureEnergySeriesCombined"
                   :aspect-ratio="2"
                   x-axis-name="Crack Length [mm]"
                   y-axis-name="Fracture Energy [J/m²]"
-                  :y-axis-max="yAxisMaxFractureEnergyMBT"
-                  :x-axis-max="xAxisMaxFractureEnergyMBT"
-                  :axis-label-formatter="axisTickFormatter"
-                />
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col v-if="fractureEnergySeries_mcc.length" cols="6">
-            <v-card :loading="loading">
-              <v-card-title>
-                Crack Length vs Fracture Energy (MCC)
-                <info-tooltip>
-                  The graph shows fracture energy calculated using Modified
-                  Compliance Calibration as a function of crack length.
-                </info-tooltip>
-              </v-card-title>
-              <v-card-text>
-                <simple-chart
-                  :series="fractureEnergySeries_mcc"
-                  :aspect-ratio="2"
-                  x-axis-name="Crack Length [mm]"
-                  y-axis-name="Fracture Energy [J/m²]"
-                  :y-axis-max="yAxisMaxFractureEnergyMCC"
-                  :x-axis-max="xAxisMaxFractureEnergyMCC"
-                  :axis-label-formatter="axisTickFormatter"
-                />
-              </v-card-text>
-            </v-card>
-          </v-col>
-          <v-col v-if="fractureEnergySeries_eccm.length" cols="6">
-            <v-card :loading="loading">
-              <v-card-title>
-                Crack Length vs Fracture Energy (ECCM)
-                <info-tooltip>
-                  The graph shows fracture energy calcualted using the
-                  Experimental Crack Compliance Method as a function of crack
-                  length.
-                </info-tooltip>
-              </v-card-title>
-              <v-card-text>
-                <simple-chart
-                  :series="fractureEnergySeries_eccm"
-                  :aspect-ratio="2"
-                  x-axis-name="Crack Length [mm]"
-                  y-axis-name="Fracture Energy [J/m²]"
-                  :y-axis-max="yAxisMaxFractureEnergyECCM"
-                  :x-axis-max="xAxisMaxFractureEnergyECCM"
+                  :y-axis-max="yAxisMaxFractureEnergyCombined"
+                  :x-axis-max="xAxisMaxFractureEnergyCombined"
                   :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
@@ -647,9 +632,15 @@ export default {
       fatigueWarnings: [],
       fractureEnergyData_mbt: {},
       fractureEnergyData_mcc: {},
-      fractureEnergyData_eccm: {},
+      fractureEnergyData_ecm: {},
       crackLengthData: {},
       specimenName: {},
+      selectedFractureEnergyMethods: [], // selected methods (MBT, MCC, ECM)
+      fractureEnergyMethodOptions: [
+        { text: "MBT", value: "mbt" },
+        { text: "MCC", value: "mcc" },
+        { text: "ECM", value: "ecm" },
+      ],
     };
   },
   computed: {
@@ -850,17 +841,17 @@ export default {
         })
         .filter((s) => s !== null);
     },
-    fractureEnergySeries_eccm() {
+    fractureEnergySeries_ecm() {
       return this.testIds
         .map((id) => {
           const crackLength = this.crackLengthData[id];
-          const fractureEnergy_eccm = this.fractureEnergyData_eccm[id];
-          if (!crackLength || !fractureEnergy_eccm) return null;
+          const fractureEnergy_ecm = this.fractureEnergyData_ecm[id];
+          if (!crackLength || !fractureEnergy_ecm) return null;
 
           return {
             type: "line",
             name: this.specimenName[id],
-            data: zip(crackLength, fractureEnergy_eccm),
+            data: zip(crackLength, fractureEnergy_ecm),
           };
         })
         .filter((s) => s !== null);
@@ -914,8 +905,8 @@ export default {
     yAxisMaxFractureEnergyMCC() {
       return computeYAxisMax(this.fractureEnergySeries_mcc);
     },
-    yAxisMaxFractureEnergyECCM() {
-      return computeYAxisMax(this.fractureEnergySeries_eccm);
+    yAxisMaxFractureEnergyecm() {
+      return computeYAxisMax(this.fractureEnergySeries_ecm);
     },
     xAxisMaxFractureEnergyMBT() {
       return computeXAxisMax(this.fractureEnergySeries_mbt);
@@ -923,8 +914,8 @@ export default {
     xAxisMaxFractureEnergyMCC() {
       return computeXAxisMax(this.fractureEnergySeries_mcc);
     },
-    xAxisMaxFractureEnergyECCM() {
-      return computeXAxisMax(this.fractureEnergySeries_eccm);
+    xAxisMaxFractureEnergyecm() {
+      return computeXAxisMax(this.fractureEnergySeries_ecm);
     },
     xAxisMaxDoubleChart() {
       const series =
@@ -974,6 +965,51 @@ export default {
     },
     axisTickFormatter() {
       return formatTick;
+    },
+    fractureEnergySeriesCombined() {
+      const lineStyles = {
+        mbt: { type: "solid" },
+        mcc: { type: "dashed" },
+        ecm: { type: "dotted" },
+      };
+
+      const selectedMethods =
+        this.selectedFractureEnergyMethods.length > 0
+          ? this.selectedFractureEnergyMethods
+          : ["mbt", "mcc", "ecm"]; // se vuoto, mostra tutti
+
+      return this.testIds.flatMap((id, testIndex) => {
+        const crackLength = this.crackLengthData[id];
+        if (!crackLength) return [];
+
+        const color = this.colors[testIndex % this.colors.length];
+
+        return selectedMethods
+          .map((method) => {
+            const fractureEnergyData = this[`fractureEnergyData_${method}`][id];
+            if (!fractureEnergyData) return null;
+
+            return {
+              type: "line",
+              name: `${this.specimenName[id]}`,
+              data: zip(crackLength, fractureEnergyData),
+              lineStyle: { ...lineStyles[method], color },
+              itemStyle: { color },
+              tooltip: {
+                formatter: function (params) {
+                  return params.seriesName;
+                },
+              },
+            };
+          })
+          .filter(Boolean);
+      });
+    },
+    yAxisMaxFractureEnergyCombined() {
+      return computeYAxisMax(this.fractureEnergySeriesCombined);
+    },
+    xAxisMaxFractureEnergyCombined() {
+      return computeXAxisMax(this.fractureEnergySeriesCombined);
     },
   },
   watch: {
@@ -1060,7 +1096,7 @@ export default {
         console.log("🧪 Quasi-static specimen ID:", d.specimen_id);
         this.fractureEnergyData_mbt[tid] = d.crack_fractureenergy_mbt;
         this.fractureEnergyData_mcc[tid] = d.crack_fractureenergy_mcc;
-        this.fractureEnergyData_eccm[tid] = d.crack_fractureenergy_eccm;
+        this.fractureEnergyData_ecm[tid] = d.crack_fractureenergy_ecm;
         this.crackLengthData[tid] = d.crack_length;
         if (d.crack_displacement.length) {
           this.crackSeries.push({
