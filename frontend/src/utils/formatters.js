@@ -146,3 +146,33 @@ export function computeXAxisMin(series) {
   // Round down to the nearest convenient tick step
   return Math.floor(minVal / tickStep) * tickStep;
 }
+
+export function computeLogYAxisLimits(
+  series,
+  targetMin = 1e-6,
+  targetMax = 1e-2
+) {
+  const allYValues = series
+    .flatMap((s) => s?.data || [])
+    .map(([, y]) => y)
+    .filter((v) => typeof v === "number" && isFinite(v) && v > 0);
+
+  if (!allYValues.length) {
+    return { min: targetMin, max: targetMax };
+  }
+
+  const minVal = Math.min(...allYValues);
+  const maxVal = Math.max(...allYValues);
+
+  const minExp = Math.floor(Math.log10(minVal));
+  const maxExp = Math.ceil(Math.log10(maxVal));
+
+  // Add a helper to compute splitNumber dynamically, e.g. 4 or 5 ticks by default
+  const splitNumber = Math.max(3, maxExp - minExp + 1);
+
+  return {
+    min: Math.pow(10, minExp),
+    max: Math.pow(10, maxExp),
+    splitNumber,
+  };
+}

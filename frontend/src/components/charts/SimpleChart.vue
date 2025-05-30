@@ -48,6 +48,7 @@ export default {
     xAxisName: { type: String, default: "" },
     yAxisName: { type: String, default: "" },
     xAxisType: { type: String, default: "value" },
+    yAxisType: { type: String, default: "value" },
     dataZoom: { type: String, default: "" },
     color: { type: Array, default: () => colorPalette },
     xAxisMin: { type: [Number, null], default: null },
@@ -97,13 +98,19 @@ export default {
           },
         },
         yAxis: {
+          type: this.yAxisType,
           name: this.yAxisName,
           nameLocation: "middle",
           nameGap: 50,
-          min: 0,
+          logBase: this.yAxisType === "log" ? 10 : undefined,
+          minorSplitLine: { show: this.yAxisType === "log" },
+          min: this.yAxisType === "log" ? "dataMin" : 0,
           max: this.yAxisMax != null ? this.yAxisMax : "dataMax",
           axisLabel: {
-            formatter: this.axisLabelFormatter,
+            formatter: (val) =>
+              this.yAxisType === "log"
+                ? `10^${Math.round(Math.log10(val))}`
+                : this.axisLabelFormatter(val),
             hideOverlap: true,
           },
         },

@@ -44,7 +44,7 @@ class FatigueTest(BaseModel):
     crack_load: List[float]
     crack_length: List[float]
     crack_n_cycles: List[float]
-    da_dn: Optional[List[float]] = None
+    da_dN: Optional[List[float]] = None
     G_MBT: Optional[List[float]] = None
 
 
@@ -177,7 +177,7 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
     if is_fracture:
         crack_load = std_df["Load"].tolist() if "Load" in std_df else []
         crack_displacement = std_df["u"].tolist() if "u" in std_df else []
-        crack_displacement = [u - crack_displacement[0] for u in crack_displacement] if crack_displacement else []
+        #crack_displacement = [u - crack_displacement[0] for u in crack_displacement] if crack_displacement else []
         crack_length = std_df["Crack_length"].tolist() if "Crack_length" in std_df else []
         crack_n_cycles = std_df["N_cycles"].tolist() if "N_cycles" in std_df else []
 
@@ -185,6 +185,7 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
         w = test_meta["width"]
         h = test_meta["thickness"]
         t = h / 4 + 22
+        l_prime = 0
 
         # Calcoli preliminari
         std_df["Force_kN"] = std_df["Load"] * 1e-3
@@ -200,8 +201,8 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
         # N factor
         std_df["N"] = (
             1
-            - (LOOP_SPACING / std_df["Crack_length"])**3
-            - 9/8 * (1 - (LOOP_SPACING / std_df["Crack_length"])**2) * (std_df["u"] * t) / (std_df["Crack_length"]**2)
+            - (l_prime / std_df["Crack_length"])**3
+            - 9/8 * (1 - (l_prime / std_df["Crack_length"])**2) * (std_df["u"] * t) / (std_df["Crack_length"]**2)
             - 9/35 * (std_df["u"] / std_df["Crack_length"])**2
         )
 
@@ -213,6 +214,19 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
 
         x_fit = std_df["Crack_length"]
         y_fit = (std_df["compliance"] / std_df["N"])**(1/3)
+        # Filtra eventuali NaN o Inf
+        x_fit = np.array(x_fit)
+        y_fit = np.array(y_fit)
+        mask = np.isfinite(x_fit) & np.isfinite(y_fit)
+        x_fit = x_fit[mask]
+        y_fit = y_fit[mask]
+
+        # Verifica se ci sono dati sufficienti
+        if len(y_fit) == 0 or len(x_fit) == 0:
+            # Lancia un errore o logga un warning
+            raise ValueError("Nessun dato valido per curve_fit.")
+
+        # Se OK, procedi al fit
         params, _ = curve_fit(fit_func, x_fit, y_fit)
         a_param, b_param = params
         triangle = abs(b_param / a_param)
@@ -289,7 +303,7 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
             crack_load=crack_load,
             crack_length=crack_length,
             crack_n_cycles=crack_n_cycles,
-            da_dn = da_dn_new,
+            da_dN = da_dn_new,
             G_MBT=std_df["G_MBT"].tolist(),
         )
 
@@ -330,6 +344,6 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
         crack_load=[],
         crack_length=[],
         crack_n_cycles=[], 
-        da_dn=[],
+        da_dN=[],
         G_MBT=[],
     )

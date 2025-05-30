@@ -279,51 +279,123 @@
     </v-row>
     <v-row v-else-if="experimentType === 'FA' && isFracture">
       <v-col cols="10">
-        <v-card :loading="loading">
-          <v-card-title>
-            <v-row align="center" class="w-100">
-              <v-col class="d-flex align-center" cols="auto">
-                <v-span> Crack length & Load vs Number of cycles </v-span>
-                <info-tooltip>
-                  The graph shows the evolution of the crack length (dotted
-                  lines) and load (straight line) during the test.
-                </info-tooltip>
-              </v-col>
-              <v-spacer />
-              <v-col cols="auto" class="d-flex">
-                <v-select
-                  v-model="xAxisMode"
-                  :items="[
-                    { text: 'Cycle count', value: 'normal' },
-                    { text: 'Log(Cycle count)', value: 'log' },
-                    { text: 'Normalized cycle count', value: 'normalized' },
-                  ]"
-                  dense
-                  hide-details
-                  label="X-Axis scale"
-                  style="max-width: 220px"
+        <v-row>
+          <v-col cols="6">
+            <v-card :loading="loading">
+              <v-card-title>
+                <v-row align="center" class="w-100">
+                  <v-col class="d-flex align-center" cols="auto">
+                    Crack length & Load vs Number of cycles
+                    <info-tooltip>
+                      The graph shows the evolution of the crack length (dotted
+                      lines) and load (solid line) during the test.
+                    </info-tooltip>
+                  </v-col>
+                  <v-spacer />
+                  <v-col cols="auto" class="d-flex">
+                    <v-select
+                      v-model="xAxisMode"
+                      :items="[
+                        { text: 'Cycle count', value: 'normal' },
+                        { text: 'Log(Cycle count)', value: 'log' },
+                        { text: 'Normalized cycle count', value: 'normalized' },
+                      ]"
+                      dense
+                      hide-details
+                      label="X-Axis scale"
+                      style="max-width: 220px"
+                    />
+                  </v-col>
+                </v-row>
+              </v-card-title>
+              <v-card-text>
+                <double-chart
+                  :series="crackFaFractureSeries"
+                  :aspect-ratio="2"
+                  :x-axis-name="computedXAxisLabel"
+                  :x-axis-type="xAxisChartType"
+                  :x-axis-max="xAxisMaxDoubleChart"
+                  :x-axis-min="xAxisMinDoubleChart"
+                  :y1-axis-name="'Load [N]'"
+                  :y1-axis-max="y1AxisMaxDoubleChart"
+                  :y1-axis-min="y1AxisMinDoubleChart"
+                  :y2-axis-name="'Crack Length [mm]'"
+                  :y2-axis-max="y2AxisMaxDoubleChart"
+                  :y2-axis-min="y2AxisMinDoubleChart"
+                  :axis-label-formatter="axisTickFormatter"
                 />
-              </v-col>
-            </v-row>
-          </v-card-title>
-          <v-card-text>
-            <double-chart
-              :series="crackFaFractureSeries"
-              :aspect-ratio="2"
-              :x-axis-name="computedXAxisLabel"
-              :x-axis-type="xAxisChartType"
-              :x-axis-max="xAxisMaxDoubleChart"
-              :x-axis-min="xAxisMinDoubleChart"
-              :y1-axis-name="'Load [N]'"
-              :y1-axis-max="y1AxisMaxDoubleChart"
-              :y1-axis-min="y1AxisMinDoubleChart"
-              :y2-axis-name="'Crack Length [mm]'"
-              :y2-axis-max="y2AxisMaxDoubleChart"
-              :y2-axis-min="y2AxisMinDoubleChart"
-              :axis-label-formatter="axisTickFormatter"
-            />
-          </v-card-text>
-        </v-card>
+              </v-card-text>
+            </v-card>
+          </v-col>
+
+          <v-col cols="6">
+            <v-card :loading="loading">
+              <v-card-title>
+                <v-row align="center" class="w-100">
+                  <v-col class="d-flex align-center" cols="auto">
+                    G_MBT vs Number of cycles
+                    <info-tooltip>
+                      Fracture energy (G_MBT) vs cycles.
+                    </info-tooltip>
+                  </v-col>
+                  <v-spacer />
+                  <v-col cols="auto" class="d-flex">
+                    <v-select
+                      v-model="xAxisMode"
+                      :items="[
+                        { text: 'Cycle count', value: 'normal' },
+                        { text: 'Log(Cycle count)', value: 'log' },
+                        { text: 'Normalized cycle count', value: 'normalized' },
+                      ]"
+                      dense
+                      hide-details
+                      label="X-Axis scale"
+                      style="max-width: 220px"
+                    />
+                  </v-col>
+                </v-row>
+              </v-card-title>
+              <v-card-text>
+                <simple-chart
+                  :series="fractureGMBTSeries"
+                  :aspect-ratio="2"
+                  :x-axis-name="computedXAxisLabel"
+                  :x-axis-type="xAxisChartType"
+                  y-axis-name="G_MBT [J/m²]"
+                  :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
+                  :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
+                  :axis-label-formatter="axisTickFormatter"
+                />
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col cols="6">
+            <v-card :loading="loading">
+              <v-card-title>
+                da/dN vs G_MBT
+                <info-tooltip>
+                  Crack growth rate vs fracture energy.
+                </info-tooltip>
+              </v-card-title>
+              <v-card-text>
+                <simple-chart
+                  :series="daDnVsGMBTSeries"
+                  :aspect-ratio="2"
+                  x-axis-name="G_MBT [J/m²]"
+                  y-axis-name="da/dN [mm/cycle]"
+                  :y-axis-type="'log'"
+                  :y-axis-min="yAxisLogLimits_daDnVsGMBT.min"
+                  :y-axis-max="yAxisLogLimits_daDnVsGMBT.max"
+                  :y-axis-split-number="yAxisLogLimits_daDnVsGMBT.splitNumber"
+                  :axis-label-formatter="axisTickFormatter"
+                />
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
       </v-col>
       <v-col cols="2">
         <v-card :loading="loading">
@@ -393,7 +465,6 @@
           </v-card-text>
         </v-card>
       </v-col>
-
       <v-col cols="2">
         <v-card :loading="loading">
           <v-card-text>
@@ -578,6 +649,7 @@ import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue"
 import ExperimentSV from "@/components/ExperimentSV.vue";
 import InfoTooltip from "@/components/InfoTooltip.vue";
 import {
+  computeLogYAxisLimits,
   computeXAxisMax,
   computeXAxisMin,
   computeYAxisMax,
@@ -842,6 +914,20 @@ export default {
         ];
       });
     },
+    fractureGMBTSeries() {
+      return this.fatigueData.map((d) => ({
+        type: "line",
+        name: d.specimen_name,
+        data: zip(this.transformXAxis(d.crack_n_cycles, d.n_fail), d.G_MBT),
+      }));
+    },
+    daDnVsGMBTSeries() {
+      return this.fatigueData.map((d) => ({
+        type: "line",
+        name: d.specimen_name,
+        data: zip(d.G_MBT, d.da_dN),
+      }));
+    },
     yAxisMaxStrainStressQS() {
       return computeYAxisMax(this.strainStressSeriesQS);
     },
@@ -893,6 +979,16 @@ export default {
           : this.crackFaFractureSeries;
       const y2Series = series.filter((s) => s.yAxisIndex === 1);
       return computeYAxisMin(y2Series);
+    },
+    yAxisLogLimits_daDnVsGMBT() {
+      const { min, max, splitNumber } = computeLogYAxisLimits(
+        this.daDnVsGMBTSeries
+      );
+      return {
+        min,
+        max,
+        splitNumber,
+      };
     },
     axisTickFormatter() {
       return formatTick;
@@ -991,6 +1087,8 @@ export default {
         d.crack_length = d.crack_length || [];
         d.crack_n_cycles = d.crack_n_cycles || [];
         d.crack_load = d.crack_load || [];
+        d.G_MBT = d.G_MBT || [];
+        d.da_dN = d.da_dN || [];
       });
 
       this.loading = false;
