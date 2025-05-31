@@ -7,6 +7,7 @@ from pandas.core.frame import DataFrame
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from scipy.optimize import curve_fit
 
 from ccfatigue.experiment.common import DATA_DIRECTORY, get_test_fields
 from ccfatigue.models.database import Experiment, Test
@@ -165,6 +166,8 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
         Test.thickness,
         Test.length,
         Test.maximum_load,
+        Test.t, 
+        Test.l_prime,
     ))
 
     specimen_id = test_meta["sequential_number"]
@@ -176,121 +179,150 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
 
     if is_fracture:
         crack_load = std_df["Load"].tolist() if "Load" in std_df else []
+        crack_load = (np.array(crack_load) / 1000).tolist()  # Convert to kN if needed
         crack_displacement = std_df["u"].tolist() if "u" in std_df else []
-        #crack_displacement = [u - crack_displacement[0] for u in crack_displacement] if crack_displacement else []
         crack_length = std_df["Crack_length"].tolist() if "Crack_length" in std_df else []
         crack_n_cycles = std_df["N_cycles"].tolist() if "N_cycles" in std_df else []
 
-        # Parametri geometrici
         w = test_meta["width"]
         h = test_meta["thickness"]
-        t = h / 4 + 22
-        l_prime = 0
+        t = test_meta["t"] or 0.0
+        l_prime = test_meta["l_prime"] or 0.0
 
-        # Calcoli preliminari
-        std_df["Force_kN"] = std_df["Load"] * 1e-3
-        std_df["compliance"] = std_df["u"] / std_df["Force_kN"]
-
-        # F factor
-        std_df["F"] = (
-            1
-            - 3/10 * (std_df["u"] / std_df["Crack_length"])**2
-            - 3/2 * ((std_df["u"] * t) / (std_df["Crack_length"])**2)
-        )
-
-        # N factor
-        std_df["N"] = (
-            1
-            - (l_prime / std_df["Crack_length"])**3
-            - 9/8 * (1 - (l_prime / std_df["Crack_length"])**2) * (std_df["u"] * t) / (std_df["Crack_length"]**2)
-            - 9/35 * (std_df["u"] / std_df["Crack_length"])**2
-        )
-
-        # MBT triangle fitting
-        from scipy.optimize import curve_fit
-
+        # Funzioni di utilità
         def fit_func(x, a, b):
             return a * x + b
 
-        x_fit = std_df["Crack_length"]
-        y_fit = (std_df["compliance"] / std_df["N"])**(1/3)
-        # Filtra eventuali NaN o Inf
-        x_fit = np.array(x_fit)
-        y_fit = np.array(y_fit)
-        mask = np.isfinite(x_fit) & np.isfinite(y_fit)
-        x_fit = x_fit[mask]
-        y_fit = y_fit[mask]
+        def fit_crack_length_from_compliance(
+            crack_length: List[float],
+            crack_displacement: List[float],
+            crack_load: List[float]
+        ) -> List[float]:
+            from scipy.optimize import curve_fit
+            import numpy as np
 
-        # Verifica se ci sono dati sufficienti
-        if len(y_fit) == 0 or len(x_fit) == 0:
-            # Lancia un errore o logga un warning
-            raise ValueError("Nessun dato valido per curve_fit.")
+            compliance = np.array(crack_displacement) / np.array(crack_load)
+            crack_length_array = np.array(crack_length)
 
-        # Se OK, procedi al fit
-        params, _ = curve_fit(fit_func, x_fit, y_fit)
-        a_param, b_param = params
-        triangle = abs(b_param / a_param)
+            def power_law(x, a, m):
+                return a * x ** m
 
-        # G_MBT
-        std_df["G_MBT"] = (
-            (3 * std_df["Force_kN"] * std_df["u"])
-            / (2 * w * (std_df["Crack_length"] + triangle))
-            * std_df["F"] / std_df["N"]
-            * 1e6
+            popt, _ = curve_fit(power_law, crack_length_array, compliance)
+            a_fit, m_fit = popt
+
+            crack_length_fitted = (compliance / a_fit) ** (1 / m_fit)
+            return crack_length_fitted.tolist()
+
+        def compute_compliance_and_crack_length_fitted(
+            crack_displacement: List[float],
+            crack_load: List[float],
+            crack_length: List[float]
+        ) -> (np.ndarray, np.ndarray):
+            compliance = np.array(crack_displacement) / np.array(crack_load)
+            crack_length_fitted = np.array(
+                fit_crack_length_from_compliance(crack_length, crack_displacement, crack_load)
+            )
+            return compliance, crack_length_fitted
+
+        def compute_factors(
+            crack_displacement: List[float],
+            crack_length_fitted: np.ndarray,
+            t: float,
+            l_prime: float
+        ):
+            F = (
+                1
+                - 3/10 * (np.array(crack_displacement) / crack_length_fitted)**2
+                - 3/2 * ((np.array(crack_displacement) * t) / crack_length_fitted**2)
+            )
+            N = (
+                1
+                - (l_prime / crack_length_fitted)**3
+                - 9/8 * (1 - (l_prime / crack_length_fitted)**2) * (np.array(crack_displacement) * t) / crack_length_fitted**2
+                - 9/35 * (np.array(crack_displacement) / crack_length_fitted)**2
+            )
+            return F, N
+
+        def compute_g_mbt(
+            compliance, crack_displacement, crack_load, crack_length_fitted, F, N, w
+        ):
+            C_N_1_3 = (compliance / N)**(1/3)
+            params, _ = curve_fit(fit_func, crack_length_fitted, C_N_1_3)
+            a, b = params
+            triangle = abs(b / a)
+
+            G = (
+                (3 * np.array(crack_load) * np.array(crack_displacement))
+                / (2 * w * (crack_length_fitted + triangle))
+                * F / N
+                * 1e6
+            )
+            return G.tolist()
+
+        def compute_da_dn(crack_length_fitted, crack_n_cycles):
+            da_dn_new = []
+            a_estimated = []
+
+            # Punto iniziale
+            a_0 = 0.5 * (crack_length_fitted[1] + crack_length_fitted[0])
+            a_estimated.append(a_0)
+            da_dn_0 = (
+                (crack_length_fitted[1] - crack_length_fitted[0])
+                / (crack_n_cycles[1] - crack_n_cycles[0])
+            )
+            da_dn_new.append(da_dn_0)
+
+            def poly_func(x, b0, b1, b2):
+                return b0 + b1 * x + b2 * x**2
+
+            for i in range(3, len(crack_length_fitted) - 3):
+                C1 = 0.5 * (crack_n_cycles[i - 3] + crack_n_cycles[i + 3])
+                C2 = 0.5 * (crack_n_cycles[i + 3] - crack_n_cycles[i - 3])
+                x_vals = (np.array(crack_n_cycles[i - 3:i + 4]) - C1) / C2
+                y_vals = crack_length_fitted[i - 3:i + 4]
+                popt, _ = curve_fit(poly_func, x_vals, y_vals)
+                a_est = poly_func(x_vals[3], *popt)
+                a_estimated.append(a_est)
+                da_dn = popt[1] / C2 + (2 * popt[2] * (crack_n_cycles[i] - C1)) / C2**2
+                da_dn_new.append(da_dn)
+
+            for i in range(len(crack_length_fitted) - 3, len(crack_length_fitted)):
+                if i == len(crack_length_fitted) - 1:
+                    a_est = 0.5 * (crack_length_fitted[-2] + crack_length_fitted[-1])
+                    da_dn = (
+                        (crack_length_fitted[-1] - crack_length_fitted[-2])
+                        / (crack_n_cycles[-1] - crack_n_cycles[-2])
+                    )
+                else:
+                    a_est = crack_length_fitted[i]
+                    da_dn = (
+                        (crack_length_fitted[i + 1] - crack_length_fitted[i - 1])
+                        / (crack_n_cycles[i + 1] - crack_n_cycles[i - 1])
+                    )
+                a_estimated.append(a_est)
+                da_dn_new.append(da_dn)
+
+            return da_dn_new
+
+        # Calcolo dei valori comuni
+        compliance, crack_length_fitted = compute_compliance_and_crack_length_fitted(
+            crack_displacement, crack_load, crack_length
         )
+        F, N = compute_factors(crack_displacement, crack_length_fitted, t, l_prime)
+        crack_load_kN = np.array(crack_load)  # già in kN
 
-        # Calcolo da/dN (metodo polinomiale)
-        def func(x, b0, b1, b2):
-            return b0 + b1 * x + b2 * x**2
-
-        da_dn_new = []
-        a_estimated = []
-
-        # Punto iniziale
-        a_0 = 0.5 * (std_df["Crack_length"].iloc[1] + std_df["Crack_length"].iloc[0])
-        a_estimated.append(a_0)
-        da_dn_0 = (
-            (std_df["Crack_length"].iloc[1] - std_df["Crack_length"].iloc[0])
-            / (std_df["N_cycles"].iloc[1] - std_df["N_cycles"].iloc[0])
+        G_MBT = compute_g_mbt(
+            compliance, crack_displacement, crack_load_kN, crack_length_fitted, F, N, w
         )
-        da_dn_new.append(da_dn_0)
+        da_dn_new = compute_da_dn(crack_length_fitted, crack_n_cycles)
 
-        # Punti intermedi con finestra mobile di 7 dati
-        for i in range(3, len(std_df) - 3):
-            C1 = 0.5 * (std_df["N_cycles"].iloc[i - 3] + std_df["N_cycles"].iloc[i + 3])
-            C2 = 0.5 * (std_df["N_cycles"].iloc[i + 3] - std_df["N_cycles"].iloc[i - 3])
-            x_vals = (std_df["N_cycles"].iloc[i - 3:i + 4] - C1) / C2
-            y_vals = std_df["Crack_length"].iloc[i - 3:i + 4]
-            popt, _ = curve_fit(func, x_vals, y_vals)
-            a_est = func(x_vals.iloc[3], *popt)
-            a_estimated.append(a_est)
-            da_dn = popt[1] / C2 + (2 * popt[2] * (std_df["N_cycles"].iloc[i] - C1)) / C2**2
-            da_dn_new.append(da_dn)
-
-        # Ultimi punti (usa differenze finite semplici)
-        for i in range(len(std_df) - 3, len(std_df)):
-            if i == len(std_df) - 1:
-                a_est = 0.5 * (std_df["Crack_length"].iloc[-2] + std_df["Crack_length"].iloc[-1])
-                da_dn = (
-                    (std_df["Crack_length"].iloc[-1] - std_df["Crack_length"].iloc[-2])
-                    / (std_df["N_cycles"].iloc[-1] - std_df["N_cycles"].iloc[-2])
-                )
-            else:
-                a_est = std_df["Crack_length"].iloc[i]
-                da_dn = (
-                    (std_df["Crack_length"].iloc[i + 1] - std_df["Crack_length"].iloc[i - 1])
-                    / (std_df["N_cycles"].iloc[i + 1] - std_df["N_cycles"].iloc[i - 1])
-                )
-            a_estimated.append(a_est)
-            da_dn_new.append(da_dn)
-
-        # Restituzione del FatigueTest (senza da_dn_new o G_MBT inclusi direttamente)
+        # Costruzione del FatigueTest
         return FatigueTest(
             specimen_id=specimen_id,
             specimen_name=specimen_name,
             run_out=test_meta["run_out"],
             hysteresis_loops=[],
-            n_cycles=std_df["N_cycles"].tolist(),
+            n_cycles=crack_n_cycles,
             creep=[],
             hysteresis_area=[],
             stiffness=[],
@@ -301,11 +333,12 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
             warning_messages=False,
             crack_displacement=crack_displacement,
             crack_load=crack_load,
-            crack_length=crack_length,
+            crack_length=crack_length_fitted.tolist(),
             crack_n_cycles=crack_n_cycles,
-            da_dN = da_dn_new,
-            G_MBT=std_df["G_MBT"].tolist(),
+            da_dN=da_dn_new,
+            G_MBT=G_MBT,
         )
+
 
     hyst_df = get_dataframe("HYS", experiment, specimen_id).fillna(0)
 
