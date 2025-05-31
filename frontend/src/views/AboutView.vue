@@ -4,7 +4,7 @@
     <v-card flat>
       <v-card-title>Disclaimer</v-card-title>
       <p class="text-body-1 text-justify">
-        <em>CCFatigue</em>
+        <em>CCfatigue</em>
         Platform is an initiative from GR-MeC at EPFL that aims to develop an
         open-source web application to harmonize, facilitate storage and
         analysis of composite materials testing datasets.

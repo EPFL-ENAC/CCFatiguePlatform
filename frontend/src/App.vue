@@ -53,7 +53,7 @@
         </v-tab>
 
         <v-tab :to="{ name: 'CCFatigueAnalysis' }" exact class="text-white">
-          <em>CCFatigue</em>&nbsp;analysis
+          <em>CCfatigue</em>&nbsp;analysis
         </v-tab>
 
         <v-tab :to="{ name: 'About' }" exact class="text-white">
