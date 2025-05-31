@@ -333,9 +333,10 @@
               <v-card-title>
                 <v-row align="center" class="w-100">
                   <v-col class="d-flex align-center" cols="auto">
-                    G_MBT vs Number of cycles
+                    Fracture Energy vs Number of cycles
                     <info-tooltip>
-                      Fracture energy (G_MBT) vs cycles.
+                      Fracture energy is calculated with the Modified Beam
+                      Theory.
                     </info-tooltip>
                   </v-col>
                   <v-spacer />
@@ -362,6 +363,7 @@
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
                   y-axis-name="G_MBT [J/m²]"
+                  :y-axis-max="yAxisMaxGMBT"
                   :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
                   :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
                   :axis-label-formatter="axisTickFormatter"
@@ -1037,6 +1039,9 @@ export default {
     },
     xAxisMaxFractureEnergyCombined() {
       return computeXAxisMax(this.fractureEnergySeriesCombined);
+    },
+    yAxisMaxGMBT() {
+      return computeYAxisMax(this.fractureGMBTSeries);
     },
   },
   watch: {
