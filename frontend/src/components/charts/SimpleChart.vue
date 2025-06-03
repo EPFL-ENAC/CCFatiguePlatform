@@ -140,7 +140,7 @@ export default {
                   useGrouping: false,
                 });
               } else {
-                // fallback se non c'è rawX
+                // fallback if rawX is not available
                 const xValue = p.value[0] ?? p.value;
                 xLabel = Number(xValue).toLocaleString(undefined, {
                   minimumFractionDigits: 0,
@@ -149,7 +149,7 @@ export default {
                 });
               }
             } else {
-              // altri grafici: usa il valore normale
+              // other graphs: use default value
               xLabel = params[0].axisValueLabel;
             }
 
