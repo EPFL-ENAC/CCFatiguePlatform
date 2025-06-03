@@ -118,8 +118,41 @@ export default {
           trigger: "axis",
           confine: true,
           formatter: (params) => {
-            const formatter = this.tooltipFormatter; // ✅ take from props
-            const xLabel = params[0].axisValueLabel;
+            const formatter = this.tooltipFormatter;
+            let xLabel;
+
+            if (
+              this.xAxisName.includes("Number of cycles") ||
+              this.xAxisName.includes("Normalized cycles")
+            ) {
+              const p = params[0];
+              let rawX = null;
+
+              if (p.seriesIndex != null && this.series[p.seriesIndex]?.rawX) {
+                const pointIndex = p.dataIndex;
+                rawX = this.series[p.seriesIndex].rawX[pointIndex];
+              }
+
+              if (rawX != null) {
+                xLabel = Number(rawX).toLocaleString(undefined, {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                  useGrouping: false,
+                });
+              } else {
+                // fallback se non c'è rawX
+                const xValue = p.value[0] ?? p.value;
+                xLabel = Number(xValue).toLocaleString(undefined, {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                  useGrouping: false,
+                });
+              }
+            } else {
+              // altri grafici: usa il valore normale
+              xLabel = params[0].axisValueLabel;
+            }
+
             const rows = [`<strong>${xLabel}</strong>`];
 
             for (const p of params) {
@@ -128,6 +161,7 @@ export default {
               const formattedY = formatter(yVal);
               rows.push(`${p.marker}${p.seriesName}: ${formattedY}`);
             }
+
             return rows.join("<br/>");
           },
         },

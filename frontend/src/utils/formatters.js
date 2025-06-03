@@ -76,6 +76,26 @@ export const formatTick = (value) => {
   });
 };
 
+export const formatNumber0 = (value) => {
+  const num = Number(value);
+  if (isNaN(num)) return value;
+
+  const abs = Math.abs(num);
+
+  if (abs >= 1000 || (abs > 0 && abs < 0.001)) {
+    // power calculated manually
+    const exponent = Math.floor(Math.log10(abs));
+    const mantissa = num / Math.pow(10, exponent);
+    const fixedMantissa = mantissa.toFixed(0);
+    return `${fixedMantissa}e${exponent >= 0 ? "+" : ""}${exponent}`;
+  }
+
+  return num.toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+};
+
 export function computeYAxisMax(series) {
   const allYValues = series
     .flatMap((s) => s?.data || [])
@@ -149,8 +169,8 @@ export function computeXAxisMin(series) {
 
 export function computeLogYAxisLimits(
   series,
-  targetMin = 1e-6,
-  targetMax = 1e-2
+  targetMin = 1e-10,
+  targetMax = 1e-1
 ) {
   const allYValues = series
     .flatMap((s) => s?.data || [])

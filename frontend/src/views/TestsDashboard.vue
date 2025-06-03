@@ -316,7 +316,7 @@
                   :x-axis-type="xAxisChartType"
                   :x-axis-max="xAxisMaxDoubleChart"
                   :x-axis-min="xAxisMinDoubleChart"
-                  :y1-axis-name="'Load [N]'"
+                  :y1-axis-name="'Load [kN]'"
                   :y1-axis-max="y1AxisMaxDoubleChart"
                   :y1-axis-min="y1AxisMinDoubleChart"
                   :y2-axis-name="'Crack Length [mm]'"
@@ -362,7 +362,7 @@
                   :aspect-ratio="2"
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
-                  y-axis-name="G_MBT [J/m²]"
+                  y-axis-name="G [J/m²]"
                   :y-axis-max="yAxisMaxGMBT"
                   :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
                   :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
@@ -377,7 +377,7 @@
           <v-col cols="6">
             <v-card :loading="loading">
               <v-card-title>
-                da/dN vs G_MBT
+                Crack growth rate vs fracture energy
                 <info-tooltip>
                   Crack growth rate vs fracture energy.
                 </info-tooltip>
@@ -386,13 +386,14 @@
                 <simple-chart
                   :series="daDnVsGMBTSeries"
                   :aspect-ratio="2"
-                  x-axis-name="G_MBT [J/m²]"
+                  x-axis-name="G [J/m²]"
                   y-axis-name="da/dN [mm/cycle]"
                   :y-axis-type="'log'"
                   :y-axis-min="yAxisLogLimits_daDnVsGMBT.min"
                   :y-axis-max="yAxisLogLimits_daDnVsGMBT.max"
                   :y-axis-split-number="yAxisLogLimits_daDnVsGMBT.splitNumber"
                   :axis-label-formatter="axisTickFormatter"
+                  :tooltip-formatter="formatScientific"
                 />
               </v-card-text>
             </v-card>
@@ -538,7 +539,8 @@
                 <v-span>Load & Crack length vs Displacement</v-span>
                 <info-tooltip>
                   The graph shows the evolution of the crack length (dotted
-                  lines) and load (straight line) during the test.
+                  lines) and load (straight line) during the Displacement
+                  Controlled test.
                 </info-tooltip>
               </v-card-title>
               <v-card-text>
@@ -548,7 +550,7 @@
                   x-axis-name="Displacement [mm]"
                   :x-axis-max="xAxisMaxDoubleChart"
                   :x-axis-min="xAxisMinDoubleChart"
-                  :y1-axis-name="'Load [N]'"
+                  :y1-axis-name="'Load [kN]'"
                   :y1-axis-max="y1AxisMaxDoubleChart"
                   :y1-axis-min="y1AxisMinDoubleChart"
                   :y2-axis-name="'Crack Length [mm]'"
@@ -569,9 +571,20 @@
                       The graph shows the evolution of the fracture energy
                       calculated with different methods as a function of the
                       <ul>
-                        <li><strong>MBT</strong> = solid line</li>
-                        <li><strong>MCC</strong> = dashed line</li>
-                        <li><strong>ECM</strong> = dotted line</li>
+                        <li>
+                          <strong>Modified Beam Theory, MBT</strong> = solid
+                          line
+                        </li>
+                        <li>
+                          <strong>Modified Compliance Calibration, MCC</strong>
+                          = dashed line
+                        </li>
+                        <li>
+                          <strong
+                            >Experimental Compliance Calibration, ECM</strong
+                          >
+                          = dotted line
+                        </li>
                       </ul>
                     </info-tooltip>
                   </v-col>
@@ -656,6 +669,7 @@ import {
   computeXAxisMin,
   computeYAxisMax,
   computeYAxisMin,
+  formatNumber0,
   formatNumber5,
   formatTick,
 } from "@/utils/formatters";
@@ -823,6 +837,15 @@ export default {
     TooltipFormatter_5() {
       return formatNumber5;
     },
+    XAxis_cycles() {
+      return formatNumber0;
+    },
+    xAxisTickFormatter() {
+      if (this.xAxisMode === "normal") {
+        return this.XAxis_cycles();
+      }
+      return this.axisTickFormatter;
+    },
     hasWarnings() {
       return this.testIds.some((_, i) => this.fatigueWarnings?.[i]);
     },
@@ -840,18 +863,32 @@ export default {
       return this.xAxisMode === "log" ? "log" : "value";
     },
     hysteresisAreaSeries() {
-      return this.fatigueData.map((d) => ({
-        type: "line",
-        name: d.specimen_name,
-        data: zip(this.transformXAxis(d.n_cycles, d.n_fail), d.hysteresis_area),
-      }));
+      return this.fatigueData.map((d) => {
+        const normalizedX = this.transformXAxis(d.n_cycles, d.n_fail);
+        const series = {
+          type: "line",
+          name: d.specimen_name,
+          data: zip(normalizedX, d.hysteresis_area),
+        };
+        if (this.xAxisMode === "normalized") {
+          series.rawX = d.n_cycles;
+        }
+        return series;
+      });
     },
     creepSeries() {
-      return this.fatigueData.map((d) => ({
-        type: "line",
-        name: d.specimen_name,
-        data: zip(this.transformXAxis(d.n_cycles, d.n_fail), d.creep),
-      }));
+      return this.fatigueData.map((d) => {
+        const normalizedX = this.transformXAxis(d.n_cycles, d.n_fail);
+        const series = {
+          type: "line",
+          name: d.specimen_name,
+          data: zip(normalizedX, d.creep),
+        };
+        if (this.xAxisMode === "normalized") {
+          series.rawX = d.n_cycles;
+        }
+        return series;
+      });
     },
     computedYAxisStiffnessLabel() {
       return this.yAxisStiffnessMode === "normalized"
@@ -872,11 +909,18 @@ export default {
           );
         }
 
-        return {
+        const normalizedX = this.transformXAxis(d.n_cycles, d.n_fail);
+        const series = {
           type: "line",
           name: d.specimen_name,
-          data: zip(this.transformXAxis(d.n_cycles, d.n_fail), yValues),
+          data: zip(normalizedX, yValues),
         };
+
+        if (this.xAxisMode === "normalized") {
+          series.rawX = d.n_cycles;
+        }
+
+        return series;
       });
     },
     crackFaFractureSeries() {
@@ -890,25 +934,27 @@ export default {
           return [];
         }
 
+        // Normalized X axis
+        const transformedX = this.transformXAxis(d.crack_n_cycles, d.n_fail);
+
+        // Store rawX alongside transformedX
+        const rawX = d.crack_n_cycles;
+
         return [
           {
             type: "line",
-            name, // only in the first dataset (line)
-            data: zip(
-              this.transformXAxis(d.crack_n_cycles, d.n_fail),
-              d.crack_load
-            ),
+            name,
+            data: zip(transformedX, d.crack_load),
+            rawX: rawX,
             yAxisIndex: 0,
             lineStyle: { color },
             itemStyle: { color },
           },
           {
             type: "scatter",
-            name: null, // does not appear in the legend
-            data: zip(
-              this.transformXAxis(d.crack_n_cycles, d.n_fail),
-              d.crack_length || []
-            ),
+            name: null, // non appare nella legenda
+            data: zip(transformedX, d.crack_length || []),
+            rawX: rawX,
             yAxisIndex: 1,
             symbolSize: 6,
             itemStyle: { color },
@@ -917,11 +963,20 @@ export default {
       });
     },
     fractureGMBTSeries() {
-      return this.fatigueData.map((d) => ({
-        type: "line",
-        name: d.specimen_name,
-        data: zip(this.transformXAxis(d.crack_n_cycles, d.n_fail), d.G_MBT),
-      }));
+      return this.fatigueData.map((d) => {
+        const normalizedX = this.transformXAxis(d.crack_n_cycles, d.n_fail);
+        const series = {
+          type: "line",
+          name: d.specimen_name,
+          data: zip(normalizedX, d.G_MBT),
+        };
+
+        if (this.xAxisMode === "normalized") {
+          series.rawX = d.crack_n_cycles;
+        }
+
+        return series;
+      });
     },
     daDnVsGMBTSeries() {
       return this.fatigueData.map((d) => ({
@@ -1198,6 +1253,10 @@ export default {
       const base = values.find((v) => typeof v === "number" && isFinite(v));
       if (!base || base === 0) return values;
       return values.map((v) => (isFinite(v) ? v / base : v));
+    },
+    formatScientific(value) {
+      if (typeof value !== "number" || !isFinite(value)) return value;
+      return value.toExponential(2); // ad esempio 2 cifre decimali
     },
   },
 };
