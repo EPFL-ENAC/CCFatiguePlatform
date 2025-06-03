@@ -729,28 +729,31 @@ export default {
     };
   },
   computed: {
+    // --- Vuex State ---
     ...mapState("experiments", {
       experiment: "oneExperiment",
       units: "units",
     }),
+
+    // --- Experiment Type & Mode ---
     experimentType() {
       return this.experiment.experiment.experiment_type;
     },
     isFracture() {
       const exp = this.experiment?.experiment;
       const type = exp?.experiment_type?.toLowerCase();
-
       if (type === "qs") {
         return exp.qs_experiment_type?.toLowerCase() === "fracture";
       }
-
       if (type === "fa") {
         return exp.fa_experiment_type?.toLowerCase() === "fracture";
       }
-
       return false;
     },
+
+    // --- Chart Data: Quasi-static Strain/Stress ---
     strainStressSeriesQS() {
+      // Returns series for QS strain-stress chart
       return this.testIds
         .map((id) => ({
           type: "line",
@@ -762,41 +765,306 @@ export default {
         }))
         .filter((s) => s.data.length);
     },
+
+    // --- Chart Data: Fatigue Hysteresis Loops ---
     strainStressSeriesFA() {
+      // Returns series for FA hysteresis loops chart
       return this.fatigueData.flatMap((test, testIndex) => {
         const loops = test.hysteresis_loops || [];
         const name = test.specimen_name;
         const color = this.colors[testIndex % this.colors.length];
-
         if (!loops.length) return [];
-
         const indices =
           this.selectedLoopIndices.length > 0
             ? this.selectedLoopIndices
-            : Array.from({ length: loops.length }, (_, i) => i); // default: all
-
+            : Array.from({ length: loops.length }, (_, i) => i);
         return indices
           .map((i) => ({
             type: "line",
-            name: null, // the legend does not change
+            name: null,
             data: zip(loops[i]?.strain || [], loops[i]?.stress || []),
             lineStyle: { color },
           }))
           .map((series, i) => ({
             ...series,
-            // Only the first cycle has a name for the legend
             name: i === 0 ? name : null,
           }));
       });
     },
     loopIndexOptions() {
-      // Always show cycles from 1 to 10 (0–9 as internal values)
+      // Options for hysteresis loop selection
       return Array.from({ length: 10 }, (_, i) => ({
         text: `Cycle ${i + 1}`,
         value: i,
       }));
     },
+
+    // --- Chart Data: Fatigue Evolution ---
+    hysteresisAreaSeries() {
+      // Hysteresis area evolution series
+      return this.fatigueData.map((d) => {
+        const normalizedX = this.transformXAxis(d.n_cycles, d.n_fail);
+        const series = {
+          type: "line",
+          name: d.specimen_name,
+          data: zip(normalizedX, d.hysteresis_area),
+        };
+        if (this.xAxisMode === "normalized") {
+          series.rawX = d.n_cycles;
+        }
+        return series;
+      });
+    },
+    creepSeries() {
+      // Creep evolution series
+      return this.fatigueData.map((d) => {
+        const normalizedX = this.transformXAxis(d.n_cycles, d.n_fail);
+        const series = {
+          type: "line",
+          name: d.specimen_name,
+          data: zip(normalizedX, d.creep),
+        };
+        if (this.xAxisMode === "normalized") {
+          series.rawX = d.n_cycles;
+        }
+        return series;
+      });
+    },
+    stiffnessSeries() {
+      // Stiffness evolution series
+      return this.fatigueData.map((d) => {
+        let yValues;
+        if (this.yAxisStiffnessMode === "normalized") {
+          yValues = this.normalizeYAxis(d.stiffness);
+        } else {
+          yValues = d.stiffness.map((v) =>
+            typeof v === "number" ? v / 1000 : v
+          );
+        }
+        const normalizedX = this.transformXAxis(d.n_cycles, d.n_fail);
+        const series = {
+          type: "line",
+          name: d.specimen_name,
+          data: zip(normalizedX, yValues),
+        };
+        if (this.xAxisMode === "normalized") {
+          series.rawX = d.n_cycles;
+        }
+        return series;
+      });
+    },
+
+    // --- Chart Data: Fatigue Fracture ---
+    crackFaFractureSeries() {
+      // Crack length & load vs cycles for FA fracture
+      return this.fatigueData.flatMap((d, i) => {
+        const id = d.specimen_id;
+        const name = d.specimen_name || `Specimen ${id}`;
+        const color = this.colors[i % this.colors.length];
+        if (!d.crack_n_cycles?.length || !d.crack_load?.length) {
+          console.warn("⚠️ Missing crack data for specimen", id);
+          return [];
+        }
+        const transformedX = this.transformXAxis(d.crack_n_cycles, d.n_fail);
+        const rawX = d.crack_n_cycles;
+        return [
+          {
+            type: "line",
+            name,
+            data: zip(transformedX, d.crack_load),
+            rawX: rawX,
+            yAxisIndex: 0,
+            lineStyle: { color },
+            itemStyle: { color },
+          },
+          {
+            type: "scatter",
+            name: null,
+            data: zip(transformedX, d.crack_length || []),
+            rawX: rawX,
+            yAxisIndex: 1,
+            symbolSize: 6,
+            itemStyle: { color },
+          },
+        ];
+      });
+    },
+    fractureGMBTSeries() {
+      // Fracture energy (MBT) vs cycles
+      return this.fatigueData.map((d) => {
+        const normalizedX = this.transformXAxis(d.crack_n_cycles, d.n_fail);
+        const series = {
+          type: "line",
+          name: d.specimen_name,
+          data: zip(normalizedX, d.G_MBT),
+        };
+        if (this.xAxisMode === "normalized") {
+          series.rawX = d.crack_n_cycles;
+        }
+        return series;
+      });
+    },
+    daDnVsGMBTSeries() {
+      // Crack growth rate vs fracture energy
+      return this.fatigueData.map((d) => ({
+        type: "line",
+        name: d.specimen_name,
+        data: zip(d.G_MBT, d.da_dN),
+      }));
+    },
+
+    // --- Chart Data: Fracture Energy (QS) ---
+    fractureEnergySeriesCombined() {
+      // Combined fracture energy series for QS fracture
+      const lineStyles = {
+        mbt: { type: "solid" },
+        mcc: { type: "dashed" },
+        ecm: { type: "dotted" },
+      };
+      const selectedMethods =
+        this.selectedFractureEnergyMethods.length > 0
+          ? this.selectedFractureEnergyMethods
+          : ["mbt", "mcc", "ecm"];
+      return this.testIds.flatMap((id, testIndex) => {
+        const crackLength = this.crackLengthData[id];
+        if (!crackLength) return [];
+        const color = this.colors[testIndex % this.colors.length];
+        return selectedMethods
+          .map((method) => {
+            const fractureEnergyData = this[`fractureEnergyData_${method}`][id];
+            if (!fractureEnergyData) return null;
+            return {
+              type: "line",
+              name: `${this.specimenName[id]}`,
+              data: zip(crackLength, fractureEnergyData),
+              lineStyle: { ...lineStyles[method], color },
+              itemStyle: { color },
+              tooltip: {
+                formatter: function (params) {
+                  return params.seriesName;
+                },
+              },
+            };
+          })
+          .filter(Boolean);
+      });
+    },
+
+    // --- Chart Axis & Limits ---
+    computedXAxisLabel() {
+      // X axis label for fatigue charts
+      switch (this.xAxisMode) {
+        case "log":
+          return "log₁₀(Number of cycles) [-]";
+        case "normalized":
+          return "Normalized cycles (Number of cycles / Cycles at failure) [-]";
+        default:
+          return "Number of cycles [-]";
+      }
+    },
+    xAxisChartType() {
+      // X axis type for charts
+      return this.xAxisMode === "log" ? "log" : "value";
+    },
+    computedYAxisStiffnessLabel() {
+      // Y axis label for stiffness chart
+      return this.yAxisStiffnessMode === "normalized"
+        ? "Normalized stiffness [-]"
+        : "Stiffness [GPa]";
+    },
+
+    // --- Chart Axis: Min/Max Calculations ---
+    yAxisMaxStrainStressQS() {
+      return computeYAxisMax(this.strainStressSeriesQS);
+    },
+    yAxisMaxStiffness() {
+      return computeYAxisMax(this.stiffnessSeries);
+    },
+    yAxisMaxFractureEnergyCombined() {
+      return computeYAxisMax(this.fractureEnergySeriesCombined);
+    },
+    xAxisMaxFractureEnergyCombined() {
+      return computeXAxisMax(this.fractureEnergySeriesCombined);
+    },
+    yAxisMaxGMBT() {
+      return computeYAxisMax(this.fractureGMBTSeries);
+    },
+    // Double chart axis min/max for both FA and QS fracture
+    xAxisMaxDoubleChart() {
+      const series =
+        this.isFracture && this.experimentType === "QS"
+          ? this.crackSeries
+          : this.crackFaFractureSeries;
+      return computeXAxisMax(series);
+    },
+    xAxisMinDoubleChart() {
+      const series =
+        this.isFracture && this.experimentType === "QS"
+          ? this.crackSeries
+          : this.crackFaFractureSeries;
+      return computeXAxisMin(series);
+    },
+    y1AxisMaxDoubleChart() {
+      const series =
+        this.isFracture && this.experimentType === "QS"
+          ? this.crackSeries
+          : this.crackFaFractureSeries;
+      const y1Series = series.filter((s) => s.yAxisIndex !== 1);
+      return computeYAxisMax(y1Series);
+    },
+    y1AxisMinDoubleChart() {
+      const series =
+        this.isFracture && this.experimentType === "QS"
+          ? this.crackSeries
+          : this.crackFaFractureSeries;
+      const y1Series = series.filter((s) => s.yAxisIndex !== 1);
+      return computeYAxisMin(y1Series);
+    },
+    y2AxisMaxDoubleChart() {
+      const series =
+        this.isFracture && this.experimentType === "QS"
+          ? this.crackSeries
+          : this.crackFaFractureSeries;
+      const y2Series = series.filter((s) => s.yAxisIndex === 1);
+      return computeYAxisMax(y2Series);
+    },
+    y2AxisMinDoubleChart() {
+      const series =
+        this.isFracture && this.experimentType === "QS"
+          ? this.crackSeries
+          : this.crackFaFractureSeries;
+      const y2Series = series.filter((s) => s.yAxisIndex === 1);
+      return computeYAxisMin(y2Series);
+    },
+    yAxisLogLimits_daDnVsGMBT() {
+      // Log axis limits for da/dN vs G chart
+      const { min, max, splitNumber } = computeLogYAxisLimits(
+        this.daDnVsGMBTSeries
+      );
+      return { min, max, splitNumber };
+    },
+
+    // --- Chart Formatting & Tooltip ---
+    axisTickFormatter() {
+      return formatTick;
+    },
+    TooltipFormatter_5() {
+      return formatNumber5;
+    },
+    XAxis_cycles() {
+      return formatNumber0;
+    },
+    xAxisTickFormatter() {
+      // Custom tick formatter for x axis
+      if (this.xAxisMode === "normal") {
+        return this.XAxis_cycles();
+      }
+      return this.axisTickFormatter;
+    },
+
+    // --- Value Formatting for UI ---
     valueColors() {
+      // Color for each specimen/test
       return this.testIds.map((_, i) => this.colors[i % this.colors.length]);
     },
     formattedStressAtFailure() {
@@ -834,269 +1102,11 @@ export default {
         e != null ? Number(e).toFixed(2) : "-"
       );
     },
-    TooltipFormatter_5() {
-      return formatNumber5;
-    },
-    XAxis_cycles() {
-      return formatNumber0;
-    },
-    xAxisTickFormatter() {
-      if (this.xAxisMode === "normal") {
-        return this.XAxis_cycles();
-      }
-      return this.axisTickFormatter;
-    },
+
+    // --- Warnings ---
     hasWarnings() {
+      // True if any fatigue test has warnings
       return this.testIds.some((_, i) => this.fatigueWarnings?.[i]);
-    },
-    computedXAxisLabel() {
-      switch (this.xAxisMode) {
-        case "log":
-          return "log₁₀(Number of cycles) [-]";
-        case "normalized":
-          return "Normalized cycles (Number of cycles / Cycles at failure) [-]";
-        default:
-          return "Number of cycles [-]";
-      }
-    },
-    xAxisChartType() {
-      return this.xAxisMode === "log" ? "log" : "value";
-    },
-    hysteresisAreaSeries() {
-      return this.fatigueData.map((d) => {
-        const normalizedX = this.transformXAxis(d.n_cycles, d.n_fail);
-        const series = {
-          type: "line",
-          name: d.specimen_name,
-          data: zip(normalizedX, d.hysteresis_area),
-        };
-        if (this.xAxisMode === "normalized") {
-          series.rawX = d.n_cycles;
-        }
-        return series;
-      });
-    },
-    creepSeries() {
-      return this.fatigueData.map((d) => {
-        const normalizedX = this.transformXAxis(d.n_cycles, d.n_fail);
-        const series = {
-          type: "line",
-          name: d.specimen_name,
-          data: zip(normalizedX, d.creep),
-        };
-        if (this.xAxisMode === "normalized") {
-          series.rawX = d.n_cycles;
-        }
-        return series;
-      });
-    },
-    computedYAxisStiffnessLabel() {
-      return this.yAxisStiffnessMode === "normalized"
-        ? "Normalized stiffness [-]"
-        : "Stiffness [GPa]";
-    },
-    stiffnessSeries() {
-      return this.fatigueData.map((d) => {
-        let yValues;
-
-        if (this.yAxisStiffnessMode === "normalized") {
-          // Normalized: do not modify (remain dimensionless)
-          yValues = this.normalizeYAxis(d.stiffness);
-        } else {
-          // Absolute values: convert from MPa to GPa
-          yValues = d.stiffness.map((v) =>
-            typeof v === "number" ? v / 1000 : v
-          );
-        }
-
-        const normalizedX = this.transformXAxis(d.n_cycles, d.n_fail);
-        const series = {
-          type: "line",
-          name: d.specimen_name,
-          data: zip(normalizedX, yValues),
-        };
-
-        if (this.xAxisMode === "normalized") {
-          series.rawX = d.n_cycles;
-        }
-
-        return series;
-      });
-    },
-    crackFaFractureSeries() {
-      return this.fatigueData.flatMap((d, i) => {
-        const id = d.specimen_id;
-        const name = d.specimen_name || `Specimen ${id}`;
-        const color = this.colors[i % this.colors.length];
-
-        if (!d.crack_n_cycles?.length || !d.crack_load?.length) {
-          console.warn("⚠️ Missing crack data for specimen", id);
-          return [];
-        }
-
-        // Normalized X axis
-        const transformedX = this.transformXAxis(d.crack_n_cycles, d.n_fail);
-
-        // Store rawX alongside transformedX
-        const rawX = d.crack_n_cycles;
-
-        return [
-          {
-            type: "line",
-            name,
-            data: zip(transformedX, d.crack_load),
-            rawX: rawX,
-            yAxisIndex: 0,
-            lineStyle: { color },
-            itemStyle: { color },
-          },
-          {
-            type: "scatter",
-            name: null, // non appare nella legenda
-            data: zip(transformedX, d.crack_length || []),
-            rawX: rawX,
-            yAxisIndex: 1,
-            symbolSize: 6,
-            itemStyle: { color },
-          },
-        ];
-      });
-    },
-    fractureGMBTSeries() {
-      return this.fatigueData.map((d) => {
-        const normalizedX = this.transformXAxis(d.crack_n_cycles, d.n_fail);
-        const series = {
-          type: "line",
-          name: d.specimen_name,
-          data: zip(normalizedX, d.G_MBT),
-        };
-
-        if (this.xAxisMode === "normalized") {
-          series.rawX = d.crack_n_cycles;
-        }
-
-        return series;
-      });
-    },
-    daDnVsGMBTSeries() {
-      return this.fatigueData.map((d) => ({
-        type: "line",
-        name: d.specimen_name,
-        data: zip(d.G_MBT, d.da_dN),
-      }));
-    },
-    yAxisMaxStrainStressQS() {
-      return computeYAxisMax(this.strainStressSeriesQS);
-    },
-    yAxisMaxStiffness() {
-      return computeYAxisMax(this.stiffnessSeries);
-    },
-    xAxisMaxDoubleChart() {
-      const series =
-        this.isFracture && this.experimentType === "QS"
-          ? this.crackSeries
-          : this.crackFaFractureSeries;
-      return computeXAxisMax(series);
-    },
-    y1AxisMaxDoubleChart() {
-      const series =
-        this.isFracture && this.experimentType === "QS"
-          ? this.crackSeries
-          : this.crackFaFractureSeries;
-      const y1Series = series.filter((s) => s.yAxisIndex !== 1);
-      return computeYAxisMax(y1Series);
-    },
-    y2AxisMaxDoubleChart() {
-      const series =
-        this.isFracture && this.experimentType === "QS"
-          ? this.crackSeries
-          : this.crackFaFractureSeries;
-      const y2Series = series.filter((s) => s.yAxisIndex === 1);
-      return computeYAxisMax(y2Series);
-    },
-    xAxisMinDoubleChart() {
-      const series =
-        this.isFracture && this.experimentType === "QS"
-          ? this.crackSeries
-          : this.crackFaFractureSeries;
-      return computeXAxisMin(series);
-    },
-    y1AxisMinDoubleChart() {
-      const series =
-        this.isFracture && this.experimentType === "QS"
-          ? this.crackSeries
-          : this.crackFaFractureSeries;
-      const y1Series = series.filter((s) => s.yAxisIndex !== 1);
-      return computeYAxisMin(y1Series);
-    },
-    y2AxisMinDoubleChart() {
-      const series =
-        this.isFracture && this.experimentType === "QS"
-          ? this.crackSeries
-          : this.crackFaFractureSeries;
-      const y2Series = series.filter((s) => s.yAxisIndex === 1);
-      return computeYAxisMin(y2Series);
-    },
-    yAxisLogLimits_daDnVsGMBT() {
-      const { min, max, splitNumber } = computeLogYAxisLimits(
-        this.daDnVsGMBTSeries
-      );
-      return {
-        min,
-        max,
-        splitNumber,
-      };
-    },
-    axisTickFormatter() {
-      return formatTick;
-    },
-    fractureEnergySeriesCombined() {
-      const lineStyles = {
-        mbt: { type: "solid" },
-        mcc: { type: "dashed" },
-        ecm: { type: "dotted" },
-      };
-
-      const selectedMethods =
-        this.selectedFractureEnergyMethods.length > 0
-          ? this.selectedFractureEnergyMethods
-          : ["mbt", "mcc", "ecm"]; // se vuoto, mostra tutti
-
-      return this.testIds.flatMap((id, testIndex) => {
-        const crackLength = this.crackLengthData[id];
-        if (!crackLength) return [];
-
-        const color = this.colors[testIndex % this.colors.length];
-
-        return selectedMethods
-          .map((method) => {
-            const fractureEnergyData = this[`fractureEnergyData_${method}`][id];
-            if (!fractureEnergyData) return null;
-
-            return {
-              type: "line",
-              name: `${this.specimenName[id]}`,
-              data: zip(crackLength, fractureEnergyData),
-              lineStyle: { ...lineStyles[method], color },
-              itemStyle: { color },
-              tooltip: {
-                formatter: function (params) {
-                  return params.seriesName;
-                },
-              },
-            };
-          })
-          .filter(Boolean);
-      });
-    },
-    yAxisMaxFractureEnergyCombined() {
-      return computeYAxisMax(this.fractureEnergySeriesCombined);
-    },
-    xAxisMaxFractureEnergyCombined() {
-      return computeXAxisMax(this.fractureEnergySeriesCombined);
-    },
-    yAxisMaxGMBT() {
-      return computeYAxisMax(this.fractureGMBTSeries);
     },
   },
   watch: {
