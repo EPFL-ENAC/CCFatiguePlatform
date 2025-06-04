@@ -175,8 +175,33 @@ async def quasi_static_test(
 
             return F, N
 
-        def compute_g_mbt(compliance, crack_displacement, crack_load, crack_length_fitted, F, N, width):
-            C_N_1_3 = (compliance / N)**(1/3)
+        def compute_g_mbt(
+            compliance, crack_displacement, crack_load, crack_length_fitted, F, N, width
+        ):
+            def fit_func(x, a, b):
+                return a * x + b
+
+            def find_plateau_start(crack_length, fracture_energy, threshold=40):
+                import numpy as np
+
+                if len(crack_length) < 2 or len(fracture_energy) < 2:
+                    return float("nan")
+
+                crack_length_array = np.array(crack_length)
+                fracture_energy_array = np.array(fracture_energy)
+
+                derivative = np.gradient(fracture_energy_array, crack_length_array)
+                index_plateau = np.argmax(
+                    (crack_length_array > crack_length_array[0]) & (np.abs(derivative) < threshold)
+                )
+
+                if index_plateau == 0 and (np.abs(derivative[0]) >= threshold):
+                    return float("nan")
+                else:
+                    return crack_length_array[index_plateau]
+
+            # Calcolo G
+            C_N_1_3 = (compliance / N) ** (1 / 3)
             params, _ = curve_fit(fit_func, crack_length_fitted, C_N_1_3)
             a, b = params
             print(f"a: {a}, b: {b}")
@@ -185,27 +210,45 @@ async def quasi_static_test(
 
             linear_compliance = np.mean(compliance[:5])
             threshold_compliance = linear_compliance * 1.01
-
-            # Find the index where compliance exceeds the threshold
             threshold_index = np.where(compliance >= threshold_compliance)[0]
-            
-            G = (3 * np.array(crack_load) * np.array(crack_displacement)) / (2 * width * (crack_length_fitted + triangle)) * F / N * 1e6
-            
-            # G_init is the value of G at the threshold compliance. use the index of the first occurrence
-            if len(threshold_index) > 0:
-                G_init_mbt = G[threshold_index[0]]
-                bridginglength_mbt = crack_length_fitted[threshold_index[0]]
-            else:
-                G_init_mbt = float("nan")
-                bridginglength_mbt = float("nan")
 
-            # calculate G plateau as the average f the values of G after the threshold compliance
-            if len(threshold_index) > 0:
-                G_plateau_mbt = np.mean(G[threshold_index[0]:])
+            G = (
+                3
+                * np.array(crack_load)
+                * np.array(crack_displacement)
+                / (2 * width * (crack_length_fitted + triangle))
+                * F
+                / N
+                * 1e6
+            )
+
+            # Calcolo Fracture Energy per uso successivo
+            fracture_energy = G.tolist()
+
+            # Calcola bridginglength_mbt usando la funzione di plateau detection
+            plateau_start_x = find_plateau_start(
+                crack_length_fitted.tolist(), fracture_energy, threshold=10
+            )
+            bridginglength_mbt = plateau_start_x
+
+            # Trova gli indici a destra del plateau_start_x per calcolare la media plateau
+            if not np.isnan(bridginglength_mbt):
+                plateau_indices = np.where(crack_length_fitted >= bridginglength_mbt)[0]
+                if len(plateau_indices) > 0:
+                    G_plateau_mbt = np.mean(G[plateau_indices])
+                else:
+                    G_plateau_mbt = float("nan")
             else:
                 G_plateau_mbt = float("nan")
 
-            return G.tolist(), G_init_mbt, bridginglength_mbt, G_plateau_mbt
+            # G_init_mbt rimane il primo punto di superamento della threshold_compliance
+            if len(threshold_index) > 0:
+                G_init_mbt = G[threshold_index[0]]
+            else:
+                G_init_mbt = float("nan")
+
+            return fracture_energy, G_init_mbt, bridginglength_mbt, G_plateau_mbt
+
 
         def compute_g_mcc(compliance, crack_displacement, crack_load, crack_length_fitted, F, N, width, thickness):
             a_over_h = crack_length_fitted / thickness
