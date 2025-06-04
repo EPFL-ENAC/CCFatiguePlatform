@@ -42,98 +42,10 @@ TST_Doe_2020-01_FA
 
 ## TST XLS file standards
 
-Must match metadata template : [TST_Data_Template.xls](TST_Data_Template.xls)
-In the Excel metadata template, note that only row 4 (sheet 1) and row 3 (sheet 2) must be filled with metadata. The rest must remain unchanged.
+A ready to use metadata file is inside each downloadable folder in the Data Upload page. 
 
 ## TST CSV files standards (column names must be exact, where # is replaced by a number) :
 
-| Column name            | Description                                           | Unit    | Data type | Mandatory | Multiple measurement points |
-| ---------------------- | ----------------------------------------------------- | ------- | --------- | --------- | --------------------------- |
-| `Machine_Time`         | Absolute or relative time recorded by the machine     | `[-]`   | string    |           |                             |
-| `Machine_N_cycles`     | Number of cycles counted by the machine               | `[-]`   | int       |           |                             |
-| `Machine_Displacement` | Displacement measured by the machine                  | `[mm]`  | double    |           |                             |
-| `Machine_Load`         | Load measured by the machine                          | `[N]`   | double    |           |                             |
-| `MD_index--#`          | index for the measurement, e.g. image number          | `[-]`   | int       |           | y                           |
-| `MD_time--#`           | Time recored by the measuring device                  | `[-]`   | string    |           | y                           |
-| `MD_N_cycles--#`       | Number of cycles from measuring device                | `[-]`   | int       |           | y                           |
-| `MD_Displacement--#`   | Displacement from measuring device                    | `[mm]`  | double    |           | y                           |
-| `MD_Load--#`           | Load from measuring device                            | `[N]`   | double    |           | y                           |
-| `u--#`                 | Displacement measured along main axis at point #      | `[mm]`  | double    |           | y                           |
-| `v--#`                 | Displacement measured along secondary axis at point # | `[mm]`  | double    |           | y                           |
-| `exx--#`               | Strain measured along main axis at point #            | `[-]`   | double    |           | y                           |
-| `eyy--#`               | Strain measured along secondary axis at point #       | `[-]`   | double    |           | y                           |
-| `exy--#`               | Strain measured along a specified axis at point #     | `[-]`   | double    |           | y                           |
-| `Crack_length`         | Crack length measurement (for fracture testings)      | `[mm]`  | double    |           |                             |
-| `Crack_N_cycles`       | Number of cycles at measured crack length             | `[mm]`  | double    |           |                             |
-| `Crack_Displacement`   | Displacement at measured crack length                 | `[mm]`  | double    |           |                             |
-| `Crack_Load`           | Load at measured crack length                         | `[N]`   | double    |           |                             |
-| `Th_time`              | Time as counted by temperature monitoring             | `[sec]` | int       |           |                             |
-| `Th_N_cycles`          | Number of cycles counted by temperature monitoring    | `[-]`   | int       |           |                             |
-| `Th_specimen_max`      | Maximum temperature monitored                         | `[°C]`  | double    |           |                             |
-| `Th_specimen_mean`     | Mean temperature                                      | `[°C]`  | double    |           |                             |
-| `Th_chamber`           | Temperature of the test environment                   | `[°C]`  | double    |           |                             |
-| `Th_uppergrips`        | Temperature of the upper grips                        | `[°C]`  | double    |           |                             |
-| `Th_lowergrips`        | Temperature of the lower grips                        | `[°C]`  | double    |           |                             |
-| `T--#`                 | Temperature at point #                                | `[°C]`  | double    |           | y                           |
-| `Storage_modulus`      | Storage modulus measured from DMA                     | `[GPa]` | double    |           |                             |
-| `Tan_delta`            | Tan delta measured from DMA                           | `[-]`   | double    |           |                             |
-| `Specimen_name`        | Name of the specimen                                  | `[-]`   | string    |           |                             |
+A dedicated guide about CSV columns is inside each downloadable folder in the Data Upload page. 
 
-### `FA` without fracture specifities :
-
-Mandatory data columns
-
-- one of :
-  - `Machine_N_cycles`
-  - `MD_N_cycles--#`
-- one of :
-  - `Machine_Displacement`
-  - `MD_Displacement--#`
-  - `exx--#`
-- one of :
-  - `Machine_Load`
-  - `MD_Load--#`
-
-### `FA` with fracture specifities :
-
-Mandatory data columns
-
-- `Crack_N_cycles`
-- `Crack_length`
-
-### `QS` without fracture specifities :
-
-Mandatory data columns
-
-- one of :
-  - `Machine_Displacement`
-  - `MD_Displacement--#`
-  - `exx--#`
-- one of :
-  - `Machine_Load`
-  - `MD_Load--#`
-
-### `QS` with fracture specifities :
-
-Mandatory data columns
-
-- one of :
-  - `Machine_Displacement`
-  - `MD_Displacement--#`
-  - `Crack_length`
-  - `Crack_Displacement`
-- one of :
-  - `Machine_Load`
-  - `MD_Load--#`
-  - `Crack_Load`
-
-### `TM` with and without fracture specifities:
-
-Mandatory data columns
-
-- `T--#`
-- one of :
-  - `Storage_modulus`
-  - `Tan_delta`
-  - `Machine_Load`
-  - `MD_Load--#`
+Each experiment type have different mandatory columns so make sure to download the right folder.
