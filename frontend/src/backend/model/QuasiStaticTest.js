@@ -26,6 +26,9 @@ class QuasiStaticTest {
     crack_fractureenergy_ecm,
     young_modulus,
     poisson_ratio,
+    g_init_mbt, 
+    bridginglength_mbt,
+    g_plateau_mbt,
   ) {
     QuasiStaticTest.initialize(
       this,
@@ -45,6 +48,9 @@ class QuasiStaticTest {
       crack_fractureenergy_ecm,
       young_modulus,
       poisson_ratio,
+      g_init_mbt,
+      bridginglength_mbt,
+      g_plateau_mbt,
     );
   }
 
@@ -66,6 +72,9 @@ class QuasiStaticTest {
     crack_fractureenergy_ecm,
     young_modulus,
     poisson_ratio,
+    g_init_mbt,
+    bridginglength_mbt,
+    g_plateau_mbt,
   ) {
     obj["specimen_name"] = specimenName;
     obj["crack_displacement"] = crackDisplacement;
@@ -83,6 +92,9 @@ class QuasiStaticTest {
     obj["crack_fractureenergy_ecm"] = crack_fractureenergy_ecm;
     obj["young_modulus"] = young_modulus;
     obj["poisson_ratio"] = poisson_ratio;
+    obj["g_init_mbt"] = g_init_mbt;
+    obj["bridginglength_mbt"] = bridginglength_mbt;
+    obj["g_plateau_mbt"] = g_plateau_mbt;
   }
 
   static constructFromObject(data, obj) {
@@ -138,6 +150,15 @@ class QuasiStaticTest {
       if (data.hasOwnProperty("poisson_ratio")) {
         obj["poisson_ratio"] = ApiClient.convertToType(data["poisson_ratio"], "Number");
       }
+      if (data.hasOwnProperty("g_init_mbt")) {
+        obj["g_init_mbt"] = ApiClient.convertToType(data["g_init_mbt"], "Number");
+      }
+      if (data.hasOwnProperty("bridginglength_mbt")) {
+        obj["bridginglength_mbt"] = ApiClient.convertToType(data["bridginglength_mbt"], "Number");
+      }
+      if (data.hasOwnProperty("g_plateau_mbt")) {
+        obj["g_plateau_mbt"] = ApiClient.convertToType(data["g_plateau_mbt"], "Number");
+      }
     }
     console.log("Constructed QuasiStaticTest object:", obj); // useful logs
     return obj;
@@ -161,5 +182,8 @@ QuasiStaticTest.prototype["crack_fractureenergy_mcc"] = undefined;
 QuasiStaticTest.prototype["crack_fractureenergy_ecm"] = undefined;
 QuasiStaticTest.prototype["young_modulus"] = undefined;
 QuasiStaticTest.prototype["poisson_ratio"] = undefined;
+QuasiStaticTest.prototype["g_init_mbt"] = undefined;
+QuasiStaticTest.prototype["bridginglength_mbt"] = undefined;
+QuasiStaticTest.prototype["g_plateau_mbt"] = undefined;
 
 export default QuasiStaticTest;

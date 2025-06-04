@@ -31,6 +31,9 @@ class QuasiStaticTest(BaseModel):
     crack_fractureenergy_mbt: List[float]
     crack_fractureenergy_mcc: List[float]
     crack_fractureenergy_ecm: List[float]
+    g_init_mbt: float | None 
+    bridginglength_mbt: float | None 
+    g_plateau_mbt: float | None 
 
 
 def get_dataframe(
@@ -180,8 +183,29 @@ async def quasi_static_test(
             triangle = abs(b / a)
             print(f"Triangle value: {triangle} mm")
 
+            linear_compliance = np.mean(compliance[:5])
+            threshold_compliance = linear_compliance * 1.01
+
+            # Find the index where compliance exceeds the threshold
+            threshold_index = np.where(compliance >= threshold_compliance)[0]
+            
             G = (3 * np.array(crack_load) * np.array(crack_displacement)) / (2 * width * (crack_length_fitted + triangle)) * F / N * 1e6
-            return G.tolist()
+            
+            # G_init is the value of G at the threshold compliance. use the index of the first occurrence
+            if len(threshold_index) > 0:
+                G_init_mbt = G[threshold_index[0]]
+                bridginglength_mbt = crack_length_fitted[threshold_index[0]]
+            else:
+                G_init_mbt = float("nan")
+                bridginglength_mbt = float("nan")
+
+            # calculate G plateau as the average f the values of G after the threshold compliance
+            if len(threshold_index) > 0:
+                G_plateau_mbt = np.mean(G[threshold_index[0]:])
+            else:
+                G_plateau_mbt = float("nan")
+
+            return G.tolist(), G_init_mbt, bridginglength_mbt, G_plateau_mbt
 
         def compute_g_mcc(compliance, crack_displacement, crack_load, crack_length_fitted, F, N, width, thickness):
             a_over_h = crack_length_fitted / thickness
@@ -219,7 +243,7 @@ async def quasi_static_test(
             crack_displacement, crack_load, crack_length_fitted, thickness, t, l_prime
         )
 
-        crack_fractureenergy_mbt = compute_g_mbt(
+        crack_fractureenergy_mbt, G_init_mbt, bridginglength_mbt, G_plateau_mbt = compute_g_mbt(
             compliance, crack_displacement, crack_load, crack_length_fitted, F, N, width
         )
         crack_fractureenergy_mcc = compute_g_mcc(
@@ -247,6 +271,9 @@ async def quasi_static_test(
             initial_crack_length=test_meta["initial_crack_length"],
             young_modulus=None,
             poisson_ratio=None,
+            g_init_mbt=G_init_mbt,
+            bridginglength_mbt=bridginglength_mbt,
+            g_plateau_mbt=G_plateau_mbt,
         )
 
     else:
@@ -313,4 +340,7 @@ async def quasi_static_test(
             initial_crack_length=None,
             young_modulus=young_modulus,
             poisson_ratio=poisson_ratio,
+            g_init_mbt=None,
+            bridginglength_mbt=None,
+            g_plateau_mbt=None,
         )

@@ -649,6 +649,33 @@
                   tooltip="Initial crack length measured before testing."
                 />
               </li>
+              <li>
+                <experiment-s-v
+                  subject="G initiation"
+                  :values="formattedGinitMBTQSValues"
+                  :colors="valueColors"
+                  :unit="'J/m²'"
+                  tooltip="Fracture energy calculated with MBT method at 1% compliance increase."
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="Bridging length"
+                  :values="formattedBridgingLengths"
+                  :colors="valueColors"
+                  :unit="'mm'"
+                  tooltip="The crack length at 1% compliance increase."
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="G plateau"
+                  :values="formattedGPlateauMBTQSValues"
+                  :colors="valueColors"
+                  :unit="'J/m²'"
+                  tooltip="Average fracture energy calculated with MBT method after the initiation point."
+                />
+              </li>
             </ul>
           </v-card-text>
         </v-card>
@@ -714,6 +741,9 @@ export default {
       toughnessValues: [],
       youngModulusValues: [],
       quasiStaticPoissonRatios: [],
+      ginitMBTQSValues: [],
+      bridginglengths: [],
+      gplateauMBTQSValues: [],
       fatigueWarnings: [],
       fractureEnergyData_mbt: {},
       fractureEnergyData_mcc: {},
@@ -1102,6 +1132,21 @@ export default {
         e != null ? Number(e).toFixed(2) : "-"
       );
     },
+    formattedBridgingLengths() {
+      return this.bridginglengths.map((v) =>
+        v != null ? Number(v).toFixed(2) : "-"
+      );
+    },
+    formattedGPlateauMBTQSValues() {
+      return this.gplateauMBTQSValues.map((v) =>
+        v != null ? Number(v).toFixed(2) : "-"
+      );
+    },
+    formattedGinitMBTQSValues() {
+      return this.ginitMBTQSValues.map((v) =>
+        v != null ? Number(v).toFixed(2) : "-"
+      );
+    },
 
     // --- Warnings ---
     hasWarnings() {
@@ -1185,6 +1230,9 @@ export default {
       this.quasiStaticPoissonRatios = []; // new
       this.initialCrackLengths = []; // new
       this.crackLengthData = {};
+      this.ginitMBTQSValues = [];
+      this.bridginglengths = [];
+      this.gplateauMBTQSValues = [];
 
       dataList.forEach((d, i) => {
         const tid = this.testIds[i];
@@ -1238,6 +1286,15 @@ export default {
           isFinite(d.young_modulus) ? Number(d.young_modulus) : null
         );
         this.quasiStaticPoissonRatios.push(d.poisson_ratio);
+        this.ginitMBTQSValues.push(
+          isFinite(d.g_init_mbt) ? Number(d.g_init_mbt) : null
+        );
+        this.bridginglengths.push(
+          isFinite(d.bridginglength_mbt) ? Number(d.bridginglength_mbt) : null
+        );
+        this.gplateauMBTQSValues.push(
+          isFinite(d.g_plateau_mbt) ? Number(d.g_plateau_mbt) : null
+        );
       });
 
       this.strainOptions = Array.from(this.strainOptions);
