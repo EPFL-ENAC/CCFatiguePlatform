@@ -16,6 +16,16 @@ settings = Dynaconf(
         Validator("postgres_password", must_exist=True),
         Validator("postgres_db", default="ccfatigue"),
         Validator("data_path", default="../Data"),
+
+        # Email settings (new)
+        Validator("mail_from", must_exist=True),
+        Validator("mail_password", must_exist=True),
+        Validator("mail_server", default="smtp.gmail.com"),
+        Validator("mail_port", default=587),
+        Validator("mail_username", must_exist=True),
+        Validator("mail_tls", default=True),
+        Validator("mail_ssl", default=False),
+        Validator("recipient_email", must_exist=True),
     ],
 )
 
