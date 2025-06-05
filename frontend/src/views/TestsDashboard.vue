@@ -391,6 +391,7 @@
                   :y-axis-type="'log'"
                   :y-axis-min="yAxisLogLimits_daDnVsGMBT.min"
                   :y-axis-max="yAxisLogLimits_daDnVsGMBT.max"
+                  :x-axis-max="xAxisMaxGrowthRatevsFractureEnergy"
                   :y-axis-split-number="yAxisLogLimits_daDnVsGMBT.splitNumber"
                   :axis-label-formatter="axisTickFormatter"
                   :tooltip-formatter="formatScientific"
@@ -620,6 +621,7 @@
                   x-axis-name="Crack Length [mm]"
                   y-axis-name="Fracture Energy [J/m²]"
                   :y-axis-max="yAxisMaxFractureEnergyCombined"
+                  :x-axis-min="xAxisMinFractureEnergyCombined"
                   :x-axis-max="xAxisMaxFractureEnergyCombined"
                   :axis-label-formatter="axisTickFormatter"
                 />
@@ -1016,8 +1018,14 @@ export default {
     xAxisMaxFractureEnergyCombined() {
       return computeXAxisMax(this.fractureEnergySeriesCombined);
     },
+    xAxisMinFractureEnergyCombined() {
+      return computeXAxisMin(this.fractureEnergySeriesCombined);
+    },
     yAxisMaxGMBT() {
       return computeYAxisMax(this.fractureGMBTSeries);
+    },
+    xAxisMaxGrowthRatevsFractureEnergy() {
+      return computeXAxisMax(this.daDnVsGMBTSeries);
     },
     // Double chart axis min/max for both FA and QS fracture
     xAxisMaxDoubleChart() {
