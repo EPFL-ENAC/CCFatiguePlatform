@@ -430,6 +430,22 @@
                   tooltip="No fatigue failure."
                 />
               </li>
+              <li>
+                <experiment-s-v
+                  subject="C"
+                  :values="formattedcParisValues"
+                  :colors="valueColors"
+                  tooltip="Paris fitting C value, stable region"
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="m"
+                  :values="formattedmParisValues"
+                  :colors="valueColors"
+                  tooltip="Paris fitting m value, stable region"
+                />
+              </li>
             </ul>
           </v-card-text>
         </v-card>
@@ -731,6 +747,8 @@ export default {
       strainAtFailure: [],
       specimenIds: [],
       totalDissipatedEnergies: [],
+      mParisValues: [],
+      cParisValues: [],
       runOuts: [],
       selectedLoopIndices: [], // { value }
       crackSeries: [],
@@ -1140,6 +1158,16 @@ export default {
         e != null ? Number(e).toFixed(2) : "-"
       );
     },
+    formattedmParisValues() {
+      return this.mParisValues.map((e) =>
+        e != null ? Number(e).toFixed(2) : "-"
+      );
+    },
+    formattedcParisValues() {
+      return this.cParisValues.map((e) =>
+        e != null ? Number(e).toExponential(2) : "-"
+      );
+    },
     formattedBridgingLengths() {
       return this.bridginglengths.map((v) =>
         v != null ? Number(v).toFixed(2) : "-"
@@ -1195,6 +1223,8 @@ export default {
       this.strainAtFailure = [];
       this.specimenIds = [];
       this.totalDissipatedEnergies = [];
+      this.mParisValues = [];
+      this.cParisValues = [];
       this.runOuts = [];
       this.fatigueData = dataList;
       dataList.forEach((d, i) => {
@@ -1205,6 +1235,8 @@ export default {
         this.strainAtFailure.push(d.strain_at_failure);
         this.specimenIds.push(d.specimen_id);
         this.totalDissipatedEnergies.push(d.total_dissipated_energy);
+        this.mParisValues.push(d.m_value_paris);
+        this.cParisValues.push(d.c_value_paris);
         this.runOuts.push(d.run_out);
         this.fatigueWarnings.push(d.warning_messages || false);
         d.crack_length = d.crack_length || [];
