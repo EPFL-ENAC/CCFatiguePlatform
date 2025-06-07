@@ -379,7 +379,8 @@
               <v-card-title>
                 Crack growth rate vs fracture energy
                 <info-tooltip>
-                  Crack growth rate vs fracture energy.
+                  Crack growth rate vs fracture energy. Fracture energy is
+                  calculated with the Modified Beam Theory.
                 </info-tooltip>
               </v-card-title>
               <v-card-text>
@@ -929,7 +930,7 @@ export default {
           },
           {
             type: "scatter",
-            name: null,
+            name,
             data: zip(transformedX, d.crack_length || []),
             rawX: rawX,
             yAxisIndex: 1,

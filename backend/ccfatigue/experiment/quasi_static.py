@@ -129,8 +129,6 @@ async def quasi_static_test(
             crack_displacement: List[float],
             crack_load: List[float]
         ) -> List[float]:
-            from scipy.optimize import curve_fit
-            import numpy as np
 
             compliance = np.array(crack_displacement) / np.array(crack_load)
             crack_length_array = np.array(crack_length)
@@ -182,7 +180,6 @@ async def quasi_static_test(
                 return a * x + b
 
             def find_plateau_start(crack_length, fracture_energy, threshold=40):
-                import numpy as np
 
                 if len(crack_length) < 2 or len(fracture_energy) < 2:
                     return float("nan")
