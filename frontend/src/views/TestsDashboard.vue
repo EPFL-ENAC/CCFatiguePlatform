@@ -701,6 +701,7 @@
         </v-row>
       </v-col>
       <v-col cols="2">
+        <!-- First card: always visible -->
         <v-card :loading="loading">
           <v-card-text>
             <ul>
@@ -721,6 +722,17 @@
                   tooltip="Initial crack length measured before testing."
                 />
               </li>
+            </ul>
+          </v-card-text>
+        </v-card>
+
+        <!-- Second card: conditionally shown only when MBT is selected (or none selected) -->
+        <v-card v-if="showFractureMBTDetails" :loading="loading" class="mt-4">
+          <v-card-title class="text-subtitle-1 font-weight-medium">
+            MBT Values
+          </v-card-title>
+          <v-card-text>
+            <ul>
               <li>
                 <experiment-s-v
                   subject="G initiation"
@@ -1275,6 +1287,15 @@ export default {
     hasWarnings() {
       // True if any fatigue test has warnings
       return this.testIds.some((_, i) => this.fatigueWarnings?.[i]);
+    },
+
+    // --- Conditional banners ---
+    showFractureMBTDetails() {
+      const selected = this.selectedFractureEnergyMethods;
+      return (
+        selected.length === 0 ||
+        (selected.length === 1 && selected[0] === "mbt")
+      );
     },
   },
   watch: {
