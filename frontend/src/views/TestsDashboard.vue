@@ -331,16 +331,42 @@
           <v-col cols="6">
             <v-card :loading="loading">
               <v-card-title>
-                <v-row align="center" class="w-100">
-                  <v-col class="d-flex align-center" cols="auto">
-                    Fracture Energy vs Number of cycles
-                    <info-tooltip>
-                      Fracture energy is calculated with the Modified Beam
-                      Theory.
-                    </info-tooltip>
+                Fracture Energy vs Number of Cycles
+                <info-tooltip>
+                  The graph shows the evolution of the fracture energy
+                  calculated with different methods:
+                  <ul>
+                    <li><strong>MBT</strong> = solid line</li>
+                    <li><strong>MCC</strong> = dashed line</li>
+                    <li><strong>ECM</strong> = dotted line</li>
+                  </ul>
+                </info-tooltip>
+              </v-card-title>
+
+              <v-card-text>
+                <v-row class="mb-6">
+                  <v-col>
+                    <v-select
+                      v-model="selectedFractureEnergyMethods"
+                      :items="fractureEnergyMethodOptions"
+                      label="Fracture Energy Types"
+                      dense
+                      hide-details
+                      multiple
+                    >
+                      <template #prepend-item>
+                        <v-list-item
+                          @click="selectedFractureEnergyMethods = []"
+                        >
+                          <v-list-item-title class="text-primary"
+                            >Clear all</v-list-item-title
+                          >
+                        </v-list-item>
+                        <v-divider />
+                      </template>
+                    </v-select>
                   </v-col>
-                  <v-spacer />
-                  <v-col cols="auto" class="d-flex">
+                  <v-col>
                     <v-select
                       v-model="xAxisMode"
                       :items="[
@@ -351,21 +377,18 @@
                       dense
                       hide-details
                       label="X-Axis scale"
-                      style="max-width: 220px"
                     />
                   </v-col>
                 </v-row>
-              </v-card-title>
-              <v-card-text>
+
                 <simple-chart
-                  :series="fractureGMBTSeries"
+                  :series="fractureEnergyVsCyclesSeriesCombined"
                   :aspect-ratio="2"
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
-                  y-axis-name="G [J/m²]"
-                  :y-axis-max="yAxisMaxGMBT"
                   :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
                   :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
+                  y-axis-name="Fracture Energy [J/m²]"
                   :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
@@ -1000,6 +1023,36 @@ export default {
           .filter(Boolean);
       });
     },
+    fractureEnergyVsCyclesSeriesCombined() {
+      const lineStyles = {
+        mbt: { type: "solid" },
+        mcc: { type: "dashed" },
+        ecm: { type: "dotted" },
+      };
+
+      const selectedMethods =
+        this.selectedFractureEnergyMethods.length > 0
+          ? this.selectedFractureEnergyMethods
+          : ["mbt", "mcc", "ecm"];
+
+      return this.fatigueData.flatMap((d, index) => {
+        const color = this.colors[index % this.colors.length];
+        const x = this.transformXAxis(d.crack_n_cycles, d.n_fail);
+        return selectedMethods
+          .map((method) => {
+            const y = d[`G_${method.toUpperCase()}`]; // G_MBT, G_MCC, G_ECM
+            if (!x || !y || x.length !== y.length) return null;
+            return {
+              type: "line",
+              name: `${d.specimen_name}`,
+              data: zip(x, y),
+              lineStyle: { ...lineStyles[method], color },
+              itemStyle: { color },
+            };
+          })
+          .filter(Boolean);
+      });
+    },
 
     // --- Chart Axis & Limits ---
     computedXAxisLabel() {
@@ -1033,6 +1086,9 @@ export default {
     },
     yAxisMaxFractureEnergyCombined() {
       return computeYAxisMax(this.fractureEnergySeriesCombined);
+    },
+    yAxisMaxFractureEnergyVsCycles() {
+      return computeYAxisMax(this.fractureEnergyVsCyclesSeriesCombined);
     },
     xAxisMaxFractureEnergyCombined() {
       return computeXAxisMax(this.fractureEnergySeriesCombined);
@@ -1244,6 +1300,8 @@ export default {
         d.crack_n_cycles = d.crack_n_cycles || [];
         d.crack_load = d.crack_load || [];
         d.G_MBT = d.G_MBT || [];
+        d.G_MCC = d.G_MCC || [];
+        d.G_ECM = d.G_ECM || [];
         d.da_dN = d.da_dN || [];
       });
 

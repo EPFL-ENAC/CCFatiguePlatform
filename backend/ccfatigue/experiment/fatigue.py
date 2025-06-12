@@ -49,6 +49,8 @@ class FatigueTest(BaseModel):
     crack_n_cycles: List[float]
     da_dN: Optional[List[float]] = None
     G_MBT: Optional[List[float]] = None
+    G_MCC: Optional[List[float]] = None
+    G_ECM: Optional[List[float]] = None
     c_value_paris: float | None 
     m_value_paris: float | None
 
@@ -147,8 +149,6 @@ def apply_spike_filter(df: DataFrame, field: str, specimen_name: str) -> (List[f
         print(f"[Spike Filter] '{specimen_name}' – '{field}' modified in {sum(o != f for o, f in zip(original, filtered))} points")
     return filtered, changed
 
-
-# ==== Funzione principale ====
 
 async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) -> FatigueTest:
     experiment = (await session.execute(
@@ -263,6 +263,29 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
                 * 1e6
             )
 
+            return G.tolist()
+
+        def compute_g_mcc(compliance, crack_displacement, crack_load, crack_length_fitted, F, N, width, thickness):
+            a_over_h = crack_length_fitted / thickness
+            C_N_1_3 = (compliance / N)**(1/3)
+            A1, _ = np.polyfit(C_N_1_3, a_over_h, 1)
+            G = (3 * np.array(crack_load)**2 * (compliance / N)**(2/3)) / (2 * A1 * width * thickness) * F * 1e6
+            return G.tolist()
+
+        def compute_g_ecm(compliance, crack_displacement, crack_load, crack_length_fitted, F, N, width):
+            crack_array = crack_length_fitted
+            c_over_n = compliance / N
+
+            valid_mask = (crack_array > 0) & (c_over_n > 0) & np.isfinite(c_over_n)
+            if np.sum(valid_mask) < 2:
+                return [float("nan")] * len(crack_array)
+
+            a_log = np.log10(crack_array[valid_mask])
+            log_C_N = np.log10(c_over_n[valid_mask])
+
+            m, _ = np.polyfit(a_log, log_C_N, 1)
+
+            G = (m * np.array(crack_load) * np.array(crack_displacement)) / (2 * width * crack_array) * F / N * 1e6
             return G.tolist()
 
         def compute_da_dn(crack_length_fitted, crack_n_cycles):
@@ -471,6 +494,14 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
             compliance, crack_displacement, crack_load, crack_length_fitted, F, N, w
         )
 
+        G_MCC = compute_g_mcc(
+            compliance, crack_displacement, crack_load, crack_length_fitted, F, N, w, h
+        )
+
+        G_ECM = compute_g_ecm(
+            compliance, crack_displacement, crack_load, crack_length_fitted, F, N, w
+        )
+
         da_dn_new = compute_da_dn(crack_length_fitted, crack_n_cycles)
 
         m, C, r2_best = find_best_paris_fit(G_MBT, da_dn_new, da_dn_min=0.00001, da_dn_max=0.001)
@@ -495,6 +526,8 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
             crack_n_cycles=crack_n_cycles,
             da_dN=da_dn_new,
             G_MBT=G_MBT,
+            G_MCC=G_MCC,
+            G_ECM=G_ECM,
             m_value_paris=m,
             c_value_paris=C,
         )
@@ -539,6 +572,8 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
         crack_n_cycles=[], 
         da_dN=[],
         G_MBT=[],
+        G_MCC=[],
+        G_ECM=[],
         c_value_paris=None,
         m_value_paris=None
     )

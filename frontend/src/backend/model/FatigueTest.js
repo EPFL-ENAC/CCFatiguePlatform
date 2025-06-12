@@ -43,6 +43,8 @@ class FatigueTest {
    * @param crackNCycles {Array.<Number>}
    * @param da_dN {Array.<Number>}
    * @param G_MBT {Array.<Number>}
+   * @param G_MCC {Array.<Number>}
+   * @param G_ECM {Array.<Number>}
    * @param m_value_paris {Number} ! None
    * @param c_value_paris {Number} ! None
    */
@@ -67,6 +69,8 @@ class FatigueTest {
     crackNCycles, 
     da_dN,
     G_MBT,
+    G_MCC,
+    G_ECM,
     m_value_paris,
     c_value_paris,
   ) {
@@ -92,6 +96,8 @@ class FatigueTest {
       crackNCycles,
       da_dN,
       G_MBT,
+      G_MCC, 
+      G_ECM,
       m_value_paris,
       c_value_paris,
     );
@@ -124,6 +130,8 @@ class FatigueTest {
     crackNCycles, 
     da_dN,
     G_MBT,
+    G_MCC, 
+    G_ECM,
     m_value_paris,
     c_value_paris,
   ) {
@@ -147,6 +155,8 @@ class FatigueTest {
     obj["crack_n_cycles"] = crackNCycles;
     obj["da_dN"] = da_dN;
     obj["G_MBT"] = G_MBT;
+    obj["G_MCC"] = G_MCC;
+    obj["G_ECM"] = G_ECM;
     obj["m_value_paris"] = m_value_paris; // Paris law exponent
     obj["c_value_paris"] = c_value_paris; // Paris law coefficient
   }
@@ -264,6 +274,12 @@ class FatigueTest {
       if (data.hasOwnProperty("G_MBT")) {
         obj["G_MBT"] = ApiClient.convertToType(data["G_MBT"], ["Number"]);
       }
+      if (data.hasOwnProperty("G_MCC")) {
+        obj["G_MCC"] = ApiClient.convertToType(data["G_MCC"], ["Number"]);
+      }
+      if (data.hasOwnProperty("G_ECM")) {
+        obj["G_ECM"] = ApiClient.convertToType(data["G_ECM"], ["Number"]);
+      }
       if (data.hasOwnProperty("m_value_paris")) {
         obj["m_value_paris"] = ApiClient.convertToType(
           data["m_value_paris"],
@@ -376,6 +392,14 @@ FatigueTest.prototype["da_dN"] = undefined;
  * @member {Array.<Number>} G_MBT
  */
 FatigueTest.prototype["G_MBT"] = undefined;
+/**
+ * @member {Number} m_value_paris - Paris law exponent
+ */
+FatigueTest.prototype["G_MCC"] = undefined;
+/**
+ * @member {Number} m_value_paris - Paris law exponent
+ */
+FatigueTest.prototype["G_ECM"] = undefined;
 /**
  * @member {Number} m_value_paris - Paris law exponent
  */
