@@ -46,8 +46,18 @@ export default {
     y1AxisName: { type: String, default: "" },
     y2AxisName: { type: String, default: "" },
     xAxisType: { type: String, default: "" },
+    xAxisMax: { type: [Number, null], default: null },
+    y1AxisMax: { type: [Number, null], default: null },
+    y2AxisMax: { type: [Number, null], default: null },
+    xAxisMin: { type: [Number, null], default: null },
+    y1AxisMin: { type: [Number, null], default: null },
+    y2AxisMin: { type: [Number, null], default: null },
     color: { type: Array, default: () => colorPalette },
     axisLabelFormatter: {
+      type: Function,
+      default: formatNumber3,
+    },
+    tooltipFormatter: {
       type: Function,
       default: formatNumber3,
     },
@@ -80,8 +90,8 @@ export default {
           name: this.xAxisName,
           nameLocation: "middle",
           nameGap: 26,
-          min: "dataMin",
-          max: "dataMax",
+          min: this.xAxisMin ?? "dataMin",
+          max: this.xAxisMax ?? "dataMax",
           axisLabel: {
             formatter: this.axisLabelFormatter,
             fontSize: 10,
@@ -92,8 +102,8 @@ export default {
             name: this.y1AxisName,
             nameLocation: "middle",
             nameGap: 30,
-            min: "dataMin",
-            max: "dataMax",
+            min: this.y1AxisMin ?? "dataMin",
+            max: this.y1AxisMax ?? "dataMax",
             axisLabel: {
               formatter: this.axisLabelFormatter,
               fontSize: 10,
@@ -103,8 +113,8 @@ export default {
             name: this.y2AxisName,
             nameLocation: "middle",
             nameGap: 30,
-            min: "dataMin",
-            max: "dataMax",
+            min: this.y2AxisMin ?? "dataMin",
+            max: this.y2AxisMax ?? "dataMax",
             axisLabel: {
               formatter: this.axisLabelFormatter,
               fontSize: 10,
@@ -114,7 +124,51 @@ export default {
         tooltip: {
           trigger: "axis",
           confine: true,
-          valueFormatter: this.axisLabelFormatter,
+          formatter: (params) => {
+            const formatter = this.tooltipFormatter;
+            let xLabel;
+
+            if (
+              this.xAxisName.includes("Number of cycles") ||
+              this.xAxisName.includes("Normalized cycles")
+            ) {
+              const p = params[0];
+              let rawX = null;
+
+              if (p.seriesIndex != null && this.series[p.seriesIndex]?.rawX) {
+                const pointIndex = p.dataIndex;
+                rawX = this.series[p.seriesIndex].rawX[pointIndex];
+              }
+
+              if (rawX != null) {
+                xLabel = Number(rawX).toLocaleString(undefined, {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                  useGrouping: false,
+                });
+              } else {
+                const xValue = p.value[0] ?? p.value;
+                xLabel = Number(xValue).toLocaleString(undefined, {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                  useGrouping: false,
+                });
+              }
+            } else {
+              xLabel = params[0].axisValueLabel;
+            }
+
+            const rows = [`<strong>${xLabel}</strong>`];
+
+            for (const p of params) {
+              const rawY = Array.isArray(p.value) ? p.value[1] : p.value;
+              const yVal = Number(rawY);
+              const formattedY = formatter(yVal);
+              rows.push(`${p.marker}${p.seriesName}: ${formattedY}`);
+            }
+
+            return rows.join("<br/>");
+          },
         },
         series: this.series.map((serie) => merge(serie, { showSymbol: false })),
         color: this.color,

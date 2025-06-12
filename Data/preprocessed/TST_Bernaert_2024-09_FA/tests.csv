@@ -1,2 +1,2 @@
-sequential number,specimen name,number of cycles,maximum load,run out,width,thickness,initial crack length,subset size,step size
-1,DCB_F_830_1,2057000,2.367505,False,39.99,21.805,68.59,35.0,8.0
+sequential number,specimen name,number of cycles,maximum load,run out,width,thickness,t,initial crack length,subset size,step size
+1,DCB_F_830_1,2057000,2.367505,False,39.99,21.805,27.45,68.59,35.0,8.0

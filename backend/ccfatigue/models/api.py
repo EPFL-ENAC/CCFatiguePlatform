@@ -79,6 +79,8 @@ class TestModel(OrmModel):
         "maximum_load",
         "length",
         "width",
+        "t",
+        "l_prime",
         "thickness",
         "temperature",
         "humidity",
@@ -98,6 +100,8 @@ class TestModel(OrmModel):
     run_out: Optional[bool]
     length: Optional[float]
     width: Optional[float]
+    t: Optional[float]  
+    l_prime: Optional[float]  
     thickness: Optional[float]
     initial_crack_length: Optional[float]
     temperature: Optional[float]

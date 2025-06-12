@@ -8,6 +8,8 @@ from ccfatigue.config import settings
 from ccfatigue.routers import analysis, experiments, root, tests
 from ccfatigue.utils.fastapi import use_route_names_as_operation_ids
 from init_db import run_init_db
+from ccfatigue.routes import dataset_integration
+
 
 run_init_db()
 
@@ -16,6 +18,9 @@ app = FastAPI(
     version=__version__,
     root_path=settings.root_path,
 )
+
+
+
 
 ### NEW MIDDLEWARE START
 import traceback
@@ -50,3 +55,5 @@ app.include_router(tests.router)
 app.include_router(analysis.router)
 add_pagination(app)
 use_route_names_as_operation_ids(app)
+
+app.include_router(dataset_integration.router)

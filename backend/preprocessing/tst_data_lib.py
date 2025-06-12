@@ -894,6 +894,8 @@ class Experiment:
                 {"path": "geometry>length", "type": float},
                 {"path": "geometry>width", "type": float},
                 {"path": "geometry>thickness", "type": float},
+                {"path": "geometry>t", "type": float},
+                {"path": "geometry>l'", "type": str},
                 {"path": "environment>temperature", "type": float},
                 {"path": "environment>humidity", "type": float},
                 {"path": "geometry>initial crack length", "type": float},

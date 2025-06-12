@@ -41,6 +41,12 @@ class FatigueTest {
    * @param crackDisplacement {Array.<Number>}
    * @param crackLoad {Array.<Number>tring}
    * @param crackNCycles {Array.<Number>}
+   * @param da_dN {Array.<Number>}
+   * @param G_MBT {Array.<Number>}
+   * @param G_MCC {Array.<Number>}
+   * @param G_ECM {Array.<Number>}
+   * @param m_value_paris {Number} ! None
+   * @param c_value_paris {Number} ! None
    */
   constructor(
     specimenId,
@@ -60,7 +66,13 @@ class FatigueTest {
     crackLength,
     crackDisplacement,
     crackLoad,
-    crackNCycles
+    crackNCycles, 
+    da_dN,
+    G_MBT,
+    G_MCC,
+    G_ECM,
+    m_value_paris,
+    c_value_paris,
   ) {
     FatigueTest.initialize(
       this,
@@ -81,7 +93,13 @@ class FatigueTest {
       crackLength,
       crackDisplacement,
       crackLoad,
-      crackNCycles
+      crackNCycles,
+      da_dN,
+      G_MBT,
+      G_MCC, 
+      G_ECM,
+      m_value_paris,
+      c_value_paris,
     );
   }
 
@@ -109,7 +127,13 @@ class FatigueTest {
     crackLength,
     crackDisplacement,
     crackLoad,
-    crackNCycles
+    crackNCycles, 
+    da_dN,
+    G_MBT,
+    G_MCC, 
+    G_ECM,
+    m_value_paris,
+    c_value_paris,
   ) {
     obj["specimen_id"] = specimenId;
     obj["specimen_name"] = specimenName;
@@ -129,6 +153,12 @@ class FatigueTest {
     obj["crack_displacement"] = crackDisplacement;
     obj["crack_load"] = crackLoad;
     obj["crack_n_cycles"] = crackNCycles;
+    obj["da_dN"] = da_dN;
+    obj["G_MBT"] = G_MBT;
+    obj["G_MCC"] = G_MCC;
+    obj["G_ECM"] = G_ECM;
+    obj["m_value_paris"] = m_value_paris; // Paris law exponent
+    obj["c_value_paris"] = c_value_paris; // Paris law coefficient
   }
 
   /**
@@ -238,6 +268,30 @@ class FatigueTest {
           ["Number"]
         );
       }
+      if (data.hasOwnProperty("da_dN")) {
+        obj["da_dN"] = ApiClient.convertToType(data["da_dN"], ["Number"]);
+      }
+      if (data.hasOwnProperty("G_MBT")) {
+        obj["G_MBT"] = ApiClient.convertToType(data["G_MBT"], ["Number"]);
+      }
+      if (data.hasOwnProperty("G_MCC")) {
+        obj["G_MCC"] = ApiClient.convertToType(data["G_MCC"], ["Number"]);
+      }
+      if (data.hasOwnProperty("G_ECM")) {
+        obj["G_ECM"] = ApiClient.convertToType(data["G_ECM"], ["Number"]);
+      }
+      if (data.hasOwnProperty("m_value_paris")) {
+        obj["m_value_paris"] = ApiClient.convertToType(
+          data["m_value_paris"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("c_value_paris")) {
+        obj["c_value_paris"] = ApiClient.convertToType(
+          data["c_value_paris"],
+          "Number"
+        );
+      }
     }
     console.log("Constructed FatigueTest object:", obj); // useful logs
     return obj;
@@ -330,5 +384,29 @@ FatigueTest.prototype["crack_load"] = undefined;
  * @member {Array.<Number>} crack_n_cycles
  */
 FatigueTest.prototype["crack_n_cycles"] = undefined;
+/**
+ * @member {Array.<Number>} da_dN
+ */
+FatigueTest.prototype["da_dN"] = undefined;
+/**
+ * @member {Array.<Number>} G_MBT
+ */
+FatigueTest.prototype["G_MBT"] = undefined;
+/**
+ * @member {Number} m_value_paris - Paris law exponent
+ */
+FatigueTest.prototype["G_MCC"] = undefined;
+/**
+ * @member {Number} m_value_paris - Paris law exponent
+ */
+FatigueTest.prototype["G_ECM"] = undefined;
+/**
+ * @member {Number} m_value_paris - Paris law exponent
+ */
+FatigueTest.prototype["m_value_paris"] = undefined;
+/**
+ * @member {Number} c_value_paris - Paris law coefficient
+ */
+FatigueTest.prototype["c_value_paris"] = undefined;
 
 export default FatigueTest;

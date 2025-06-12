@@ -29,13 +29,17 @@
             <v-card-text>
               <simple-chart
                 ref="chartComponent"
-                :key="chartKey"
                 :show-legend="false"
                 :series="chartSeries"
                 :aspect-ratio="2"
                 :x-axis-name="computedXAxisLabel"
                 :x-axis-type="xAxisChartType"
                 :y-axis-name="yAxisLabel"
+                :x-axis-min="minX"
+                :x-axis-max="maxX"
+                :y-axis-max="maxY"
+                :axis-label-formatter="axisTickFormatter"
+                @chart-click="handleChartClick"
               />
             </v-card-text>
           </v-card>
@@ -75,6 +79,7 @@
 <script>
 import SimpleChart from "@/components/charts/SimpleChart.vue";
 import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
+import { formatTick } from "@/utils/formatters";
 import { mapState } from "vuex";
 
 export default {
@@ -114,7 +119,6 @@ export default {
             calculatedStress !== null
               ? parseFloat(calculatedStress.toFixed(2))
               : null,
-          /* maximum displacement with 2 decimal points */
           maximum_displacement: test.maximum_load
             ? parseFloat(test.maximum_load.toFixed(2))
             : null,
@@ -203,7 +207,6 @@ export default {
       ];
     },
     chartKey() {
-      // Force the chart to re-render when the selection changes
       return this.testsSelected.map((t) => t.id).join("-");
     },
     yAxisLabel() {
@@ -226,6 +229,34 @@ export default {
     },
     xAxisChartType() {
       return this.xAxisMode === "log" ? "log" : "value";
+    },
+    axisTickFormatter() {
+      return formatTick;
+    },
+    maxX() {
+      const max = Math.max(
+        ...this.numberedTests
+          .filter((t) => typeof t.number_of_cycles === "number")
+          .map((t) => t.number_of_cycles)
+      );
+      return this.roundUpTick(max);
+    },
+    minX() {
+      return this.xAxisMode === "log" ? 1 : 0;
+    },
+    maxY() {
+      const controlMode =
+        this.experiment?.experiment?.control_mode?.toLowerCase();
+      const isDisplacement = controlMode === "displacement controlled";
+
+      const max = Math.max(
+        ...this.numberedTests
+          .map((t) =>
+            isDisplacement ? t.maximum_displacement : t.maximum_stress
+          )
+          .filter((v) => typeof v === "number")
+      );
+      return this.roundUpTick(max);
     },
   },
   watch: {
@@ -304,20 +335,23 @@ export default {
         (t) => t.id === clickedTest.id
       );
       if (index >= 0) {
-        this.testsSelected.splice(index, 1); // Deselect
+        this.testsSelected.splice(index, 1);
       } else {
-        this.testsSelected.push(clickedTest); // Select
+        this.testsSelected.push(clickedTest);
       }
     },
-    attachChartClickHandler() {
+    attachChartClickHandler(retries = 10) {
       this.$nextTick(() => {
-        const chartInstance =
-          this.$refs.chartComponent?.$refs?.chartContainer?.$children?.[0]
-            ?.chart;
+        const chartInstance = this.$refs.chartComponent?.getChartInstance?.();
 
-        if (!chartInstance) return;
+        if (!chartInstance) {
+          if (retries > 0) {
+            setTimeout(() => this.attachChartClickHandler(retries - 1), 100);
+          }
+          return;
+        }
 
-        chartInstance.off("click"); // to avoid duplicates
+        chartInstance.off("click");
         chartInstance.on("click", (params) => {
           if (!params?.data || !Array.isArray(params.data.value)) return;
 
@@ -343,12 +377,19 @@ export default {
             (t) => t.id === clickedTest.id
           );
           if (index >= 0) {
-            this.testsSelected.splice(index, 1); // Deselect
+            this.testsSelected.splice(index, 1);
           } else {
-            this.testsSelected.push(clickedTest); // Select
+            this.testsSelected.push(clickedTest);
           }
+          this.testsSelected = [...this.testsSelected];
         });
       });
+    },
+    roundUpTick(value) {
+      if (value <= 0) return 1;
+      const log = Math.floor(Math.log10(value));
+      const scale = Math.pow(10, log);
+      return Math.ceil(value / scale) * scale;
     },
   },
 };
@@ -357,9 +398,7 @@ export default {
 <style scoped lang="scss">
 :deep(.v-data-table__selected) {
   background-color: #bbdefb !important;
-  /* light blue */
 }
-
 .chart-wrapper {
   max-height: 250px;
   margin-bottom: 16px;

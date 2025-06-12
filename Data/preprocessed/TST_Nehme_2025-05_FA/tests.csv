@@ -1,0 +1,7 @@
+sequential number,specimen name,number of cycles,maximum load,run out,width,thickness
+1,T1-FC-8-B5,1500,1064.925258,False,13.17,3.83
+2,T1-FC-9-B5,14958,908.358634,False,13.21,3.92
+3,T1-FC-10-B5,58004,812.167179,False,13.21,3.86
+4,T1-FC-11-B6,8842,1092.844871,False,13.08,3.97
+5,T1-FC-12-B6,2100,1283.65077,False,13.09,4.0
+6,T1-FC-13-B7,87210,727.317609,False,13.04,3.97

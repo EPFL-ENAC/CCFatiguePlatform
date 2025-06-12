@@ -6,7 +6,6 @@
         <v-btn color="primary" outlined @click="showPdf = !showPdf">
           {{ showPdf ? "Hide PDF" : "Open PDF" }}
         </v-btn>
-
         <div v-if="showPdf" class="mt-4">
           <iframe
             :src="pdfURL"
@@ -17,9 +16,8 @@
         </div>
       </v-card-text>
     </v-card>
-    <!-- File Download Dropdown -->
     <v-card class="mt-4">
-      <v-card-title>Select the experimental campaign type</v-card-title>
+      <v-card-title>Specific experimental campaign type files</v-card-title>
       <v-card-text>
         <v-select
           v-model="selectedFile"
@@ -38,8 +36,6 @@
         </v-btn>
       </v-card-text>
     </v-card>
-
-    <!-- Dataset checker -->
     <v-card class="mt-4">
       <v-card-title>Dataset checker</v-card-title>
       <v-card-text>
@@ -61,14 +57,9 @@
               {{ countWarnings }} {{ "warning" | pluralize(countWarnings) }}.
               <br />
               You can send your dataset for integration
-              <v-btn
-                href="https://github.com/EPFL-ENAC/CCFatiguePlatform/issues/new?assignees=sbancal&labels=Dataset%2Ctriage&template=dataset_integration_request.yml&title=%5BNew+Dataset%5D+%3A+%7B3LettersDataCode%7D_%7BResearcher%27s+lastname%7D_%7BDate%7D_%7BTest+type%7D"
-                outlined
-                small
-              >
+              <v-btn outlined small @click="handleIntegrationRequest">
                 here
               </v-btn>
-              .
             </v-alert>
           </template>
           <template v-else>
@@ -76,9 +67,10 @@
               Dataset validation failed<br />
               {{ countWarnings }} {{ "warning" | pluralize(countWarnings) }},
               {{ countErrors }} {{ "error" | pluralize(countErrors) }}. <br />
-              Please fix it according to the
-              <a :href="TSTDataConventionURL">TST Data convention</a>
-              and test it here again
+              Please fix it according to the explained rules in the guide and in
+              the specific experimental campaign files.
+              <br />
+              Test your dataset again after fixing it.
             </v-alert>
           </template>
           <div class="caption output">
@@ -109,10 +101,7 @@ export default {
   data() {
     return {
       showPdf: false,
-      pdfURL: "/downloads/Upload_guide.pdf", // Make sure the file is in public/downloads/
-
-      TSTDataConventionURL:
-        "https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/main/Data/TST_Data_Convention.md",
+      pdfURL: "/downloads/Upload_guide.pdf",
       experimentZip: {
         file: null,
         loading: false,
@@ -157,7 +146,6 @@ export default {
   methods: {
     downloadFile() {
       if (!this.selectedFile) return;
-
       const link = document.createElement("a");
       link.href = this.selectedFile;
       link.setAttribute("download", this.selectedFile.split("/").pop());
@@ -174,13 +162,11 @@ export default {
         return false;
       }
       this.experimentZip.loading = true;
-
       const formData = new FormData();
       formData.append("file", this.experimentZip.file);
-
       axios
         .post(
-          `${this.$experimentsApi.apiClient.basePath}/experiments/data_preprocess_check_v2`,
+          `${this.$experimentsApi.apiClient.basePath}/experiments/data_preprocess_check`,
           formData,
           {
             headers: {
@@ -204,12 +190,29 @@ export default {
           };
           this.experimentZip.loading = false;
         })
-        .catch((error) => {
-          console.log("Error", { error });
+        .catch(() => {
           this.experimentZip.loading = false;
         });
-
       return true;
+    },
+    async handleIntegrationRequest() {
+      if (!this.experimentZip.file) return;
+      const formData = new FormData();
+      formData.append("file", this.experimentZip.file);
+      try {
+        await axios.post(
+          `${this.$experimentsApi.apiClient.basePath}/experiments/integrate_dataset`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        this.$toast?.success("Dataset copied to Data/raw successfully.");
+      } catch {
+        this.$toast?.error("Failed to copy dataset.");
+      }
     },
   },
 };

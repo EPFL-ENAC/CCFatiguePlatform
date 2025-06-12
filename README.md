@@ -12,6 +12,14 @@ CCFatiguePlatform is an initiative from CCLab that aims to develop a web applica
 mkdir -p secrets && cat <<EOF > secrets/.env
 POSTGRES_USER=ccfatigue
 POSTGRES_PASSWORD=mannino
+mail_from=sender@email.com
+mail_username=your_username
+mail_password=your_password
+mail_server=your_server
+mail_port=your_mailport
+mail_tls=True/False
+mail_ssl=True/False
+recipient_email=receiver@email.com
 EOF
 ```
 

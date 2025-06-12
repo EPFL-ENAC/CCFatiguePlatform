@@ -1,0 +1,20 @@
+{
+  "general": {
+    "laboratory": "GR-MeC",
+    "researcher": "Michael Nehme",
+    "date": "2025-05",
+    "experiment type": "FA",
+    "fa experiment type": "tensile",
+    "control mode": "Load Controlled",
+    "fatigue loading type (flt)": "VA",
+    "loading rate": 1.0
+  },
+  "material info": {
+    "material tested": "Bulk adhesives",
+    "sample type": "ASTM Type I"
+  },
+  "fatigue": {
+    "r ratio": 0.1,
+    "frequency": 5.0
+  }
+}

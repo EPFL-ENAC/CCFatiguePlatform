@@ -53,7 +53,7 @@
         </v-tab>
 
         <v-tab :to="{ name: 'CCFatigueAnalysis' }" exact class="text-white">
-          CCFatigue analysis
+          <em>CCfatigue</em>&nbsp;analysis
         </v-tab>
 
         <v-tab :to="{ name: 'About' }" exact class="text-white">
@@ -91,5 +91,11 @@ export default {
 .custom-app-bar,
 .custom-app-bar * {
   color: white !important;
+}
+.v-btn .v-btn__content,
+.v-tab,
+.v-tab .v-btn__content {
+  text-transform: none !important;
+  font-size: 1.1rem !important;
 }
 </style>

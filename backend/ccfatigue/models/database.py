@@ -88,6 +88,8 @@ class Test(Base):
     width = Column(Float)
     thickness = Column(Float)
     initial_crack_length = Column(Float)
+    t = Column(Float)  
+    l_prime = Column(Float)  
 
     temperature = Column(Float)
     humidity = Column(Float)
