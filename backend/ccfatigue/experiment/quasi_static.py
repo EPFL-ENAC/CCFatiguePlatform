@@ -252,10 +252,6 @@ async def quasi_static_test(
             C_N_1_3 = (compliance / N)**(1/3)
             A1, _ = np.polyfit(C_N_1_3, a_over_h, 1)
             G = (3 * np.array(crack_load)**2 * (compliance / N)**(2/3)) / (2 * A1 * width * thickness) * F * 1e6
-            print(f"A1: {A1}")
-            print(f"compliance min/max: {np.min(compliance)}, {np.max(compliance)}")
-            print(f"N min/max: {np.min(N)}, {np.max(N)}")
-            print(f"F min/max: {np.min(F)}, {np.max(F)}")
             return G.tolist()
 
         def compute_g_ecm(compliance, crack_displacement, crack_load, crack_length_fitted, F, N, width):
