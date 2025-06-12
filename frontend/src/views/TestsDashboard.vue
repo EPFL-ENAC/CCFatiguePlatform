@@ -402,21 +402,51 @@
               <v-card-title>
                 Crack growth rate vs fracture energy
                 <info-tooltip>
-                  Crack growth rate vs fracture energy. Fracture energy is
-                  calculated with the Modified Beam Theory.
+                  Crack growth rate vs fracture energy.
+                  <ul>
+                    <li><strong>MBT</strong> = solid line</li>
+                    <li><strong>MCC</strong> = dashed line</li>
+                    <li><strong>ECM</strong> = dotted line</li>
+                  </ul>
                 </info-tooltip>
               </v-card-title>
+
               <v-card-text>
+                <v-row class="mb-6">
+                  <v-col>
+                    <v-select
+                      v-model="selectedFractureEnergyMethods"
+                      :items="fractureEnergyMethodOptions"
+                      label="Fracture Energy Types"
+                      dense
+                      hide-details
+                      multiple
+                      style="max-width: 220px"
+                    >
+                      <template #prepend-item>
+                        <v-list-item
+                          @click="selectedFractureEnergyMethods = []"
+                        >
+                          <v-list-item-title class="text-primary"
+                            >Clear all</v-list-item-title
+                          >
+                        </v-list-item>
+                        <v-divider />
+                      </template>
+                    </v-select>
+                  </v-col>
+                </v-row>
+
                 <simple-chart
-                  :series="daDnVsGMBTSeries"
+                  :series="daDnVsGSeriesCombined"
                   :aspect-ratio="2"
                   x-axis-name="G [J/m²]"
                   y-axis-name="da/dN [mm/cycle]"
                   :y-axis-type="'log'"
-                  :y-axis-min="yAxisLogLimits_daDnVsGMBT.min"
-                  :y-axis-max="yAxisLogLimits_daDnVsGMBT.max"
+                  :y-axis-min="yAxisLogLimits_daDnVsG.min"
+                  :y-axis-max="yAxisLogLimits_daDnVsG.max"
                   :x-axis-max="xAxisMaxGrowthRatevsFractureEnergy"
-                  :y-axis-split-number="yAxisLogLimits_daDnVsGMBT.splitNumber"
+                  :y-axis-split-number="yAxisLogLimits_daDnVsG.splitNumber"
                   :axis-label-formatter="axisTickFormatter"
                   :tooltip-formatter="formatScientific"
                 />
@@ -963,30 +993,35 @@ export default {
         ];
       });
     },
-    fractureGMBTSeries() {
-      // Fracture energy (MBT) vs cycles
-      return this.fatigueData.map((d) => {
-        const normalizedX = this.transformXAxis(d.crack_n_cycles, d.n_fail);
-        const series = {
-          type: "line",
-          name: d.specimen_name,
-          data: zip(normalizedX, d.G_MBT),
-        };
-        if (this.xAxisMode === "normalized") {
-          series.rawX = d.crack_n_cycles;
-        }
-        return series;
+    daDnVsGSeriesCombined() {
+      const lineStyles = {
+        mbt: { type: "solid" },
+        mcc: { type: "dashed" },
+        ecm: { type: "dotted" },
+      };
+      const selectedMethods =
+        this.selectedFractureEnergyMethods.length > 0
+          ? this.selectedFractureEnergyMethods
+          : ["mbt", "mcc", "ecm"];
+
+      return this.fatigueData.flatMap((d, index) => {
+        const color = this.colors[index % this.colors.length];
+        return selectedMethods
+          .map((method) => {
+            const G = d[`G_${method.toUpperCase()}`];
+            const da = d.da_dN;
+            if (!G || !G.length || !da || G.length !== da.length) return null;
+            return {
+              type: "line",
+              name: d.specimen_name,
+              data: zip(G, da),
+              lineStyle: { ...lineStyles[method], color },
+              itemStyle: { color },
+            };
+          })
+          .filter(Boolean);
       });
     },
-    daDnVsGMBTSeries() {
-      // Crack growth rate vs fracture energy
-      return this.fatigueData.map((d) => ({
-        type: "line",
-        name: d.specimen_name,
-        data: zip(d.G_MBT, d.da_dN),
-      }));
-    },
-
     // --- Chart Data: Fracture Energy (QS) ---
     fractureEnergySeriesCombined() {
       // Combined fracture energy series for QS fracture
@@ -1096,11 +1131,8 @@ export default {
     xAxisMinFractureEnergyCombined() {
       return computeXAxisMin(this.fractureEnergySeriesCombined);
     },
-    yAxisMaxGMBT() {
-      return computeYAxisMax(this.fractureGMBTSeries);
-    },
     xAxisMaxGrowthRatevsFractureEnergy() {
-      return computeXAxisMax(this.daDnVsGMBTSeries);
+      return computeXAxisMax(this.daDnVsGSeriesCombined);
     },
     // Double chart axis min/max for both FA and QS fracture
     xAxisMaxDoubleChart() {
@@ -1149,14 +1181,12 @@ export default {
       const y2Series = series.filter((s) => s.yAxisIndex === 1);
       return computeYAxisMin(y2Series);
     },
-    yAxisLogLimits_daDnVsGMBT() {
-      // Log axis limits for da/dN vs G chart
+    yAxisLogLimits_daDnVsG() {
       const { min, max, splitNumber } = computeLogYAxisLimits(
-        this.daDnVsGMBTSeries
+        this.daDnVsGSeriesCombined
       );
       return { min, max, splitNumber };
     },
-
     // --- Chart Formatting & Tooltip ---
     axisTickFormatter() {
       return formatTick;
