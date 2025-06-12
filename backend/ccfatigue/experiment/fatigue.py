@@ -288,7 +288,7 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
             G = (m * np.array(crack_load) * np.array(crack_displacement)) / (2 * width * crack_array) * F / N * 1e6
             return G.tolist()
 
-        def compute_da_dn(crack_length_fitted, crack_n_cycles):
+        def compute_da_dn(crack_length, crack_n_cycles):
             """
             Computes da/dN exactly following the sequence:
             i=0, i=1, i=2, central loop (i=3..N-4), i=N-3, i=N-2, i=N-1
@@ -306,7 +306,7 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
             a_estimated = []
 
             
-            a_arr = np.array(crack_length_fitted)
+            a_arr = np.array(crack_length)
             N_arr = np.array(crack_n_cycles)
             N = len(a_arr)
 
