@@ -722,15 +722,33 @@
                   tooltip="Initial crack length measured before testing."
                 />
               </li>
+              <li>
+                <experiment-s-v
+                  subject="G initiation"
+                  tooltip="Fracture energy value at the point where compliance increases by 1% from its initial linear trend."
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="Bridging length"
+                  tooltip="Crack length at the start of the plateau in the fracture energy curve, determined by low variation in energy growth"
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="G plateau"
+                  tooltip="Average fracture energy after the bridging length point."
+                />
+              </li>
             </ul>
           </v-card-text>
         </v-card>
 
-        <!-- Second card: conditionally shown only when MBT is selected (or none selected) -->
-        <v-card v-if="showFractureMBTDetails" :loading="loading" class="mt-4">
-          <v-card-title class="text-subtitle-1 font-weight-medium">
-            MBT Values
-          </v-card-title>
+        <!-- MBT -->
+        <v-card v-if="showMBTDetails" :loading="loading" class="mt-4">
+          <v-card-title class="text-subtitle-1 font-weight-medium"
+            >MBT Values</v-card-title
+          >
           <v-card-text>
             <ul>
               <li>
@@ -739,16 +757,14 @@
                   :values="formattedGinitMBTQSValues"
                   :colors="valueColors"
                   :unit="'J/m²'"
-                  tooltip="Fracture energy calculated with MBT method at 1% compliance increase."
                 />
               </li>
               <li>
                 <experiment-s-v
                   subject="Bridging length"
-                  :values="formattedBridgingLengths"
+                  :values="formattedBridgingLengthsMBT"
                   :colors="valueColors"
                   :unit="'mm'"
-                  tooltip="The crack length at 1% compliance increase."
                 />
               </li>
               <li>
@@ -757,7 +773,76 @@
                   :values="formattedGPlateauMBTQSValues"
                   :colors="valueColors"
                   :unit="'J/m²'"
-                  tooltip="Average fracture energy calculated with MBT method after the initiation point."
+                />
+              </li>
+            </ul>
+          </v-card-text>
+        </v-card>
+
+        <!-- MCC -->
+        <v-card v-if="showMCCDetails" :loading="loading" class="mt-4">
+          <v-card-title class="text-subtitle-1 font-weight-medium"
+            >MCC Values</v-card-title
+          >
+          <v-card-text>
+            <ul>
+              <li>
+                <experiment-s-v
+                  subject="G initiation"
+                  :values="formattedGinitMCCQSValues"
+                  :colors="valueColors"
+                  :unit="'J/m²'"
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="Bridging length"
+                  :values="formattedBridgingLengthsMCC"
+                  :colors="valueColors"
+                  :unit="'mm'"
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="G plateau"
+                  :values="formattedGPlateauMCCQSValues"
+                  :colors="valueColors"
+                  :unit="'J/m²'"
+                />
+              </li>
+            </ul>
+          </v-card-text>
+        </v-card>
+
+        <!-- ECM -->
+        <v-card v-if="showECMDetails" :loading="loading" class="mt-4">
+          <v-card-title class="text-subtitle-1 font-weight-medium"
+            >ECM Values</v-card-title
+          >
+          <v-card-text>
+            <ul>
+              <li>
+                <experiment-s-v
+                  subject="G initiation"
+                  :values="formattedGinitECMQSValues"
+                  :colors="valueColors"
+                  :unit="'J/m²'"
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="Bridging length"
+                  :values="formattedBridgingLengthsECM"
+                  :colors="valueColors"
+                  :unit="'mm'"
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="G plateau"
+                  :values="formattedGPlateauECMQSValues"
+                  :colors="valueColors"
+                  :unit="'J/m²'"
                 />
               </li>
             </ul>
@@ -828,8 +913,14 @@ export default {
       youngModulusValues: [],
       quasiStaticPoissonRatios: [],
       ginitMBTQSValues: [],
-      bridginglengths: [],
+      bridginglengthsMBT: [],
       gplateauMBTQSValues: [],
+      ginitMCCQSValues: [],
+      bridginglengthsMCC: [],
+      gplateauMCCQSValues: [],
+      ginitECMQSValues: [],
+      bridginglengthsECM: [],
+      gplateauECMQSValues: [],
       fatigueWarnings: [],
       fractureEnergyData_mbt: {},
       fractureEnergyData_mcc: {},
@@ -1267,8 +1358,13 @@ export default {
         e != null ? Number(e).toExponential(2) : "-"
       );
     },
-    formattedBridgingLengths() {
-      return this.bridginglengths.map((v) =>
+    formattedGinitMBTQSValues() {
+      return this.ginitMBTQSValues.map((v) =>
+        v != null ? Number(v).toFixed(2) : "-"
+      );
+    },
+    formattedBridgingLengthsMBT() {
+      return this.bridginglengthsMBT.map((v) =>
         v != null ? Number(v).toFixed(2) : "-"
       );
     },
@@ -1277,12 +1373,36 @@ export default {
         v != null ? Number(v).toFixed(2) : "-"
       );
     },
-    formattedGinitMBTQSValues() {
-      return this.ginitMBTQSValues.map((v) =>
+    formattedGinitMCCQSValues() {
+      return this.ginitMCCQSValues.map((v) =>
         v != null ? Number(v).toFixed(2) : "-"
       );
     },
-
+    formattedBridgingLengthsMCC() {
+      return this.bridginglengthsMCC.map((v) =>
+        v != null ? Number(v).toFixed(2) : "-"
+      );
+    },
+    formattedGPlateauMCCQSValues() {
+      return this.gplateauMCCQSValues.map((v) =>
+        v != null ? Number(v).toFixed(2) : "-"
+      );
+    },
+    formattedGinitECMQSValues() {
+      return this.ginitECMQSValues.map((v) =>
+        v != null ? Number(v).toFixed(2) : "-"
+      );
+    },
+    formattedBridgingLengthsECM() {
+      return this.bridginglengthsECM.map((v) =>
+        v != null ? Number(v).toFixed(2) : "-"
+      );
+    },
+    formattedGPlateauECMQSValues() {
+      return this.gplateauECMQSValues.map((v) =>
+        v != null ? Number(v).toFixed(2) : "-"
+      );
+    },
     // --- Warnings ---
     hasWarnings() {
       // True if any fatigue test has warnings
@@ -1290,12 +1410,17 @@ export default {
     },
 
     // --- Conditional banners ---
-    showFractureMBTDetails() {
+    showMBTDetails() {
       const selected = this.selectedFractureEnergyMethods;
-      return (
-        selected.length === 0 ||
-        (selected.length === 1 && selected[0] === "mbt")
-      );
+      return selected.length === 0 || selected.includes("mbt");
+    },
+    showMCCDetails() {
+      const selected = this.selectedFractureEnergyMethods;
+      return selected.length === 0 || selected.includes("mcc");
+    },
+    showECMDetails() {
+      const selected = this.selectedFractureEnergyMethods;
+      return selected.length === 0 || selected.includes("ecm");
     },
   },
   watch: {
@@ -1381,8 +1506,14 @@ export default {
       this.initialCrackLengths = []; // new
       this.crackLengthData = {};
       this.ginitMBTQSValues = [];
-      this.bridginglengths = [];
+      this.bridginglengthsMBT = [];
       this.gplateauMBTQSValues = [];
+      this.ginitMCCQSValues = [];
+      this.bridginglengthsMCC = [];
+      this.gplateauMCCQSValues = [];
+      this.ginitECMQSValues = [];
+      this.bridginglengthsECM = [];
+      this.gplateauECMQSValues = [];
 
       dataList.forEach((d, i) => {
         const tid = this.testIds[i];
@@ -1439,11 +1570,30 @@ export default {
         this.ginitMBTQSValues.push(
           isFinite(d.g_init_mbt) ? Number(d.g_init_mbt) : null
         );
-        this.bridginglengths.push(
+        this.bridginglengthsMBT.push(
           isFinite(d.bridginglength_mbt) ? Number(d.bridginglength_mbt) : null
         );
         this.gplateauMBTQSValues.push(
           isFinite(d.g_plateau_mbt) ? Number(d.g_plateau_mbt) : null
+        );
+        this.ginitMCCQSValues.push(
+          isFinite(d.g_init_mcc) ? Number(d.g_init_mcc) : null
+        );
+        this.bridginglengthsMCC.push(
+          isFinite(d.bridginglength_mcc) ? Number(d.bridginglength_mcc) : null
+        );
+        this.gplateauMCCQSValues.push(
+          isFinite(d.g_plateau_mcc) ? Number(d.g_plateau_mcc) : null
+        );
+
+        this.ginitECMQSValues.push(
+          isFinite(d.g_init_ecm) ? Number(d.g_init_ecm) : null
+        );
+        this.bridginglengthsECM.push(
+          isFinite(d.bridginglength_ecm) ? Number(d.bridginglength_ecm) : null
+        );
+        this.gplateauECMQSValues.push(
+          isFinite(d.g_plateau_ecm) ? Number(d.g_plateau_ecm) : null
         );
       });
 

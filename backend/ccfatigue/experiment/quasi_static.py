@@ -34,6 +34,12 @@ class QuasiStaticTest(BaseModel):
     g_init_mbt: float | None 
     bridginglength_mbt: float | None 
     g_plateau_mbt: float | None 
+    g_init_mcc: float | None
+    bridginglength_mcc: float | None
+    g_plateau_mcc: float | None
+    g_init_ecm: float | None
+    bridginglength_ecm: float | None
+    g_plateau_ecm: float | None
 
 
 def get_dataframe(
@@ -173,104 +179,123 @@ async def quasi_static_test(
 
             return F, N
 
-        def compute_g_mbt(
-            compliance, crack_displacement, crack_load, crack_length_fitted, F, N, width
-        ):
-            def fit_func(x, a, b):
-                return a * x + b
+        def find_plateau_start(crack_length: List[float], fracture_energy: List[float], threshold: float = 40) -> float:
+            if len(crack_length) < 2 or len(fracture_energy) < 2:
+                return float("nan")
 
-            def find_plateau_start(crack_length, fracture_energy, threshold=40):
+            crack_length_array = np.array(crack_length)
+            fracture_energy_array = np.array(fracture_energy)
 
-                if len(crack_length) < 2 or len(fracture_energy) < 2:
-                    return float("nan")
+            derivative = np.gradient(fracture_energy_array, crack_length_array)
+            index_plateau = np.argmax(
+                (crack_length_array > crack_length_array[0]) & (np.abs(derivative) < threshold)
+            )
 
-                crack_length_array = np.array(crack_length)
-                fracture_energy_array = np.array(fracture_energy)
+            if index_plateau == 0 and np.abs(derivative[0]) >= threshold:
+                return float("nan")
+            return crack_length_array[index_plateau]
 
-                derivative = np.gradient(fracture_energy_array, crack_length_array)
-                index_plateau = np.argmax(
-                    (crack_length_array > crack_length_array[0]) & (np.abs(derivative) < threshold)
-                )
-
-                if index_plateau == 0 and (np.abs(derivative[0]) >= threshold):
-                    return float("nan")
-                else:
-                    return crack_length_array[index_plateau]
-
-            # Calcolo G
-            C_N_1_3 = (compliance / N) ** (1 / 3)
-            params, _ = curve_fit(fit_func, crack_length_fitted, C_N_1_3)
-            a, b = params
-            print(f"a: {a}, b: {b}")
-            triangle = abs(b / a)
-            print(f"Triangle value: {triangle} mm")
-
+        def compute_g_stats(
+            compliance: np.ndarray,
+            fracture_energy: List[float],
+            crack_length_fitted: np.ndarray,
+            threshold: float = 10
+        ) -> tuple[float, float, float]:
+            
+            fracture_energy_array = np.array(fracture_energy)
+            
+            # g_init
             linear_compliance = np.mean(compliance[:5])
             threshold_compliance = linear_compliance * 1.01
             threshold_index = np.where(compliance >= threshold_compliance)[0]
+            g_init = fracture_energy_array[threshold_index[0]] if len(threshold_index) > 0 else float("nan")
 
-            G = (
-                3
-                * np.array(crack_load)
-                * np.array(crack_displacement)
-                / (2 * width * (crack_length_fitted + triangle))
-                * F
-                / N
-                * 1e6
-            )
+            # bridginglength
+            bridginglength = find_plateau_start(crack_length_fitted.tolist(), fracture_energy, threshold=threshold)
 
-            # Calcolo Fracture Energy per uso successivo
+            # g_plateau
+            if not np.isnan(bridginglength):
+                plateau_indices = np.where(crack_length_fitted >= bridginglength)[0]
+                if len(plateau_indices) > 0:
+                    g_plateau = np.mean(fracture_energy_array[plateau_indices])
+                else:
+                    g_plateau = float("nan")
+            else:
+                g_plateau = float("nan")
+
+            return g_init, bridginglength, g_plateau
+
+
+        def compute_g_mbt(
+            compliance: np.ndarray,
+            crack_displacement: list[float],
+            crack_load: list[float],
+            crack_length_fitted: np.ndarray,
+            F: np.ndarray,
+            N: np.ndarray,
+            width: float
+        ) -> tuple[list[float], float, float, float]:
+            C_N_1_3 = (compliance / N) ** (1 / 3)
+            a, b = np.polyfit(crack_length_fitted, C_N_1_3, 1)
+            triangle = abs(b / a)
+
+            G = (3 * np.array(crack_load) * np.array(crack_displacement)) / (2 * width * (crack_length_fitted + triangle)) * F / N * 1e6
             fracture_energy = G.tolist()
 
-            # Calcola bridginglength_mbt usando la funzione di plateau detection
-            plateau_start_x = find_plateau_start(
-                crack_length_fitted.tolist(), fracture_energy, threshold=10
-            )
-            bridginglength_mbt = plateau_start_x
-
-            # Trova gli indici a destra del plateau_start_x per calcolare la media plateau
-            if not np.isnan(bridginglength_mbt):
-                plateau_indices = np.where(crack_length_fitted >= bridginglength_mbt)[0]
-                if len(plateau_indices) > 0:
-                    G_plateau_mbt = np.mean(G[plateau_indices])
-                else:
-                    G_plateau_mbt = float("nan")
-            else:
-                G_plateau_mbt = float("nan")
-
-            # G_init_mbt rimane il primo punto di superamento della threshold_compliance
-            if len(threshold_index) > 0:
-                G_init_mbt = G[threshold_index[0]]
-            else:
-                G_init_mbt = float("nan")
-
-            return fracture_energy, G_init_mbt, bridginglength_mbt, G_plateau_mbt
+            g_init, bridginglength, g_plateau = compute_g_stats(compliance, fracture_energy, crack_length_fitted, threshold=10)
+            return fracture_energy, g_init, bridginglength, g_plateau
 
 
-        def compute_g_mcc(compliance, crack_displacement, crack_load, crack_length_fitted, F, N, width, thickness):
+        def compute_g_mcc(
+            compliance: np.ndarray,
+            crack_displacement: list[float],
+            crack_load: list[float],
+            crack_length_fitted: np.ndarray,
+            F: np.ndarray,
+            N: np.ndarray,
+            width: float,
+            thickness: float
+        ) -> tuple[list[float], float, float, float]:
             a_over_h = crack_length_fitted / thickness
-            C_N_1_3 = (compliance / N)**(1/3)
+            C_N_1_3 = (compliance / N) ** (1 / 3)
             A1, _ = np.polyfit(C_N_1_3, a_over_h, 1)
-            G = (3 * np.array(crack_load)**2 * (compliance / N)**(2/3)) / (2 * A1 * width * thickness) * F * 1e6
-            return G.tolist()
 
-        def compute_g_ecm(compliance, crack_displacement, crack_load, crack_length_fitted, F, N, width):
+            G = (3 * np.array(crack_load) ** 2 * (compliance / N) ** (2 / 3)) / (2 * A1 * width * thickness) * F * 1e6
+            fracture_energy = G.tolist()
+
+            g_init, bridginglength, g_plateau = compute_g_stats(compliance, fracture_energy, crack_length_fitted, threshold=10)
+            return fracture_energy, g_init, bridginglength, g_plateau
+
+
+        def compute_g_ecm(
+            compliance: np.ndarray,
+            crack_displacement: list[float],
+            crack_load: list[float],
+            crack_length_fitted: np.ndarray,
+            F: np.ndarray,
+            N: np.ndarray,
+            width: float
+        ) -> tuple[list[float], float, float, float]:
             crack_array = crack_length_fitted
             c_over_n = compliance / N
 
             valid_mask = (crack_array > 0) & (c_over_n > 0) & np.isfinite(c_over_n)
             if np.sum(valid_mask) < 2:
-                return [float("nan")] * len(crack_array)
+                nan_list = [float("nan")] * len(crack_array)
+                return nan_list, float("nan"), float("nan"), float("nan")
 
             a_log = np.log10(crack_array[valid_mask])
             log_C_N = np.log10(c_over_n[valid_mask])
-
             m, _ = np.polyfit(a_log, log_C_N, 1)
 
             G = (m * np.array(crack_load) * np.array(crack_displacement)) / (2 * width * crack_array) * F / N * 1e6
-            return G.tolist()
+            fracture_energy = G.tolist()
 
-        # Calcolo dei valori comuni
+            g_init, bridginglength, g_plateau = compute_g_stats(compliance, fracture_energy, crack_array, threshold=10)
+            return fracture_energy, g_init, bridginglength, g_plateau
+
+
+        # Calculating common values
         compliance, crack_length_fitted = compute_compliance_and_crack_length_fitted(
             crack_displacement, crack_load, crack_length
         )
@@ -279,15 +304,18 @@ async def quasi_static_test(
             crack_displacement, crack_load, crack_length_fitted, thickness, t, l_prime
         )
 
-        crack_fractureenergy_mbt, G_init_mbt, bridginglength_mbt, G_plateau_mbt = compute_g_mbt(
+        crack_fractureenergy_mbt, g_init_mbt, bridginglength_mbt, g_plateau_mbt = compute_g_mbt(
             compliance, crack_displacement, crack_load, crack_length_fitted, F, N, width
         )
-        crack_fractureenergy_mcc = compute_g_mcc(
+
+        crack_fractureenergy_mcc, g_init_mcc, bridginglength_mcc, g_plateau_mcc = compute_g_mcc(
             compliance, crack_displacement, crack_load, crack_length_fitted, F, N, width, thickness
         )
-        crack_fractureenergy_ecm = compute_g_ecm(
+
+        crack_fractureenergy_ecm, g_init_ecm, bridginglength_ecm, g_plateau_ecm = compute_g_ecm(
             compliance, crack_displacement, crack_load, crack_length_fitted, F, N, width
         )
+
 
 
         return QuasiStaticTest(
@@ -307,9 +335,15 @@ async def quasi_static_test(
             initial_crack_length=test_meta["initial_crack_length"],
             young_modulus=None,
             poisson_ratio=None,
-            g_init_mbt=G_init_mbt,
+            g_init_mbt=g_init_mbt,
             bridginglength_mbt=bridginglength_mbt,
-            g_plateau_mbt=G_plateau_mbt,
+            g_plateau_mbt=g_plateau_mbt,
+            g_init_mcc=g_init_mcc,
+            bridginglength_mcc=bridginglength_mcc,
+            g_plateau_mcc=g_plateau_mcc,
+            g_init_ecm=g_init_ecm,
+            bridginglength_ecm=bridginglength_ecm,
+            g_plateau_ecm=g_plateau_ecm,
         )
 
     else:
@@ -379,4 +413,10 @@ async def quasi_static_test(
             g_init_mbt=None,
             bridginglength_mbt=None,
             g_plateau_mbt=None,
+            g_init_mcc=None,
+            bridginglength_mcc=None,
+            g_plateau_mcc=None,
+            g_init_ecm=None,
+            bridginglength_ecm=None,
+            g_plateau_ecm=None,
         )

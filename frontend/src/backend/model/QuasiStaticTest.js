@@ -29,6 +29,12 @@ class QuasiStaticTest {
     g_init_mbt, 
     bridginglength_mbt,
     g_plateau_mbt,
+    g_init_mcc, 
+    bridginglength_mcc,
+    g_plateau_mcc,
+    g_init_ecm, 
+    bridginglength_ecm,
+    g_plateau_ecm,
   ) {
     QuasiStaticTest.initialize(
       this,
@@ -51,6 +57,12 @@ class QuasiStaticTest {
       g_init_mbt,
       bridginglength_mbt,
       g_plateau_mbt,
+      g_init_mcc, 
+      bridginglength_mcc,
+      g_plateau_mcc,
+      g_init_ecm, 
+      bridginglength_ecm,
+      g_plateau_ecm,
     );
   }
 
@@ -75,6 +87,12 @@ class QuasiStaticTest {
     g_init_mbt,
     bridginglength_mbt,
     g_plateau_mbt,
+    g_init_mcc, 
+    bridginglength_mcc,
+    g_plateau_mcc,
+    g_init_ecm, 
+    bridginglength_ecm,
+    g_plateau_ecm,
   ) {
     obj["specimen_name"] = specimenName;
     obj["crack_displacement"] = crackDisplacement;
@@ -95,6 +113,12 @@ class QuasiStaticTest {
     obj["g_init_mbt"] = g_init_mbt;
     obj["bridginglength_mbt"] = bridginglength_mbt;
     obj["g_plateau_mbt"] = g_plateau_mbt;
+    obj["g_init_mcc"] = g_init_mcc;
+    obj["bridginglength_mcc"] = bridginglength_mcc;
+    obj["g_plateau_mcc"] = g_plateau_mcc;
+    obj["g_init_ecm"] = g_init_ecm;
+    obj["bridginglength_ecm"] = bridginglength_ecm;
+    obj["g_plateau_ecm"] = g_plateau_ecm;
   }
 
   static constructFromObject(data, obj) {
@@ -159,6 +183,24 @@ class QuasiStaticTest {
       if (data.hasOwnProperty("g_plateau_mbt")) {
         obj["g_plateau_mbt"] = ApiClient.convertToType(data["g_plateau_mbt"], "Number");
       }
+      if (data.hasOwnProperty("g_init_mcc")) {
+        obj["g_init_mcc"] = ApiClient.convertToType(data["g_init_mcc"], "Number");
+      }
+      if (data.hasOwnProperty("bridginglength_mcc")) {
+        obj["bridginglength_mcc"] = ApiClient.convertToType(data["bridginglength_mcc"], "Number");
+      }
+      if (data.hasOwnProperty("g_plateau_mcc")) {
+        obj["g_plateau_mcc"] = ApiClient.convertToType(data["g_plateau_mcc"], "Number");
+      }
+            if (data.hasOwnProperty("g_init_ecm")) {
+        obj["g_init_ecm"] = ApiClient.convertToType(data["g_init_ecm"], "Number");
+      }
+      if (data.hasOwnProperty("bridginglength_ecm")) {
+        obj["bridginglength_ecm"] = ApiClient.convertToType(data["bridginglength_ecm"], "Number");
+      }
+      if (data.hasOwnProperty("g_plateau_ecm")) {
+        obj["g_plateau_ecm"] = ApiClient.convertToType(data["g_plateau_ecm"], "Number");
+      }
     }
     console.log("Constructed QuasiStaticTest object:", obj); // useful logs
     return obj;
@@ -185,5 +227,11 @@ QuasiStaticTest.prototype["poisson_ratio"] = undefined;
 QuasiStaticTest.prototype["g_init_mbt"] = undefined;
 QuasiStaticTest.prototype["bridginglength_mbt"] = undefined;
 QuasiStaticTest.prototype["g_plateau_mbt"] = undefined;
+QuasiStaticTest.prototype["g_init_mcc"] = undefined;
+QuasiStaticTest.prototype["bridginglength_mcc"] = undefined;
+QuasiStaticTest.prototype["g_plateau_mcc"] = undefined;
+QuasiStaticTest.prototype["g_init_ecm"] = undefined;
+QuasiStaticTest.prototype["bridginglength_ecm"] = undefined;
+QuasiStaticTest.prototype["g_plateau_ecm"] = undefined;
 
 export default QuasiStaticTest;
