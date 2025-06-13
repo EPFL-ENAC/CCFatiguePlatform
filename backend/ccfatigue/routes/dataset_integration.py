@@ -1,4 +1,5 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
+from fastapi.responses import FileResponse
 from pathlib import Path
 import shutil
 import zipfile
@@ -106,3 +107,32 @@ async def integrate_dataset_old(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Error sending email: {str(e)}")
 
     return {"success": True}
+
+@router.get("/downloads_zip")
+def download_zip(folder_name: str, background_tasks: BackgroundTasks):
+    # Absolute path to the "frontend/public/downloads" directory
+    base_folder = Path(__file__).resolve().parents[3] / "frontend" / "public" / "downloads"
+    folder_path = base_folder / folder_name
+
+    # Ensure the folder exists and is a directory
+    if not folder_path.exists() or not folder_path.is_dir():
+        raise HTTPException(status_code=404, detail="Folder not found")
+
+    # Check that the folder is not empty
+    contents = list(folder_path.iterdir())
+    if not contents:
+        raise HTTPException(status_code=400, detail=f"The folder '{folder_name}' is empty and cannot be zipped.")
+
+    # Generate the ZIP archive in /tmp
+    zip_output_base = Path(f"/tmp/{folder_name}")
+    zip_path = shutil.make_archive(str(zip_output_base), 'zip', folder_path)
+
+    # Schedule the ZIP file for deletion after the response is sent
+    background_tasks.add_task(Path(zip_path).unlink)
+
+    # Return the ZIP file as a response
+    return FileResponse(
+        path=zip_path,
+        filename=f"{folder_name}.zip",
+        media_type="application/zip"
+    )

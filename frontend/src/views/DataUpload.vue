@@ -118,16 +118,10 @@ export default {
       },
       selectedFile: null,
       fileOptions: [
-        { text: "Quasi static", value: "/downloads/QuasiStatic.zip" },
-        {
-          text: "Quasi static with fracture",
-          value: "/downloads/QuasiStatic_fracture.zip",
-        },
-        { text: "Fatigue", value: "/downloads/Fatigue.zip" },
-        {
-          text: "Fatigue with fracture",
-          value: "/downloads/Fatigue_fracture.zip",
-        },
+        { text: "Quasi static", value: "QuasiStatic" },
+        { text: "Quasi static with fracture", value: "QuasiStatic_fracture" },
+        { text: "Fatigue", value: "Fatigue" },
+        { text: "Fatigue with fracture", value: "Fatigue_fracture" },
       ],
     };
   },
@@ -146,9 +140,14 @@ export default {
   methods: {
     downloadFile() {
       if (!this.selectedFile) return;
+
+      const zipUrl = `${
+        this.$experimentsApi.apiClient.basePath
+      }/downloads_zip?folder_name=${encodeURIComponent(this.selectedFile)}`;
+
       const link = document.createElement("a");
-      link.href = this.selectedFile;
-      link.setAttribute("download", this.selectedFile.split("/").pop());
+      link.href = zipUrl;
+      link.setAttribute("download", `${this.selectedFile}.zip`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
