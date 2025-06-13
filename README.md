@@ -4,6 +4,23 @@ CCFatiguePlatform is an initiative from CCLab that aims to develop a web applica
 
 [Demo](https://ccfatigue-test.epfl.ch/)
 
+## Data Convention 
+
+A detailed guide for uploading data is available at: frontend/public/downloads/Upload_guide.pdf.
+
+For each experiment, a complete .xls metadata file and one .csv file per specimen are required.
+
+# TST XLS file standards
+
+A ready-to-use metadata template is provided in each downloadable folder located in frontend/public/downloads/.
+
+## TST CSV files standards (column names must be exact, where # is replaced by a number) :
+
+Each experiment type have different mandatory columns. 
+Make sure to read carefully the dedicated guide inside each downloadable folder in frontend/public/downloads/.  
+Additionally, an example .csv file is provided alongside the guide.
+
+
 # How to use on your desktop
 
 ## Secrets
