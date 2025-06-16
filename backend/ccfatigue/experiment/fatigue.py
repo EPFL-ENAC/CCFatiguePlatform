@@ -13,6 +13,16 @@ from ccfatigue.experiment.common import DATA_DIRECTORY, get_test_fields
 from ccfatigue.models.database import Experiment, Test
 from sklearn.linear_model import LinearRegression
 import math
+from ccfatigue.experiment.fatigue_with_fracture_utils import (
+    compute_compliance_and_crack_length_fitted,
+    compute_factors,
+    compute_g_mbt,
+    compute_g_mcc,
+    compute_g_ecm,
+    find_fit_limit,
+    find_best_paris_fit,  
+    compute_da_dn
+)
 
 
 # ==== Costanti ====
@@ -53,9 +63,8 @@ class FatigueTest(BaseModel):
     G_ECM: Optional[List[float]] = None
     c_value_paris: float | None 
     m_value_paris: float | None
+    G_th: float | None 
 
-
-# ==== Funzioni utili ====
 
 def get_dataframe(data_in: str, exp: Dict[str, str], specimen_id: int) -> DataFrame:
     researcher_name = exp["researcher"].split(" ")[-1]
@@ -193,296 +202,6 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
         t = test_meta["t"] or 0.0
         l_prime = test_meta["l_prime"] or 0.0
 
-        # Utility functions
-        def fit_func(x, a, b):
-            return a * x + b
-
-        def fit_crack_length_from_compliance(
-            crack_length: List[float],
-            crack_displacement: List[float],
-            crack_load: List[float]
-        ) -> List[float]:
-            from scipy.optimize import curve_fit
-            import numpy as np
-
-            compliance = np.array(crack_displacement) / np.array(crack_load)
-            crack_length_array = np.array(crack_length)
-
-            def power_law(x, a, m):
-                return a * x ** m
-
-            popt, _ = curve_fit(power_law, crack_length_array, compliance)
-            a_fit, m_fit = popt
-
-            crack_length_fitted = (compliance / a_fit) ** (1 / m_fit)
-            return crack_length_fitted.tolist()
-
-        def compute_compliance_and_crack_length_fitted(
-            crack_displacement: List[float],
-            crack_load: List[float],
-            crack_length: List[float]
-        ) -> (np.ndarray, np.ndarray):
-            compliance = np.array(crack_displacement) / np.array(crack_load)
-            crack_length_fitted = np.array(
-                fit_crack_length_from_compliance(crack_length, crack_displacement, crack_load)
-            )
-            
-            return compliance, crack_length_fitted
-
-        def compute_factors(
-            crack_displacement: List[float],
-            crack_length_fitted: np.ndarray,
-            t: float,
-            l_prime: float
-        ):
-            F = (
-                1
-                - 3/10 * (np.array(crack_displacement) / crack_length_fitted)**2
-                - 3/2 * ((np.array(crack_displacement) * t) / crack_length_fitted**2)
-            )
-            N = (
-                1
-                - (l_prime / crack_length_fitted)**3
-                - 9/8 * (1 - (l_prime / crack_length_fitted)**2) * (np.array(crack_displacement) * t) / crack_length_fitted**2
-                - 9/35 * (np.array(crack_displacement) / crack_length_fitted)**2
-            )
-            return F, N
-
-        def compute_g_mbt(
-            compliance, crack_displacement, crack_load, crack_length_fitted, F, N, w
-        ):
-            C_N_1_3 = (compliance / N)**(1/3)
-            params, _ = curve_fit(fit_func, crack_length_fitted, C_N_1_3)
-            a, b = params
-            triangle = abs(b / a)
-
-            G = (
-                (3 * np.array(crack_load) * np.array(crack_displacement))
-                / (2 * w * (crack_length_fitted + triangle))
-                * F / N
-                * 1e6
-            )
-
-            return G.tolist()
-
-        def compute_g_mcc(compliance, crack_displacement, crack_load, crack_length_fitted, F, N, width, thickness):
-            a_over_h = crack_length_fitted / thickness
-            C_N_1_3 = (compliance / N)**(1/3)
-            A1, _ = np.polyfit(C_N_1_3, a_over_h, 1)
-            G = (3 * np.array(crack_load)**2 * (compliance / N)**(2/3)) / (2 * A1 * width * thickness) * F * 1e6
-            return G.tolist()
-
-        def compute_g_ecm(compliance, crack_displacement, crack_load, crack_length_fitted, F, N, width):
-            crack_array = crack_length_fitted
-            c_over_n = compliance / N
-
-            valid_mask = (crack_array > 0) & (c_over_n > 0) & np.isfinite(c_over_n)
-            if np.sum(valid_mask) < 2:
-                return [float("nan")] * len(crack_array)
-
-            a_log = np.log10(crack_array[valid_mask])
-            log_C_N = np.log10(c_over_n[valid_mask])
-
-            m, _ = np.polyfit(a_log, log_C_N, 1)
-
-            G = (m * np.array(crack_load) * np.array(crack_displacement)) / (2 * width * crack_array) * F / N * 1e6
-            return G.tolist()
-
-        def compute_da_dn(crack_length, crack_n_cycles):
-            """
-            Computes da/dN exactly following the sequence:
-            i=0, i=1, i=2, central loop (i=3..N-4), i=N-3, i=N-2, i=N-1
-            as in the "manual" block, but using two arrays:
-            - crack_length_fitted: list or array of fitted crack lengths
-            - crack_n_cycles:      list or array of corresponding cycle numbers
-
-            Returns:
-            - da_dn_new: list of da/dN values calculated point by point
-            """
-            def poly_func(x, b0, b1, b2):
-                return b0 + b1 * x + b2 * x**2
-
-            da_dn_new = []
-            a_estimated = []
-
-            
-            a_arr = np.array(crack_length)
-            N_arr = np.array(crack_n_cycles)
-            N = len(a_arr)
-
-            
-            a_0 = 0.5 * (a_arr[1] + a_arr[0])
-            a_estimated.append(a_0)
-            da_dn_0 = (a_arr[1] - a_arr[0]) / (N_arr[1] - N_arr[0])
-            da_dn_new.append(da_dn_0)
-
-            
-            C1 = 0.5 * (N_arr[0] + N_arr[2])
-            C2 = 0.5 * (N_arr[2] - N_arr[0])
-            # x_vals and y_vals for i=1
-            x_vals = (N_arr[0:3] - C1) / C2
-            y_vals = a_arr[0:3]
-            popt, _ = curve_fit(poly_func, x_vals, y_vals)
-            # estimate a_1 at the central point (index 1 of block 0:3)
-            xi = x_vals[1]
-            a_1_estimated = popt[0] + popt[1] * xi + popt[2] * xi**2
-            a_estimated.append(a_1_estimated)
-            da_dn_1 = popt[1] / C2 + (2 * popt[2] * (N_arr[1] - C1)) / (C2**2)
-            da_dn_new.append(da_dn_1)
-
-            # --- Point i = 2 (window on indices 0..4) ---
-            C1 = 0.5 * (N_arr[0] + N_arr[4])
-            C2 = 0.5 * (N_arr[4] - N_arr[0])
-            x_vals = (N_arr[0:5] - C1) / C2
-            y_vals = a_arr[0:5]
-            popt2, _ = curve_fit(poly_func, x_vals, y_vals)
-            xi = x_vals[2]
-            a_2_estimated = popt2[0] + popt2[1] * xi + popt2[2] * xi**2
-            a_estimated.append(a_2_estimated)
-            da_dn_2 = popt2[1] / C2 + (2 * popt2[2] * (N_arr[2] - C1)) / (C2**2)
-            da_dn_new.append(da_dn_2)
-
-            # --- Main loop i = 3 .. N-4 (window on 7 points) ---
-            for i in range(3, N - 3):
-                C1 = 0.5 * (N_arr[i - 3] + N_arr[i + 3])
-                C2 = 0.5 * (N_arr[i + 3] - N_arr[i - 3])
-                x_vals = (N_arr[i - 3 : i + 4] - C1) / C2
-                y_vals = a_arr[i - 3 : i + 4]
-                popt3, _ = curve_fit(poly_func, x_vals, y_vals)
-                # estimate a_i at the central point (index 3 of block i-3:i+4)
-                xi = x_vals[3]
-                a_3_estimated = popt3[0] + popt3[1] * xi + popt3[2] * xi**2
-                a_estimated.append(a_3_estimated)
-                da_dn_3 = popt3[1] / C2 + (2 * popt3[2] * (N_arr[i] - C1)) / (C2**2)
-                da_dn_new.append(da_dn_3)
-
-            # --- Point i = N-3 (window on indices N-5..N-1) ---
-            i = N - 3
-            C1 = 0.5 * (N_arr[i - 2] + N_arr[i + 2])
-            C2 = 0.5 * (N_arr[i + 2] - N_arr[i - 2])
-            x_vals = (N_arr[i - 2 : i + 3] - C1) / C2
-            y_vals = a_arr[i - 2 : i + 3]
-            popt3, _ = curve_fit(poly_func, x_vals, y_vals)
-            xi = x_vals[2]  # corresponds to the central index i
-            a_3_estimated = popt3[0] + popt3[1] * xi + popt3[2] * xi**2
-            a_estimated.append(a_3_estimated)
-            da_dn_4 = popt3[1] / C2 + (2 * popt3[2] * (N_arr[i] - C1)) / (C2**2)
-            da_dn_new.append(da_dn_4)
-
-            # --- Point i = N-2 (window on indices N-3..N-1) ---
-            i = N - 2
-            C1 = 0.5 * (N_arr[i - 1] + N_arr[i + 1])
-            C2 = 0.5 * (N_arr[i + 1] - N_arr[i - 1])
-            x_vals = (N_arr[i - 1 : i + 2] - C1) / C2
-            y_vals = a_arr[i - 1 : i + 2]
-            popt3, _ = curve_fit(poly_func, x_vals, y_vals)
-            xi = x_vals[1]  # central index of the 3-point block
-            a_3_estimated = popt3[0] + popt3[1] * xi + popt3[2] * xi**2
-            a_estimated.append(a_3_estimated)
-            da_dn_5 = popt3[1] / C2 + (2 * popt3[2] * (N_arr[i] - C1)) / (C2**2)
-            da_dn_new.append(da_dn_5)
-
-            # --- Point i = N-1 (last point, simple derivative on two values) ---
-            i = N - 1
-            a_last = 0.5 * (a_arr[N - 2] + a_arr[N - 1])
-            a_estimated.append(a_last)
-            da_dn_last = (a_arr[N - 1] - a_arr[N - 2]) / (N_arr[N - 1] - N_arr[N - 2])
-            da_dn_new.append(da_dn_last)
-
-            return da_dn_new
-
-
-        def find_best_paris_fit(
-            G_MBT,
-            da_dn,
-            min_window_size=3,
-            r2_threshold=0.98,
-            da_dn_min=None,
-            da_dn_max=None
-        ):
-
-            da_dn = np.array(da_dn)
-
-
-            print(f"Len G_MBT: {len(G_MBT)}, len da_dn: {len(da_dn)}")
-            log_G = np.log(G_MBT)
-            log_da_dn = np.log(da_dn)
-
-            if da_dn_min is not None and da_dn_max is not None:
-                print("USING SELECTED WINDOW")
-                # Filter the window based on da/dN values
-                mask = (da_dn >= da_dn_min) & (da_dn <= da_dn_max)
-                filtered_log_G = log_G[mask]
-                filtered_log_da_dn = log_da_dn[mask]
-                
-                if len(filtered_log_G) < min_window_size:
-                    raise ValueError(f"The selected window ({len(filtered_log_G)} points) is too small for fitting.")
-                
-                x = filtered_log_G.reshape(-1, 1)
-                y = filtered_log_da_dn
-                reg = LinearRegression().fit(x, y)
-                r2 = reg.score(x, y)
-                m = reg.coef_[0]
-                logC = reg.intercept_
-                C = math.exp(logC)
-                return m, C, r2
-
-            else:
-                # Use automatic logic as fallback
-                best_r2 = -np.inf
-                best_start = None
-                best_end = None
-                best_params = None
-
-                for start in range(len(log_G) - min_window_size + 1):
-                    for end in range(start + min_window_size - 1, len(log_G)):
-                        x = log_G[start:end+1].reshape(-1, 1)
-                        y = log_da_dn[start:end+1]
-                        reg = LinearRegression().fit(x, y)
-                        r2 = reg.score(x, y)
-                        if r2 > best_r2:
-                            best_r2 = r2
-                            best_start = start
-                            best_end = end
-                            best_params = (reg.coef_[0], reg.intercept_)
-
-                # Expand the window as long as R² remains high
-                expand = True
-                while expand:
-                    expanded = False
-                    if best_start > 0:
-                        new_start = best_start - 1
-                        x = log_G[new_start:best_end+1].reshape(-1, 1)
-                        y = log_da_dn[new_start:best_end+1]
-                        reg = LinearRegression().fit(x, y)
-                        r2 = reg.score(x, y)
-                        if r2 >= r2_threshold:
-                            best_start = new_start
-                            best_params = (reg.coef_[0], reg.intercept_)
-                            best_r2 = r2
-                            expanded = True
-                    if best_end < len(log_G) - 1:
-                        new_end = best_end + 1
-                        x = log_G[best_start:new_end+1].reshape(-1, 1)
-                        y = log_da_dn[best_start:new_end+1]
-                        reg = LinearRegression().fit(x, y)
-                        r2 = reg.score(x, y)
-                        if r2 >= r2_threshold:
-                            best_end = new_end
-                            best_params = (reg.coef_[0], reg.intercept_)
-                            best_r2 = r2
-                            expanded = True
-                    if not expanded:
-                        expand = False
-
-                m, logC = best_params
-                C = math.exp(logC)
-                print(f"Paris Law fit: m = {m:.4f}, C = {C:.4e}, R² = {best_r2:.4f}")
-                da_dn_window = da_dn[best_start:best_end+1]
-                print(f"da/dN window: {da_dn_window}")
-
-                return m, C, best_r2
-
         # Compute common values
         compliance, crack_length_fitted = compute_compliance_and_crack_length_fitted(
             crack_displacement, crack_load, crack_length
@@ -503,6 +222,8 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
         )
 
         da_dn_new = compute_da_dn(crack_length_fitted, crack_n_cycles)
+
+        G_th, slope = find_fit_limit(G_MBT, da_dn_new)
 
         m, C, r2_best = find_best_paris_fit(G_MBT, da_dn_new, da_dn_min=0.00001, da_dn_max=0.001)
 
@@ -530,6 +251,7 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
             G_ECM=G_ECM,
             m_value_paris=m,
             c_value_paris=C,
+            G_th=G_th,
         )
 
 
@@ -575,5 +297,6 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
         G_MCC=[],
         G_ECM=[],
         c_value_paris=None,
-        m_value_paris=None
+        m_value_paris=None, 
+        G_th=None
     )

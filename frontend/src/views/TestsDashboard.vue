@@ -500,6 +500,15 @@
                   tooltip="Paris fitting m value, stable region"
                 />
               </li>
+              <li>
+                <experiment-s-v
+                  subject="Gth"
+                  :values="formattedGthValues"
+                  :colors="valueColors"
+                  :unit="'J/m²'"
+                  tooltip="Threshold energy value"
+                />
+              </li>
             </ul>
           </v-card-text>
         </v-card>
@@ -900,6 +909,7 @@ export default {
       totalDissipatedEnergies: [],
       mParisValues: [],
       cParisValues: [],
+      Gth: [],
       runOuts: [],
       selectedLoopIndices: [], // { value }
       crackSeries: [],
@@ -1358,6 +1368,9 @@ export default {
         e != null ? Number(e).toExponential(2) : "-"
       );
     },
+    formattedGthValues() {
+      return this.Gth.map((e) => (e != null ? Number(e).toFixed(3) : "-"));
+    },
     formattedGinitMBTQSValues() {
       return this.ginitMBTQSValues.map((v) =>
         v != null ? Number(v).toFixed(2) : "-"
@@ -1458,6 +1471,7 @@ export default {
       this.totalDissipatedEnergies = [];
       this.mParisValues = [];
       this.cParisValues = [];
+      this.Gth = [];
       this.runOuts = [];
       this.fatigueData = dataList;
       dataList.forEach((d, i) => {
@@ -1470,6 +1484,7 @@ export default {
         this.totalDissipatedEnergies.push(d.total_dissipated_energy);
         this.mParisValues.push(d.m_value_paris);
         this.cParisValues.push(d.c_value_paris);
+        this.Gth.push(d.G_th);
         this.runOuts.push(d.run_out);
         this.fatigueWarnings.push(d.warning_messages || false);
         d.crack_length = d.crack_length || [];

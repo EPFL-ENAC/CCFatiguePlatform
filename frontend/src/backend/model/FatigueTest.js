@@ -47,6 +47,7 @@ class FatigueTest {
    * @param G_ECM {Array.<Number>}
    * @param m_value_paris {Number} ! None
    * @param c_value_paris {Number} ! None
+   * @param G_th {Number} ! None
    */
   constructor(
     specimenId,
@@ -73,6 +74,7 @@ class FatigueTest {
     G_ECM,
     m_value_paris,
     c_value_paris,
+    G_th,
   ) {
     FatigueTest.initialize(
       this,
@@ -100,6 +102,7 @@ class FatigueTest {
       G_ECM,
       m_value_paris,
       c_value_paris,
+      G_th,
     );
   }
 
@@ -134,6 +137,7 @@ class FatigueTest {
     G_ECM,
     m_value_paris,
     c_value_paris,
+    G_th,
   ) {
     obj["specimen_id"] = specimenId;
     obj["specimen_name"] = specimenName;
@@ -159,6 +163,7 @@ class FatigueTest {
     obj["G_ECM"] = G_ECM;
     obj["m_value_paris"] = m_value_paris; // Paris law exponent
     obj["c_value_paris"] = c_value_paris; // Paris law coefficient
+    obj["G_th"] = G_th; // Threshold energy release rate
   }
 
   /**
@@ -292,6 +297,9 @@ class FatigueTest {
           "Number"
         );
       }
+      if (data.hasOwnProperty("G_th")) {
+        obj["G_th"] = ApiClient.convertToType(data["G_th"], "Number");
+      }
     }
     console.log("Constructed FatigueTest object:", obj); // useful logs
     return obj;
@@ -408,5 +416,9 @@ FatigueTest.prototype["m_value_paris"] = undefined;
  * @member {Number} c_value_paris - Paris law coefficient
  */
 FatigueTest.prototype["c_value_paris"] = undefined;
+/**
+ * @member {Number} G_th - Threshold energy release rate
+ */
+FatigueTest.prototype["G_th"] = undefined;
 
 export default FatigueTest;
