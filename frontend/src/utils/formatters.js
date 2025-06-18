@@ -1,129 +1,125 @@
 export const formatTick = (value) => {
   const num = Number(value);
   if (!isFinite(num)) return value;
-
-  // No thousands separator, max 2 decimals
   return num.toLocaleString(undefined, {
-    useGrouping: false, // removes the thousands separator
+    useGrouping: false,
     maximumFractionDigits: 3,
   });
 };
 
+// --------------------------------------------------
+// NICE‑TICK LOGIC (1‑2‑5 progression)
+// --------------------------------------------------
+
+const EPS = Number.EPSILON;
+const NICE_STEPS = [1, 2, 5];
+
+/**
+ * Return a "nice" tick spacing so that ~targetTicks cover [0, maxVal].
+ */
+function niceTickStep(maxVal, targetTicks = 5) {
+  if (maxVal <= 0) return 1;
+  const raw = maxVal / targetTicks; // rough spacing
+  const exponent = Math.floor(Math.log10(raw));
+  const base = 10 ** exponent;
+  const fraction = raw / base;
+  const niceFraction = NICE_STEPS.find((s) => fraction <= s) ?? 10;
+  return niceFraction * base;
+}
+
+function axisMax(values) {
+  if (!values.length) return null;
+  const maxVal = Math.max(...values);
+  const step = niceTickStep(maxVal);
+  let maxAxis = Math.ceil(maxVal / step) * step;
+  // Se coincide col tick, aggiungi un ulteriore step
+  if (Math.abs(maxVal - maxAxis) < EPS) maxAxis += step;
+  return maxAxis;
+}
+
+function axisMin(values) {
+  if (!values.length) return null;
+  const minVal = Math.min(...values);
+  // Usiamo lo stesso step del max per coerenza visiva
+  const step = niceTickStep(Math.max(...values.map(Math.abs)));
+  return Math.floor(minVal / step) * step;
+}
+
+// --------------------------------------------------
+// PUBLIC API
+// --------------------------------------------------
+
 export function computeYAxisMax(series) {
-  const allYValues = series
+  const vals = series
     .flatMap((s) => s?.data || [])
     .map(([, y]) => y)
-    .filter((v) => typeof v === "number" && isFinite(v));
-
-  if (!allYValues.length) return null;
-
-  const maxVal = Math.max(...allYValues);
-
-  // Dynamic calculation of the "step" based on the order of magnitude
-  const magnitude = Math.pow(10, Math.floor(Math.log10(maxVal)));
-  const tickStep = magnitude / 2;
-
-  // Round up to the next convenient tick
-  return Math.ceil(maxVal / tickStep) * tickStep;
+    .filter(Number.isFinite);
+  return axisMax(vals);
 }
 
 export function computeXAxisMax(series) {
-  const allXValues = series
+  const vals = series
     .flatMap((s) => s?.data || [])
     .map(([x]) => x)
-    .filter((v) => typeof v === "number" && isFinite(v));
-
-  if (!allXValues.length) return null;
-
-  const maxVal = Math.max(...allXValues);
-
-  // Dynamic calculation of the "step" based on the order of magnitude
-  const magnitude = Math.pow(10, Math.floor(Math.log10(maxVal)));
-  const tickStep = magnitude / 2;
-
-  // Round up to the next convenient tick
-  return Math.ceil(maxVal / tickStep) * tickStep;
+    .filter(Number.isFinite);
+  return axisMax(vals);
 }
+
 export function computeYAxisMin(series) {
-  const allYValues = series
+  const vals = series
     .flatMap((s) => s?.data || [])
     .map(([, y]) => y)
-    .filter((v) => typeof v === "number" && isFinite(v));
-
-  if (!allYValues.length) return null;
-
-  const minVal = Math.min(...allYValues);
-
-  // Compute the order of magnitude of the minimum value
-  const magnitude = Math.pow(10, Math.floor(Math.log10(Math.abs(minVal) || 1)));
-  const tickStep = magnitude / 2;
-
-  // Round down to the nearest convenient tick step
-  return Math.floor(minVal / tickStep) * tickStep;
+    .filter(Number.isFinite);
+  return axisMin(vals);
 }
 
 export function computeXAxisMin(series) {
-  const allXValues = series
+  const vals = series
     .flatMap((s) => s?.data || [])
     .map(([x]) => x)
-    .filter((v) => typeof v === "number" && isFinite(v));
-
-  if (!allXValues.length) return null;
-
-  const minVal = Math.min(...allXValues);
-
-  // Compute the order of magnitude of the minimum value
-  const magnitude = Math.pow(10, Math.floor(Math.log10(Math.abs(minVal) || 1)));
-  const tickStep = magnitude / 2;
-
-  // Round down to the nearest convenient tick step
-  return Math.floor(minVal / tickStep) * tickStep;
+    .filter(Number.isFinite);
+  return axisMin(vals);
 }
+
+// --------------------------------------------------
+// LOG‑SCALE Y AXIS LIMITS (unchanged)
+// --------------------------------------------------
 
 export function computeLogYAxisLimits(
   series,
   targetMin = 1e-10,
   targetMax = 1e-1
 ) {
-  const allYValues = series
+  const vals = series
     .flatMap((s) => s?.data || [])
     .map(([, y]) => y)
-    .filter((v) => typeof v === "number" && isFinite(v) && v > 0);
-
-  if (!allYValues.length) {
-    return { min: targetMin, max: targetMax };
-  }
-
-  const minVal = Math.min(...allYValues);
-  const maxVal = Math.max(...allYValues);
-
-  const minExp = Math.floor(Math.log10(minVal));
-  const maxExp = Math.ceil(Math.log10(maxVal));
-
-  // Add a helper to compute splitNumber dynamically, e.g. 4 or 5 ticks by default
-  const splitNumber = Math.max(3, maxExp - minExp + 1);
-
+    .filter((v) => v > 0 && isFinite(v));
+  if (!vals.length) return { min: targetMin, max: targetMax, splitNumber: 4 };
+  const minExp = Math.floor(Math.log10(Math.min(...vals)));
+  const maxExp = Math.ceil(Math.log10(Math.max(...vals)));
   return {
-    min: Math.pow(10, minExp),
-    max: Math.pow(10, maxExp),
-    splitNumber,
+    min: 10 ** minExp,
+    max: 10 ** maxExp,
+    splitNumber: Math.max(3, maxExp - minExp + 1),
   };
 }
 
-export const formatFixed = (value, decimals = 2) => {
-  const num = Number(value);
-  return isFinite(num) ? num.toFixed(decimals) : "-";
+// --------------------------------------------------
+// VALUE FORMATTING (unchanged)
+// --------------------------------------------------
+
+const fixed = (v, d = 2) => {
+  const n = Number(v);
+  return isFinite(n) ? n.toFixed(d) : "-";
+};
+const sci = (v, d = 2) => {
+  const n = Number(v);
+  return isFinite(n) ? n.toExponential(d) : "-";
 };
 
-export const formatScientific = (value, decimals = 2) => {
-  const num = Number(value);
-  return isFinite(num) ? num.toExponential(decimals) : "-";
-};
-
-export const format0 = (v) => formatFixed(v, 0);
-export const format2 = (v) => formatFixed(v, 2);
-export const format3 = (v) => formatFixed(v, 3);
-export const format4 = (v) => formatFixed(v, 4);
-export const format5 = (v) => formatFixed(v, 5);
-
-export const formatScientific2 = (v) => formatScientific(v, 2);
+export const format0 = (v) => fixed(v, 0);
+export const format2 = (v) => fixed(v, 2);
+export const format3 = (v) => fixed(v, 3);
+export const format4 = (v) => fixed(v, 4);
+export const format5 = (v) => fixed(v, 5);
+export const formatScientific2 = (v) => sci(v, 2);

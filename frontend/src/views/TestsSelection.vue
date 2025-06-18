@@ -79,7 +79,7 @@
 <script>
 import SimpleChart from "@/components/charts/SimpleChart.vue";
 import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
-import { formatTick } from "@/utils/formatters";
+import { computeXAxisMax, formatTick } from "@/utils/formatters";
 import { mapState } from "vuex";
 
 export default {
@@ -234,15 +234,16 @@ export default {
       return formatTick;
     },
     maxX() {
-      const max = Math.max(
-        ...this.numberedTests
-          .filter((t) => typeof t.number_of_cycles === "number")
-          .map((t) => t.number_of_cycles)
-      );
-      return this.roundUpTick(max);
+      const series = [
+        {
+          data: this.chartSeries[0]?.data.map((d) => d.value) || [],
+        },
+      ];
+      const val = computeXAxisMax(series);
+      return val ?? 1;
     },
     minX() {
-      return this.xAxisMode === "log" ? 1 : 0;
+      return this.xAxisMode === "log" ? 1 : 1;
     },
     maxY() {
       const controlMode =

@@ -60,6 +60,7 @@
                   :aspect-ratio="2"
                   x-axis-name="Strain [-]"
                   y-axis-name="Stress [MPa]"
+                  :y-axis-max="computeYAxisMax(strainStressSeriesFA)"
                   :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
@@ -101,8 +102,13 @@
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
                   y-axis-name="Creep [-]"
-                  :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
-                  :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
+                  :x-axis-min="xAxisMode === 'normalized' ? 0 : 1"
+                  :x-axis-max="
+                    xAxisMode === 'normalized'
+                      ? 1
+                      : computeXAxisMax(creepSeries)
+                  "
+                  :y-axis-max="computeYAxisMax(creepSeries)"
                   :axis-label-formatter="axisTickFormatter"
                   :tooltip-formatter="format5"
                 />
@@ -145,8 +151,13 @@
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
                   y-axis-name="Hysteresis area [MPa]"
-                  :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
-                  :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
+                  :x-axis-min="xAxisMode === 'normalized' ? 0 : 1"
+                  :x-axis-max="
+                    xAxisMode === 'normalized'
+                      ? 1
+                      : computeXAxisMax(hysteresisAreaSeries)
+                  "
+                  :y-axis-max="computeYAxisMax(hysteresisAreaSeries)"
                   :axis-label-formatter="axisTickFormatter"
                   :tooltip-formatter="format5"
                 />
@@ -197,9 +208,13 @@
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
                   :y-axis-name="computedYAxisStiffnessLabel"
-                  :y-axis-max="yAxisMaxStiffness"
-                  :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
-                  :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
+                  :y-axis-max="computeYAxisMax(stiffnessSeries)"
+                  :x-axis-min="xAxisMode === 'normalized' ? 0 : 1"
+                  :x-axis-max="
+                    xAxisMode === 'normalized'
+                      ? 1
+                      : computeXAxisMax(stiffnessSeries)
+                  "
                   :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
@@ -386,9 +401,16 @@
                   :aspect-ratio="2"
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
-                  :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
-                  :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
+                  :x-axis-min="xAxisMode === 'normalized' ? 0 : 1"
+                  :x-axis-max="
+                    xAxisMode === 'normalized'
+                      ? 1
+                      : computeXAxisMax(fractureEnergyVsCyclesSeriesCombined)
+                  "
                   y-axis-name="Fracture Energy [J/m²]"
+                  :y-axis-max="
+                    computeYAxisMax(fractureEnergyVsCyclesSeriesCombined)
+                  "
                   :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
@@ -445,7 +467,7 @@
                   :y-axis-type="'log'"
                   :y-axis-min="yAxisLogLimits_daDnVsG.min"
                   :y-axis-max="yAxisLogLimits_daDnVsG.max"
-                  :x-axis-max="xAxisMaxGrowthRatevsFractureEnergy"
+                  :x-axis-max="computeXAxisMax(daDnVsGSeriesCombined)"
                   :y-axis-split-number="yAxisLogLimits_daDnVsG.splitNumber"
                   :axis-label-formatter="axisTickFormatter"
                   :tooltip-formatter="formatScientific"
@@ -624,7 +646,7 @@
               :aspect-ratio="2"
               x-axis-name="Strain [-]"
               y-axis-name="Stress [MPa]"
-              :y-axis-max="yAxisMaxStrainStressQS"
+              :y-axis-max="computeYAxisMax(strainStressSeriesQS)"
               :axis-label-formatter="axisTickFormatter"
             />
           </v-card-text>
@@ -781,9 +803,10 @@
                   :aspect-ratio="2"
                   x-axis-name="Crack Length [mm]"
                   y-axis-name="Fracture Energy [J/m²]"
-                  :y-axis-max="yAxisMaxFractureEnergyCombined"
-                  :x-axis-min="xAxisMinFractureEnergyCombined"
-                  :x-axis-max="xAxisMaxFractureEnergyCombined"
+                  :y-axis-min="computeYAxisMin(fractureEnergySeriesCombined)"
+                  :y-axis-max="computeYAxisMax(fractureEnergySeriesCombined)"
+                  :x-axis-min="computeXAxisMin(fractureEnergySeriesCombined)"
+                  :x-axis-max="computeXAxisMax(fractureEnergySeriesCombined)"
                   :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
@@ -1170,7 +1193,6 @@ export default {
         const name = d.specimen_name || `Specimen ${id}`;
         const color = this.colors[i % this.colors.length];
         if (!d.crack_n_cycles?.length || !d.crack_load?.length) {
-          console.warn("⚠️ Missing crack data for specimen", id);
           return [];
         }
         const transformedX = this.transformXAxis(d.crack_n_cycles, d.n_fail);
@@ -1317,27 +1339,6 @@ export default {
     },
 
     // --- Chart Axis: Min/Max Calculations ---
-    yAxisMaxStrainStressQS() {
-      return computeYAxisMax(this.strainStressSeriesQS);
-    },
-    yAxisMaxStiffness() {
-      return computeYAxisMax(this.stiffnessSeries);
-    },
-    yAxisMaxFractureEnergyCombined() {
-      return computeYAxisMax(this.fractureEnergySeriesCombined);
-    },
-    yAxisMaxFractureEnergyVsCycles() {
-      return computeYAxisMax(this.fractureEnergyVsCyclesSeriesCombined);
-    },
-    xAxisMaxFractureEnergyCombined() {
-      return computeXAxisMax(this.fractureEnergySeriesCombined);
-    },
-    xAxisMinFractureEnergyCombined() {
-      return computeXAxisMin(this.fractureEnergySeriesCombined);
-    },
-    xAxisMaxGrowthRatevsFractureEnergy() {
-      return computeXAxisMax(this.daDnVsGSeriesCombined);
-    },
     // Double chart axis min/max for both FA and QS fracture
     xAxisMaxDoubleChart() {
       const series =
@@ -1353,37 +1354,31 @@ export default {
           : this.crackFaFractureSeries;
       return computeXAxisMin(series);
     },
+    // series displayed in the double-chart (only one source: QS or FA)
+    doubleChartSeries() {
+      return this.isFracture && this.experimentType === "QS"
+        ? this.crackSeries
+        : this.crackFaFractureSeries;
+    },
+
+    // ------------------ Y1 (Load) ------------------
     y1AxisMaxDoubleChart() {
-      const series =
-        this.isFracture && this.experimentType === "QS"
-          ? this.crackSeries
-          : this.crackFaFractureSeries;
-      const y1Series = series.filter((s) => s.yAxisIndex !== 1);
-      return computeYAxisMax(y1Series);
+      const y1 = this.doubleChartSeries.filter((s) => s.yAxisIndex !== 1);
+      return computeYAxisMax(y1); // “nice-tick” 1-2-5
     },
     y1AxisMinDoubleChart() {
-      const series =
-        this.isFracture && this.experimentType === "QS"
-          ? this.crackSeries
-          : this.crackFaFractureSeries;
-      const y1Series = series.filter((s) => s.yAxisIndex !== 1);
-      return computeYAxisMin(y1Series);
+      const y1 = this.doubleChartSeries.filter((s) => s.yAxisIndex !== 1);
+      return computeYAxisMin(y1);
     },
+
+    // ------------------ Y2 (Crack length) ----------
     y2AxisMaxDoubleChart() {
-      const series =
-        this.isFracture && this.experimentType === "QS"
-          ? this.crackSeries
-          : this.crackFaFractureSeries;
-      const y2Series = series.filter((s) => s.yAxisIndex === 1);
-      return computeYAxisMax(y2Series);
+      const y2 = this.doubleChartSeries.filter((s) => s.yAxisIndex === 1);
+      return computeYAxisMax(y2);
     },
     y2AxisMinDoubleChart() {
-      const series =
-        this.isFracture && this.experimentType === "QS"
-          ? this.crackSeries
-          : this.crackFaFractureSeries;
-      const y2Series = series.filter((s) => s.yAxisIndex === 1);
-      return computeYAxisMin(y2Series);
+      const y2 = this.doubleChartSeries.filter((s) => s.yAxisIndex === 1);
+      return computeYAxisMin(y2);
     },
     yAxisLogLimits_daDnVsG() {
       const { min, max, splitNumber } = computeLogYAxisLimits(
@@ -1632,6 +1627,10 @@ export default {
     format4,
     format5,
     formatScientific2,
+    computeYAxisMin,
+    computeYAxisMax,
+    computeXAxisMax,
+    computeXAxisMin,
   },
 };
 </script>
