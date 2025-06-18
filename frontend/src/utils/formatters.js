@@ -18,10 +18,15 @@ const NICE_STEPS = [1, 2, 5, 10];
  * Return a "nice" tick spacing so that ~targetTicks cover [0, maxVal].
  */
 function autoTargetTicks(maxVal) {
-  if (maxVal <= 0) return 5; // edge-case
-  if (maxVal < 2) return 10; // ~0.1 di passo → 1 → 2 kN
-  if (maxVal < 20) return 8; // ~1   di passo → 2 → 20 kN
-  return 5; // default 1-2-5
+  if (maxVal <= 0) return 5; // fallback
+
+  if (maxVal < 3) return 10; // 0-3  → step 0.1
+  if (maxVal < 30) return 8; // 3-30 → step 1
+
+  // 30-300 mm → about 1 tick every 10 mm   (≈14 ticks at 140 mm)
+  if (maxVal < 300) return Math.min(15, Math.ceil(maxVal / 10));
+
+  return 5; // over 300 → standard scale
 }
 
 function niceTickStep(maxVal, targetTicks = autoTargetTicks(maxVal)) {
@@ -39,7 +44,8 @@ function axisMax(values) {
   const maxVal = Math.max(...values);
   const step = niceTickStep(maxVal);
   let maxAxis = Math.ceil(maxVal / step) * step;
-  // Se coincide col tick, aggiungi un ulteriore step
+  // Ensure the axis max is a bit larger than the max value
+  // This avoids the last tick being exactly at the max value
   if (Math.abs(maxVal - maxAxis) < EPS) maxAxis += step;
   return maxAxis;
 }
@@ -47,7 +53,7 @@ function axisMax(values) {
 function axisMin(values) {
   if (!values.length) return null;
   const minVal = Math.min(...values);
-  // Usiamo lo stesso step del max per coerenza visiva
+  // Use the same step as max for visual consistency
   const step = niceTickStep(Math.max(...values.map(Math.abs)));
   return Math.floor(minVal / step) * step;
 }
