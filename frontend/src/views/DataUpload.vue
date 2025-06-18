@@ -3,6 +3,10 @@
     <v-card>
       <v-card-title>Upload Guidelines</v-card-title>
       <v-card-text>
+        <p class="text-body-1 text-justify font-weight-bold red--text">
+          Read this pdf carefully, each line is important and fundamental to
+          pass the dataset checker.
+        </p>
         <v-btn color="primary" outlined @click="showPdf = !showPdf">
           {{ showPdf ? "Hide PDF" : "Open PDF" }}
         </v-btn>
