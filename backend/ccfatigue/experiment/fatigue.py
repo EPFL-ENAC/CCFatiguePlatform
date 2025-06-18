@@ -61,9 +61,15 @@ class FatigueTest(BaseModel):
     G_MBT: Optional[List[float]] = None
     G_MCC: Optional[List[float]] = None
     G_ECM: Optional[List[float]] = None
-    c_value_paris: float | None 
-    m_value_paris: float | None
-    G_th: float | None 
+    c_paris_mbt: float | None 
+    m_paris_mbt: float | None
+    G_th_mbt: float | None 
+    c_paris_mcc: float | None 
+    m_paris_mcc: float | None
+    G_th_mcc: float | None 
+    c_paris_ecm: float | None 
+    m_paris_ecm: float | None
+    G_th_ecm: float | None 
 
 
 def get_dataframe(data_in: str, exp: Dict[str, str], specimen_id: int) -> DataFrame:
@@ -223,9 +229,17 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
 
         da_dn_new = compute_da_dn(crack_length_fitted, crack_n_cycles)
 
-        G_th, slope = find_fit_limit(G_MBT, da_dn_new)
+        G_th_mbt, slope_mbt = find_fit_limit(G_MBT, da_dn_new)
 
-        m, C, r2_best = find_best_paris_fit(G_MBT, da_dn_new, da_dn_min=0.00001, da_dn_max=0.001)
+        G_th_mcc, slope_mbt = find_fit_limit(G_MCC, da_dn_new)
+
+        G_th_ecm, slope_mbt = find_fit_limit(G_ECM, da_dn_new)
+
+        m_mbt, C_mbt, r2_best_mbt = find_best_paris_fit(G_MBT, da_dn_new, da_dn_min=0.00001, da_dn_max=0.001)
+
+        m_mcc, C_mcc, r2_best_mcc = find_best_paris_fit(G_MCC, da_dn_new, da_dn_min=0.00001, da_dn_max=0.001)
+
+        m_ecm, C_ecm, r2_best_ecm = find_best_paris_fit(G_ECM, da_dn_new, da_dn_min=0.00001, da_dn_max=0.001)
 
         return FatigueTest(
             specimen_id=specimen_id,
@@ -249,9 +263,15 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
             G_MBT=G_MBT,
             G_MCC=G_MCC,
             G_ECM=G_ECM,
-            m_value_paris=m,
-            c_value_paris=C,
-            G_th=G_th,
+            m_paris_mbt=m_mbt,
+            c_paris_mbt=C_mbt,
+            G_th_mbt=G_th_mbt,
+            m_paris_mcc=m_mcc,
+            c_paris_mcc=C_mcc,
+            G_th_mcc=G_th_mcc,
+            m_paris_ecm=m_ecm,
+            c_paris_ecm=C_ecm,
+            G_th_ecm=G_th_ecm,
         )
 
 
@@ -296,7 +316,13 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
         G_MBT=[],
         G_MCC=[],
         G_ECM=[],
-        c_value_paris=None,
-        m_value_paris=None, 
-        G_th=None
+        c_paris_mbt=None,
+        m_paris_mbt=None,
+        G_th_mbt=None,
+        c_paris_mcc=None,
+        m_paris_mcc=None,
+        G_th_mcc=None,
+        c_paris_ecm=None,
+        m_paris_ecm=None,
+        G_th_ecm=None,
     )
