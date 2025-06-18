@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { formatNumber3 } from "@/utils/formatters";
+import { format3 } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
 import { LineChart, ScatterChart } from "echarts/charts";
 import {
@@ -55,11 +55,11 @@ export default {
     color: { type: Array, default: () => colorPalette },
     axisLabelFormatter: {
       type: Function,
-      default: formatNumber3,
+      default: format3,
     },
     tooltipFormatter: {
       type: Function,
-      default: formatNumber3,
+      default: format3,
     },
   },
   data() {

@@ -1,98 +1,11 @@
-import { round } from "lodash";
-
-export const formatNumber3 = (value) => {
-  const num = Number(value);
-  if (isNaN(num)) return value;
-
-  const abs = Math.abs(num);
-
-  if (abs >= 1000 || (abs > 0 && abs < 0.001)) {
-    // power calculated manually
-    const exponent = Math.floor(Math.log10(abs));
-    const mantissa = num / Math.pow(10, exponent);
-    const fixedMantissa = mantissa.toFixed(3);
-    return `${fixedMantissa}e${exponent >= 0 ? "+" : ""}${exponent}`;
-  }
-
-  return num.toLocaleString(undefined, {
-    minimumFractionDigits: 3,
-    maximumFractionDigits: 3,
-  });
-};
-
-export const formatNumber4 = (value) => {
-  const num = Number(value);
-  if (isNaN(num)) return value;
-
-  const abs = Math.abs(num);
-
-  if (abs >= 10000 || (abs > 0 && abs < 0.0001)) {
-    // power calculated manually
-    const exponent = Math.floor(Math.log10(abs));
-    const mantissa = num / Math.pow(10, exponent);
-    const fixedMantissa = mantissa.toFixed(4);
-    return `${fixedMantissa}e${exponent >= 0 ? "+" : ""}${exponent}`;
-  }
-
-  return num.toLocaleString(undefined, {
-    minimumFractionDigits: 4,
-    maximumFractionDigits: 4,
-  });
-};
-
-export const formatNumber5 = (value) => {
-  const num = Number(value);
-  if (isNaN(num)) return value;
-
-  const abs = Math.abs(num);
-
-  if (abs >= 100000 || (abs > 0 && abs < 0.00001)) {
-    // power calculated manually
-    const exponent = Math.floor(Math.log10(abs));
-    const mantissa = num / Math.pow(10, exponent);
-    const fixedMantissa = mantissa.toFixed(5);
-    return `${fixedMantissa}e${exponent >= 0 ? "+" : ""}${exponent}`;
-  }
-
-  return num.toLocaleString(undefined, {
-    minimumFractionDigits: 5,
-    maximumFractionDigits: 5,
-  });
-};
-
-export const formatNumber2 = (value) =>
-  Math.abs(value) >= 1000 || (Math.abs(value) < 0.001 && value !== 0)
-    ? round(value, 2).toExponential()
-    : round(value, 2);
-
 export const formatTick = (value) => {
   const num = Number(value);
   if (!isFinite(num)) return value;
 
   // No thousands separator, max 2 decimals
   return num.toLocaleString(undefined, {
-    useGrouping: false, // ⬅️ removes the thousands separator
+    useGrouping: false, // removes the thousands separator
     maximumFractionDigits: 3,
-  });
-};
-
-export const formatNumber0 = (value) => {
-  const num = Number(value);
-  if (isNaN(num)) return value;
-
-  const abs = Math.abs(num);
-
-  if (abs >= 1000 || (abs > 0 && abs < 0.001)) {
-    // power calculated manually
-    const exponent = Math.floor(Math.log10(abs));
-    const mantissa = num / Math.pow(10, exponent);
-    const fixedMantissa = mantissa.toFixed(0);
-    return `${fixedMantissa}e${exponent >= 0 ? "+" : ""}${exponent}`;
-  }
-
-  return num.toLocaleString(undefined, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
   });
 };
 
@@ -196,3 +109,21 @@ export function computeLogYAxisLimits(
     splitNumber,
   };
 }
+
+export const formatFixed = (value, decimals = 2) => {
+  const num = Number(value);
+  return isFinite(num) ? num.toFixed(decimals) : "-";
+};
+
+export const formatScientific = (value, decimals = 2) => {
+  const num = Number(value);
+  return isFinite(num) ? num.toExponential(decimals) : "-";
+};
+
+export const format0 = (v) => formatFixed(v, 0);
+export const format2 = (v) => formatFixed(v, 2);
+export const format3 = (v) => formatFixed(v, 3);
+export const format4 = (v) => formatFixed(v, 4);
+export const format5 = (v) => formatFixed(v, 5);
+
+export const formatScientific2 = (v) => formatScientific(v, 2);

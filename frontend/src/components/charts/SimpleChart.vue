@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { formatNumber3 } from "@/utils/formatters";
+import { format3 } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
 import { LineChart, ScatterChart } from "echarts/charts";
 import {
@@ -56,12 +56,12 @@ export default {
     yAxisMax: { type: [Number, null], default: null },
     axisLabelFormatter: {
       type: Function,
-      default: formatNumber3,
+      default: format3,
     },
     showLegend: { type: Boolean, default: true },
     tooltipFormatter: {
       type: Function,
-      default: formatNumber3,
+      default: format3,
     },
   },
   data() {
