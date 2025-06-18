@@ -12,12 +12,19 @@ export const formatTick = (value) => {
 // --------------------------------------------------
 
 const EPS = Number.EPSILON;
-const NICE_STEPS = [1, 2, 5];
+const NICE_STEPS = [1, 2, 5, 10];
 
 /**
  * Return a "nice" tick spacing so that ~targetTicks cover [0, maxVal].
  */
-function niceTickStep(maxVal, targetTicks = 5) {
+function autoTargetTicks(maxVal) {
+  if (maxVal <= 0) return 5; // edge-case
+  if (maxVal < 2) return 10; // ~0.1 di passo → 1 → 2 kN
+  if (maxVal < 20) return 8; // ~1   di passo → 2 → 20 kN
+  return 5; // default 1-2-5
+}
+
+function niceTickStep(maxVal, targetTicks = autoTargetTicks(maxVal)) {
   if (maxVal <= 0) return 1;
   const raw = maxVal / targetTicks; // rough spacing
   const exponent = Math.floor(Math.log10(raw));

@@ -34,10 +34,8 @@ use([
 ]);
 
 export default {
-  name: "SimpleChart",
-  components: {
-    VChart,
-  },
+  name: "DoubleChart",
+  components: { VChart },
   props: {
     aspectRatio: { type: Number, default: 1 },
     series: { type: Array, default: () => [] },
@@ -45,39 +43,28 @@ export default {
     xAxisName: { type: String, default: "" },
     y1AxisName: { type: String, default: "" },
     y2AxisName: { type: String, default: "" },
-    xAxisType: { type: String, default: "" },
-    xAxisMax: { type: [Number, null], default: null },
-    y1AxisMax: { type: [Number, null], default: null },
-    y2AxisMax: { type: [Number, null], default: null },
+    xAxisType: { type: String, default: "value" },
+
+    /* opzionale override dei limiti */
     xAxisMin: { type: [Number, null], default: null },
+    xAxisMax: { type: [Number, null], default: null },
     y1AxisMin: { type: [Number, null], default: null },
+    y1AxisMax: { type: [Number, null], default: null },
     y2AxisMin: { type: [Number, null], default: null },
+    y2AxisMax: { type: [Number, null], default: null },
+
     color: { type: Array, default: () => colorPalette },
-    axisLabelFormatter: {
-      type: Function,
-      default: format3,
-    },
-    tooltipFormatter: {
-      type: Function,
-      default: format3,
-    },
+    axisLabelFormatter: { type: Function, default: format3 },
+    tooltipFormatter: { type: Function, default: format3 },
   },
   data() {
-    return {
-      updateOptions: {
-        notMerge: true,
-      },
-    };
+    return { updateOptions: { notMerge: true } };
   },
   computed: {
-    actualOption: function () {
+    actualOption() {
       return {
-        title: {
-          text: this.title,
-        },
-        legend: {
-          type: "scroll",
-        },
+        title: { text: this.title },
+        legend: { type: "scroll" },
         grid: {
           left: 50,
           top: 40,
@@ -92,10 +79,7 @@ export default {
           nameGap: 26,
           min: this.xAxisMin ?? "dataMin",
           max: this.xAxisMax ?? "dataMax",
-          axisLabel: {
-            formatter: this.axisLabelFormatter,
-            fontSize: 10,
-          },
+          axisLabel: { formatter: this.axisLabelFormatter, fontSize: 10 },
         },
         yAxis: [
           {
@@ -104,10 +88,9 @@ export default {
             nameGap: 30,
             min: this.y1AxisMin ?? "dataMin",
             max: this.y1AxisMax ?? "dataMax",
-            axisLabel: {
-              formatter: this.axisLabelFormatter,
-              fontSize: 10,
-            },
+            scale: true,
+            axisLabel: { formatter: this.axisLabelFormatter, fontSize: 10 },
+            alignTicks: false,
           },
           {
             name: this.y2AxisName,
@@ -115,62 +98,28 @@ export default {
             nameGap: 30,
             min: this.y2AxisMin ?? "dataMin",
             max: this.y2AxisMax ?? "dataMax",
-            axisLabel: {
-              formatter: this.axisLabelFormatter,
-              fontSize: 10,
-            },
+            scale: true,
+            axisLabel: { formatter: this.axisLabelFormatter, fontSize: 10 },
+            alignTicks: false,
           },
         ],
         tooltip: {
           trigger: "axis",
           confine: true,
           formatter: (params) => {
-            const formatter = this.tooltipFormatter;
-            let xLabel;
-
-            if (
-              this.xAxisName.includes("Number of cycles") ||
-              this.xAxisName.includes("Normalized cycles")
-            ) {
-              const p = params[0];
-              let rawX = null;
-
-              if (p.seriesIndex != null && this.series[p.seriesIndex]?.rawX) {
-                const pointIndex = p.dataIndex;
-                rawX = this.series[p.seriesIndex].rawX[pointIndex];
-              }
-
-              if (rawX != null) {
-                xLabel = Number(rawX).toLocaleString(undefined, {
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                  useGrouping: false,
-                });
-              } else {
-                const xValue = p.value[0] ?? p.value;
-                xLabel = Number(xValue).toLocaleString(undefined, {
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                  useGrouping: false,
-                });
-              }
-            } else {
-              xLabel = params[0].axisValueLabel;
-            }
-
-            const rows = [`<strong>${xLabel}</strong>`];
-
+            const rows = [
+              `<strong>${params[0]?.axisValueLabel ?? ""}</strong>`,
+            ];
             for (const p of params) {
-              const rawY = Array.isArray(p.value) ? p.value[1] : p.value;
-              const yVal = Number(rawY);
-              const formattedY = formatter(yVal);
-              rows.push(`${p.marker}${p.seriesName}: ${formattedY}`);
+              const yVal = Array.isArray(p.value) ? p.value[1] : p.value;
+              rows.push(
+                `${p.marker}${p.seriesName}: ${this.tooltipFormatter(yVal)}`
+              );
             }
-
             return rows.join("<br/>");
           },
         },
-        series: this.series.map((serie) => merge(serie, { showSymbol: false })),
+        series: this.series.map((s) => merge({}, s, { showSymbol: false })),
         color: this.color,
       };
     },

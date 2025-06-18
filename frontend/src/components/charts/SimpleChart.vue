@@ -95,6 +95,7 @@ export default {
           axisLabel: {
             formatter: this.axisLabelFormatter,
             hideOverlap: true,
+            showMaxLabel: true,
           },
         },
         yAxis: {
@@ -112,6 +113,7 @@ export default {
                 ? `10^${Math.round(Math.log10(val))}`
                 : this.axisLabelFormatter(val),
             hideOverlap: true,
+            showMaxLabel: true,
           },
         },
         tooltip: {

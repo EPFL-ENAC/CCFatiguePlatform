@@ -60,6 +60,7 @@
                   :aspect-ratio="2"
                   x-axis-name="Strain [-]"
                   y-axis-name="Stress [MPa]"
+                  :x-axis-max="computeXAxisMax(strainStressSeriesFA)"
                   :y-axis-max="computeYAxisMax(strainStressSeriesFA)"
                   :axis-label-formatter="axisTickFormatter"
                 />
@@ -329,8 +330,12 @@
                   :aspect-ratio="2"
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
-                  :x-axis-max="xAxisMaxDoubleChart"
-                  :x-axis-min="xAxisMinDoubleChart"
+                  :x-axis-min="xAxisMode === 'normalized' ? 0 : 1"
+                  :x-axis-max="
+                    xAxisMode === 'normalized'
+                      ? 1
+                      : computeXAxisMax(stiffnessSeries)
+                  "
                   :y1-axis-name="'Load [kN]'"
                   :y1-axis-max="y1AxisMaxDoubleChart"
                   :y1-axis-min="y1AxisMinDoubleChart"
@@ -647,6 +652,7 @@
               x-axis-name="Strain [-]"
               y-axis-name="Stress [MPa]"
               :y-axis-max="computeYAxisMax(strainStressSeriesQS)"
+              :x-axis-max="computeXAxisMax(strainStressSeriesQS)"
               :axis-label-formatter="axisTickFormatter"
             />
           </v-card-text>
@@ -1363,11 +1369,16 @@ export default {
 
     // ------------------ Y1 (Load) ------------------
     y1AxisMaxDoubleChart() {
-      const y1 = this.doubleChartSeries.filter((s) => s.yAxisIndex !== 1);
-      return computeYAxisMax(y1); // “nice-tick” 1-2-5
+      // asse sinistro = yAxisIndex 0 (o undefined, che ECharts considera 0)
+      const y1 = this.doubleChartSeries.filter(
+        (s) => (s.yAxisIndex ?? 0) === 0
+      );
+      return computeYAxisMax(y1);
     },
     y1AxisMinDoubleChart() {
-      const y1 = this.doubleChartSeries.filter((s) => s.yAxisIndex !== 1);
+      const y1 = this.doubleChartSeries.filter(
+        (s) => (s.yAxisIndex ?? 0) === 0
+      );
       return computeYAxisMin(y1);
     },
 
