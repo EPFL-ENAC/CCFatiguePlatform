@@ -74,23 +74,33 @@ def process_hysteresis(df, test_meta):
     loop_points_records = []
     max_load_nominal = test_meta.get("maximum load")
 
-    # Choose a subset of cycles to process
-    if len(n_cycles) <= 10:
-        selected_cycles = set(n_cycles)
-    else:
-        selected_cycles = set(n_cycles[np.linspace(0, len(n_cycles) - 1, 10, dtype=int)])
+    # First step: filter only valid cycles
+    valid_cycles = []
+    cycle_data = {}
 
     for n in n_cycles:
         cycle_df = df[df[cycle_field] == n]
         load_max = cycle_df[load_field].max()
         if not (0.9 * max_load_nominal <= load_max <= 1.1 * max_load_nominal):
             continue
+        if cycle_df.shape[0] < 2:
+            continue
+        valid_cycles.append(n)
+        cycle_data[n] = cycle_df
 
+
+    # Now select those to save in Loops.csv
+    if len(valid_cycles) <= 10:
+        selected_cycles = set(valid_cycles)
+    else:
+        indices = np.round(np.linspace(0, len(valid_cycles) - 1, 10)).astype(int)
+        selected_cycles = set([valid_cycles[i] for i in indices])
+
+    # Now process only valid cycles
+    for n in valid_cycles:
+        cycle_df = cycle_data[n]
         stress = cycle_df["stress"].values
         strain = cycle_df["strain"].values
-
-        if stress.size < 2:
-            continue
 
         params = fit_ellipse_matlab(strain, stress, num_points=50)
         fit_x = params["fit_x"]
@@ -121,6 +131,7 @@ def process_hysteresis(df, test_meta):
                 })
 
     return pd.DataFrame(hys_records), pd.DataFrame(loop_points_records)
+
 
 def run_on_folder(PREPROCESSED_FOLDER):
     tests_fp = os.path.join(PREPROCESSED_FOLDER, "tests.csv")
@@ -157,9 +168,7 @@ def main():
         if not os.path.isdir(PREPROCESSED_FOLDER):
             continue
         if is_fawithoutfracture(PREPROCESSED_FOLDER):
-            print(f"❌ Skipping experiment: {folder_name}")
             continue
-        print(f"✅ Processing: {folder_name}")
         run_on_folder(PREPROCESSED_FOLDER)
 
 if __name__ == "__main__":
