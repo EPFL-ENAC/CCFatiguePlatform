@@ -57,20 +57,27 @@ def compute_g_mbt(compliance, crack_displacement, crack_load, crack_length_fitte
 def compute_g_mcc(compliance, crack_displacement, crack_load, crack_length_fitted, F, N, width, thickness):
     a_over_h = crack_length_fitted / thickness
     C_N_1_3 = (compliance / N)**(1/3)
-    A1, _ = np.polyfit(C_N_1_3, a_over_h, 1)
+    # A1, _ = np.polyfit(C_N_1_3, a_over_h, 1)
+    params, _ = curve_fit(fit_func, C_N_1_3, a_over_h)
+    A1 = params[0]          # slope
     G = (3 * np.array(crack_load)**2 * (compliance / N)**(2/3)) / (2 * A1 * width * thickness) * F * 1e6
     return G.tolist()
 
 def compute_g_ecm(compliance, crack_displacement, crack_load, crack_length_fitted, F, N, width):
     crack_array = crack_length_fitted
     c_over_n = compliance / N
-    valid_mask = (crack_array > 0) & (c_over_n > 0) & np.isfinite(c_over_n)
-    if np.sum(valid_mask) < 2:
-        return [float("nan")] * len(crack_array)
+    #valid_mask = (crack_array > 0) & (c_over_n > 0) & np.isfinite(c_over_n)
+    #if np.sum(valid_mask) < 2:
+    #    return [float("nan")] * len(crack_array)
 
-    a_log = np.log10(crack_array[valid_mask])
-    log_C_N = np.log10(c_over_n[valid_mask])
-    m, _ = np.polyfit(a_log, log_C_N, 1)
+    #a_log = np.log10(crack_array[valid_mask])
+    #log_C_N = np.log10(c_over_n[valid_mask])
+    #m, _ = np.polyfit(a_log, log_C_N, 1)
+    a_log      = np.log(crack_length_fitted) / np.log(10)
+    log_C_N    = np.log(compliance / N)      / np.log(10)
+
+    params, _ = curve_fit(fit_func, a_log, log_C_N)
+    m = params[0]           # slope
 
     G = (m * np.array(crack_load) * np.array(crack_displacement)) / (2 * width * crack_array) * F / N * 1e6
     return G.tolist()
@@ -108,73 +115,60 @@ def find_fit_limit(G, da_dn, slope_threshold=0.04, window_size=5):
 
     return G_sorted[-1], slope  # No threshold breach, return last point
 
-def find_best_paris_fit(G: List[float], da_dn: List[float], min_window_size=3, r2_threshold=0.98, da_dn_min=None, da_dn_max=None):
-    da_dn = np.array(da_dn)
-    log_G = np.log(G)
-    log_da_dn = np.log(da_dn)
+def find_best_paris_fit(
+    G: List[float],
+    da_dn: List[float],
+    da_dn_high: float = 1e-3,   # high threshold (≈ 10-3 mm/cycle)
+    da_dn_low: float  = 1e-5,   # low threshold (≈ 10-5 mm/cycle)
+    min_points: int   = 3
+) -> Tuple[float, float, float]:
+    """
+    Exactly reproduces the procedure from the notebook:
+    1.  transforms G and da/dN to natural log.
+    2.  finds the index closest to da_dn_high and the one
+        closest to da_dn_low.
+    3.  takes *all* points between the two indices (contiguous slice).
+    4.  performs a linear regression log-log and returns:
+        m, C, R².
 
-    if da_dn_min is not None and da_dn_max is not None:
-        mask = (da_dn >= da_dn_min) & (da_dn <= da_dn_max)
-        filtered_log_G = log_G[mask]
-        filtered_log_da_dn = log_da_dn[mask]
+    Parameters
+    ----------
+    G          : list of G (J/m²)
+    da_dn      : list of da/dN (mm/cycle)
+    da_dn_high : upper threshold to choose the start
+    da_dn_low  : lower threshold to choose the end
+    min_points : minimum points required for the fit
+    """
+    G_arr     = np.asarray(G, dtype=float)
+    da_dn_arr = np.asarray(da_dn, dtype=float)
 
-        if len(filtered_log_G) < min_window_size:
-            raise ValueError(f"Selected window too small ({len(filtered_log_G)} points)")
+    log_G      = np.log(G_arr)
+    log_da_dn  = np.log(da_dn_arr)
 
-        x = filtered_log_G.reshape(-1, 1)
-        y = filtered_log_da_dn
-        reg = LinearRegression().fit(x, y)
-        r2 = reg.score(x, y)
-        m = reg.coef_[0]
-        logC = reg.intercept_
-        C = math.exp(logC)
-        return m, C, r2
+    # --- 1. find the indices “closest” to the two thresholds ---
+    idx_high = int(np.argmin(np.abs(da_dn_arr - da_dn_high)))
+    idx_low  = int(np.argmin(np.abs(da_dn_arr - da_dn_low)))
 
-    best_r2 = -np.inf
-    best_start, best_end, best_params = None, None, None
+    # ensure that start < end
+    start, end = sorted([idx_high, idx_low])
 
-    for start in range(len(log_G) - min_window_size + 1):
-        for end in range(start + min_window_size - 1, len(log_G)):
-            x = log_G[start:end+1].reshape(-1, 1)
-            y = log_da_dn[start:end+1]
-            reg = LinearRegression().fit(x, y)
-            r2 = reg.score(x, y)
-            if r2 > best_r2:
-                best_r2 = r2
-                best_start = start
-                best_end = end
-                best_params = (reg.coef_[0], reg.intercept_)
+    if end - start + 1 < min_points:
+        raise ValueError(
+            f"Window too small: {end-start+1} points (<{min_points})"
+        )
 
-    while True:
-        expanded = False
-        if best_start > 0:
-            new_start = best_start - 1
-            x = log_G[new_start:best_end+1].reshape(-1, 1)
-            y = log_da_dn[new_start:best_end+1]
-            reg = LinearRegression().fit(x, y)
-            r2 = reg.score(x, y)
-            if r2 >= r2_threshold:
-                best_start = new_start
-                best_params = (reg.coef_[0], reg.intercept_)
-                best_r2 = r2
-                expanded = True
-        if best_end < len(log_G) - 1:
-            new_end = best_end + 1
-            x = log_G[best_start:new_end+1].reshape(-1, 1)
-            y = log_da_dn[best_start:new_end+1]
-            reg = LinearRegression().fit(x, y)
-            r2 = reg.score(x, y)
-            if r2 >= r2_threshold:
-                best_end = new_end
-                best_params = (reg.coef_[0], reg.intercept_)
-                best_r2 = r2
-                expanded = True
-        if not expanded:
-            break
+    # --- 2. linear regression log-log on the contiguous interval ---
+    x = log_G[start : end + 1].reshape(-1, 1)
+    y = log_da_dn[start : end + 1]
 
-    m, logC = best_params
-    C = math.exp(logC)
-    return m, C, best_r2
+    reg = LinearRegression().fit(x, y)
+    m      = float(reg.coef_[0])        # slope
+    log_C  = float(reg.intercept_)
+    r2     = float(reg.score(x, y))
+    C      = math.exp(log_C)
+
+    return m, C, r2
+
 
 def compute_da_dn(crack_length, crack_n_cycles):
     """
@@ -278,3 +272,96 @@ def compute_da_dn(crack_length, crack_n_cycles):
     da_dn_new.append(da_dn_last)
 
     return da_dn_new
+
+def find_paris_fit_auto(
+    G: List[float],
+    da_dn: List[float],
+    min_points,
+    r2_threshold,
+) -> Tuple[float, float, float, float, float]:
+    """
+    1) Exhaustive search of every window (length >= min_points) to find
+       the slice with the *highest* R² (log(da/dN) vs log(G)).
+    2) Starting from that slice, expand outward as long as the new window
+       keeps R² >= r2_threshold.
+    3) Return m, C, final R², and the da/dN values at the window edges.
+    """
+
+    # ---------------- sanity check -----------------------------------
+    if len(G) < min_points:
+        raise ValueError(f"Need at least {min_points} points, got {len(G)}.")
+
+    # ---------------- sort & log-transform ---------------------------
+    G_arr  = np.asarray(G, dtype=float)
+    da_arr = np.asarray(da_dn, dtype=float)
+
+    order = np.argsort(G_arr)          # ascending G
+    G_arr, da_arr = G_arr[order], da_arr[order]
+
+    log_G  = np.log(G_arr)
+    log_da = np.log(da_arr)
+
+    n = len(log_G)
+    reg = LinearRegression()
+
+    # ---------------- 1) exhaustive seed search ----------------------
+    best_r2 = -np.inf
+    best_start = best_end = None
+    best_m = best_logC = None
+
+    for s in range(n - min_points + 1):
+        for e in range(s + min_points - 1, n):
+            x = log_G[s:e + 1].reshape(-1, 1)
+            y = log_da[s:e + 1]
+            reg.fit(x, y)
+            r2 = reg.score(x, y)
+            if r2 > best_r2:
+                best_r2   = r2
+                best_start, best_end = s, e
+                best_m     = float(reg.coef_[0])
+                best_logC  = float(reg.intercept_)
+
+    if best_r2 < r2_threshold:
+        raise RuntimeError(
+            f"The best window found has R² = {best_r2:.4f} "
+            f"(below r2_threshold = {r2_threshold})."
+        )
+
+    # fitting helper
+    def fit_slice(a: int, b: int):
+        x = log_G[a:b + 1].reshape(-1, 1)
+        y = log_da[a:b + 1]
+        reg.fit(x, y)
+        return float(reg.coef_[0]), float(reg.intercept_), float(reg.score(x, y))
+
+    # ---------------- 2) grow the window -----------------------------
+    m, logC, r2 = best_m, best_logC, best_r2
+
+    while True:
+        expanded = False
+
+        # try one point to the left
+        if best_start > 0:
+            m_tmp, logC_tmp, r2_tmp = fit_slice(best_start - 1, best_end)
+            if r2_tmp >= r2_threshold:
+                best_start -= 1
+                m, logC, r2 = m_tmp, logC_tmp, r2_tmp
+                expanded = True
+
+        # try one point to the right
+        if best_end < n - 1:
+            m_tmp, logC_tmp, r2_tmp = fit_slice(best_start, best_end + 1)
+            if r2_tmp >= r2_threshold:
+                best_end += 1
+                m, logC, r2 = m_tmp, logC_tmp, r2_tmp
+                expanded = True
+
+        if not expanded:
+            break
+
+    # ---------------- 3) final outputs -------------------------------
+    C         = math.exp(logC)
+    da_start  = float(da_arr[best_start])
+    da_end    = float(da_arr[best_end])
+
+    return m, C, r2, da_start, da_end

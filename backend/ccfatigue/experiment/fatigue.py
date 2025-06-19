@@ -22,7 +22,8 @@ from ccfatigue.experiment.fatigue_with_fracture_utils import (
     compute_g_ecm,
     find_fit_limit,
     find_best_paris_fit,  
-    compute_da_dn
+    compute_da_dn, 
+    find_paris_fit_auto
 )
 from ccfatigue.experiment.fatigue_utils import (
     get_loops_dataframe,
@@ -166,11 +167,22 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
 
         G_th_ecm, slope_mbt = find_fit_limit(G_ECM, da_dn_new)
 
-        m_mbt, C_mbt, r2_best_mbt = find_best_paris_fit(G_MBT, da_dn_new, da_dn_min=0.00001, da_dn_max=0.001)
+        m_mbt, C_mbt, r2_best_mbt = find_best_paris_fit(G_MBT, da_dn_new)
+        
+        #m_mbt, C_mbt, r2_best_mbt, da_start, da_end = find_paris_fit_auto(
+        #    G=G_MBT,            # energy-release-rate data
+        #    da_dn=da_dn_new,    # crack-growth-rate data
+        #    min_points=35,      # require at least 20 points
+        #    r2_threshold=0.98   # keep expanding only if R² stays ≥ 0.98
+        #)
 
-        m_mcc, C_mcc, r2_best_mcc = find_best_paris_fit(G_MCC, da_dn_new, da_dn_min=0.00001, da_dn_max=0.001)
+        m_mcc, C_mcc, r2_best_mcc = find_best_paris_fit(G_MCC, da_dn_new)
 
-        m_ecm, C_ecm, r2_best_ecm = find_best_paris_fit(G_ECM, da_dn_new, da_dn_min=0.00001, da_dn_max=0.001)
+        m_ecm, C_ecm, r2_best_ecm = find_best_paris_fit(G_ECM, da_dn_new)
+
+        #m_mcc, C_mcc, r2_best_mcc = find_best_paris_fit(G_MCC, da_dn_new, da_dn_min=0.00001, da_dn_max=0.001)
+
+        #m_ecm, C_ecm, r2_best_ecm = find_best_paris_fit(G_ECM, da_dn_new, da_dn_min=0.00001, da_dn_max=0.001)
 
         return FatigueTest(
             specimen_id=specimen_id,
