@@ -235,8 +235,9 @@ async def quasi_static_test(
             N: np.ndarray,
             width: float
         ) -> tuple[list[float], float, float, float]:
-            C_N_1_3 = (compliance / N) ** (1 / 3)
-            a, b = np.polyfit(crack_length_fitted, C_N_1_3, 1)
+            C_N_1_3 = (compliance / N)**(1/3)
+            params, _ = curve_fit(fit_func, crack_length_fitted, C_N_1_3)
+            a, b = params
             triangle = abs(b / a)
 
             G = (3 * np.array(crack_load) * np.array(crack_displacement)) / (2 * width * (crack_length_fitted + triangle)) * F / N * 1e6
@@ -257,8 +258,10 @@ async def quasi_static_test(
             thickness: float
         ) -> tuple[list[float], float, float, float]:
             a_over_h = crack_length_fitted / thickness
-            C_N_1_3 = (compliance / N) ** (1 / 3)
-            A1, _ = np.polyfit(C_N_1_3, a_over_h, 1)
+            C_N_1_3 = (compliance / N)**(1/3)
+            # A1, _ = np.polyfit(C_N_1_3, a_over_h, 1)
+            params, _ = curve_fit(fit_func, C_N_1_3, a_over_h)
+            A1 = params[0]          # slope
 
             G = (3 * np.array(crack_load) ** 2 * (compliance / N) ** (2 / 3)) / (2 * A1 * width * thickness) * F * 1e6
             fracture_energy = G.tolist()
@@ -278,15 +281,18 @@ async def quasi_static_test(
         ) -> tuple[list[float], float, float, float]:
             crack_array = crack_length_fitted
             c_over_n = compliance / N
+            #valid_mask = (crack_array > 0) & (c_over_n > 0) & np.isfinite(c_over_n)
+            #if np.sum(valid_mask) < 2:
+            #    return [float("nan")] * len(crack_array)
 
-            valid_mask = (crack_array > 0) & (c_over_n > 0) & np.isfinite(c_over_n)
-            if np.sum(valid_mask) < 2:
-                nan_list = [float("nan")] * len(crack_array)
-                return nan_list, float("nan"), float("nan"), float("nan")
+            #a_log = np.log10(crack_array[valid_mask])
+            #log_C_N = np.log10(c_over_n[valid_mask])
+            #m, _ = np.polyfit(a_log, log_C_N, 1)
+            a_log      = np.log(crack_length_fitted) / np.log(10)
+            log_C_N    = np.log(compliance / N)      / np.log(10)
 
-            a_log = np.log10(crack_array[valid_mask])
-            log_C_N = np.log10(c_over_n[valid_mask])
-            m, _ = np.polyfit(a_log, log_C_N, 1)
+            params, _ = curve_fit(fit_func, a_log, log_C_N)
+            m = params[0]           # slope
 
             G = (m * np.array(crack_load) * np.array(crack_displacement)) / (2 * width * crack_array) * F / N * 1e6
             fracture_energy = G.tolist()
