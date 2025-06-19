@@ -414,7 +414,7 @@
                   "
                   y-axis-name="Fracture Energy [J/m²]"
                   :y-axis-max="
-                    computeYAxisMax(fractureEnergyVsCyclesSeriesCombined)
+                    computeYAxisMax2(fractureEnergyVsCyclesSeriesCombined)
                   "
                   :axis-label-formatter="axisTickFormatter"
                 />
@@ -472,7 +472,8 @@
                   :y-axis-type="'log'"
                   :y-axis-min="yAxisLogLimits_daDnVsG.min"
                   :y-axis-max="yAxisLogLimits_daDnVsG.max"
-                  :x-axis-max="computeXAxisMax(daDnVsGSeriesCombined)"
+                  :x-axis-min="computeXAxisMin(daDnVsGSeriesCombined)"
+                  :x-axis-max="computeXAxisMax2(daDnVsGSeriesCombined)"
                   :y-axis-split-number="yAxisLogLimits_daDnVsG.splitNumber"
                   :axis-label-formatter="axisTickFormatter"
                   :tooltip-formatter="formatScientific"
@@ -982,8 +983,10 @@ import InfoTooltip from "@/components/InfoTooltip.vue";
 import {
   computeLogYAxisLimits,
   computeXAxisMax,
+  computeXAxisMax2,
   computeXAxisMin,
   computeYAxisMax,
+  computeYAxisMax2,
   computeYAxisMin,
   format0,
   format2,
@@ -1640,8 +1643,10 @@ export default {
     formatScientific2,
     computeYAxisMin,
     computeYAxisMax,
+    computeYAxisMax2,
     computeXAxisMax,
     computeXAxisMin,
+    computeXAxisMax2,
   },
 };
 </script>

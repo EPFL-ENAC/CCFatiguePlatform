@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { format3 } from "@/utils/formatters";
+import { computeLogYAxisLimits, format3 } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
 import { LineChart, ScatterChart } from "echarts/charts";
 import {
@@ -73,6 +73,8 @@ export default {
   },
   computed: {
     actualOption() {
+      const yLogLimits =
+        this.yAxisType === "log" ? computeLogYAxisLimits(this.series) : null;
       return {
         title: {
           text: this.title,
@@ -96,6 +98,7 @@ export default {
             formatter: this.axisLabelFormatter,
             hideOverlap: true,
             showMaxLabel: true,
+            showMinLabel: true,
           },
         },
         yAxis: {
@@ -105,8 +108,16 @@ export default {
           nameGap: 50,
           logBase: this.yAxisType === "log" ? 10 : undefined,
           minorSplitLine: { show: this.yAxisType === "log" },
-          min: this.yAxisType === "log" ? "dataMin" : 0,
-          max: this.yAxisMax != null ? this.yAxisMax : "dataMax",
+          min: this.yAxisType === "log" ? yLogLimits.min : 0,
+          max:
+            this.yAxisType === "log"
+              ? yLogLimits.max
+              : this.yAxisMax != null
+              ? this.yAxisMax
+              : "dataMax",
+          scale: this.yAxisType === "log" ? false : undefined,
+          nice: this.yAxisType === "log" ? false : undefined,
+          boundaryGap: this.yAxisType === "log" ? false : undefined,
           axisLabel: {
             formatter: (val) =>
               this.yAxisType === "log"
@@ -114,6 +125,7 @@ export default {
                 : this.axisLabelFormatter(val),
             hideOverlap: true,
             showMaxLabel: true,
+            showMinLabel: true,
           },
         },
         tooltip: {
