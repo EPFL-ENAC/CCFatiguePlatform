@@ -476,7 +476,7 @@
                   :x-axis-max="computeXAxisMax2(daDnVsGSeriesCombined)"
                   :y-axis-split-number="yAxisLogLimits_daDnVsG.splitNumber"
                   :axis-label-formatter="axisTickFormatter"
-                  :tooltip-formatter="formatScientific"
+                  :tooltip-formatter="formatScientific2"
                 />
               </v-card-text>
             </v-card>
