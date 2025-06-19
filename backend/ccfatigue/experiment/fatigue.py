@@ -1,5 +1,6 @@
 import os
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Sequence, Tuple
+from statistics import median
 
 import numpy as np
 import pandas as pd
@@ -23,15 +24,23 @@ from ccfatigue.experiment.fatigue_with_fracture_utils import (
     find_best_paris_fit,  
     compute_da_dn
 )
+from ccfatigue.experiment.fatigue_utils import (
+    get_loops_dataframe,
+    extract_hysteresis_loops_from_file,
+    compute_sub_indexes,
+    fatigue_processing,
+    apply_spike_filter,
+    apply_iqr_filter,
+)
 
 
-# ==== Costanti ====
+# ==== Costants ====
 INTERVAL = 10
 LOOP_SPACING = 1000
 MAGNITUDE = -3
 
 
-# ==== Modelli ====
+# ==== Models ====
 
 class HysteresisLoop(BaseModel):
     n_cycles: List[float]
@@ -86,84 +95,6 @@ def get_dataframe(data_in: str, exp: Dict[str, str], specimen_id: int) -> DataFr
     )
     filepath = os.path.join(DATA_DIRECTORY, folder_name, filename)
     return pd.read_csv(os.path.abspath(filepath))
-
-
-def get_loops_dataframe(experiment: Dict[str, str], specimen_id: int) -> Optional[DataFrame]:
-    researcher_name = experiment["researcher"].split(" ")[-1]
-    folder_name = f"TST_{researcher_name}_{experiment['date']}_{experiment['experiment_type']}"
-    file_path = os.path.join(DATA_DIRECTORY, folder_name, f"Loops_measure_{specimen_id:03d}.csv")
-    return pd.read_csv(file_path) if os.path.exists(file_path) else None
-
-
-def extract_hysteresis_loops_from_file(df: pd.DataFrame) -> List[HysteresisLoop]:
-    loops = []
-    for n_cycle, group in df.groupby("n_cycles"):
-        sorted_group = group.sort_values("point_index")
-        loops.append(HysteresisLoop(
-            n_cycles=[n_cycle] * len(sorted_group),
-            strain=sorted_group["fit_x"].tolist(),
-            stress=sorted_group["fit_y"].tolist()
-        ))
-    return loops
-
-
-def compute_sub_indexes(df: DataFrame) -> List[int]:
-    unique_n_cycles = np.unique(df["n_cycles"])
-    indexes = np.linspace(0, len(unique_n_cycles) - 1, 10).astype(int)
-    return unique_n_cycles[indexes]
-
-
-def fatigue_processing(df: DataFrame, sub_indexes: List[int], test_meta) -> Dict:
-    sub_hystloops = []
-    df = df.assign(
-        stress=df["Load"] / (test_meta["width"] * test_meta["thickness"]),
-        strain=df["exx"]
-    )
-    n_fail = int(df["N_cycles"].max())
-
-    for sub_index in sub_indexes:
-        mask = df["N_cycles"] == sub_index
-        if not mask.any():
-            continue
-
-        sub_df = df[mask]
-        stress = np.append(sub_df["stress"].to_numpy(), sub_df["stress"].iloc[0])
-        strain = np.append(sub_df["strain"].to_numpy(), sub_df["strain"].iloc[0])
-        cycles = np.append(sub_df["N_cycles"].to_numpy(), sub_df["N_cycles"].iloc[0])
-
-        sub_hystloops.append(HysteresisLoop(
-            n_cycles=cycles.tolist(),
-            stress=stress.tolist(),
-            strain=strain.tolist()
-        ))
-
-    return {
-        "sub_hystloops": sub_hystloops,
-        "n_fail": n_fail
-    }
-
-
-def smooth_spikes(data: List[float], threshold: float = 0.05) -> List[float]:
-    smoothed = data.copy()
-    for i in range(2, len(data) - 2):
-        v0, v1, v2, v3, v4 = data[i - 2:i + 3]
-        m1, m2 = (v0 + v1) / 2, (v3 + v4) / 2
-        avg = (m1 + m2) / 2
-        if avg == 0:
-            continue
-        if abs(m1 - m2) / avg < threshold and abs(v2 - avg) / avg > threshold:
-            smoothed[i] = avg
-    return smoothed
-
-
-def apply_spike_filter(df: DataFrame, field: str, specimen_name: str) -> (List[float], bool):
-    original = df[field].tolist()
-    filtered = smooth_spikes(original)
-    changed = original != filtered
-    if changed:
-        print(f"[Spike Filter] '{specimen_name}' – '{field}' modified in {sum(o != f for o, f in zip(original, filtered))} points")
-    return filtered, changed
-
 
 async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) -> FatigueTest:
     experiment = (await session.execute(
@@ -278,8 +209,13 @@ async def fatigue_test(session: AsyncSession, experiment_id: int, test_id: int) 
     hyst_df = get_dataframe("HYS", experiment, specimen_id).fillna(0)
 
     for field in ["creep", "hysteresis_area", "stiffness"]:
-        filtered, changed = apply_spike_filter(hyst_df, field, specimen_name)
-        hyst_df[field] = filtered
+        # 1️⃣ Global-scale cleaning: IQR filter
+        values, _ = apply_iqr_filter(hyst_df, field, specimen_name)
+        hyst_df[field] = values                # ← reviewer can comment here
+
+        # 2️⃣ Local-scale smoothing: spike filter
+        values, changed = apply_spike_filter(hyst_df, field, specimen_name)
+        hyst_df[field] = values                # ← …or here
         warning_triggered = warning_triggered or changed
 
     loops_df = get_loops_dataframe(experiment, specimen_id)
