@@ -710,7 +710,11 @@
               <li>
                 <experiment-s-v
                   subject="Poisson ratio"
-                  :values="poissonRatioValues.map(format2)"
+                  :values="
+                    poissonRatioValues.map((v) =>
+                      v == null ? '-' : format2(v)
+                    )
+                  "
                   :colors="valueColors"
                   :unit="'[-]'"
                   tooltip="Slope of the -eyy vs exx linear fit between 0.0015 and 0.0035 strain."
