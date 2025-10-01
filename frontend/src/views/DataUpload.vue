@@ -65,6 +65,20 @@
                 here
               </v-btn>
             </v-alert>
+            <v-alert
+              v-if="integrationResult && integrationResult.success"
+              type="success"
+              class="mt-4"
+            >
+              Email sent
+            </v-alert>
+            <v-alert
+              v-else-if="integrationResult && !integrationResult.success"
+              type="error"
+              class="mt-4"
+            >
+              {{ integrationResult.message || "Failed to send email." }}
+            </v-alert>
           </template>
           <template v-else>
             <v-alert type="error">
@@ -127,6 +141,7 @@ export default {
         { text: "Fatigue", value: "Fatigue" },
         { text: "Fatigue with fracture", value: "Fatigue_fracture" },
       ],
+      integrationResult: null, // { success, filename, recipient, message }
     };
   },
   computed: {
@@ -203,18 +218,23 @@ export default {
       const formData = new FormData();
       formData.append("file", this.experimentZip.file);
       try {
-        await axios.post(
+        const response = await axios.post(
           `${this.$experimentsApi.apiClient.basePath}/experiments/integrate_dataset`,
           formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
+          { headers: { "Content-Type": "multipart/form-data" } }
         );
-        this.$toast?.success("Dataset copied to Data/raw successfully.");
-      } catch {
-        this.$toast?.error("Failed to copy dataset.");
+
+        // Salvo il risultato per mostrare il v-alert persistente in pagina
+        this.integrationResult = response?.data || { success: true };
+
+        // Mantengo anche il toast rapido
+        this.$toast?.success("Email sent successfully.");
+      } catch (err) {
+        this.integrationResult = {
+          success: false,
+          message: err?.response?.data?.detail || "Failed to send email.",
+        };
+        this.$toast?.error("Failed to send email.");
       }
     },
   },
