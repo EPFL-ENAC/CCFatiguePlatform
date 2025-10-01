@@ -28,7 +28,7 @@ Additionally, an example .csv file is provided alongside the guide.
 ```bash
 mkdir -p secrets && cat <<EOF > secrets/.env
 POSTGRES_USER=ccfatigue
-POSTGRES_PASSWORD=mannino
+POSTGRES_PASSWORD=change-it!
 mail_from=sender@email.com
 mail_username=your_username
 mail_password=your_password
