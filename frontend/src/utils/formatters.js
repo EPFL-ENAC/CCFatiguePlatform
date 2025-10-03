@@ -127,7 +127,6 @@ function _logLimits(series, dim = 1, fallbackMin = 1e-10, fallbackMax = 1e-1) {
     .filter((v) => v > 0 && isFinite(v));
 
   if (!vals.length) {
-    console.debug("[logLimits] no finite positive values, using fallback");
     return { min: fallbackMin, max: fallbackMax, splitNumber: 4 };
   }
 

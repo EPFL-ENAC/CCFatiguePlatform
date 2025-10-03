@@ -1557,7 +1557,6 @@ export default {
         if (typeof d.specimen_id !== "undefined") {
           this.specimenIds.push(String(d.specimen_id));
         } else {
-          console.warn("⚠️ specimen_id missing for test", tid);
           this.specimenIds.push("–"); // or "N/A" for visual clarity
         }
         const stressValues = Object.values(d.stress)
