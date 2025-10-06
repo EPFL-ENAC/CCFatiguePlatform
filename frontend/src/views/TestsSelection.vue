@@ -35,7 +35,7 @@
                 :x-axis-name="computedXAxisLabel"
                 :x-axis-type="xAxisChartType"
                 :y-axis-name="yAxisLabel"
-                :x-axis-min="minX"
+                :x-axis-min="1"
                 :x-axis-max="maxX"
                 :y-axis-max="maxY"
                 :axis-label-formatter="axisTickFormatter"
@@ -79,7 +79,7 @@
 <script>
 import SimpleChart from "@/components/charts/SimpleChart.vue";
 import ExperimentSpecifications from "@/components/ExperimentSpecifications.vue";
-import { computeXAxisMax, formatTick } from "@/utils/formatters";
+import { formatTick } from "@/utils/formatters";
 import { mapState } from "vuex";
 
 export default {
@@ -234,16 +234,17 @@ export default {
       return formatTick;
     },
     maxX() {
-      const series = [
-        {
-          data: this.chartSeries[0]?.data.map((d) => d.value) || [],
-        },
-      ];
-      const val = computeXAxisMax(series);
-      return val ?? 1;
-    },
-    minX() {
-      return this.xAxisMode === "log" ? 1 : 1;
+      // prendo direttamente gli x dai dati (cicli) che sono già numeri
+      const xs = this.numberedTests
+        .map((t) => t.number_of_cycles)
+        .filter((v) => typeof v === "number" && isFinite(v));
+
+      // se non ho ancora dati, lascia autoscale (null) invece di 1
+      if (!xs.length) return null;
+
+      // "nice tick" come per Y (riuso roundUpTick già presente nel file)
+      const rawMax = Math.max(...xs);
+      return this.roundUpTick(rawMax);
     },
     maxY() {
       const controlMode =

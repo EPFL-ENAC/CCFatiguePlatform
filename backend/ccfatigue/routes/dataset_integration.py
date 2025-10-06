@@ -84,7 +84,7 @@ def download_zip(folder_name: str, background_tasks: BackgroundTasks):
     if not contents:
         raise HTTPException(status_code=400, detail=f"The folder '{folder_name}' is empty and cannot be zipped.")
 
-    zip_output_base = Path(f"/tmp/{folder_name}")
+    zip_output_base = Path(tempfile.gettempdir()) / folder_name
     zip_path = shutil.make_archive(str(zip_output_base), 'zip', folder_path)
 
     background_tasks.add_task(Path(zip_path).unlink)

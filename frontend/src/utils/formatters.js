@@ -39,8 +39,10 @@ function autoTargetTicks(minVal, maxVal) {
 }
 
 function niceTickStep(maxVal, minVal) {
+  // fallback for invalid input
+  if (!Number.isFinite(maxVal) || !Number.isFinite(minVal) || maxVal <= minVal)
+    return 1;
   const targetTicks = autoTargetTicks(minVal, maxVal);
-  if (maxVal <= 0) return 1; // fallback
   const raw = maxVal / targetTicks; // raw spacing
   const exponent = Math.floor(Math.log10(raw));
   const base = 10 ** exponent;

@@ -94,7 +94,7 @@ def process_hysteresis(df, test_meta):
         selected_cycles = set(valid_cycles)
     else:
         indices = np.round(np.linspace(0, len(valid_cycles) - 1, 10)).astype(int)
-        selected_cycles = set([valid_cycles[i] for i in indices])
+        selected_cycles = {valid_cycles[i] for i in indices}
 
     # Now process only valid cycles
     for n in valid_cycles:

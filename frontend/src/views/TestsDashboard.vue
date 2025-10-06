@@ -5,7 +5,6 @@
         <experiment-specifications :experiment="experiment.experiment" />
       </v-col>
     </v-row>
-
     <v-row>
       <v-col cols="auto">
         <h2>Test results</h2>
@@ -15,7 +14,6 @@
         <v-btn @click="goBack">Add test(s)</v-btn>
       </v-col>
     </v-row>
-
     <!-- Fatigue branch -->
     <v-row v-if="experimentType === 'FA' && !isFracture">
       <v-col cols="10">
@@ -202,7 +200,6 @@
                     />
                   </v-col>
                 </v-row>
-
                 <simple-chart
                   :series="stiffnessSeries"
                   :aspect-ratio="2"
