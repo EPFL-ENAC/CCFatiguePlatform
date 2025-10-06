@@ -27,7 +27,7 @@ preprocessing:
 
 # dev-* -> run things localy for dev/testing
 dev-database:
-	docker-compose up -d database
+	docker compose up -d database
 
 dev-backend:
 	$(MAKE) -C backend run
@@ -42,8 +42,8 @@ init-database:
 # run -> run the whole project on the server (dockerized)
 # can be run on the laptop also ... to final check everything
 run:
-	docker-compose build --parallel --pull
-	docker-compose up -d --remove-orphans
+	docker compose build --parallel --pull
+	docker compose up -d --remove-orphans
 
 
 # compile* -> does all Fortran compilation
@@ -51,4 +51,4 @@ compile:
 	$(MAKE) -C backend compile
 
 backup-dump:
-	@docker-compose exec database sh -c 'PGPASSWORD="${POSTGRES_PASSWORD}" pg_dumpall -U ${POSTGRES_USER}' > ${DEST_FOLDER}/all-databases.sql
+	docker compose exec database sh -c 'PGPASSWORD="${POSTGRES_PASSWORD}" pg_dumpall -U ${POSTGRES_USER}' > ${DEST_FOLDER}/all-databases.sql

@@ -27,6 +27,8 @@ simplejson = "^3.17.6"
 xlrd = "^2.0.1"
 openpyxl = "^3.0.10"
 deprecation = "^2.1.0"
+scikit-learn = "^1.6.1"
+matplotlib = "^3.10.3"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^5.0.4"

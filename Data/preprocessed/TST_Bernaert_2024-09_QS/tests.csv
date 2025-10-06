@@ -1,0 +1,4 @@
+sequential number,specimen name,width,thickness,t,l',initial crack length,subset size,step size
+1,DCB_DC_830_1,40.0033,22.12,27.53,0,50.0,35.0,8.0
+2,DCB_DC_830_2,39.9567,21.765,27.441,0,51.0,35.0,8.0
+3,DCB_DC_830_3,40.18,22.28,27.57,0,50.5,35.0,8.0

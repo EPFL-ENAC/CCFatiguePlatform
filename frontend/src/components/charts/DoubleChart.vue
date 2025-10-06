@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { formatNumber } from "@/utils/formatters";
+import { format3 } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
 import { LineChart, ScatterChart } from "echarts/charts";
 import {
@@ -34,10 +34,8 @@ use([
 ]);
 
 export default {
-  name: "SimpleChart",
-  components: {
-    VChart,
-  },
+  name: "DoubleChart",
+  components: { VChart },
   props: {
     aspectRatio: { type: Number, default: 1 },
     series: { type: Array, default: () => [] },
@@ -45,25 +43,28 @@ export default {
     xAxisName: { type: String, default: "" },
     y1AxisName: { type: String, default: "" },
     y2AxisName: { type: String, default: "" },
-    xAxisType: { type: String, default: "" },
+    xAxisType: { type: String, default: "value" },
+
+    /* opzionale override dei limiti */
+    xAxisMin: { type: [Number, null], default: null },
+    xAxisMax: { type: [Number, null], default: null },
+    y1AxisMin: { type: [Number, null], default: null },
+    y1AxisMax: { type: [Number, null], default: null },
+    y2AxisMin: { type: [Number, null], default: null },
+    y2AxisMax: { type: [Number, null], default: null },
+
     color: { type: Array, default: () => colorPalette },
+    axisLabelFormatter: { type: Function, default: format3 },
+    tooltipFormatter: { type: Function, default: format3 },
   },
   data() {
-    return {
-      updateOptions: {
-        notMerge: true,
-      },
-    };
+    return { updateOptions: { notMerge: true } };
   },
   computed: {
-    actualOption: function () {
+    actualOption() {
       return {
-        title: {
-          text: this.title,
-        },
-        legend: {
-          type: "scroll",
-        },
+        title: { text: this.title },
+        legend: { type: "scroll" },
         grid: {
           left: 50,
           top: 40,
@@ -76,43 +77,49 @@ export default {
           name: this.xAxisName,
           nameLocation: "middle",
           nameGap: 26,
-          min: "dataMin",
-          max: "dataMax",
-          axisLabel: {
-            formatter: formatNumber,
-            fontSize: 10,
-          },
+          min: this.xAxisMin ?? "dataMin",
+          max: this.xAxisMax ?? "dataMax",
+          axisLabel: { formatter: this.axisLabelFormatter, fontSize: 10 },
         },
         yAxis: [
           {
             name: this.y1AxisName,
             nameLocation: "middle",
             nameGap: 30,
-            min: "dataMin",
-            max: "dataMax",
-            axisLabel: {
-              formatter: formatNumber,
-              fontSize: 10,
-            },
+            min: this.y1AxisMin ?? "dataMin",
+            max: this.y1AxisMax ?? "dataMax",
+            scale: true,
+            axisLabel: { formatter: this.axisLabelFormatter, fontSize: 10 },
+            alignTicks: false,
           },
           {
             name: this.y2AxisName,
             nameLocation: "middle",
             nameGap: 30,
-            min: "dataMin",
-            max: "dataMax",
-            axisLabel: {
-              formatter: formatNumber,
-              fontSize: 10,
-            },
+            min: this.y2AxisMin ?? "dataMin",
+            max: this.y2AxisMax ?? "dataMax",
+            scale: true,
+            axisLabel: { formatter: this.axisLabelFormatter, fontSize: 10 },
+            alignTicks: false,
           },
         ],
         tooltip: {
           trigger: "axis",
           confine: true,
-          valueFormatter: formatNumber,
+          formatter: (params) => {
+            const rows = [
+              `<strong>${params[0]?.axisValueLabel ?? ""}</strong>`,
+            ];
+            for (const p of params) {
+              const yVal = Array.isArray(p.value) ? p.value[1] : p.value;
+              rows.push(
+                `${p.marker}${p.seriesName}: ${this.tooltipFormatter(yVal)}`
+              );
+            }
+            return rows.join("<br/>");
+          },
         },
-        series: this.series.map((serie) => merge(serie, { showSymbol: false })),
+        series: this.series.map((s) => merge({}, s, { showSymbol: false })),
         color: this.color,
       };
     },

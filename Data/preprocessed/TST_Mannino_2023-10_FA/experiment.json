@@ -1,0 +1,29 @@
+{
+  "general": {
+    "laboratory": "GR-MeC",
+    "researcher": "Filippo Mannino",
+    "date": "2023-10",
+    "experiment type": "FA",
+    "fa experiment type": "tensile",
+    "control mode": "Load Controlled",
+    "fatigue loading type (flt)": "CA"
+  },
+  "publication": {
+    "doi": "https://doi.org/10.1016/j.ijfatigue.2024.108600"
+  },
+  "material info": {
+    "material tested": "Bulk adhesives",
+    "sample type": "Type II",
+    "resin": "Epoxy Sikadur-330",
+    "curing time": 10080.0,
+    "curing temperature": 21.0,
+    "curing pressure": 1.0,
+    "postcuring time": 30.0,
+    "postcuring temperature": 90.0,
+    "postcuring pressure": 1.0
+  },
+  "fatigue": {
+    "r ratio": 0.1,
+    "frequency": 10.0
+  }
+}

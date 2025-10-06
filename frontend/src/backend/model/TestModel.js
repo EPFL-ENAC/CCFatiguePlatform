@@ -49,6 +49,7 @@ class TestModel {
    */
   static constructFromObject(data, obj) {
     if (data) {
+      console.log("TestModel received data:", data);
       obj = obj || new TestModel();
 
       if (data.hasOwnProperty("id")) {
@@ -60,9 +61,9 @@ class TestModel {
           "Number"
         );
       }
-      if (data.hasOwnProperty("specimen_number")) {
-        obj["specimen_number"] = ApiClient.convertToType(
-          data["specimen_number"],
+      if (data.hasOwnProperty("sequential_number")) {
+        obj["sequential_number"] = ApiClient.convertToType(
+          data["sequential_number"],
           "Number"
         );
       }
@@ -72,15 +73,9 @@ class TestModel {
           "String"
         );
       }
-      if (data.hasOwnProperty("stress_ratio")) {
-        obj["stress_ratio"] = ApiClient.convertToType(
-          data["stress_ratio"],
-          "Number"
-        );
-      }
-      if (data.hasOwnProperty("maximum_stress")) {
-        obj["maximum_stress"] = ApiClient.convertToType(
-          data["maximum_stress"],
+      if (data.hasOwnProperty("maximum_load")) {
+        obj["maximum_load"] = ApiClient.convertToType(
+          data["maximum_load"],
           "Number"
         );
       }
@@ -89,18 +84,6 @@ class TestModel {
       }
       if (data.hasOwnProperty("run_out")) {
         obj["run_out"] = ApiClient.convertToType(data["run_out"], "Boolean");
-      }
-      if (data.hasOwnProperty("displacement_controlled_loading_rate")) {
-        obj["displacement_controlled_loading_rate"] = ApiClient.convertToType(
-          data["displacement_controlled_loading_rate"],
-          "Number"
-        );
-      }
-      if (data.hasOwnProperty("load_controlled_loading_rate")) {
-        obj["load_controlled_loading_rate"] = ApiClient.convertToType(
-          data["load_controlled_loading_rate"],
-          "Number"
-        );
       }
       if (data.hasOwnProperty("length")) {
         obj["length"] = ApiClient.convertToType(data["length"], "Number");
@@ -126,6 +109,13 @@ class TestModel {
           "Number"
         );
       }
+      /* add number of cycles */
+      if (data.hasOwnProperty("number_of_cycles")) {
+        obj["number_of_cycles"] = ApiClient.convertToType(
+          data["number_of_cycles"],
+          "Number"
+        );
+      }
     }
     return obj;
   }
@@ -142,24 +132,20 @@ TestModel.prototype["id"] = undefined;
 TestModel.prototype["experiment_id"] = undefined;
 
 /**
- * @member {Number} specimen_number
+ * @member {Number} sequential_number
  */
-TestModel.prototype["specimen_number"] = undefined;
+TestModel.prototype["sequential_number"] = undefined;
 
 /**
  * @member {String} specimen_name
  */
 TestModel.prototype["specimen_name"] = undefined;
 
-/**
- * @member {Number} stress_ratio
- */
-TestModel.prototype["stress_ratio"] = undefined;
 
 /**
- * @member {Number} maximum_stress
+ * @member {Number} maximum_load
  */
-TestModel.prototype["maximum_stress"] = undefined;
+TestModel.prototype["maximum_load"] = undefined;
 
 /**
  * @member {Number} frequency
@@ -170,16 +156,6 @@ TestModel.prototype["frequency"] = undefined;
  * @member {Boolean} run_out
  */
 TestModel.prototype["run_out"] = undefined;
-
-/**
- * @member {Number} displacement_controlled_loading_rate
- */
-TestModel.prototype["displacement_controlled_loading_rate"] = undefined;
-
-/**
- * @member {Number} load_controlled_loading_rate
- */
-TestModel.prototype["load_controlled_loading_rate"] = undefined;
 
 /**
  * @member {Number} length
@@ -210,5 +186,11 @@ TestModel.prototype["humidity"] = undefined;
  * @member {Number} initial_crack_length
  */
 TestModel.prototype["initial_crack_length"] = undefined;
+
+/**
+ * @member {Number} number_of_cycles
+ */
+TestModel.prototype["number_of_cycles"] = undefined;
+
 
 export default TestModel;

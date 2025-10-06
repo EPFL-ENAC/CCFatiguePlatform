@@ -79,30 +79,21 @@ class ExperimentModel {
           "String"
         );
       }
-      if (data.hasOwnProperty("fracture")) {
-        obj["fracture"] = ApiClient.convertToType(data["fracture"], "Boolean");
-      }
-      if (data.hasOwnProperty("fracture_mode")) {
-        obj["fracture_mode"] = ApiClient.convertToType(
-          data["fracture_mode"],
+      if (data.hasOwnProperty("fracture_mode_fm")) {
+        obj["fracture_mode_fm"] = ApiClient.convertToType(
+          data["fracture_mode_fm"],
           "String"
         );
       }
-      if (data.hasOwnProperty("fatigue_test_type")) {
-        obj["fatigue_test_type"] = ApiClient.convertToType(
-          data["fatigue_test_type"],
+      if (data.hasOwnProperty("fa_experiment_type")) {
+        obj["fa_experiment_type"] = ApiClient.convertToType(
+          data["fa_experiment_type"],
           "String"
         );
       }
-      if (data.hasOwnProperty("quasi_static_test_type")) {
-        obj["quasi_static_test_type"] = ApiClient.convertToType(
-          data["quasi_static_test_type"],
-          "String"
-        );
-      }
-      if (data.hasOwnProperty("temperature_test_type")) {
-        obj["temperature_test_type"] = ApiClient.convertToType(
-          data["temperature_test_type"],
+      if (data.hasOwnProperty("qs_experiment_type")) {
+        obj["qs_experiment_type"] = ApiClient.convertToType(
+          data["qs_experiment_type"],
           "String"
         );
       }
@@ -124,33 +115,9 @@ class ExperimentModel {
           "String"
         );
       }
-      if (data.hasOwnProperty("publication_title")) {
-        obj["publication_title"] = ApiClient.convertToType(
-          data["publication_title"],
-          "String"
-        );
-      }
-      if (data.hasOwnProperty("publication_author")) {
-        obj["publication_author"] = ApiClient.convertToType(
-          data["publication_author"],
-          "String"
-        );
-      }
-      if (data.hasOwnProperty("publication_year")) {
-        obj["publication_year"] = ApiClient.convertToType(
-          data["publication_year"],
-          "String"
-        );
-      }
       if (data.hasOwnProperty("publication_doi")) {
         obj["publication_doi"] = ApiClient.convertToType(
           data["publication_doi"],
-          "String"
-        );
-      }
-      if (data.hasOwnProperty("publication_images_repository")) {
-        obj["publication_images_repository"] = ApiClient.convertToType(
-          data["publication_images_repository"],
           "String"
         );
       }
@@ -196,26 +163,6 @@ class ExperimentModel {
           "String"
         );
       }
-      if (data.hasOwnProperty("laminates_and_assemblies_curing_time")) {
-        obj["laminates_and_assemblies_curing_time"] = ApiClient.convertToType(
-          data["laminates_and_assemblies_curing_time"],
-          "Number"
-        );
-      }
-      if (data.hasOwnProperty("laminates_and_assemblies_curing_temperature")) {
-        obj["laminates_and_assemblies_curing_temperature"] =
-          ApiClient.convertToType(
-            data["laminates_and_assemblies_curing_temperature"],
-            "Number"
-          );
-      }
-      if (data.hasOwnProperty("laminates_and_assemblies_curing_pressure")) {
-        obj["laminates_and_assemblies_curing_pressure"] =
-          ApiClient.convertToType(
-            data["laminates_and_assemblies_curing_pressure"],
-            "Number"
-          );
-      }
       if (data.hasOwnProperty("laminates_and_assemblies_fiber_volume_ratio")) {
         obj["laminates_and_assemblies_fiber_volume_ratio"] =
           ApiClient.convertToType(
@@ -230,21 +177,78 @@ class ExperimentModel {
             "String"
           );
       }
-      if (data.hasOwnProperty("measurement_measuring_points")) {
-        obj["measurement_measuring_points"] = ApiClient.convertToType(
-          data["measurement_measuring_points"],
+      if (data.hasOwnProperty("fatigue_r_ratio")) {
+        obj["fatigue_r_ratio"] = ApiClient.convertToType(
+          data["fatigue_r_ratio"],
           "Number"
         );
       }
-      if (data.hasOwnProperty("dic_analysis_subset_size")) {
-        obj["dic_analysis_subset_size"] = ApiClient.convertToType(
-          data["dic_analysis_subset_size"],
+      if (data.hasOwnProperty("fatigue_frequency")) {
+        obj["fatigue_frequency"] = ApiClient.convertToType(
+          data["fatigue_frequency"],
           "Number"
         );
       }
-      if (data.hasOwnProperty("dic_analysis_step_size")) {
-        obj["dic_analysis_step_size"] = ApiClient.convertToType(
-          data["dic_analysis_step_size"],
+      /* add fatigue control mode */
+      if (data.hasOwnProperty("fatigue_loading_type_flt")) {
+        obj["fatigue_loading_type_flt"] = ApiClient.convertToType(
+          data["fatigue_loading_type_flt"],
+          "String"
+        );
+      }
+      /* add loading rate */
+      if (data.hasOwnProperty("loading_rate")) {
+        obj["loading_rate"] = ApiClient.convertToType(
+          data["loading_rate"],
+          "Number"
+        );
+      }
+      /* add curing time */
+      if (data.hasOwnProperty("curing_time")) {
+        obj["curing_time"] = ApiClient.convertToType(
+          data["curing_time"],
+          "Number"
+        );
+      }
+      /* add curing temperature */
+      if (data.hasOwnProperty("curing_temperature")) {
+        obj["curing_temperature"] = ApiClient.convertToType(
+          data["curing_temperature"],
+          "Number"
+        );
+      }
+      /* add curing pressure */
+      if (data.hasOwnProperty("curing_pressure")) {
+        obj["curing_pressure"] = ApiClient.convertToType(
+          data["curing_pressure"],
+          "Number"
+        );
+      }
+      /* add material tested */
+      if (data.hasOwnProperty("material_tested")) {
+        obj["material_tested"] = ApiClient.convertToType(
+          data["material_tested"],
+          "String"
+        );
+      }
+      /* add postcuring time */
+      if (data.hasOwnProperty("postcuring_time")) {
+        obj["postcuring_time"] = ApiClient.convertToType(
+          data["postcuring_time"],
+          "Number"
+        );
+      }
+      /* add postcuring temperature */
+      if (data.hasOwnProperty("postcuring_temperature")) {
+        obj["postcuring_temperature"] = ApiClient.convertToType(
+          data["postcuring_temperature"],
+          "Number"
+        );
+      }
+      /* add postcuring pressure */
+      if (data.hasOwnProperty("postcuring_pressure")) {
+        obj["postcuring_pressure"] = ApiClient.convertToType(
+          data["postcuring_pressure"],
           "Number"
         );
       }

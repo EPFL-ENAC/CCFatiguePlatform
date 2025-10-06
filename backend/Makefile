@@ -26,4 +26,4 @@ compile-win:
 	rmdir ccfatigue/.libs
 
 run:
-	DOTENV_PATH_FOR_DYNACONF="../secrets/.env" poetry run uvicorn ccfatigue.main:app --reload
+	DOTENV_PATH_FOR_DYNACONF="../secrets/.env" poetry run uvicorn ccfatigue.main:app --reload --log-level debug

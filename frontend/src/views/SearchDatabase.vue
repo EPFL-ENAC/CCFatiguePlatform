@@ -43,19 +43,6 @@
                   />
                 </v-col>
               </v-row>
-              <v-row v-if="filters.withFracture && !filters.withoutFracture">
-                <v-col>
-                  <v-overflow-btn
-                    v-model="filters.fractureMode"
-                    :items="[fractureModeAll, ...allFractureMode]"
-                    label="fracture mode"
-                    hide-details
-                    dense
-                    @change="fetchExperiments"
-                  >
-                  </v-overflow-btn>
-                </v-col>
-              </v-row>
             </v-card-text>
           </v-card>
           <v-card flat>
@@ -111,19 +98,10 @@
             </v-card-text>
           </v-card>
           <v-card flat>
-            <v-card-title>Filter by text</v-card-title>
-            <v-card-text>
-              <v-row>
-                <v-col>
-                  <v-text-field
-                    v-model="filters.textSearch"
-                    placeholder="search"
-                    dense
-                    @change="fetchExperiments"
-                  >
-                  </v-text-field>
-                </v-col>
-              </v-row>
+            <v-card-text class="d-flex justify-end">
+              <v-btn text color="primary" @click="resetFilters">
+                Reset filters
+              </v-btn>
             </v-card-text>
           </v-card>
         </v-col>
@@ -223,7 +201,7 @@ export default {
         { text: "Experiment Type", value: "experiment_type" },
         { text: "Researcher", value: "researcher" },
         { text: "Date", value: "date" },
-        { text: "Fracture", value: "fracture" },
+        { text: "Fracture", value: "fracture_display" }, // <--- the new datastructure fracture
         { text: "Publication", value: "publication_doi" },
       ],
       experimentSelected: [],
@@ -255,19 +233,39 @@ export default {
     rowClick(_item, row) {
       row.select(!row.isSelected);
     },
+    resetFilters() {
+      this.filters = {
+        typeFA: true,
+        typeQS: true,
+        withFracture: true,
+        withoutFracture: true,
+        fractureMode: "All fracture modes",
+        fiberMaterial: "All materials",
+        resin: "All resins",
+        stackingSequence: "All stacking sequences",
+        textSearch: "",
+      };
+      this.fetchExperiments();
+    },
     fetchExperiments() {
+      const typeFA =
+        this.filters.typeFA || (!this.filters.typeFA && !this.filters.typeQS);
+      const typeQS =
+        this.filters.typeQS || (!this.filters.typeFA && !this.filters.typeQS);
+
+      const withFracture =
+        this.filters.withFracture ||
+        (!this.filters.withFracture && !this.filters.withoutFracture);
+      const withoutFracture =
+        this.filters.withoutFracture ||
+        (!this.filters.withFracture && !this.filters.withoutFracture);
+
       this.$store.dispatch("experiments/fetchFilteredExperiments", {
         filters: {
-          typeFA: this.filters.typeFA,
-          typeQS: this.filters.typeQS,
-          withFracture: this.filters.withFracture,
-          withoutFracture: this.filters.withoutFracture,
-          fractureMode:
-            this.filters.withFracture &&
-            !this.filters.withoutFracture &&
-            this.filters.fractureMode !== this.fractureModeAll
-              ? this.filters.fractureMode
-              : null,
+          typeFA,
+          typeQS,
+          withFracture,
+          withoutFracture,
           fiberMaterial:
             this.filters.fiberMaterial !== this.fiberMaterialsAll
               ? this.filters.fiberMaterial
@@ -279,6 +277,7 @@ export default {
               ? this.filters.stackingSequence
               : null,
           textSearch: this.filters.textSearch,
+          fractureMode: null, // disattivato per ora
         },
         pagination: {
           page: this.options.page,
@@ -286,6 +285,7 @@ export default {
         },
       });
     },
+
     downloadRawFiles() {
       // Download Raw files for experiment ${this.experimentSelected[0].id} : not implemented yet.
     },
@@ -302,4 +302,8 @@ export default {
 };
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+:deep(.v-data-table__selected) {
+  background-color: #bbdefb !important;
+}
+</style>

@@ -3,7 +3,9 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from ccfatigue.models import database
+# from ccfatigue.models import database
+from ccfatigue.models.database import Base
+
 from ccfatigue.services.database import sync_url
 
 # this is the Alembic Config object, which provides
@@ -24,7 +26,9 @@ config.set_main_option("sqlalchemy.url", sync_url)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = database.Base.metadata
+# target_metadata = database.Base.metadata
+
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

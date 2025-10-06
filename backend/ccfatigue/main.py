@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from fastapi_pagination import add_pagination
 
 from ccfatigue import __name__, __version__
@@ -7,9 +8,10 @@ from ccfatigue.config import settings
 from ccfatigue.routers import analysis, experiments, root, tests
 from ccfatigue.utils.fastapi import use_route_names_as_operation_ids
 from init_db import run_init_db
+from ccfatigue.routes import dataset_integration
+
 
 run_init_db()
-
 
 app = FastAPI(
     title=__name__,
@@ -17,6 +19,23 @@ app = FastAPI(
     root_path=settings.root_path,
 )
 
+
+
+
+### NEW MIDDLEWARE START
+import traceback
+
+@app.middleware("http")
+async def catch_exceptions_middleware(request: Request, call_next):
+    try:
+        return await call_next(request)
+    except Exception as e:
+        traceback.print_exc()  # Print error in the terminal
+        return JSONResponse(
+            status_code=500,
+            content={"detail": str(e)},
+        )
+### NEW MIDDLEWARE END
 
 if settings.cors_enabled:
     print("cors enabled")
@@ -36,3 +55,5 @@ app.include_router(tests.router)
 app.include_router(analysis.router)
 add_pagination(app)
 use_route_names_as_operation_ids(app)
+
+app.include_router(dataset_integration.router)

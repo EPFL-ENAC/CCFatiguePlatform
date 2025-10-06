@@ -1,13 +1,48 @@
 <template>
   <v-container>
     <v-card>
+      <v-card-title>Upload Guidelines</v-card-title>
+      <v-card-text>
+        <p class="text-body-1 text-justify font-weight-bold red--text">
+          Read this pdf carefully, each line is important and fundamental to
+          pass the dataset checker.
+        </p>
+        <v-btn color="primary" outlined @click="showPdf = !showPdf">
+          {{ showPdf ? "Hide PDF" : "Open PDF" }}
+        </v-btn>
+        <div v-if="showPdf" class="mt-4">
+          <iframe
+            :src="pdfURL"
+            width="100%"
+            height="500px"
+            style="border: none"
+          ></iframe>
+        </div>
+      </v-card-text>
+    </v-card>
+    <v-card class="mt-4">
+      <v-card-title>Specific experimental campaign type files</v-card-title>
+      <v-card-text>
+        <v-select
+          v-model="selectedFile"
+          :items="fileOptions"
+          label="Choose a file"
+          dense
+          outlined
+        ></v-select>
+        <v-btn
+          :disabled="!selectedFile"
+          color="primary"
+          class="mt-2"
+          @click="downloadFile"
+        >
+          Download ZIP
+        </v-btn>
+      </v-card-text>
+    </v-card>
+    <v-card class="mt-4">
       <v-card-title>Dataset checker</v-card-title>
       <v-card-text>
-        <p>
-          Refer to the
-          <a :href="TSTDataConventionURL"> TST Data Convention </a>
-          to prepare your Dataset.
-        </p>
         <v-file-input
           v-model="experimentZip.file"
           chips
@@ -26,14 +61,23 @@
               {{ countWarnings }} {{ "warning" | pluralize(countWarnings) }}.
               <br />
               You can send your dataset for integration
-              <v-btn
-                href="https://github.com/EPFL-ENAC/CCFatiguePlatform/issues/new?assignees=sbancal&labels=Dataset%2Ctriage&template=dataset_integration_request.yml&title=%5BNew+Dataset%5D+%3A+%7B3LettersDataCode%7D_%7BResearcher%27s+lastname%7D_%7BDate%7D_%7BTest+type%7D"
-                outlined
-                small
-              >
+              <v-btn outlined small @click="handleIntegrationRequest">
                 here
               </v-btn>
-              .
+            </v-alert>
+            <v-alert
+              v-if="integrationResult && integrationResult.success"
+              type="success"
+              class="mt-4"
+            >
+              Email sent
+            </v-alert>
+            <v-alert
+              v-else-if="integrationResult && !integrationResult.success"
+              type="error"
+              class="mt-4"
+            >
+              {{ integrationResult.message || "Failed to send email." }}
             </v-alert>
           </template>
           <template v-else>
@@ -41,9 +85,10 @@
               Dataset validation failed<br />
               {{ countWarnings }} {{ "warning" | pluralize(countWarnings) }},
               {{ countErrors }} {{ "error" | pluralize(countErrors) }}. <br />
-              Please fix it according to the
-              <a :href="TSTDataConventionURL"> TST Data convention </a>
-              and test it here again
+              Please fix it according to the explained rules in the guide and in
+              the specific experimental campaign files.
+              <br />
+              Test your dataset again after fixing it.
             </v-alert>
           </template>
           <div class="caption output">
@@ -67,13 +112,14 @@
 </template>
 
 <script>
-const axios = require("axios");
+import axios from "axios";
+
 export default {
   name: "DataUpload",
   data() {
     return {
-      TSTDataConventionURL:
-        "https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/main/Data/TST_Data_Convention.md",
+      showPdf: false,
+      pdfURL: "/downloads/Upload_guide.pdf",
       experimentZip: {
         file: null,
         loading: false,
@@ -88,6 +134,14 @@ export default {
         "Warning: ": "warning white--text",
         "ERROR: ": "error white--text",
       },
+      selectedFile: null,
+      fileOptions: [
+        { text: "Quasi static", value: "QuasiStatic" },
+        { text: "Quasi static with fracture", value: "QuasiStatic_fracture" },
+        { text: "Fatigue", value: "Fatigue" },
+        { text: "Fatigue with fracture", value: "Fatigue_fracture" },
+      ],
+      integrationResult: null, // { success, filename, recipient, message }
     };
   },
   computed: {
@@ -103,6 +157,20 @@ export default {
     },
   },
   methods: {
+    downloadFile() {
+      if (!this.selectedFile) return;
+
+      const zipUrl = `${
+        this.$experimentsApi.apiClient.basePath
+      }/downloads_zip?folder_name=${encodeURIComponent(this.selectedFile)}`;
+
+      const link = document.createElement("a");
+      link.href = zipUrl;
+      link.setAttribute("download", `${this.selectedFile}.zip`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    },
     changeExperimentZip() {
       this.experimentCheckResult = {
         output: [],
@@ -112,7 +180,6 @@ export default {
         return false;
       }
       this.experimentZip.loading = true;
-
       const formData = new FormData();
       formData.append("file", this.experimentZip.file);
       axios
@@ -141,11 +208,34 @@ export default {
           };
           this.experimentZip.loading = false;
         })
-        .catch((error) => {
-          // eslint-disable-next-line no-console
-          console.log("Error", { error });
+        .catch(() => {
+          this.experimentZip.loading = false;
         });
       return true;
+    },
+    async handleIntegrationRequest() {
+      if (!this.experimentZip.file) return;
+      const formData = new FormData();
+      formData.append("file", this.experimentZip.file);
+      try {
+        const response = await axios.post(
+          `${this.$experimentsApi.apiClient.basePath}/experiments/integrate_dataset`,
+          formData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+
+        // Salvo il risultato per mostrare il v-alert persistente in pagina
+        this.integrationResult = response?.data || { success: true };
+
+        // Mantengo anche il toast rapido
+        this.$toast?.success("Email sent successfully.");
+      } catch (err) {
+        this.integrationResult = {
+          success: false,
+          message: err?.response?.data?.detail || "Failed to send email.",
+        };
+        this.$toast?.error("Failed to send email.");
+      }
     },
   },
 };
@@ -158,5 +248,8 @@ a {
 .output {
   height: 30vh;
   overflow-y: scroll;
+}
+iframe {
+  border-radius: 6px;
 }
 </style>

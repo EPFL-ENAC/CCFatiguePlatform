@@ -1,0 +1,24 @@
+{
+  "general": {
+    "laboratory": "GR-MeC",
+    "researcher": "Joseph Bernaert",
+    "date": "2024-09",
+    "experiment type": "QS",
+    "qs experiment type": "fracture",
+    "fracture mode (fm)": "Mode I",
+    "control mode": "Displacement Controlled",
+    "measuring equipment": "MTS Acumen",
+    "loading rate": 1.0
+  },
+  "publication": {
+    "doi": "To be published"
+  },
+  "material info": {
+    "material tested": "Adhesive joints",
+    "sample type": "DCB",
+    "fiber material": "[GFRP, Glue, GFRP]",
+    "fiber form": "[UD, NA, UD]",
+    "resin": "Polyester",
+    "glue": "Epoxy Sikapower 830"
+  }
+}

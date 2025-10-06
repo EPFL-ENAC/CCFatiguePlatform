@@ -10,6 +10,7 @@ import re
 
 import numpy as np
 import pandas as pd
+from datetime import datetime
 
 EXPERIMENTS_FOLDER = os.path.abspath(f"{__file__}/../../../Data")
 RAW_EXPERIMENT_FP_FOLDERS = sorted(
@@ -304,41 +305,50 @@ class Experiment:
             fixed_experiment = {}
 
             for constraint in (
+                # GENERAL SECTION
                 {"path": "general>laboratory", "type": str},
                 {"path": "general>researcher", "type": str},
                 {"path": "general>date", "type": str},
                 {"path": "general>experiment type", "type": str},
-                {"path": "general>fracture", "type": bool},
-                {"path": "general>fracture mode", "type": str},
-                {"path": "general>fatigue test type", "type": str},
-                {"path": "general>quasi-static test type", "type": str},
-                {"path": "general>temperature test type", "type": str},
-                {"path": "general>measuring equipment", "type": str},
-                {"path": "general>reliability level", "type": float},
+                {"path": "general>qs experiment type", "type": str},
+                {"path": "general>fa experiment type", "type": str},
+                {"path": "general>ot experiment type", "type": str},
+                {"path": "general>ot add info", "type": str},
+                {"path": "general>fracture mode (fm)", "type": str},
+                {"path": "general>fm add info", "type": str},                
                 {"path": "general>control mode", "type": str},
-                {"path": "publication>title", "type": str},
-                {"path": "publication>author", "type": str},
-                {"path": "publication>year", "type": int},
+                {"path": "general>fatigue loading type (flt)", "type": str},
+                {"path": "general>flt add info", "type": str},
+                {"path": "general>measuring equipment", "type": str},
+                # PUBLICATION SECTION
                 {"path": "publication>doi", "type": str},
-                {"path": "publication>images repository", "type": str},
-                {"path": "material type>sample type", "type": str},
-                {"path": "material type>fiber material", "type": str},
-                {"path": "material type>fiber form", "type": str},
-                {"path": "material type>area density", "type": str},
-                {"path": "material type>resin", "type": str},
-                {"path": "material type>hardener", "type": str},
-                {"path": "material type>mixing ratio", "type": str},
-                {"path": "laminates and assemblies>curing time", "type": float},
-                {
-                    "path": "laminates and assemblies>curing temperature",
-                    "type": float,
-                },
-                {"path": "laminates and assemblies>curing pressure", "type": float},
-                {"path": "laminates and assemblies>fiber volume ratio", "type": float},
+                # material info SECTION
+                {"path": "material info>material tested", "type": str},
+                {"path": "material info>sample type", "type": str},
+                {"path": "material info>sample type add info", "type": str},
+                {"path": "material info>fiber material", "type": str},
+                {"path": "material info>fiber form", "type": str},
+                {"path": "material info>area density", "type": str},
+                {"path": "material info>resin", "type": str},
+                {"path": "material info>hardener", "type": str},
+                {"path": "material info>mixing ratio", "type": str},
+                {"path": "material info>curing time", "type": float},
+                {"path": "material info>curing temperature", "type": float},
+                {"path": "material info>curing pressure", "type": float},
+                {"path": "material info>postcuring time", "type": float},
+                {"path": "material info>postcuring temperature", "type": float},
+                {"path": "material info>postcuring pressure", "type": float},
+                {"path": "material info>glue", "type": str},
+                {"path": "material info>glue curing time", "type": float},
+                {"path": "material info>glue curing pressure", "type": float},
+                {"path": "material info>glue curing temperature", "type": float},                                                                
+                # LAMINATES AND ASSEMBLIES SECTION
                 {"path": "laminates and assemblies>stacking sequence", "type": str},
-                {"path": "measurement>measuring points", "type": int},
-                {"path": "dic analysis>subset size", "type": int},
-                {"path": "dic analysis>step size", "type": int},
+                {"path": "laminates and assemblies>fiber volume ratio", "type": str},
+                # FATIGUE SECTION
+                {"path": "fatigue>r ratio", "type": float},
+                {"path": "fatigue>frequency", "type": float},
+                {"path": "general>loading rate", "type": float},
             ):
                 try:
                     try:
@@ -363,7 +373,21 @@ class Experiment:
                 except ValueError as e:
                     self.logger.error(f"exception: {e}")
 
-            self.experiment = fixed_experiment
+            # Converts the flat dictionary into a nested structure
+            def nest_dict(flat_dict):
+                nested = {}
+                for compound_key, value in flat_dict.items():
+                    keys = compound_key.split(">")
+                    d = nested
+                    for key in keys[:-1]:
+                        key = key.strip()  # Removes unwanted spaces
+                        if key not in d:
+                            d[key] = {}
+                        d = d[key]
+                    d[keys[-1].strip()] = value
+                return nested
+
+            self.experiment = nest_dict(fixed_experiment)
 
     def _validate_experiment(self):
         """
@@ -371,8 +395,48 @@ class Experiment:
         """
         self.logger.info("Validate experiment")
         with self.logger.indent:
-            # Check self.experiment
-            # Mandatory fields check
+            # Print the entire experiment structure
+            import json
+            self.logger.info("Experiment structure after cleanup:")
+            self.logger.info(json.dumps(self.experiment, indent=2, ensure_ascii=False))
+
+            # Normalize the value of experiment type to avoid issues with spaces or case sensitivity
+            experiment_type_raw = Experiment.__get_val_at(self.experiment, "general>experiment type", "")
+            experiment_type = experiment_type_raw.strip().upper()
+            self.logger.info(f"Normalized experiment type: '{experiment_type}' (raw: '{experiment_type_raw}')")
+
+            # If the experiment type is FA, check the specific fields
+            if experiment_type == "FA":
+                general_section = self.experiment.get("general", {})
+                if "fa experiment type" not in general_section:
+                    self.logger.error("Missing mandatory column 'general>fa experiment type' (experiment type is 'FA')")
+                else:
+                    self.logger.info(f"Found 'general>fa experiment type': {general_section['fa experiment type']}")
+
+                if "fatigue loading type (flt)" not in general_section:
+                    self.logger.error("Missing mandatory column 'general>fatigue loading type (flt)' (experiment type is 'FA')")
+                else:
+                    self.logger.info(f"Found 'general>fatigue loading type (flt)': {general_section['fatigue loading type (flt)']}")
+
+                fatigue_section = self.experiment.get("fatigue", {})
+                if "r ratio" not in fatigue_section:
+                    self.logger.error("Missing mandatory column 'fatigue>r ratio' (experiment type is 'FA')")
+                else:
+                    self.logger.info(f"Found 'fatigue>r ratio': {fatigue_section['r ratio']}")
+            else:
+                self.logger.info("Experiment type is not 'FA'; specific FA checks skipped.")
+            
+            # Custom check: if experiment is FA, at least one of 'loading rate' or 'frequency' must be present
+            if experiment_type == "FA":
+                has_loading_rate = "loading rate" in self.experiment.get("fatigue", {}) and self.experiment["fatigue"]["loading rate"] is not None
+                has_frequency = "frequency" in self.experiment.get("fatigue", {}) and self.experiment["fatigue"]["frequency"] is not None
+                if not has_loading_rate and not has_frequency:
+                    self.logger.error(
+                        "For FA experiments, at least one of 'fatigue>loading rate' or 'fatigue>frequency' must be provided."
+                    )
+
+
+            # Block 1: Mandatory Fields Check
             for col_constraint in (
                 {
                     "path": "general>laboratory",
@@ -391,41 +455,63 @@ class Experiment:
                     "mandatory": True,
                 },
                 {
-                    "path": "general>fracture",
+                    "path": "general>control mode",
                     "mandatory": True,
                 },
                 {
-                    "path": "general>fracture mode",
-                    "mandatory": Experiment.__get_val_at(
-                        self.experiment,
-                        "general>fracture",
-                        False,
+                    "path": "general>fracture mode (fm)",
+                    "mandatory": (
+                        Experiment.__get_val_at(self.experiment, "general>qs experiment type", "") == "fracture"
+                        or Experiment.__get_val_at(self.experiment, "general>fa experiment type", "") == "fracture"
                     ),
-                    "mandatory_condition": "when fracture",
+                    "mandatory_condition": "when quasi-static test type or fatigue test type is 'fracture'",
                 },
                 {
-                    "path": "general>fatigue test type",
+                    "path": "general>fa experiment type",
                     "mandatory": Experiment.__get_val_at(
                         self.experiment, "general>experiment type", ""
-                    )
-                    == "FA",
+                    ) == "FA",
                     "mandatory_condition": "when experiment type is 'FA'",
                 },
                 {
-                    "path": "general>quasi-static test type",
-                    "mandatory": Experiment.__get_val_at(
-                        self.experiment, "general>experiment type", ""
-                    )
-                    == "QS",
+                    "path": "general>fatigue loading type (flt)",
+                    "mandatory": Experiment.__get_val_at(self.experiment, "general>experiment type", "") == "FA",
+                    "mandatory_condition": "quando experiment type è 'FA'",
+                },
+                {
+                    "path": "fatigue>r ratio",
+                    "mandatory": Experiment.__get_val_at(self.experiment, "general>experiment type", "") == "FA",
+                    "mandatory_condition": "when experiment type is 'FA'",
+                },
+                #{
+                #    "path": "fatigue>frequency",
+                #    "mandatory": (Experiment.__get_val_at(self.experiment, "general>experiment type", "") == "FA") 
+                #                and (not self.experiment.get("general", {}).get("loading rate")),
+                #    "mandatory_condition": "when experiment type is 'FA' and 'general>loading rate' is not provided",
+                #},
+                #{
+                #    "path": "general>loading rate",
+                #    "mandatory": (Experiment.__get_val_at(self.experiment, "general>experiment type", "") == "FA") 
+                #                and (not self.experiment.get("fatigue", {}).get("frequency")),
+                #    "mandatory_condition": "when experiment type is 'FA' and 'fatigue>frequency' is not provided",
+                #},
+                {
+                    "path": "general>qs experiment type",
+                    "mandatory": Experiment.__get_val_at(self.experiment, "general>experiment type", "") == "QS",
                     "mandatory_condition": "when experiment type is 'QS'",
                 },
                 {
-                    "path": "general>temperature test type",
-                    "mandatory": Experiment.__get_val_at(
-                        self.experiment, "general>experiment type", ""
-                    )
-                    == "TM",
-                    "mandatory_condition": "when experiment type is 'TM'",
+                    "path": "general>ot experiment type",
+                    "mandatory": Experiment.__get_val_at(self.experiment, "general>experiment type", "") == "OT",
+                    "mandatory_condition": "when experiment type is 'OT'",
+                },
+                {
+                    "path": "material info>material tested",
+                    "mandatory": True,
+                },
+                {
+                    "path": "material info>sample type",
+                    "mandatory": True,
                 },
             ):
                 try:
@@ -438,8 +524,7 @@ class Experiment:
                             f"{col_constraint['path']}"
                         )
 
-            # Fields constraints
-            # Date check : YYYY-MM
+            # Block 2: Date Format Validation
             if not re.match(
                 r"\d{4}-\d{2}",
                 Experiment.__get_val_at(self.experiment, "general>date"),
@@ -449,7 +534,7 @@ class Experiment:
                     f"'{Experiment.__get_val_at(self.experiment, 'general>date')}'"
                 )
 
-            # Enums check
+            # Block 3: Enum Values Check
             for col_constraint in filter(
                 lambda constr: constr["check_needed"],
                 (
@@ -459,14 +544,15 @@ class Experiment:
                         "enum": (
                             "FA",
                             "QS",
-                            "TM",
+                            "OT",
                         ),
                     },
                     {
-                        "check_needed": Experiment.__get_val_at(
-                            self.experiment, "general>fracture", False
+                        "check_needed": (
+                            Experiment.__get_val_at(self.experiment, "general>qs experiment type", "") == "fracture"
+                            or Experiment.__get_val_at(self.experiment, "general>fa experiment type", "") == "fracture"
                         ),
-                        "path": "general>fracture mode",
+                        "path": "general>fracture mode (fm)",
                         "enum": (
                             "Mode I",
                             "Mode II",
@@ -481,12 +567,28 @@ class Experiment:
                             "",
                         )
                         == "FA",
-                        "path": "general>fatigue test type",
+                        "path": "general>fatigue loading type (flt)",
                         "enum": (
                             "CA",
                             "VA",
                             "BL",
-                            "Combined",
+                            "Other",
+                        ),
+                    },
+                    {
+                        "check_needed": Experiment.__get_val_at(
+                            self.experiment,
+                            "general>experiment type",
+                            "",
+                        )
+                        == "FA",
+                        "path": "general>fa experiment type",
+                        "enum": (
+                            "tensile",
+                            "compressive",
+                            "shear",
+                            "bending",
+                            "fracture",
                         ),
                     },
                     {
@@ -496,14 +598,13 @@ class Experiment:
                             "",
                         )
                         == "QS",
-                        "path": "general>quasi-static test type",
+                        "path": "general>qs experiment type",
                         "enum": (
-                            "Tensile",
-                            "Compressive",
-                            "Shear",
-                            "Bending",
-                            "Fracture",
-                            "Unspecified",
+                            "tensile",
+                            "compressive",
+                            "shear",
+                            "bending",
+                            "fracture",
                         ),
                     },
                     {
@@ -512,13 +613,13 @@ class Experiment:
                             "general>experiment type",
                             "",
                         )
-                        == "TM",
-                        "path": "general>temperature test type",
+                        == "OT",
+                        "path": "general>ot experiment type",
                         "enum": (
                             "DMA",
                             "DSC",
-                            "FIRE",
-                            "Unspecified",
+                            "Fire",
+                            "Other",
                         ),
                     },
                     {
@@ -527,8 +628,19 @@ class Experiment:
                         "enum": (
                             "Load Controlled",
                             "Displacement Controlled",
+                            "Strain controlled",
                         ),
                     },
+                    {
+                        "check_needed": True,
+                        "path": "material info>other polymers add info",
+                        "enum": (
+                            "Laminates",
+                            "Bulk adhesives",
+                            "Adhesive joints",
+                            "Other polymers"
+                        ),
+                    },                    
                 ),
             ):
                 try:
@@ -543,7 +655,27 @@ class Experiment:
                 except KeyError:
                     pass
 
-            # Type check
+            # Block 4: Additional Info Check for 'Other'
+            # Check if, for OT and FLT, the 'add info' field is provided when necessary.
+            if self.experiment.get("general", {}).get("ot experiment type") == "Other":
+                if not self.experiment.get("general", {}).get("ot add info", "").strip():
+                    self.logger.error(
+                        "The field 'general>ot add info' is mandatory when 'general>ot experiment type' is 'Other'."
+                    )
+
+            if self.experiment.get("general", {}).get("fatigue loading type (flt)") == "Other":
+                if not self.experiment.get("general", {}).get("flt add info", "").strip():
+                    self.logger.error(
+                        "The field 'general>flt add info' is mandatory when 'general>fatigue control mode flt' is 'Other'."
+                    )
+
+            if self.experiment.get("material info", {}).get("material tested") == "Other polymers":
+                if not self.experiment.get("material info", {}).get("other polymers add info", "").strip():
+                    self.logger.error(
+                        "The field 'material info>other polymers add info' is mandatory when 'material info>other polymers add info' is 'Other polymers'."
+                    )                    
+
+            # Block 6: Type Check
             for col_constraint in (
                 {
                     "path": "general>laboratory",
@@ -554,113 +686,115 @@ class Experiment:
                     "type": str,
                 },
                 {
-                    "path": "general>fracture",
-                    "type": bool,
-                },
-                {
-                    "path": "general>measuring equipment",
-                    "type": str,
-                },
-                {
-                    "path": "general>reliability level",
-                    "type": float,
-                },
-                {
-                    "path": "publication>title",
-                    "type": str,
-                },
-                {
-                    "path": "publication>author",
-                    "type": str,
-                },
-                {
-                    "path": "publication>year",
-                    "type": int,
-                },
-                {
                     "path": "publication>doi",
                     "type": str,
                 },
                 {
-                    "path": "publication>images repository",
+                    "path": "material info>material tested",
                     "type": str,
                 },
                 {
-                    "path": "material type>sample type",
+                    "path": "material info>sample type",
                     "type": str,
                 },
                 {
-                    "path": "material type>fiber material",
+                    "path": "material info>other polymers add info",
+                    "type": str,
+                },                
+                {
+                    "path": "material info>fiber material",
                     "type": str,
                 },
                 {
-                    "path": "material type>fiber form",
+                    "path": "material info>fiber form",
                     "type": str,
                 },
                 {
-                    "path": "material type>area density",
+                    "path": "material info>area density",
                     "type": str,
                 },
                 {
-                    "path": "material type>resin",
+                    "path": "material info>resin",
                     "type": str,
                 },
                 {
-                    "path": "material type>hardener",
+                    "path": "material info>hardener",
                     "type": str,
                 },
                 {
-                    "path": "material type>mixing ratio",
+                    "path": "material info>mixing ratio",
                     "type": str,
                 },
                 {
-                    "path": "laminates and assemblies>curing time",
+                    "path": "material info>curing time",
                     "type": float,
                 },
                 {
-                    "path": "laminates and assemblies>curing temperature",
+                    "path": "material info>curing temperature",
                     "type": float,
                 },
                 {
-                    "path": "laminates and assemblies>curing pressure",
+                    "path": "material info>curing pressure",
                     "type": float,
+                },
+                {
+                    "path": "material info>postcuring time",
+                    "type": float,
+                },
+                {
+                    "path": "material info>postcuring temperature",
+                    "type": float,
+                },
+                {
+                    "path": "material info>postcuring pressure",
+                    "type": float,
+                },
+                {
+                    "path": "material info>glue",
+                    "type": str,
+                },
+                {
+                    "path": "material info>glue curing time",
+                    "type": float,
+                },
+                {
+                    "path": "material info>glue curing pressure",
+                    "type": float,
+                },
+                {
+                    "path": "material info>glue curing temperature",
+                    "type": float,
+                },                
+                {
+                    "path": "laminates and assemblies>stacking sequence",
+                    "type": str,
                 },
                 {
                     "path": "laminates and assemblies>fiber volume ratio",
                     "type": float,
                 },
                 {
-                    "path": "laminates and assemblies>stacking sequence",
-                    "type": str,
-                },
-                {
-                    "path": "measurement>measuring points",
-                    "type": int,
-                },
-                {
-                    "path": "Test condtions>humidity",
+                    "path": "fatigue>r ratio",
                     "type": float,
                 },
                 {
-                    "path": "dic analysis>subset size",
-                    "type": int,
+                    "path": "fatigue>frequency",
+                    "type": float,
                 },
                 {
-                    "path": "dic analysis>step size",
-                    "type": int,
+                    "path": "general>loading rate",
+                    "type": float,
                 },
             ):
                 try:
-                    val = Experiment.__get_val_at(
-                        self.experiment, col_constraint["path"]
-                    )
+                    val = Experiment.__get_val_at(self.experiment, col_constraint["path"])
                     if type(val) != col_constraint["type"]:
                         self.logger.error(
                             f"Wrong type for column {col_constraint['path']}: {val}"
                         )
                 except KeyError:
                     pass
-
+                    
     def _save_preprocessed_experiment(self):
         """
         Save experiment metadata to JSON preprocessed file
@@ -702,244 +836,142 @@ class Experiment:
 
     def _read_tests(self):
         """
-        Read tests metadata from XLS Tests tab
+        Read tests metadata from XLS Tests tab and convert to nested dict
         """
         self.logger.info(
             f"Read {os.path.basename(self.exp_meta_meta['raw_xls_fp'])} Tests tab"
         )
         with self.logger.indent:
-            self.tests = pd.read_excel(
-                self.exp_meta_meta["raw_xls_fp"], sheet_name="Tests"
+            tests_df = pd.read_excel(
+                self.exp_meta_meta["raw_xls_fp"],
+                sheet_name="Tests",
+                header=[0, 1]
             )
+            self.tests_df = tests_df
+
+            def df_to_nested_dict(df: pd.DataFrame) -> dict:
+                def nest(d: dict) -> dict:
+                    result = {}
+                    for key, value in d.items():
+                        target = result
+                        for k in key[:-1]:
+                            target = target.setdefault(k.strip().lower(), {})
+                        target[key[-1].strip().lower()] = value
+                    return result
+                d = df.to_dict(orient="index")
+                return {k: nest(v) for k, v in d.items()}
+
+            self.tests = self.tests = list(df_to_nested_dict(tests_df).values())
+
 
     def _cleanup_tests(self):
         """
-        Cleanup tests metadata
-        + small typos fixed
-        + only expected columns
-        + fields casted as bool / float (double) / int / str
+        Cleanup tests metadata: remove nulls, fix types, keep only expected keys
         """
         self.logger.info("Cleanup tests")
         with self.logger.indent:
-            Experiment.__dict_cleanup(self.tests)
-            EXPECTED_COLS = (
-                "specimen number",
-                "specimen name",
-                "stress ratio",
-                "maximum stress",
-                "frequency",
-                "run out",
-                "displacement controlled loading rate",
-                "load controlled loading rate",
-                "length",
-                "width",
-                "thickness",
-                "temperature",
-                "humidity",
-                "initial crack length",
-                r"x coordinate of measuring point \d",
-                r"y coordinate of measuring point \d",
+            def to_bool(value):
+                if pd.isna(value): raise ValueError("NaN cannot be converted to bool")
+                if isinstance(value, bool): return value
+                val = str(value).strip().lower()
+                if val.startswith("y") or val == "1": return True
+                if val.startswith("n") or val == "0": return False
+                raise ValueError(f"Cannot convert '{value}' to bool")
+
+            CASTING = {
+                bool: to_bool,
+                int: int,
+                float: float,
+                str: str,
+            }
+
+            expected_constraints = (
+                {"path": "specimen information>sequential number", "type": int},
+                {"path": "specimen information>specimen name", "type": str},
+                {"path": "fatigue>number of cycles", "type": int},
+                {"path": "fatigue>maximum load", "type": float},
+                {"path": "fatigue>run out", "type": bool},
+                {"path": "geometry>length", "type": float},
+                {"path": "geometry>width", "type": float},
+                {"path": "geometry>thickness", "type": float},
+                {"path": "geometry>t", "type": float},
+                {"path": "geometry>l'", "type": str},
+                {"path": "environment>temperature", "type": float},
+                {"path": "environment>humidity", "type": float},
+                {"path": "geometry>initial crack length", "type": float},
+                {"path": "dic analysis>subset size", "type": float},
+                {"path": "dic analysis>step size", "type": float},
             )
 
-            # Strip spaces and \n on column names
-            self.tests.columns = self.tests.columns.str.strip(" \n")
+            fixed_tests = []
+            for i, test in enumerate(self.tests):
+                fixed_test = {}
+                for constraint in expected_constraints:
+                    try:
+                        val = Experiment.__get_val_at(test, constraint["path"])
+                        if val is not None and not (isinstance(val, float) and np.isnan(val)):
+                            casted_val = CASTING[constraint["type"]](val)
+                            Experiment.__set_val_at(fixed_test, constraint["path"], casted_val)
+                    except (KeyError, ValueError) as e:
+                        self.logger.warning(f"Test #{i+1} - Skipping field '{constraint['path']}': {e}")
+                fixed_tests.append(fixed_test)
+            self.tests = fixed_tests
 
-            found_matching_columns = set()
-            for pattern in EXPECTED_COLS:
-                found_matching_columns.update(
-                    list(
-                        Experiment.__grep_matching_columns(pattern, self.tests.columns)
-                    )
-                )
+            self.logger.info("Tests structure after cleanup:")
+            with self.logger.indent:
+                self.logger.info(json.dumps(self.tests, indent=2, ensure_ascii=False))
 
-            # drop unexpected columns
-            unexpected_columns = list(set(self.tests.columns) - found_matching_columns)
-
-            # Remove unexpected columns
-            if len(unexpected_columns) != 0:
-                for unexpected_column in unexpected_columns:
-                    self.logger.warning(f"drop unexpected column {unexpected_column}")
-                self.tests = self.tests.drop(columns=unexpected_columns)
 
     def _validate_tests(self):
         """
-        Validate tests metadata
+        Validate cleaned test metadata
         """
         self.logger.info("Validate tests")
         with self.logger.indent:
-            # Check mandatory columns
-            for col_constraint in (
-                {
-                    "paths": ("specimen number",),
-                    "mandatory": True,
-                },
-                {
-                    "paths": ("stress ratio",),
-                    "mandatory": Experiment.__get_val_at(
-                        self.experiment, "general>experiment type", ""
-                    )
-                    == "FA",
-                    "mandatory_condition": "when experiment type is 'FA'",
-                },
-                {
-                    "paths": ("maximum stress",),
-                    "mandatory": Experiment.__get_val_at(
-                        self.experiment, "general>experiment type", ""
-                    )
-                    == "FA",
-                    "mandatory_condition": "when experiment type is 'FA'",
-                },
-                {
-                    "paths": (
-                        "frequency",
-                        "displacement controlled loading rate",
-                        "load controlled loading rate",
-                    ),
-                    "mandatory": Experiment.__get_val_at(
-                        self.experiment, "general>experiment type", ""
-                    )
-                    == "FA",
-                    "mandatory_condition": "when experiment type is 'FA'",
-                },
-                {
-                    "paths": ("run out",),
-                    "mandatory": Experiment.__get_val_at(
-                        self.experiment, "general>experiment type", ""
-                    )
-                    == "FA",
-                    "mandatory_condition": "when experiment type is 'FA'",
-                },
-                {
-                    "paths": ("length",),
-                    "mandatory": Experiment.__get_val_at(
-                        self.experiment, "general>experiment type", ""
-                    )
-                    == "FA"
-                    and not Experiment.__get_val_at(
-                        self.experiment, "general>fracture", False
-                    ),
-                    "mandatory_condition": (
-                        "when experiment type is 'FA' and no fracture"
-                    ),
-                },
-                {
-                    "paths": ("width",),
-                    "mandatory": Experiment.__get_val_at(
-                        self.experiment, "general>experiment type", ""
-                    )
-                    == "FA"
-                    and not Experiment.__get_val_at(
-                        self.experiment, "general>fracture", False
-                    ),
-                    "mandatory_condition": (
-                        "when experiment type is 'FA' and no fracture"
-                    ),
-                },
-                {
-                    "paths": ("thickness",),
-                    "mandatory": Experiment.__get_val_at(
-                        self.experiment, "general>experiment type", ""
-                    )
-                    == "FA"
-                    and not Experiment.__get_val_at(
-                        self.experiment, "general>fracture", False
-                    ),
-                    "mandatory_condition": (
-                        "when experiment type is 'FA' and no fracture"
-                    ),
-                },
-            ):
-                if col_constraint["mandatory"]:
-                    found = any(
-                        path in self.tests.columns for path in col_constraint["paths"]
-                    )
-                    if not found:
-                        self.logger.error(
-                            "missing mandatory column "
-                            f"{col_constraint.get('mandatory_condition', '')}: "
-                            f"{col_constraint['paths']}"
-                        )
+            self.logger.info("Tests structure after cleanup:")
+            self.logger.info(json.dumps(self.tests, indent=2, ensure_ascii=False))
 
-            # Type check
-            for col_constraint in (
-                {
-                    "path_pattern": "Specimen number",
-                    "type": int,
-                },
-                {
-                    "path_pattern": "Specimen name",
-                    "type": str,
-                },
-                {
-                    "path_pattern": "Stress Ratio",
-                    "type": float,
-                },
-                {
-                    "path_pattern": "Maximum Stress",
-                    "type": float,
-                },
-                {
-                    "path_pattern": "Frequency",
-                    "type": float,
-                },
-                {
-                    "path_pattern": "Run out",
-                    "type": bool,
-                },
-                {
-                    "path_pattern": "Displacement controlled loading rate",
-                    "type": float,
-                },
-                {
-                    "path_pattern": "Load controlled loading rate",
-                    "type": float,
-                },
-                {
-                    "path_pattern": "Length",
-                    "type": float,
-                },
-                {
-                    "path_pattern": "Width",
-                    "type": float,
-                },
-                {
-                    "path_pattern": "Thickness",
-                    "type": float,
-                },
-                {
-                    "path_pattern": "Temperature",
-                    "type": float,
-                },
-                {
-                    "path_pattern": "Humidity",
-                    "type": float,
-                },
-                {
-                    "path_pattern": "initial crack length",
-                    "type": float,
-                },
-                {
-                    "path_pattern": r"x coordinate of measuring point \d",
-                    "type": float,
-                },
-                {
-                    "path_pattern": r"y coordinate of measuring point \d",
-                    "type": float,
-                },
-            ):
-                for path in list(
-                    Experiment.__grep_matching_columns(
-                        col_constraint["path_pattern"], self.tests.columns
+            if hasattr(self, 'tests_df'):
+                num_tests_lines = self.tests_df.shape[0]
+                num_csv_files = len(self.exp_meta_meta["measures"])
+                if num_tests_lines != num_csv_files:
+                    self.logger.error(
+                        f"Mismatch: Number of tests sheet lines ({num_tests_lines}) "
+                        f"does not match number of CSV files ({num_csv_files})."
                     )
-                ):
+                else:
+                    self.logger.info("The number of tests matches the number of CSV files.")
+
+            test_type = Experiment.__get_val_at(self.experiment, "general>experiment type", "").strip().upper()
+            fa_type = Experiment.__get_val_at(self.experiment, "general>fa experiment type", "").strip().lower()
+            qs_type = Experiment.__get_val_at(self.experiment, "general>qs experiment type", "").strip().lower()
+            is_fracture = fa_type == "fracture" or qs_type == "fracture"
+
+            mandatory_fields = [
+                "specimen information>sequential number",
+                "specimen information>specimen name",
+                "geometry>width",
+                "geometry>thickness",
+            ]
+
+            if test_type == "FA":
+                mandatory_fields += [
+                    "fatigue>number of cycles",
+                    "fatigue>run out",
+                    "fatigue>maximum load",
+                ]
+            if is_fracture:
+                mandatory_fields += ["geometry>initial crack length"]
+
+            for i, test in enumerate(self.tests):
+                for path in mandatory_fields:
                     try:
-                        val = Experiment.__get_val_at(self.experiment, path)
-                        if type(val) != col_constraint["type"]:
-                            self.logger.error(
-                                f"Wrong type for column {col_constraint['path']}: {val}"
-                            )
+                        val = Experiment.__get_val_at(test, path)
+                        if val is None or (isinstance(val, float) and np.isnan(val)):
+                            self.logger.error(f"Test #{i+1} - Missing mandatory value: '{path}'")
                     except KeyError:
-                        pass
+                        self.logger.error(f"Test #{i+1} - Missing mandatory column: '{path}'")
+
 
     def _save_preprocessed_tests(self):
         """
@@ -947,7 +979,15 @@ class Experiment:
         """
         self.logger.info("Save tests preprocessed")
         with self.logger.indent:
-            self.tests.to_csv(
+            # se è DataFrame lo salvo direttamente
+            if isinstance(self.tests, pd.DataFrame):
+                df = self.tests
+            elif isinstance(self.tests, list):
+                df = pd.json_normalize(self.tests)
+            else:
+                df = pd.DataFrame([self.tests])
+            df.columns = [col.split('.')[-1] for col in df.columns]  # <-- Aggiungi questa riga
+            df.to_csv(
                 self.exp_meta_meta["preprocessed_tests_csv_fp"],
                 index=False,
             )
@@ -955,6 +995,7 @@ class Experiment:
                 "saved "
                 + os.path.basename(self.exp_meta_meta["preprocessed_tests_csv_fp"])
             )
+
 
     def _read_measures(self):
         """
@@ -979,34 +1020,16 @@ class Experiment:
                 # Strip spaces and \n on column names
                 measures["df"].columns = measures["df"].columns.str.strip(" \n")
                 EXPECTED_COLUMNS = (
-                    "Machine_Time",
-                    "Machine_N_cycles",
-                    "Machine_Displacement",
-                    "Machine_Load",
-                    r"MD_index--\d",
-                    r"MD_N_cycles--\d",
-                    r"MD_Displacement--\d",
-                    r"MD_Load--\d",
-                    r"u--\d",
-                    r"v--\d",
-                    r"exx--\d",
-                    r"eyy--\d",
-                    r"exy--\d",
-                    "Crack_length",
-                    "Crack_N_cycles",
-                    "Crack_Displacement",
-                    "Crack_Load",
-                    "Th_time",
-                    "Th_N_cycles",
-                    "Th_specimen_max",
-                    "Th_specimen_mean",
-                    "Th_chamber",
-                    "Th_uppergrips",
-                    "Th_lowergrips",
-                    r"T--\d",
-                    "Storage_modulus",
-                    "Tan_delta",
-                    "Specimen_name",
+                        "Test_Date",
+                        "Load",
+                        "u",
+                        "v",
+                        "exx",
+                        "eyy", 
+                        "exy",
+                        "Crack_length",
+                        "Specimen_name",
+                        "N_cycles",
                 )
 
                 found_matching_columns = set()
@@ -1036,64 +1059,34 @@ class Experiment:
         Validate measures
         """
         for measures in self.measures_list:
-            self.logger.info(
-                f"Validate measures {os.path.basename(measures['raw_fp'])}"
-            )
+            self.logger.info(f"Validate measures {os.path.basename(measures['raw_fp'])}")
             with self.logger.indent:
                 EXPECTED_COLUMNS = {
-                    "Machine_Time": {
+                    "Test_Date": {
                         "type": str,
                         "mandatory": False,
                     },
-                    "Machine_N_cycles": {
-                        "type": int,
-                        "mandatory": False,
+                    "Load": {
+                        "type": float,
+                        "mandatory": True,
                     },
-                    "Machine_Displacement": {
+                    "u": {
                         "type": float,
                         "mandatory": False,
                     },
-                    "Machine_Load": {
+                    "v": {
                         "type": float,
                         "mandatory": False,
                     },
-                    r"MD_index--\d": {
-                        "type": int,
-                        "mandatory": False,
-                    },
-                    r"MD_time--\d": {
-                        "type": str,
-                        "mandatory": False,
-                    },
-                    r"MD_N_cycles--\d": {
-                        "type": int,
-                        "mandatory": False,
-                    },
-                    r"MD_Displacement--\d": {
+                    "exx": {
                         "type": float,
                         "mandatory": False,
                     },
-                    r"MD_Load--\d": {
+                    "eyy": {
                         "type": float,
                         "mandatory": False,
                     },
-                    r"u--\d": {
-                        "type": float,
-                        "mandatory": False,
-                    },
-                    r"v--\d": {
-                        "type": float,
-                        "mandatory": False,
-                    },
-                    r"exx--\d": {
-                        "type": float,
-                        "mandatory": False,
-                    },
-                    r"eyy--\d": {
-                        "type": float,
-                        "mandatory": False,
-                    },
-                    r"exy--\d": {
+                    "exy": {
                         "type": float,
                         "mandatory": False,
                     },
@@ -1101,228 +1094,173 @@ class Experiment:
                         "type": float,
                         "mandatory": False,
                     },
-                    "Crack_N_cycles": {
-                        "type": float,
-                        "mandatory": False,
-                    },
-                    "Crack_Displacement": {
-                        "type": float,
-                        "mandatory": False,
-                    },
-                    "Crack_Load": {
-                        "type": float,
-                        "mandatory": False,
-                    },
-                    "Th_time": {
-                        "type": int,
-                        "mandatory": False,
-                    },
-                    "Th_N_cycles": {
-                        "type": int,
-                        "mandatory": False,
-                    },
-                    "Th_specimen_max": {
-                        "type": float,
-                        "mandatory": False,
-                    },
-                    "Th_specimen_mean": {
-                        "type": float,
-                        "mandatory": False,
-                    },
-                    "Th_chamber": {
-                        "type": float,
-                        "mandatory": False,
-                    },
-                    "Th_uppergrips": {
-                        "type": float,
-                        "mandatory": False,
-                    },
-                    "Th_lowergrips": {
-                        "type": float,
-                        "mandatory": False,
-                    },
-                    r"T--\d": {
-                        "type": float,
-                        "mandatory": False,
-                    },
-                    "Storage_modulus": {
-                        "type": float,
-                        "mandatory": False,
-                    },
-                    "Tan_delta": {
-                        "type": float,
-                        "mandatory": False,
-                    },
                     "Specimen_name": {
                         "type": str,
+                        "mandatory": True,
+                    },
+                    "N_cycles": {
+                        "type": int,
                         "mandatory": False,
                     },
                 }
+
+                RELAXED_MANDATORY_COLUMNS = {"Specimen_name", "Test_Date"}
+
+                # Retrieve test type values for FA and QS
+                fa_experiment_type = Experiment.__get_val_at(
+                    self.experiment, "general>fa experiment type", ""
+                )
+                qs_experiment_type = Experiment.__get_val_at(
+                    self.experiment, "general>qs experiment type", ""
+                )
+
+                # Define FA rules based on "fracture" selection
+                if fa_experiment_type == "fracture":
+                    mandatory_fa = [
+                        ["N_cycles"],       # "N_cycles" must be present
+                        ["Crack_length"],   # and, in addition, "Crack_length" becomes mandatory
+                    ]
+                else:
+                    mandatory_fa = [
+                        ["N_cycles"],
+                    ]
+
+                # Define QS rules based on "fracture" selection
+                if qs_experiment_type == "fracture":
+                    mandatory_qs = [
+                        ["Crack_length"],   # "Crack_length" is mandatory
+                        ["u", "exx"],       # and at least one of "u" or "exx"
+                    ]
+                else:
+                    mandatory_qs = [
+                        ["u", "exx"],
+                    ]
+
+                # Group specific rules by test type
                 MANDATORY_TEST_TYPE_SPECIFIC = {
-                    ("FA", False): [
-                        [
-                            "Machine_N_cycles",
-                            r"MD_N_cycles--\d",
-                        ],
-                        [
-                            "Machine_Displacement",
-                            r"MD_Displacement--\d",
-                            r"exx--\d",
-                        ],
-                        [
-                            "Machine_Load",
-                            r"MD_Load--\d",
-                        ],
-                    ],
-                    ("FA", True): [
-                        [
-                            "Crack_N_cycles",
-                        ],
-                        [
-                            "Crack_length",
-                        ],
-                    ],
-                    ("QS", False): [
-                        [
-                            "Machine_Displacement",
-                            r"MD_Displacement--\d",
-                            r"exx--\d",
-                        ],
-                        [
-                            "Machine_Load",
-                            r"MD_Load--\d",
-                        ],
-                    ],
-                    ("QS", True): [
-                        [
-                            "Machine_Displacement",
-                            r"MD_Displacement--\d",
-                            "Crack_length",
-                            "Crack_Displacement",
-                        ],
-                        [
-                            "Machine_Load",
-                            r"MD_Load--\d",
-                            "Crack_Load",
-                        ],
-                    ],
-                    ("TM", False): [
-                        [
-                            r"T--\d",
-                        ],
-                        [
-                            "Storage_modulus",
-                            "Tan_delta",
-                            "Machine_Load",
-                            r"MD_Load--\d",
-                        ],
-                    ],
-                    ("TM", True): [
-                        [
-                            r"T--\d",
-                        ],
-                        [
-                            "Storage_modulus",
-                            "Tan_delta",
-                            "Machine_Load",
-                            r"MD_Load--\d",
-                        ],
-                    ],
+                    "FA": mandatory_fa,
+                    "QS": mandatory_qs,
                 }
+
                 COLUMN_TYPE_CHECK = {
                     int: Experiment.__check_int_column,
                     float: Experiment.__check_float_column,
                     str: Experiment.__check_str_column,
+                    datetime: Experiment.__check_datetime_column,  # 👈 new
                 }
                 TYPE_NAMES = {
                     int: "integer",
                     float: "float",
                     str: "string",
+                    datetime: "date (YYYY-MM-DD)",
                 }
 
-                # Check for mandatory columns
-                for mandatory_col_pattern in filter(
-                    lambda c: EXPECTED_COLUMNS[c]["mandatory"], EXPECTED_COLUMNS
-                ):
-                    mandatory_col_found = list(
-                        Experiment.__grep_matching_columns(
-                            mandatory_col_pattern, measures["df"].columns
-                        )
-                    )
-                    if len(mandatory_col_found) == 0:
-                        self.logger.error(
-                            f"mandatory column not found: '{mandatory_col_pattern}'"
-                        )
-                    else:
-                        for mandatory_col in mandatory_col_found:
+            # --- Check for presence of mandatory columns from EXPECTED_COLUMNS
+            for mandatory_col_pattern in filter(lambda c: EXPECTED_COLUMNS[c]["mandatory"], EXPECTED_COLUMNS):
+                mandatory_col_found = list(Experiment.__grep_matching_columns(mandatory_col_pattern, measures["df"].columns))
+                if len(mandatory_col_found) == 0:
+                    self.logger.error(f"mandatory column not found: '{mandatory_col_pattern}'")
+                else:
+                    for mandatory_col in mandatory_col_found:
+                        if mandatory_col in RELAXED_MANDATORY_COLUMNS:
+                            if measures["df"][mandatory_col].notnull().sum() == 0:
+                                self.logger.error(f"mandatory column '{mandatory_col}' has no value at all")
+                        else:
                             if measures["df"][mandatory_col].isnull().values.any():
-                                self.logger.error(
-                                    "mandatory column has empty values: "
-                                    f"'{mandatory_col}'"
-                                )
+                                self.logger.error(f"mandatory column has empty values: '{mandatory_col}'")
 
-                # Info for all non-mandatory columns that are not present
-                for optional_col_pattern in filter(
-                    lambda c: not EXPECTED_COLUMNS[c]["mandatory"],
-                    EXPECTED_COLUMNS,
-                ):
-                    optional_col_found = list(
-                        Experiment.__grep_matching_columns(
-                            optional_col_pattern, measures["df"].columns
-                        )
-                    )
+            # --- Check consistent length for "strict" mandatory columns
+            strict_mandatory_lengths = {}
+            for col_pattern in filter(
+                lambda c: EXPECTED_COLUMNS[c]["mandatory"] and c not in RELAXED_MANDATORY_COLUMNS,
+                EXPECTED_COLUMNS
+            ):
+                found_cols = list(Experiment.__grep_matching_columns(col_pattern, measures["df"].columns))
+                for col in found_cols:
+                    strict_mandatory_lengths[col] = measures["df"][col].notnull().sum()
 
-                    if len(optional_col_found) == 0:
-                        self.logger.info(
-                            f"optional column not found: '{optional_col_pattern}'"
-                        )
+            # --- Info for optional columns not found
+            for optional_col_pattern in filter(lambda c: not EXPECTED_COLUMNS[c]["mandatory"], EXPECTED_COLUMNS):
+                optional_col_found = list(Experiment.__grep_matching_columns(optional_col_pattern, measures["df"].columns))
+                if len(optional_col_found) == 0:
+                    self.logger.info(f"optional column not found: '{optional_col_pattern}'")
 
-                # Check column data type
-                for col in measures["df"].columns:
-                    for col_pattern in EXPECTED_COLUMNS:
-                        if re.match(col_pattern, col):
-                            type = EXPECTED_COLUMNS[col_pattern]["type"]
-                            if not COLUMN_TYPE_CHECK[type](measures["df"], col):
-                                self.logger.error(
-                                    f"column '{col}' is expected to be of type "
-                                    f"'{TYPE_NAMES[type]}'"
-                                )
-
-                # Look for type specific mandatory columns
-                try:
-                    experiment_type = Experiment.__get_val_at(
-                        self.experiment, "general>experiment type"
-                    )
-                    fracture = Experiment.__get_val_at(
-                        self.experiment, "general>fracture"
-                    )
-                except KeyError:
-                    self.logger.error(
-                        "XLS file seems broken. Please double check it follows "
-                        f"template provided here: {XLS_TEMPLATE_URL}"
-                    )
-                    return
-                for mandatory_cols_pattern in MANDATORY_TEST_TYPE_SPECIFIC[
-                    (experiment_type, fracture)
-                ]:
-                    for mandatory_col_pattern in mandatory_cols_pattern:
-                        mandatory_col_found = list(
-                            Experiment.__grep_matching_columns(
-                                mandatory_col_pattern, measures["df"].columns
+            # --- Type checking for each column
+            for col in measures["df"].columns:
+                for col_pattern in EXPECTED_COLUMNS:
+                    if re.match(col_pattern, col):
+                        expected_type = EXPECTED_COLUMNS[col_pattern]["type"]
+                        if not COLUMN_TYPE_CHECK[expected_type](measures["df"], col):
+                            self.logger.error(
+                                f"column '{col}' is expected to be of type '{TYPE_NAMES[expected_type]}'"
                             )
-                        )
-                        if len(mandatory_col_found) != 0:
-                            break
-                    else:
-                        self.logger.error(
-                            f"mandatory column missing for test type {experiment_type} "
-                            f"{'with' if fracture else 'without'} fracture :"
-                        )
-                        self.logger.error(" or ".join(mandatory_cols_pattern))
 
-                # Check that there are no empty rows
-                if measures["df"].isnull().all(axis=1).any():
-                    self.logger.error("found empty rows")
+            # --- Check date format in Test_Date
+            if "Test_Date" in measures["df"].columns:
+                for date_val in measures["df"]["Test_Date"].dropna().unique():
+                    if not re.match(r"^\d{4}-\d{2}", str(date_val)):
+                        self.logger.error(f"Unrecognized Test_Date: '{date_val}'")
+
+            # --- Specific validation for test type (FA or QS) using "fracture" logic
+            try:
+                experiment_type = Experiment.__get_val_at(self.experiment, "general>experiment type")
+            except KeyError:
+                self.logger.error(
+                    "XLS file seems broken. Please double check it follows "
+                    f"template provided here: {XLS_TEMPLATE_URL}"
+                )
+                return
+
+            # Determine if test is in fracture mode based on specific field
+            if experiment_type == "FA":
+                is_fracture = (fa_experiment_type == "fracture")
+                groups = MANDATORY_TEST_TYPE_SPECIFIC.get("FA", [])
+            elif experiment_type == "QS":
+                is_fracture = (qs_experiment_type == "fracture")
+                groups = MANDATORY_TEST_TYPE_SPECIFIC.get("QS", [])
+            else:
+                groups = []
+                is_fracture = False
+
+
+            test_type_cols_found = set()
+            for group in groups:
+                group_found = []
+                for pattern in group:
+                    group_found.extend(
+                        list(Experiment.__grep_matching_columns(pattern, measures["df"].columns))
+                    )
+                if len(group_found) == 0:
+                    self.logger.error(
+                        f"mandatory column missing for test type {experiment_type} " +
+                        ("with fracture:" if is_fracture else "without fracture:")
+                    )
+                    self.logger.error(" or ".join(group))
+                else:
+                    if len(group_found) > 1:
+                        sums = {col: measures["df"][col].notnull().sum() for col in group_found}
+                        if len(set(sums.values())) > 1:
+                            self.logger.error(
+                                f"Inconsistent non-null counts among columns in group {group}: {sums}"
+                            )
+                    test_type_cols_found.update(group_found)
+
+            # --- Merge: strict mandatory + columns found for test type
+            for col in test_type_cols_found:
+                if col not in strict_mandatory_lengths:
+                    strict_mandatory_lengths[col] = measures["df"][col].notnull().sum()
+
+            if len(strict_mandatory_lengths) > 1:
+                unique_counts = set(strict_mandatory_lengths.values())
+                if len(unique_counts) > 1:
+                    self.logger.error(
+                        f"Inconsistent non-null counts among mandatory columns: {strict_mandatory_lengths}"
+                    )
+
+            # --- Check that there are no completely empty rows
+            if measures["df"].isnull().all(axis=1).any():
+                self.logger.error("found empty rows")   
+
 
     def _save_preprocessed_measures(self):
         """
@@ -1382,6 +1320,14 @@ class Experiment:
         except ValueError:
             return False
         return True
+    
+    @classmethod
+    def __check_datetime_column(cls, df, column_name):
+        try:
+            pd.to_datetime(df[column_name], format="%Y-%m-%d", errors="raise")
+            return True
+        except Exception:
+            return False
 
     @classmethod
     def __get_val_at(cls, dic, path, default=None):

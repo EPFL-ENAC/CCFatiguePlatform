@@ -59,7 +59,14 @@ export default {
     storeFilteredExperiments(state, data) {
       state.filteredExperiments = {
         ...state.filteredExperiments,
-        experiments: data.items,
+        experiments: data.items.map((exp) => ({
+          ...exp,
+          fracture_display:
+            exp.fa_experiment_type === "fracture" ||
+            exp.qs_experiment_type === "fracture"
+              ? "Yes"
+              : "No",
+        })),
         pagination: {
           page: data.page,
           size: data.size,
@@ -169,15 +176,20 @@ export default {
       // fracture (true|false)
       // fracture_mode (All modes|Mode I|Mode II|Mode III|Combined)
       if (payload.filters.withFracture && !payload.filters.withoutFracture) {
-        queryElements.push("fracture:1");
-        if (payload.filters.fractureMode !== null) {
-          queryElements.push(`fracture_mode:${payload.filters.fractureMode}`);
+        queryElements.push("fracture:true");
+        if (
+          payload.filters.fractureMode !== null &&
+          payload.filters.fractureMode !== "All fracture modes"
+        ) {
+          queryElements.push(
+            `fracture_mode_fm:${payload.filters.fractureMode}`
+          );
         }
       } else if (
         !payload.filters.withFracture &&
         payload.filters.withoutFracture
       ) {
-        queryElements.push("fracture:0");
+        queryElements.push("fracture:false");
       } else if (
         !payload.filters.withFracture &&
         !payload.filters.withoutFracture
@@ -211,6 +223,9 @@ export default {
         query: queryElements.join(";"),
         textSearch: payload.filters.textSearch,
       };
+
+      console.log("Applied filters:", opts.query);
+
       this._vm.$experimentsApi.getExperiments(opts).then(
         (data) => commit("storeFilteredExperiments", data),
         // eslint-disable-next-line no-console
@@ -218,7 +233,7 @@ export default {
       );
     },
     fetchAllFiltersValues({ commit }) {
-      this._vm.$experimentsApi.getFieldDistinct("fracture_mode").then(
+      this._vm.$experimentsApi.getFieldDistinct("fracture_mode_fm").then(
         (data) => commit("storeAllFractureMode", data),
         // eslint-disable-next-line no-console
         (error) => console.error(error)
