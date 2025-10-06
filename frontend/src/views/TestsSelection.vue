@@ -35,7 +35,7 @@
                 :x-axis-name="computedXAxisLabel"
                 :x-axis-type="xAxisChartType"
                 :y-axis-name="yAxisLabel"
-                :x-axis-min="minX"
+                :x-axis-min="1"
                 :x-axis-max="maxX"
                 :y-axis-max="maxY"
                 :axis-label-formatter="axisTickFormatter"
@@ -234,15 +234,17 @@ export default {
       return formatTick;
     },
     maxX() {
-      const max = Math.max(
-        ...this.numberedTests
-          .filter((t) => typeof t.number_of_cycles === "number")
-          .map((t) => t.number_of_cycles)
-      );
-      return this.roundUpTick(max);
-    },
-    minX() {
-      return this.xAxisMode === "log" ? 1 : 0;
+      // prendo direttamente gli x dai dati (cicli) che sono già numeri
+      const xs = this.numberedTests
+        .map((t) => t.number_of_cycles)
+        .filter((v) => typeof v === "number" && isFinite(v));
+
+      // se non ho ancora dati, lascia autoscale (null) invece di 1
+      if (!xs.length) return null;
+
+      // "nice tick" come per Y (riuso roundUpTick già presente nel file)
+      const rawMax = Math.max(...xs);
+      return this.roundUpTick(rawMax);
     },
     maxY() {
       const controlMode =

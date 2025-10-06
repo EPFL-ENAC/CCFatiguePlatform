@@ -45,8 +45,15 @@ class FatigueTest {
    * @param G_MBT {Array.<Number>}
    * @param G_MCC {Array.<Number>}
    * @param G_ECM {Array.<Number>}
-   * @param m_value_paris {Number} ! None
-   * @param c_value_paris {Number} ! None
+   * @param m_paris_mbt {Number} ! None
+   * @param c_paris_mbt {Number} ! None
+   * @param G_th_mbt {Number} ! None
+   * @param m_paris_mcc {Number} ! None
+   * @param c_paris_mcc {Number} ! None
+   * @param G_th_mcc {Number} ! None
+   * @param m_paris_ecm {Number} ! None
+   * @param c_paris_ecm {Number} ! None
+   * @param G_th_ecm {Number} ! None
    */
   constructor(
     specimenId,
@@ -71,8 +78,15 @@ class FatigueTest {
     G_MBT,
     G_MCC,
     G_ECM,
-    m_value_paris,
-    c_value_paris,
+    m_paris_mbt,
+    c_paris_mbt,
+    G_th_mbt,
+    m_paris_mcc,
+    c_paris_mcc,
+    G_th_mcc,
+    m_paris_ecm,
+    c_paris_ecm,
+    G_th_ecm,
   ) {
     FatigueTest.initialize(
       this,
@@ -98,8 +112,15 @@ class FatigueTest {
       G_MBT,
       G_MCC, 
       G_ECM,
-      m_value_paris,
-      c_value_paris,
+      m_paris_mbt, // Paris law exponent for MBT
+      c_paris_mbt, // Paris law coefficient for MBT
+      G_th_mbt, // Threshold energy release rate for MBT
+      m_paris_mcc, // Paris law exponent for MCC
+      c_paris_mcc, // Paris law coefficient for MCC
+      G_th_mcc, // Threshold energy release rate for MCC
+      m_paris_ecm, // Paris law exponent for ECM
+      c_paris_ecm, // Paris law coefficient for ECM
+      G_th_ecm, // Threshold energy release rate for ECM
     );
   }
 
@@ -132,8 +153,15 @@ class FatigueTest {
     G_MBT,
     G_MCC, 
     G_ECM,
-    m_value_paris,
-    c_value_paris,
+    m_paris_mbt, // Paris law exponent for MBT
+    c_paris_mbt, // Paris law coefficient for MBT
+    G_th_mbt, // Threshold energy release rate for MBT
+    m_paris_mcc, // Paris law exponent for MCC
+    c_paris_mcc, // Paris law coefficient for MCC
+    G_th_mcc, // Threshold energy release rate for MCC
+    m_paris_ecm, // Paris law exponent for ECM
+    c_paris_ecm, // Paris law coefficient for ECM
+    G_th_ecm, // Threshold energy release rate for ECM
   ) {
     obj["specimen_id"] = specimenId;
     obj["specimen_name"] = specimenName;
@@ -157,8 +185,15 @@ class FatigueTest {
     obj["G_MBT"] = G_MBT;
     obj["G_MCC"] = G_MCC;
     obj["G_ECM"] = G_ECM;
-    obj["m_value_paris"] = m_value_paris; // Paris law exponent
-    obj["c_value_paris"] = c_value_paris; // Paris law coefficient
+    obj["m_paris_mbt"] = m_paris_mbt; // Paris law exponent for MBT
+    obj["c_paris_mbt"] = c_paris_mbt; // Paris law coefficient for MBT
+    obj["G_th_mbt"] = G_th_mbt; // Threshold energy release rate for MBT
+    obj["m_paris_mcc"] = m_paris_mcc; // Paris law exponent for MCC
+    obj["c_paris_mcc"] = c_paris_mcc; // Paris law coefficient for MCC
+    obj["G_th_mcc"] = G_th_mcc; // Threshold energy release rate for MCC
+    obj["m_paris_ecm"] = m_paris_ecm; // Paris law exponent for ECM
+    obj["c_paris_ecm"] = c_paris_ecm; // Paris law coefficient for ECM
+    obj["G_th_ecm"] = G_th_ecm; // Threshold energy release rate for ECM
   }
 
   /**
@@ -170,7 +205,6 @@ class FatigueTest {
    */
   static constructFromObject(data, obj) {
     if (data) {
-      console.log("Raw FatigueTest data:", data); // useful logs
       obj = obj || new FatigueTest();
 
       if (data.hasOwnProperty("specimen_id")) {
@@ -280,20 +314,52 @@ class FatigueTest {
       if (data.hasOwnProperty("G_ECM")) {
         obj["G_ECM"] = ApiClient.convertToType(data["G_ECM"], ["Number"]);
       }
-      if (data.hasOwnProperty("m_value_paris")) {
-        obj["m_value_paris"] = ApiClient.convertToType(
-          data["m_value_paris"],
+      if (data.hasOwnProperty("m_paris_mbt")) {
+        obj["m_paris_mbt"] = ApiClient.convertToType(
+          data["m_paris_mbt"],
           "Number"
         );
       }
-      if (data.hasOwnProperty("c_value_paris")) {
-        obj["c_value_paris"] = ApiClient.convertToType(
-          data["c_value_paris"],
+      if (data.hasOwnProperty("c_paris_mbt")) {
+        obj["c_paris_mbt"] = ApiClient.convertToType(
+          data["c_paris_mbt"],
           "Number"
         );
+      }
+      if (data.hasOwnProperty("G_th_mbt")) {
+        obj["G_th_mbt"] = ApiClient.convertToType(data["G_th_mbt"], "Number");
+      }
+      if (data.hasOwnProperty("m_paris_mcc")) {
+        obj["m_paris_mcc"] = ApiClient.convertToType(
+          data["m_paris_mcc"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("c_paris_mcc")) {
+        obj["c_paris_mcc"] = ApiClient.convertToType(
+          data["c_paris_mcc"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("G_th_mcc")) {
+        obj["G_th_mcc"] = ApiClient.convertToType(data["G_th_mcc"], "Number");
+      }
+      if (data.hasOwnProperty("m_paris_ecm")) {
+        obj["m_paris_ecm"] = ApiClient.convertToType(
+          data["m_paris_ecm"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("c_paris_ecm")) {
+        obj["c_paris_ecm"] = ApiClient.convertToType(
+          data["c_paris_ecm"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("G_th_ecm")) {
+        obj["G_th_ecm"] = ApiClient.convertToType(data["G_th_ecm"], "Number");
       }
     }
-    console.log("Constructed FatigueTest object:", obj); // useful logs
     return obj;
   }
 }
@@ -401,12 +467,40 @@ FatigueTest.prototype["G_MCC"] = undefined;
  */
 FatigueTest.prototype["G_ECM"] = undefined;
 /**
- * @member {Number} m_value_paris - Paris law exponent
- */
-FatigueTest.prototype["m_value_paris"] = undefined;
+  * @member {Number} m_paris_mbt - Paris law exponent for MBT
+  */
+FatigueTest.prototype["m_paris_mbt"] = undefined;
 /**
- * @member {Number} c_value_paris - Paris law coefficient
- */
-FatigueTest.prototype["c_value_paris"] = undefined;
+  * @member {Number} c_paris_mbt - Paris law coefficient for MBT
+  */
+FatigueTest.prototype["c_paris_mbt"] = undefined;
+/**
+  * @member {Number} G_th_mbt - Threshold energy release rate for MBT
+  */
+FatigueTest.prototype["G_th_mbt"] = undefined;
+/**
+  * @member {Number} m_paris_mcc - Paris law exponent for MCC
+  */
+FatigueTest.prototype["m_paris_mcc"] = undefined;
+/**
+  * @member {Number} c_paris_mcc - Paris law coefficient for MCC
+  */
+FatigueTest.prototype["c_paris_mcc"] = undefined;
+/**
+  * @member {Number} G_th_mcc - Threshold energy release rate for MCC
+  */
+FatigueTest.prototype["G_th_mcc"] = undefined;
+/**
+  * @member {Number} m_paris_ecm - Paris law exponent for ECM
+  */
+FatigueTest.prototype["m_paris_ecm"] = undefined;
+/**
+  * @member {Number} c_paris_ecm - Paris law coefficient for ECM
+  */
+FatigueTest.prototype["c_paris_ecm"] = undefined;
+/**
+  * @member {Number} G_th_ecm - Threshold energy release rate for ECM
+  */
+FatigueTest.prototype["G_th_ecm"] = undefined;
 
 export default FatigueTest;

@@ -5,7 +5,6 @@
         <experiment-specifications :experiment="experiment.experiment" />
       </v-col>
     </v-row>
-
     <v-row>
       <v-col cols="auto">
         <h2>Test results</h2>
@@ -15,7 +14,6 @@
         <v-btn @click="goBack">Add test(s)</v-btn>
       </v-col>
     </v-row>
-
     <!-- Fatigue branch -->
     <v-row v-if="experimentType === 'FA' && !isFracture">
       <v-col cols="10">
@@ -60,6 +58,8 @@
                   :aspect-ratio="2"
                   x-axis-name="Strain [-]"
                   y-axis-name="Stress [MPa]"
+                  :x-axis-max="computeXAxisMax(strainStressSeriesFA)"
+                  :y-axis-max="computeYAxisMax(strainStressSeriesFA)"
                   :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
@@ -101,10 +101,15 @@
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
                   y-axis-name="Creep [-]"
-                  :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
-                  :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
+                  :x-axis-min="xAxisMode === 'normalized' ? 0 : 1"
+                  :x-axis-max="
+                    xAxisMode === 'normalized'
+                      ? 1
+                      : computeXAxisMax(creepSeries)
+                  "
+                  :y-axis-max="computeYAxisMax(creepSeries)"
                   :axis-label-formatter="axisTickFormatter"
-                  :tooltip-formatter="TooltipFormatter_5"
+                  :tooltip-formatter="format5"
                 />
               </v-card-text>
             </v-card>
@@ -145,10 +150,15 @@
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
                   y-axis-name="Hysteresis area [MPa]"
-                  :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
-                  :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
+                  :x-axis-min="xAxisMode === 'normalized' ? 0 : 1"
+                  :x-axis-max="
+                    xAxisMode === 'normalized'
+                      ? 1
+                      : computeXAxisMax(hysteresisAreaSeries)
+                  "
+                  :y-axis-max="computeYAxisMax(hysteresisAreaSeries)"
                   :axis-label-formatter="axisTickFormatter"
-                  :tooltip-formatter="TooltipFormatter_5"
+                  :tooltip-formatter="format5"
                 />
               </v-card-text>
             </v-card>
@@ -190,16 +200,19 @@
                     />
                   </v-col>
                 </v-row>
-
                 <simple-chart
                   :series="stiffnessSeries"
                   :aspect-ratio="2"
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
                   :y-axis-name="computedYAxisStiffnessLabel"
-                  :y-axis-max="yAxisMaxStiffness"
-                  :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
-                  :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
+                  :y-axis-max="computeYAxisMax(stiffnessSeries)"
+                  :x-axis-min="xAxisMode === 'normalized' ? 0 : 1"
+                  :x-axis-max="
+                    xAxisMode === 'normalized'
+                      ? 1
+                      : computeXAxisMax(stiffnessSeries)
+                  "
                   :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
@@ -222,7 +235,7 @@
               <li>
                 <experiment-s-v
                   subject="Stress at failure"
-                  :values="formattedStressAtFailure"
+                  :values="stressAtFailure.map(format2)"
                   :colors="valueColors"
                   :unit="units.stress"
                   tooltip="σ_fail is the stress level that induced failure..."
@@ -231,7 +244,7 @@
               <li>
                 <experiment-s-v
                   subject="Strain at failure"
-                  :values="formattedStrainAtFailure"
+                  :values="strainAtFailure.map(format4)"
                   :colors="valueColors"
                   unit="%"
                   tooltip="ε_fail is the deformation at the time of failure..."
@@ -257,7 +270,7 @@
               <li>
                 <experiment-s-v
                   subject="Total dissipated energy (TDE)"
-                  :values="formattedTotalDissipatedEnergies"
+                  :values="totalDissipatedEnergies.map(format2)"
                   :colors="valueColors"
                   :unit="units.stress"
                   tooltip="Sum of all hysteresis areas."
@@ -314,8 +327,12 @@
                   :aspect-ratio="2"
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
-                  :x-axis-max="xAxisMaxDoubleChart"
-                  :x-axis-min="xAxisMinDoubleChart"
+                  :x-axis-min="xAxisMode === 'normalized' ? 0 : 1"
+                  :x-axis-max="
+                    xAxisMode === 'normalized'
+                      ? 1
+                      : computeXAxisMax(stiffnessSeries)
+                  "
                   :y1-axis-name="'Load [kN]'"
                   :y1-axis-max="y1AxisMaxDoubleChart"
                   :y1-axis-min="y1AxisMinDoubleChart"
@@ -386,9 +403,16 @@
                   :aspect-ratio="2"
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
-                  :x-axis-min="xAxisMode === 'normalized' ? 0 : null"
-                  :x-axis-max="xAxisMode === 'normalized' ? 1 : null"
+                  :x-axis-min="xAxisMode === 'normalized' ? 0 : 1"
+                  :x-axis-max="
+                    xAxisMode === 'normalized'
+                      ? 1
+                      : computeXAxisMax(fractureEnergyVsCyclesSeriesCombined)
+                  "
                   y-axis-name="Fracture Energy [J/m²]"
+                  :y-axis-max="
+                    computeYAxisMax2(fractureEnergyVsCyclesSeriesCombined)
+                  "
                   :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
@@ -445,10 +469,11 @@
                   :y-axis-type="'log'"
                   :y-axis-min="yAxisLogLimits_daDnVsG.min"
                   :y-axis-max="yAxisLogLimits_daDnVsG.max"
-                  :x-axis-max="xAxisMaxGrowthRatevsFractureEnergy"
+                  :x-axis-min="computeXAxisMin(daDnVsGSeriesCombined)"
+                  :x-axis-max="computeXAxisMax2(daDnVsGSeriesCombined)"
                   :y-axis-split-number="yAxisLogLimits_daDnVsG.splitNumber"
                   :axis-label-formatter="axisTickFormatter"
-                  :tooltip-formatter="formatScientific"
+                  :tooltip-formatter="formatScientific2"
                 />
               </v-card-text>
             </v-card>
@@ -484,10 +509,20 @@
                   tooltip="No fatigue failure."
                 />
               </li>
+            </ul>
+          </v-card-text>
+        </v-card>
+        <!-- MBT -->
+        <v-card v-if="showMethod('mbt')" :loading="loading" class="mt-4">
+          <v-card-title class="text-subtitle-1 font-weight-medium"
+            >MBT Values</v-card-title
+          >
+          <v-card-text>
+            <ul>
               <li>
                 <experiment-s-v
                   subject="C"
-                  :values="formattedcParisValues"
+                  :values="cParisMBTValues.map(formatScientific2)"
                   :colors="valueColors"
                   tooltip="Paris fitting C value, stable region"
                 />
@@ -495,9 +530,90 @@
               <li>
                 <experiment-s-v
                   subject="m"
-                  :values="formattedmParisValues"
+                  :values="mParisMBTValues.map(format2)"
                   :colors="valueColors"
                   tooltip="Paris fitting m value, stable region"
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="Gth"
+                  :values="GthMBT.map(format2)"
+                  :colors="valueColors"
+                  :unit="'J/m²'"
+                  tooltip="Threshold energy value"
+                />
+              </li>
+            </ul>
+          </v-card-text>
+        </v-card>
+
+        <!-- MCC -->
+        <v-card v-if="showMethod('mcc')" :loading="loading" class="mt-4">
+          <v-card-title class="text-subtitle-1 font-weight-medium"
+            >MCC Values</v-card-title
+          >
+          <v-card-text>
+            <ul>
+              <li>
+                <experiment-s-v
+                  subject="C"
+                  :values="cParisMCCValues.map(formatScientific2)"
+                  :colors="valueColors"
+                  tooltip="Paris fitting C value, stable region"
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="m"
+                  :values="mParisMCCValues.map(format2)"
+                  :colors="valueColors"
+                  tooltip="Paris fitting m value, stable region"
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="Gth"
+                  :values="GthMCC.map(format2)"
+                  :colors="valueColors"
+                  :unit="'J/m²'"
+                  tooltip="Threshold energy value"
+                />
+              </li>
+            </ul>
+          </v-card-text>
+        </v-card>
+
+        <!-- ECM -->
+        <v-card v-if="showMethod('ecm')" :loading="loading" class="mt-4">
+          <v-card-title class="text-subtitle-1 font-weight-medium"
+            >ECM Values</v-card-title
+          >
+          <v-card-text>
+            <ul>
+              <li>
+                <experiment-s-v
+                  subject="C"
+                  :values="cParisECMValues.map(formatScientific2)"
+                  :colors="valueColors"
+                  tooltip="Paris fitting C value, stable region"
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="m"
+                  :values="mParisECMValues.map(format2)"
+                  :colors="valueColors"
+                  tooltip="Paris fitting m value, stable region"
+                />
+              </li>
+              <li>
+                <experiment-s-v
+                  subject="Gth"
+                  :values="GthECM.map(format2)"
+                  :colors="valueColors"
+                  :unit="'J/m²'"
+                  tooltip="Threshold energy value"
                 />
               </li>
             </ul>
@@ -533,7 +649,8 @@
               :aspect-ratio="2"
               x-axis-name="Strain [-]"
               y-axis-name="Stress [MPa]"
-              :y-axis-max="yAxisMaxStrainStressQS"
+              :y-axis-max="computeYAxisMax(strainStressSeriesQS)"
+              :x-axis-max="computeXAxisMax(strainStressSeriesQS)"
               :axis-label-formatter="axisTickFormatter"
             />
           </v-card-text>
@@ -554,7 +671,7 @@
               <li>
                 <experiment-s-v
                   subject="Max stress"
-                  :values="formattedStressAtFailure"
+                  :values="stressAtFailure.map(format2)"
                   :colors="valueColors"
                   :unit="units.stress"
                   tooltip="Maximum stress recorded in the test."
@@ -563,7 +680,7 @@
               <li>
                 <experiment-s-v
                   subject="Max strain"
-                  :values="formattedStrainAtFailure"
+                  :values="strainAtFailure.map(format4)"
                   :colors="valueColors"
                   unit="%"
                   tooltip="Maximum strain recorded in the test."
@@ -572,7 +689,7 @@
               <li>
                 <experiment-s-v
                   subject="Toughness"
-                  :values="formattedToughnessValues"
+                  :values="toughnessValues.map(format2)"
                   :colors="valueColors"
                   :unit="'N/mm²'"
                   tooltip="Area under the stress-strain curve..."
@@ -581,7 +698,7 @@
               <li>
                 <experiment-s-v
                   subject="Young's modulus"
-                  :values="formattedYoungModulusValues"
+                  :values="youngModulusValues.map(format2)"
                   :colors="valueColors"
                   :unit="'GPa'"
                   tooltip="Linear slope of the stress-strain curve between 0.0015 and 0.0035 strain."
@@ -590,7 +707,11 @@
               <li>
                 <experiment-s-v
                   subject="Poisson ratio"
-                  :values="formattedPoissonRatioValues"
+                  :values="
+                    poissonRatioValues.map((v) =>
+                      v == null ? '-' : format2(v)
+                    )
+                  "
                   :colors="valueColors"
                   :unit="'[-]'"
                   tooltip="Slope of the -eyy vs exx linear fit between 0.0015 and 0.0035 strain."
@@ -690,9 +811,10 @@
                   :aspect-ratio="2"
                   x-axis-name="Crack Length [mm]"
                   y-axis-name="Fracture Energy [J/m²]"
-                  :y-axis-max="yAxisMaxFractureEnergyCombined"
-                  :x-axis-min="xAxisMinFractureEnergyCombined"
-                  :x-axis-max="xAxisMaxFractureEnergyCombined"
+                  :y-axis-min="computeYAxisMin(fractureEnergySeriesCombined)"
+                  :y-axis-max="computeYAxisMax(fractureEnergySeriesCombined)"
+                  :x-axis-min="computeXAxisMin(fractureEnergySeriesCombined)"
+                  :x-axis-max="computeXAxisMax(fractureEnergySeriesCombined)"
                   :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
@@ -716,7 +838,7 @@
               <li>
                 <experiment-s-v
                   subject="Initial crack length"
-                  :values="formattedInitialCrackLengths"
+                  :values="initialCrackLengths.map(format2)"
                   :colors="valueColors"
                   :unit="'mm'"
                   tooltip="Initial crack length measured before testing."
@@ -745,7 +867,7 @@
         </v-card>
 
         <!-- MBT -->
-        <v-card v-if="showMBTDetails" :loading="loading" class="mt-4">
+        <v-card v-if="showMethod('mbt')" :loading="loading" class="mt-4">
           <v-card-title class="text-subtitle-1 font-weight-medium"
             >MBT Values</v-card-title
           >
@@ -754,7 +876,7 @@
               <li>
                 <experiment-s-v
                   subject="G initiation"
-                  :values="formattedGinitMBTQSValues"
+                  :values="ginitMBTQSValues.map(format2)"
                   :colors="valueColors"
                   :unit="'J/m²'"
                 />
@@ -762,7 +884,7 @@
               <li>
                 <experiment-s-v
                   subject="Bridging length"
-                  :values="formattedBridgingLengthsMBT"
+                  :values="bridginglengthsMBT.map(format2)"
                   :colors="valueColors"
                   :unit="'mm'"
                 />
@@ -770,7 +892,7 @@
               <li>
                 <experiment-s-v
                   subject="G plateau"
-                  :values="formattedGPlateauMBTQSValues"
+                  :values="gplateauMBTQSValues.map(format2)"
                   :colors="valueColors"
                   :unit="'J/m²'"
                 />
@@ -780,7 +902,7 @@
         </v-card>
 
         <!-- MCC -->
-        <v-card v-if="showMCCDetails" :loading="loading" class="mt-4">
+        <v-card v-if="showMethod('mcc')" :loading="loading" class="mt-4">
           <v-card-title class="text-subtitle-1 font-weight-medium"
             >MCC Values</v-card-title
           >
@@ -789,7 +911,7 @@
               <li>
                 <experiment-s-v
                   subject="G initiation"
-                  :values="formattedGinitMCCQSValues"
+                  :values="ginitMCCQSValues.map(format2)"
                   :colors="valueColors"
                   :unit="'J/m²'"
                 />
@@ -797,7 +919,7 @@
               <li>
                 <experiment-s-v
                   subject="Bridging length"
-                  :values="formattedBridgingLengthsMCC"
+                  :values="bridginglengthsMCC.map(format2)"
                   :colors="valueColors"
                   :unit="'mm'"
                 />
@@ -805,7 +927,7 @@
               <li>
                 <experiment-s-v
                   subject="G plateau"
-                  :values="formattedGPlateauMCCQSValues"
+                  :values="gplateauMCCQSValues.map(format2)"
                   :colors="valueColors"
                   :unit="'J/m²'"
                 />
@@ -815,7 +937,7 @@
         </v-card>
 
         <!-- ECM -->
-        <v-card v-if="showECMDetails" :loading="loading" class="mt-4">
+        <v-card v-if="showMethod('ecm')" :loading="loading" class="mt-4">
           <v-card-title class="text-subtitle-1 font-weight-medium"
             >ECM Values</v-card-title
           >
@@ -824,7 +946,7 @@
               <li>
                 <experiment-s-v
                   subject="G initiation"
-                  :values="formattedGinitECMQSValues"
+                  :values="ginitECMQSValues.map(format2)"
                   :colors="valueColors"
                   :unit="'J/m²'"
                 />
@@ -832,7 +954,7 @@
               <li>
                 <experiment-s-v
                   subject="Bridging length"
-                  :values="formattedBridgingLengthsECM"
+                  :values="bridginglengthsECM.map(format2)"
                   :colors="valueColors"
                   :unit="'mm'"
                 />
@@ -840,7 +962,7 @@
               <li>
                 <experiment-s-v
                   subject="G plateau"
-                  :values="formattedGPlateauECMQSValues"
+                  :values="gplateauECMQSValues.map(format2)"
                   :colors="valueColors"
                   :unit="'J/m²'"
                 />
@@ -862,11 +984,16 @@ import InfoTooltip from "@/components/InfoTooltip.vue";
 import {
   computeLogYAxisLimits,
   computeXAxisMax,
+  computeXAxisMax2,
   computeXAxisMin,
   computeYAxisMax,
+  computeYAxisMax2,
   computeYAxisMin,
-  formatNumber0,
-  formatNumber5,
+  format0,
+  format2,
+  format4,
+  format5,
+  formatScientific2,
   formatTick,
 } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
@@ -898,8 +1025,15 @@ export default {
       strainAtFailure: [],
       specimenIds: [],
       totalDissipatedEnergies: [],
-      mParisValues: [],
-      cParisValues: [],
+      mParisMBTValues: [],
+      cParisMBTValues: [],
+      GthMBT: [],
+      mParisMCCValues: [],
+      cParisMCCValues: [],
+      GthMCC: [],
+      mParisECMValues: [],
+      cParisECMValues: [],
+      GthECM: [],
       runOuts: [],
       selectedLoopIndices: [], // { value }
       crackSeries: [],
@@ -911,7 +1045,7 @@ export default {
       stressOption: null,
       toughnessValues: [],
       youngModulusValues: [],
-      quasiStaticPoissonRatios: [],
+      poissonRatioValues: [],
       ginitMBTQSValues: [],
       bridginglengthsMBT: [],
       gplateauMBTQSValues: [],
@@ -1069,7 +1203,6 @@ export default {
         const name = d.specimen_name || `Specimen ${id}`;
         const color = this.colors[i % this.colors.length];
         if (!d.crack_n_cycles?.length || !d.crack_load?.length) {
-          console.warn("⚠️ Missing crack data for specimen", id);
           return [];
         }
         const transformedX = this.transformXAxis(d.crack_n_cycles, d.n_fail);
@@ -1216,27 +1349,6 @@ export default {
     },
 
     // --- Chart Axis: Min/Max Calculations ---
-    yAxisMaxStrainStressQS() {
-      return computeYAxisMax(this.strainStressSeriesQS);
-    },
-    yAxisMaxStiffness() {
-      return computeYAxisMax(this.stiffnessSeries);
-    },
-    yAxisMaxFractureEnergyCombined() {
-      return computeYAxisMax(this.fractureEnergySeriesCombined);
-    },
-    yAxisMaxFractureEnergyVsCycles() {
-      return computeYAxisMax(this.fractureEnergyVsCyclesSeriesCombined);
-    },
-    xAxisMaxFractureEnergyCombined() {
-      return computeXAxisMax(this.fractureEnergySeriesCombined);
-    },
-    xAxisMinFractureEnergyCombined() {
-      return computeXAxisMin(this.fractureEnergySeriesCombined);
-    },
-    xAxisMaxGrowthRatevsFractureEnergy() {
-      return computeXAxisMax(this.daDnVsGSeriesCombined);
-    },
     // Double chart axis min/max for both FA and QS fracture
     xAxisMaxDoubleChart() {
       const series =
@@ -1252,37 +1364,36 @@ export default {
           : this.crackFaFractureSeries;
       return computeXAxisMin(series);
     },
+    // series displayed in the double-chart (only one source: QS or FA)
+    doubleChartSeries() {
+      return this.isFracture && this.experimentType === "QS"
+        ? this.crackSeries
+        : this.crackFaFractureSeries;
+    },
+
+    // ------------------ Y1 (Load) ------------------
     y1AxisMaxDoubleChart() {
-      const series =
-        this.isFracture && this.experimentType === "QS"
-          ? this.crackSeries
-          : this.crackFaFractureSeries;
-      const y1Series = series.filter((s) => s.yAxisIndex !== 1);
-      return computeYAxisMax(y1Series);
+      // asse sinistro = yAxisIndex 0 (o undefined, che ECharts considera 0)
+      const y1 = this.doubleChartSeries.filter(
+        (s) => (s.yAxisIndex ?? 0) === 0
+      );
+      return computeYAxisMax(y1);
     },
     y1AxisMinDoubleChart() {
-      const series =
-        this.isFracture && this.experimentType === "QS"
-          ? this.crackSeries
-          : this.crackFaFractureSeries;
-      const y1Series = series.filter((s) => s.yAxisIndex !== 1);
-      return computeYAxisMin(y1Series);
+      const y1 = this.doubleChartSeries.filter(
+        (s) => (s.yAxisIndex ?? 0) === 0
+      );
+      return computeYAxisMin(y1);
     },
+
+    // ------------------ Y2 (Crack length) ----------
     y2AxisMaxDoubleChart() {
-      const series =
-        this.isFracture && this.experimentType === "QS"
-          ? this.crackSeries
-          : this.crackFaFractureSeries;
-      const y2Series = series.filter((s) => s.yAxisIndex === 1);
-      return computeYAxisMax(y2Series);
+      const y2 = this.doubleChartSeries.filter((s) => s.yAxisIndex === 1);
+      return computeYAxisMax(y2);
     },
     y2AxisMinDoubleChart() {
-      const series =
-        this.isFracture && this.experimentType === "QS"
-          ? this.crackSeries
-          : this.crackFaFractureSeries;
-      const y2Series = series.filter((s) => s.yAxisIndex === 1);
-      return computeYAxisMin(y2Series);
+      const y2 = this.doubleChartSeries.filter((s) => s.yAxisIndex === 1);
+      return computeYAxisMin(y2);
     },
     yAxisLogLimits_daDnVsG() {
       const { min, max, splitNumber } = computeLogYAxisLimits(
@@ -1294,133 +1405,18 @@ export default {
     axisTickFormatter() {
       return formatTick;
     },
-    TooltipFormatter_5() {
-      return formatNumber5;
-    },
-    XAxis_cycles() {
-      return formatNumber0;
-    },
     xAxisTickFormatter() {
-      // Custom tick formatter for x axis
-      if (this.xAxisMode === "normal") {
-        return this.XAxis_cycles();
-      }
-      return this.axisTickFormatter;
+      return this.xAxisMode === "normal" ? format0 : this.axisTickFormatter;
     },
-
     // --- Value Formatting for UI ---
     valueColors() {
       // Color for each specimen/test
       return this.testIds.map((_, i) => this.colors[i % this.colors.length]);
     },
-    formattedStressAtFailure() {
-      return this.stressAtFailure.map((s) =>
-        s != null ? Number(s).toFixed(2) : "-"
-      );
-    },
-    formattedStrainAtFailure() {
-      return this.strainAtFailure.map((e) =>
-        e != null ? Number(e).toFixed(4) : "-"
-      );
-    },
-    formattedToughnessValues() {
-      return this.toughnessValues.map((t) =>
-        t != null ? Number(t).toFixed(2) : "-"
-      );
-    },
-    formattedInitialCrackLengths() {
-      return this.initialCrackLengths.map((v) =>
-        v != null ? Number(v).toFixed(2) : "-"
-      );
-    },
-    formattedYoungModulusValues() {
-      return this.youngModulusValues.map((v) =>
-        v != null ? Number(v).toFixed(2) : "-"
-      );
-    },
-    formattedPoissonRatioValues() {
-      return this.quasiStaticPoissonRatios?.map((v) =>
-        v != null && isFinite(v) ? Number(v).toFixed(3) : "-"
-      );
-    },
-    formattedTotalDissipatedEnergies() {
-      return this.totalDissipatedEnergies.map((e) =>
-        e != null ? Number(e).toFixed(2) : "-"
-      );
-    },
-    formattedmParisValues() {
-      return this.mParisValues.map((e) =>
-        e != null ? Number(e).toFixed(2) : "-"
-      );
-    },
-    formattedcParisValues() {
-      return this.cParisValues.map((e) =>
-        e != null ? Number(e).toExponential(2) : "-"
-      );
-    },
-    formattedGinitMBTQSValues() {
-      return this.ginitMBTQSValues.map((v) =>
-        v != null ? Number(v).toFixed(2) : "-"
-      );
-    },
-    formattedBridgingLengthsMBT() {
-      return this.bridginglengthsMBT.map((v) =>
-        v != null ? Number(v).toFixed(2) : "-"
-      );
-    },
-    formattedGPlateauMBTQSValues() {
-      return this.gplateauMBTQSValues.map((v) =>
-        v != null ? Number(v).toFixed(2) : "-"
-      );
-    },
-    formattedGinitMCCQSValues() {
-      return this.ginitMCCQSValues.map((v) =>
-        v != null ? Number(v).toFixed(2) : "-"
-      );
-    },
-    formattedBridgingLengthsMCC() {
-      return this.bridginglengthsMCC.map((v) =>
-        v != null ? Number(v).toFixed(2) : "-"
-      );
-    },
-    formattedGPlateauMCCQSValues() {
-      return this.gplateauMCCQSValues.map((v) =>
-        v != null ? Number(v).toFixed(2) : "-"
-      );
-    },
-    formattedGinitECMQSValues() {
-      return this.ginitECMQSValues.map((v) =>
-        v != null ? Number(v).toFixed(2) : "-"
-      );
-    },
-    formattedBridgingLengthsECM() {
-      return this.bridginglengthsECM.map((v) =>
-        v != null ? Number(v).toFixed(2) : "-"
-      );
-    },
-    formattedGPlateauECMQSValues() {
-      return this.gplateauECMQSValues.map((v) =>
-        v != null ? Number(v).toFixed(2) : "-"
-      );
-    },
     // --- Warnings ---
     hasWarnings() {
       // True if any fatigue test has warnings
       return this.testIds.some((_, i) => this.fatigueWarnings?.[i]);
-    },
-
-    // --- Conditional banners ---
-    showMBTDetails() {
-      const selected = this.selectedFractureEnergyMethods;
-      return selected.length === 0 || selected.includes("mbt");
-    },
-    showMCCDetails() {
-      const selected = this.selectedFractureEnergyMethods;
-      return selected.length === 0 || selected.includes("mcc");
-    },
-    showECMDetails() {
-      const selected = this.selectedFractureEnergyMethods;
-      return selected.length === 0 || selected.includes("ecm");
     },
   },
   watch: {
@@ -1456,8 +1452,15 @@ export default {
       this.strainAtFailure = [];
       this.specimenIds = [];
       this.totalDissipatedEnergies = [];
-      this.mParisValues = [];
-      this.cParisValues = [];
+      this.mParisMBTValues = [];
+      this.cParisMBTValues = [];
+      this.GthMBT = [];
+      this.mParisMCCValues = [];
+      this.cParisMCCValues = [];
+      this.GthMCC = [];
+      this.mParisECMValues = [];
+      this.cParisECMValues = [];
+      this.GthECM = [];
       this.runOuts = [];
       this.fatigueData = dataList;
       dataList.forEach((d, i) => {
@@ -1468,8 +1471,15 @@ export default {
         this.strainAtFailure.push(d.strain_at_failure);
         this.specimenIds.push(d.specimen_id);
         this.totalDissipatedEnergies.push(d.total_dissipated_energy);
-        this.mParisValues.push(d.m_value_paris);
-        this.cParisValues.push(d.c_value_paris);
+        this.mParisMBTValues.push(d.m_paris_mbt);
+        this.cParisMBTValues.push(d.c_paris_mbt);
+        this.GthMBT.push(d.G_th_mbt);
+        this.mParisMCCValues.push(d.m_paris_mcc);
+        this.cParisMCCValues.push(d.c_paris_mcc);
+        this.GthMCC.push(d.G_th_mcc);
+        this.mParisECMValues.push(d.m_paris_ecm);
+        this.cParisECMValues.push(d.c_paris_ecm);
+        this.GthECM.push(d.G_th_ecm);
         this.runOuts.push(d.run_out);
         this.fatigueWarnings.push(d.warning_messages || false);
         d.crack_length = d.crack_length || [];
@@ -1502,7 +1512,7 @@ export default {
       this.strainAtFailure = [];
       this.toughnessValues = []; // new
       this.youngModulusValues = []; // new
-      this.quasiStaticPoissonRatios = []; // new
+      this.poissonRatioValues = []; // new
       this.initialCrackLengths = []; // new
       this.crackLengthData = {};
       this.ginitMBTQSValues = [];
@@ -1544,7 +1554,6 @@ export default {
         if (typeof d.specimen_id !== "undefined") {
           this.specimenIds.push(String(d.specimen_id));
         } else {
-          console.warn("⚠️ specimen_id missing for test", tid);
           this.specimenIds.push("–"); // or "N/A" for visual clarity
         }
         const stressValues = Object.values(d.stress)
@@ -1566,7 +1575,7 @@ export default {
         this.youngModulusValues.push(
           isFinite(d.young_modulus) ? Number(d.young_modulus) : null
         );
-        this.quasiStaticPoissonRatios.push(d.poisson_ratio);
+        this.poissonRatioValues.push(d.poisson_ratio);
         this.ginitMBTQSValues.push(
           isFinite(d.g_init_mbt) ? Number(d.g_init_mbt) : null
         );
@@ -1621,10 +1630,23 @@ export default {
       if (!base || base === 0) return values;
       return values.map((v) => (isFinite(v) ? v / base : v));
     },
-    formatScientific(value) {
-      if (typeof value !== "number" || !isFinite(value)) return value;
-      return value.toExponential(2); // ad esempio 2 cifre decimali
+    showMethod(method) {
+      return (
+        this.selectedFractureEnergyMethods.length === 0 ||
+        this.selectedFractureEnergyMethods.includes(method)
+      );
     },
+    format0,
+    format2,
+    format4,
+    format5,
+    formatScientific2,
+    computeYAxisMin,
+    computeYAxisMax,
+    computeYAxisMax2,
+    computeXAxisMax,
+    computeXAxisMin,
+    computeXAxisMax2,
   },
 };
 </script>

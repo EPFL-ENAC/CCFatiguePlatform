@@ -3,6 +3,10 @@
     <v-card>
       <v-card-title>Upload Guidelines</v-card-title>
       <v-card-text>
+        <p class="text-body-1 text-justify font-weight-bold red--text">
+          Read this pdf carefully, each line is important and fundamental to
+          pass the dataset checker.
+        </p>
         <v-btn color="primary" outlined @click="showPdf = !showPdf">
           {{ showPdf ? "Hide PDF" : "Open PDF" }}
         </v-btn>
@@ -61,6 +65,20 @@
                 here
               </v-btn>
             </v-alert>
+            <v-alert
+              v-if="integrationResult && integrationResult.success"
+              type="success"
+              class="mt-4"
+            >
+              Email sent
+            </v-alert>
+            <v-alert
+              v-else-if="integrationResult && !integrationResult.success"
+              type="error"
+              class="mt-4"
+            >
+              {{ integrationResult.message || "Failed to send email." }}
+            </v-alert>
           </template>
           <template v-else>
             <v-alert type="error">
@@ -118,17 +136,12 @@ export default {
       },
       selectedFile: null,
       fileOptions: [
-        { text: "Quasi static", value: "/downloads/QuasiStatic.zip" },
-        {
-          text: "Quasi static with fracture",
-          value: "/downloads/QuasiStatic_fracture.zip",
-        },
-        { text: "Fatigue", value: "/downloads/Fatigue.zip" },
-        {
-          text: "Fatigue with fracture",
-          value: "/downloads/Fatigue_fracture.zip",
-        },
+        { text: "Quasi static", value: "QuasiStatic" },
+        { text: "Quasi static with fracture", value: "QuasiStatic_fracture" },
+        { text: "Fatigue", value: "Fatigue" },
+        { text: "Fatigue with fracture", value: "Fatigue_fracture" },
       ],
+      integrationResult: null, // { success, filename, recipient, message }
     };
   },
   computed: {
@@ -146,9 +159,14 @@ export default {
   methods: {
     downloadFile() {
       if (!this.selectedFile) return;
+
+      const zipUrl = `${
+        this.$experimentsApi.apiClient.basePath
+      }/downloads_zip?folder_name=${encodeURIComponent(this.selectedFile)}`;
+
       const link = document.createElement("a");
-      link.href = this.selectedFile;
-      link.setAttribute("download", this.selectedFile.split("/").pop());
+      link.href = zipUrl;
+      link.setAttribute("download", `${this.selectedFile}.zip`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -200,18 +218,23 @@ export default {
       const formData = new FormData();
       formData.append("file", this.experimentZip.file);
       try {
-        await axios.post(
+        const response = await axios.post(
           `${this.$experimentsApi.apiClient.basePath}/experiments/integrate_dataset`,
           formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
+          { headers: { "Content-Type": "multipart/form-data" } }
         );
-        this.$toast?.success("Dataset copied to Data/raw successfully.");
-      } catch {
-        this.$toast?.error("Failed to copy dataset.");
+
+        // Salvo il risultato per mostrare il v-alert persistente in pagina
+        this.integrationResult = response?.data || { success: true };
+
+        // Mantengo anche il toast rapido
+        this.$toast?.success("Email sent successfully.");
+      } catch (err) {
+        this.integrationResult = {
+          success: false,
+          message: err?.response?.data?.detail || "Failed to send email.",
+        };
+        this.$toast?.error("Failed to send email.");
       }
     },
   },
