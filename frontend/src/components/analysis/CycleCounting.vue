@@ -25,9 +25,12 @@
               <info-tooltip>
                 See the
                 <a
-                  href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/LDS_Data_Convention.md"
-                  >LDS Data Convention</a
+                  href="/downloads/LDS_Data_Convention.pdf"
+                  target="_blank"
+                  rel="noopener"
                 >
+                  LDS Data Convention
+                </a>
               </info-tooltip>
             </template>
           </v-file-input>
