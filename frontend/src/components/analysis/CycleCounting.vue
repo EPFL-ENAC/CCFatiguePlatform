@@ -25,12 +25,9 @@
               <info-tooltip>
                 See the
                 <a
-                  href="/downloads/LDS_Data_Convention.pdf"
-                  target="_blank"
-                  rel="noopener"
+                  href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/LDS_Data_Convention.md"
+                  >LDS Data Convention</a
                 >
-                  LDS Data Convention
-                </a>
               </info-tooltip>
             </template>
           </v-file-input>
@@ -43,6 +40,18 @@
             :disabled="loading"
             @change="updateOutput"
           >
+            <template #append-outer>
+              <info-tooltip>
+                See the
+                <a
+                  href="/downloads/CycleCounting_Methods.pdf"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  Cycle Counting Methods
+                </a>
+              </info-tooltip>
+            </template>
           </v-select>
         </v-col>
       </v-row>
@@ -143,6 +152,9 @@ export default {
         );
         download(this.output, outputName + ".csv", "text/csv");
       }
+    },
+    openCycleCountingPDF() {
+      window.open("/downloads/CycleCounting_Methods.pdf", "_blank");
     },
   },
 };
