@@ -71,7 +71,9 @@
         <info-tooltip>
           See the
           <a
-            href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/CYC_Data_Convention.md"
+            href="/downloads/CYC_output_guide.pdf"
+            target="_blank"
+            rel="noopener"
             >CYC Data Convention</a
           >
         </info-tooltip>
