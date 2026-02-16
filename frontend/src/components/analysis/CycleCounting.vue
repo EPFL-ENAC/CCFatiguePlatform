@@ -3,11 +3,23 @@
     <v-card-title>
       Cycle Counting
       <v-spacer />
-      <info-tooltip
-        >Cycle counting is used to summarize irregular load-versus-time
-        histories by providing the number of occurrences of cycles of various
-        sizes.</info-tooltip
-      >
+      <info-tooltip>
+        Cycle counting is used to summarize irregular load-versus-time histories
+        <br />
+        by providing the number of occurrences of cycles of various sizes.
+        <br />
+        <a
+          href="/downloads/CycleCounting_Methods.pdf"
+          target="_blank"
+          rel="noopener"
+          variant="text"
+          density="compact"
+          class="pa-0 text-decoration-underline"
+          style="color: blue; text-transform: none; min-width: 0"
+        >
+          See detailed description of the methods (PDF)
+        </a>
+      </info-tooltip>
     </v-card-title>
     <v-card-subtitle>
       <v-row align="end">
@@ -40,18 +52,6 @@
             :disabled="loading"
             @change="updateOutput"
           >
-            <template #append-outer>
-              <info-tooltip>
-                See the
-                <a
-                  href="/downloads/CycleCounting_Methods.pdf"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  Cycle Counting Methods
-                </a>
-              </info-tooltip>
-            </template>
           </v-select>
         </v-col>
       </v-row>
