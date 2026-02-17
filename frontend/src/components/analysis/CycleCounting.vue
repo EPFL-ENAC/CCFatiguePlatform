@@ -37,7 +37,13 @@
               <info-tooltip>
                 See the
                 <a
-                  href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/LDS_Data_Convention.md"
+                  href="/downloads/LDS_Data_Convention.pdf"
+                  target="_blank"
+                  rel="noopener"
+                  variant="text"
+                  density="compact"
+                  class="pa-0 text-decoration-underline"
+                  style="color: blue; text-transform: none; min-width: 0"
                   >LDS Data Convention</a
                 >
               </info-tooltip>
