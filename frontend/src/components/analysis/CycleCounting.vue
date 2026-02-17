@@ -44,7 +44,7 @@
                   density="compact"
                   class="pa-0 text-decoration-underline"
                   style="color: blue; text-transform: none; min-width: 0"
-                  >LDS Data Convention</a
+                  >LDS Data Convention (PDF)</a
                 >
               </info-tooltip>
             </template>
@@ -80,7 +80,11 @@
             href="/downloads/CYC_output_guide.pdf"
             target="_blank"
             rel="noopener"
-            >CYC Data Convention</a
+            variant="text"
+            density="compact"
+            class="pa-0 text-decoration-underline"
+            style="color: blue; text-transform: none; min-width: 0"
+            >CYC Data Convention (PDF)</a
           >
         </info-tooltip>
       </v-btn>
