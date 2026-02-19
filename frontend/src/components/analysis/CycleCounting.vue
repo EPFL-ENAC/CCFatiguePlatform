@@ -62,101 +62,54 @@
         </v-col>
       </v-row>
     </v-card-subtitle>
+    <!-- GRAPH (plein largeur) -->
     <v-card-text v-if="stats" class="pt-0">
-      <v-row>
-        <v-col cols="12" sm="4" md="3">
-          <v-card outlined class="pa-3">
-            <div class="text-caption font-weight-bold text-uppercase mb-2">
-              Summary
-            </div>
-
-            <div class="mt-3 text-caption font-weight-bold mb-2">Cycles</div>
-            <v-divider class="mb-2" />
-            <div class="d-flex justify-space-between">
-              <span class="text-body-2">Full cycles</span>
-              <span class="text-body-2 font-weight-bold red--text">{{
-                stats.fullCycleCount
-              }}</span>
-            </div>
-
-            <div class="d-flex justify-space-between">
-              <span class="text-body-2">Half cycles</span>
-              <span class="text-body-2 font-weight-bold red--text">{{
-                stats.halfCycleCount
-              }}</span>
-            </div>
-
-            <div class="d-flex justify-space-between">
-              <span class="text-body-2">Equivalent number of cycles</span>
-              <span class="text-body-2 font-weight-bold red--text">
-                {{ Math.round(stats.eqCycles) }}
-              </span>
-            </div>
-
-            <div class="mt-3 text-caption font-weight-bold mb-2">Signal</div>
-            <v-divider class="mb-2" />
-            <div class="d-flex justify-space-between">
-              <span class="text-body-2">Stress min</span>
-              <span class="text-body-2 font-weight-bold red--text">
-                {{ formatNumber(stats.signalMin) }} MPa
-              </span>
-            </div>
-            <div class="d-flex justify-space-between">
-              <span class="text-body-2">Stress max</span>
-              <span class="text-body-2 font-weight-bold red--text">
-                {{ formatNumber(stats.signalMax) }} MPa
-              </span>
-            </div>
-
-            <div class="mt-3 text-caption font-weight-bold mb-2">
-              Stress range
-            </div>
-            <v-divider class="mb-2" />
-            <div class="d-flex justify-space-between">
-              <span class="text-body-2">Min</span>
-              <span class="text-body-2 font-weight-bold red--text">
-                {{ formatNumber(stats.stressRangeMin) }} MPa
-              </span>
-            </div>
-            <div class="d-flex justify-space-between">
-              <span class="text-body-2">Max</span>
-              <span class="text-body-2 font-weight-bold red--text">
-                {{ formatNumber(stats.stressRangeMax) }} MPa
-              </span>
-            </div>
-
-            <div class="mt-3 text-caption font-weight-bold mb-2">
-              Stress mean
-            </div>
-            <v-divider class="mb-2" />
-            <div class="d-flex justify-space-between">
-              <span class="text-body-2">Min</span>
-              <span class="text-body-2 font-weight-bold red--text">
-                {{ formatNumber(stats.stressMeanMin) }} MPa
-              </span>
-            </div>
-            <div class="d-flex justify-space-between">
-              <span class="text-body-2">Max</span>
-              <span class="text-body-2 font-weight-bold red--text">
-                {{ formatNumber(stats.stressMeanMax) }} MPa
-              </span>
-            </div>
-          </v-card>
-        </v-col>
-
-        <v-col cols="12" sm="8" md="8">
-          <!-- le graphique reste comme avant -->
-          <simple-chart
-            v-if="series.length > 0"
-            :aspect-ratio="2"
-            :series="series"
-            x-axis-name="Cummulative Percentage of Spectrum Cycles"
-            y-axis-name="Stress Range [MPa]"
-          />
-        </v-col>
-      </v-row>
+      <simple-chart
+        v-if="series.length > 0"
+        :aspect-ratio="2"
+        :series="series"
+        :y-axis-min="stats?.yAxisMin"
+        :y-axis-max="stats?.yAxisMax"
+        :y-axis-interval="stats?.yInterval"
+        x-axis-name="Cumulative Percentage of Spectrum Cycles"
+        y-axis-name="Stress Range [MPa]"
+      />
     </v-card-text>
-    <v-card-actions v-if="hasInput" class="justify-end">
+
+    <!-- BARRE DU BAS : stats à gauche + download à droite -->
+    <v-card-actions v-if="hasInput" class="align-center">
+      <v-card
+        v-if="stats"
+        outlined
+        class="pa-2"
+        style="background: #fafafa; border-radius: 6px"
+      >
+        <div class="d-flex flex-wrap align-center" style="gap: 14px">
+          <span class="text-body-2">
+            Full cycles:
+            <span class="font-weight-bold red--text">
+              {{ stats.fullCycleCount }}
+            </span>
+          </span>
+
+          <span class="text-body-2">
+            Half cycles:
+            <span class="font-weight-bold red--text">
+              {{ stats.halfCycleCount }}
+            </span>
+          </span>
+
+          <span class="text-body-2">
+            Constant amplitudes:
+            <span class="font-weight-bold red--text">
+              {{ stats.constantAmplitudes }}
+            </span>
+          </span>
+        </div>
+      </v-card>
+
+      <v-spacer />
+
       <v-btn :disabled="loading && output != null" @click="downloadOutput">
         Download CYC
         <info-tooltip>
@@ -217,94 +170,75 @@ export default {
         this.$analysisApi
           .runCycleCountingFile(this.method, this.file)
           .then(async (data) => {
-            this.stats = null;
             this.output = data;
 
-            // ---------- 1) LDS (input) => min/max du signal ----------
-            const ldsText = await this.readFileAsText(this.file);
-
-            // ⚠️ on force header:true pour récupérer les colonnes
-            const ldsParsed = parse(ldsText, { ...parserConfig, header: true });
-            const ldsRows = ldsParsed?.data || [];
-
-            const toNum = (v) => {
-              if (v === null || v === undefined || v === "") return NaN;
-              return Number(v);
-            };
-            const min = (arr) => (arr.length ? Math.min(...arr) : null);
-            const max = (arr) => (arr.length ? Math.max(...arr) : null);
-            const sum = (arr) => arr.reduce((acc, x) => acc + x, 0);
-
-            // adapte la liste si tu connais le nom exact dans LDS
-            const ldsStressKey = this.getFirstNumericColumn(ldsRows, [
-              "stress",
-              "stress_max",
-              "sigma",
-              "stress_MPa",
-            ]);
-
-            const ldsStressVals = ldsStressKey
-              ? ldsRows
-                  .map((r) => toNum(r[ldsStressKey]))
-                  .filter(Number.isFinite)
-              : [];
-
-            const signalMin = min(ldsStressVals);
-            const signalMax = max(ldsStressVals);
-
-            // ---------- 2) CYC (output) => cycles + range/mean min/max ----------
             const cycResults = parse(data, parserConfig);
-            const rows = cycResults?.data || [];
+            const rows = (cycResults?.data || []).filter(
+              (r) =>
+                r &&
+                Object.values(r).some(
+                  (v) =>
+                    v !== null && v !== undefined && String(v).trim() !== ""
+                )
+            );
 
-            const nums = (key) =>
-              rows.map((r) => toNum(r[key])).filter((x) => Number.isFinite(x));
-
-            const ncy = nums("n_cycles");
-            const srange = nums("stress_range");
-            const smean = nums("stress_mean");
-
-            // cycles :
-            // - eqCycles : somme des n_cycles (équivalent en cycles)
-            // - fullCycleCount : nombre de cycles complets (compte) = somme des parties entières
-            // - halfCycleCount : nombre de demi-cycles (compte) = 2 * somme des parties fractionnaires
-            //   (ex: 0.5 => 1 demi-cycle ; 2.5 => 1 demi-cycle ; 52.5 => 1 demi-cycle)
-
-            const eqCycles = sum(ncy);
+            const toNum = (v) =>
+              v === null || v === undefined || v === "" ? NaN : Number(v);
+            const ncy = rows
+              .map((r) => toNum(r.n_cycles))
+              .filter(Number.isFinite);
 
             const fullCycleCount = ncy.reduce(
               (acc, v) => acc + Math.floor(v),
               0
             );
-
-            // fractionnaire (0 ou 0.5 normalement). On arrondit pour éviter les erreurs flottantes.
             const halfCycleCount = ncy.reduce((acc, v) => {
               const frac = v - Math.floor(v);
-              const halfs = Math.round(frac * 2); // 0.5 -> 1, 0 -> 0
-              return acc + halfs;
+              return acc + Math.round(frac * 2);
             }, 0);
 
-            // ---------- stats finales ----------
+            let points = rows
+              .map((r) => [toNum(r.cum_n_cycles), toNum(r.stress_range)])
+              .filter(([x, y]) => Number.isFinite(x) && Number.isFinite(y));
+
+            points.sort((a, b) => a[0] - b[0]);
+
+            // y axis rounding
+            const ys = points.map((p) => p[1]);
+            const yMin = Math.min(...ys);
+            const yMax = Math.max(...ys);
+            const yInterval = 2;
+            const yAxisMin = Math.floor(yMin / yInterval) * yInterval;
+            const yAxisMax = Math.ceil(yMax / yInterval) * yInterval;
+
+            // extend x to 100%
+            if (points.length) {
+              const last = points[points.length - 1];
+              if (last[0] < 100) points.push([100, last[1]]);
+            }
+
+            // ✅ one single stats object
             this.stats = {
-              eqCycles,
               fullCycleCount,
               halfCycleCount,
-              signalMin,
-              signalMax,
-              stressRangeMin: min(srange),
-              stressRangeMax: max(srange),
-              stressMeanMin: min(smean),
-              stressMeanMax: max(smean),
+              constantAmplitudes: rows.length,
+              yAxisMin,
+              yAxisMax,
+              yInterval,
             };
 
-            // chart inchangé
             this.series = [
               {
                 type: "line",
+                step: "end",
                 name: this.method,
-                data: rows.map((item) => [
-                  item.cum_n_cycles,
-                  item.stress_range,
-                ]),
+                data: points,
+                markPoint: {
+                  data: [
+                    { type: "max", name: "Max" },
+                    { type: "min", name: "Min" },
+                  ],
+                },
               },
             ];
 

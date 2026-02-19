@@ -54,6 +54,8 @@ export default {
     xAxisMin: { type: [Number, null], default: null },
     xAxisMax: { type: [Number, null], default: null },
     yAxisMax: { type: [Number, null], default: null },
+    yAxisMin: { type: [Number, null], default: null },
+    yAxisInterval: { type: [Number, null], default: null },
     axisLabelFormatter: {
       type: Function,
       default: format3,
@@ -108,16 +110,32 @@ export default {
           nameGap: 50,
           logBase: this.yAxisType === "log" ? 10 : undefined,
           minorSplitLine: { show: this.yAxisType === "log" },
-          min: this.yAxisType === "log" ? yLogLimits.min : 0,
+
+          min:
+            this.yAxisType === "log"
+              ? yLogLimits.min
+              : this.yAxisMin != null
+              ? this.yAxisMin
+              : 0,
+
           max:
             this.yAxisType === "log"
               ? yLogLimits.max
               : this.yAxisMax != null
               ? this.yAxisMax
               : "dataMax",
+
+          interval:
+            this.yAxisType === "log"
+              ? undefined
+              : this.yAxisInterval != null
+              ? this.yAxisInterval
+              : undefined,
+
           scale: this.yAxisType === "log" ? false : undefined,
           nice: this.yAxisType === "log" ? false : undefined,
           boundaryGap: this.yAxisType === "log" ? false : undefined,
+
           axisLabel: {
             formatter: (val) =>
               this.yAxisType === "log"
