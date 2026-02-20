@@ -38,19 +38,23 @@ class Astm:
     ) -> float:
         """
         Return ASTM val corresponding to given degrees of freedom
-        Parameters
-        ----------
-            degrees_of_freedom_n1: float
-            degrees_of_freedom_n2: float
-        Returns
-        -------
-            astm_val: float
         """
+        # n1 is a column name (string)
         if degrees_of_freedom_n1 != np.inf:
             degrees_of_freedom_n1 = round(degrees_of_freedom_n1)
 
-        astm_val = self.astm_rl_df.loc[self.astm_rl_df.n == degrees_of_freedom_n2][
-            str(degrees_of_freedom_n1)
-        ].values[0]
+        # n2 is in the "n" column -> must be int-like
+        degrees_of_freedom_n2 = round(degrees_of_freedom_n2)
 
-        return astm_val or 0  # casting Optional[float] to float
+        # Filter row
+        row = self.astm_rl_df.loc[self.astm_rl_df["n"] == degrees_of_freedom_n2]
+        if row.empty:
+            return 0.0  # fallback instead of crashing
+
+        col = str(degrees_of_freedom_n1)
+        if col not in row.columns:
+            return 0.0  # fallback if n1 not in table
+
+        astm_val = row[col].values[0]
+        return float(astm_val) if pd.notna(astm_val) else 0.0
+ 
