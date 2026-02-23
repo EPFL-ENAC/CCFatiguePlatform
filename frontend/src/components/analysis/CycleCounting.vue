@@ -64,16 +64,63 @@
     </v-card-subtitle>
     <!-- GRAPH (plein largeur) -->
     <v-card-text v-if="stats" class="pt-0">
-      <simple-chart
-        v-if="series.length > 0"
-        :aspect-ratio="2"
-        :series="series"
-        :y-axis-min="stats?.yAxisMin"
-        :y-axis-max="stats?.yAxisMax"
-        :y-axis-interval="stats?.yInterval"
-        x-axis-name="Cumulative Percentage of Spectrum Cycles"
-        y-axis-name="Stress Range [MPa]"
-      />
+      <div class="text-h6 font-weight-bold text-center mb-4">
+        Cycle spectrum (Cumulative percentage vs Stress range)
+      </div>
+      <!-- ROW 1 : Summary (left) + 2D chart (right) -->
+      <v-row>
+        <!-- SUMMARY LEFT (3 values only) -->
+        <v-col cols="12" sm="4" md="3">
+          <v-card outlined class="pa-3">
+            <div class="mt-2 text-caption font-weight-bold mb-2">Cycles</div>
+            <v-divider class="mb-2" />
+
+            <div class="d-flex justify-space-between">
+              <span class="text-body-2">Full cycles</span>
+              <span class="text-body-2 font-weight-bold red--text">
+                {{ stats.fullCycleCount }}
+              </span>
+            </div>
+
+            <div class="d-flex justify-space-between">
+              <span class="text-body-2">Half cycles</span>
+              <span class="text-body-2 font-weight-bold red--text">
+                {{ stats.halfCycleCount }}
+              </span>
+            </div>
+
+            <div class="d-flex justify-space-between">
+              <span class="text-body-2">Constant amplitudes</span>
+              <span class="text-body-2 font-weight-bold red--text">
+                {{ stats.constantAmplitudes }}
+              </span>
+            </div>
+          </v-card>
+        </v-col>
+
+        <!-- 2D chart -->
+        <v-col cols="12" sm="8" md="9">
+          <simple-chart
+            v-if="series.length > 0"
+            :aspect-ratio="2"
+            :series="series"
+            :y-axis-min="stats?.yAxisMin"
+            :y-axis-max="stats?.yAxisMax"
+            :y-axis-interval="stats?.yInterval"
+            x-axis-name="Cumulative Percentage of Spectrum Cycles"
+            y-axis-name="Stress Range [MPa]"
+          />
+        </v-col>
+      </v-row>
+
+      <!-- spacing between 2D block and Markov -->
+      <div class="my-3" />
+
+      <!-- ROW 2 : Markov full width -->
+      <div class="text-h6 font-weight-bold text-center mb-2">
+        Markov Matrix (Range–Mean Cycle Distribution)
+      </div>
+
       <Markov3D
         v-if="markovData && markovData.length"
         :data="markovData"
@@ -82,61 +129,65 @@
         x-label="Stress range [MPa]"
         y-label="Stress mean [MPa]"
         z-label="Number of cycles"
-        title="Markov-like histogram (binned from CYC output)"
+        title=""
       />
+
+      <!-- Row under Markov: info left + download right -->
+      <div v-if="stats" class="mt-2">
+        <v-row align="center">
+          <!-- Info card ONLY on the left -->
+          <v-col cols="12" sm="8">
+            <v-card
+              outlined
+              class="pa-2"
+              style="background: white; border-radius: 6px"
+            >
+              <div class="text-body-2 font-weight-bold">
+                Bin widths (Markov discretization):
+              </div>
+              <div class="text-body-2">
+                Matrix
+                <span class="font-weight-bold">
+                  {{ stats.markovSize }}×{{ stats.markovSize }}
+                </span>
+                · ΔRange
+                <span class="font-weight-bold">
+                  {{ formatNumber(stats.rangeBinSize) }} MPa
+                </span>
+                · ΔMean
+                <span class="font-weight-bold">
+                  {{ formatNumber(stats.meanBinSize) }} MPa
+                </span>
+              </div>
+            </v-card>
+          </v-col>
+
+          <!-- Download button on the right (outside the card) -->
+          <v-col cols="12" sm="4" class="d-flex justify-end">
+            <v-btn
+              :disabled="loading && output != null"
+              @click="downloadOutput"
+            >
+              Download CYC
+              <info-tooltip>
+                See the
+                <a
+                  href="/downloads/CYC_output_guide.pdf"
+                  target="_blank"
+                  rel="noopener"
+                  variant="text"
+                  density="compact"
+                  class="pa-0 text-decoration-underline"
+                  style="color: blue; text-transform: none; min-width: 0"
+                >
+                  CYC Data Convention (PDF)
+                </a>
+              </info-tooltip>
+            </v-btn>
+          </v-col>
+        </v-row>
+      </div>
     </v-card-text>
-
-    <!-- BARRE DU BAS : stats à gauche + download à droite -->
-    <v-card-actions v-if="hasInput" class="align-center">
-      <v-card
-        v-if="stats"
-        outlined
-        class="pa-2"
-        style="background: #fafafa; border-radius: 6px"
-      >
-        <div class="d-flex flex-wrap align-center" style="gap: 14px">
-          <span class="text-body-2">
-            Full cycles:
-            <span class="font-weight-bold red--text">
-              {{ stats.fullCycleCount }}
-            </span>
-          </span>
-
-          <span class="text-body-2">
-            Half cycles:
-            <span class="font-weight-bold red--text">
-              {{ stats.halfCycleCount }}
-            </span>
-          </span>
-
-          <span class="text-body-2">
-            Constant amplitudes:
-            <span class="font-weight-bold red--text">
-              {{ stats.constantAmplitudes }}
-            </span>
-          </span>
-        </div>
-      </v-card>
-
-      <v-spacer />
-
-      <v-btn :disabled="loading && output != null" @click="downloadOutput">
-        Download CYC
-        <info-tooltip>
-          See the
-          <a
-            href="/downloads/CYC_output_guide.pdf"
-            target="_blank"
-            rel="noopener"
-            variant="text"
-            density="compact"
-            class="pa-0 text-decoration-underline"
-            style="color: blue; text-transform: none; min-width: 0"
-            >CYC Data Convention (PDF)</a
-          >
-        </info-tooltip>
-      </v-btn>
-    </v-card-actions>
   </v-card>
 </template>
 <script>
@@ -205,6 +256,10 @@ export default {
             // --------------------
             const MATRIX_SIZE = 64;
 
+            // defaults (so ESLint + pts.length === 0 are OK)
+            let rangeBinSize = null;
+            let meanBinSize = null;
+
             const pts = rows
               .map((r) => ({
                 range: toNum(r.stress_range),
@@ -223,9 +278,11 @@ export default {
               const rMax = Math.max(...pts.map((p) => p.range));
               const mMin = Math.min(...pts.map((p) => p.mean));
               const mMax = Math.max(...pts.map((p) => p.mean));
-
               const rSpan = rMax - rMin || 1;
               const mSpan = mMax - mMin || 1;
+
+              rangeBinSize = rSpan / MATRIX_SIZE;
+              meanBinSize = mSpan / MATRIX_SIZE;
 
               const xCenters = Array.from({ length: MATRIX_SIZE }, (_, i) => {
                 return rMin + (i + 0.5) * (rSpan / MATRIX_SIZE);
@@ -234,6 +291,8 @@ export default {
                 return mMin + (j + 0.5) * (mSpan / MATRIX_SIZE);
               });
 
+              this.markovXCenters = xCenters;
+              this.markovYCenters = yCenters;
               const mat = Array.from({ length: MATRIX_SIZE }, () =>
                 Array(MATRIX_SIZE).fill(0)
               );
@@ -258,7 +317,7 @@ export default {
               for (let i = 0; i < MATRIX_SIZE; i++) {
                 for (let j = 0; j < MATRIX_SIZE; j++) {
                   const z = mat[i][j];
-                  if (z > 0) data3d.push([i, j, z]);
+                  if (z > 0) data3d.push([i, j, z, xCenters[i], yCenters[j]]);
                 }
               }
 
@@ -266,12 +325,8 @@ export default {
               data3d.sort((a, b) => b[2] - a[2]);
 
               this.markovData = data3d.slice(0, TOP_N);
-              this.markovXCenters = xCenters;
-              this.markovYCenters = yCenters;
             } else {
               this.markovData = [];
-              this.markovXCenters = [];
-              this.markovYCenters = [];
             }
 
             // --------------------
@@ -315,6 +370,9 @@ export default {
               yAxisMin,
               yAxisMax,
               yInterval,
+              markovSize: MATRIX_SIZE,
+              rangeBinSize,
+              meanBinSize,
             };
 
             this.series = [
@@ -323,12 +381,6 @@ export default {
                 step: "end",
                 name: this.method,
                 data: points,
-                markPoint: {
-                  data: [
-                    { type: "max", name: "Max" },
-                    { type: "min", name: "Min" },
-                  ],
-                },
               },
             ];
 
@@ -386,7 +438,7 @@ export default {
     },
     formatNumber(v) {
       if (v === null || v === undefined || Number.isNaN(v)) return "-";
-      return Number(v).toFixed(3);
+      return Number(v).toFixed(1);
     },
   },
 };
