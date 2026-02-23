@@ -74,6 +74,16 @@
         x-axis-name="Cumulative Percentage of Spectrum Cycles"
         y-axis-name="Stress Range [MPa]"
       />
+      <Markov3D
+        v-if="markovData && markovData.length"
+        :data="markovData"
+        :x-centers="markovXCenters"
+        :y-centers="markovYCenters"
+        x-label="Stress range [MPa]"
+        y-label="Stress mean [MPa]"
+        z-label="Number of cycles"
+        title="Markov-like histogram (binned from CYC output)"
+      />
     </v-card-text>
 
     <!-- BARRE DU BAS : stats à gauche + download à droite -->
@@ -131,6 +141,7 @@
 </template>
 <script>
 import CycleCountingMethod from "@/backend/model/CycleCountingMethod";
+import Markov3D from "@/components/charts/Markov3D";
 import SimpleChart from "@/components/charts/SimpleChart";
 import InfoTooltip from "@/components/InfoTooltip";
 import { getOutputFileName } from "@/utils/analysis";
@@ -145,6 +156,7 @@ export default {
   components: {
     InfoTooltip,
     SimpleChart,
+    Markov3D,
   },
   data() {
     return {
@@ -156,6 +168,9 @@ export default {
       errorMessages: null,
       series: [],
       stats: null,
+      markovData: [],
+      markovXCenters: [],
+      markovYCenters: [],
     };
   },
   computed: {
@@ -184,6 +199,84 @@ export default {
 
             const toNum = (v) =>
               v === null || v === undefined || v === "" ? NaN : Number(v);
+
+            // --------------------
+            // Build Markov-like (64x64) from CYC output (stress_range / stress_mean / n_cycles)
+            // --------------------
+            const MATRIX_SIZE = 64;
+
+            const pts = rows
+              .map((r) => ({
+                range: toNum(r.stress_range),
+                mean: toNum(r.stress_mean),
+                cycles: toNum(r.n_cycles),
+              }))
+              .filter(
+                (p) =>
+                  Number.isFinite(p.range) &&
+                  Number.isFinite(p.mean) &&
+                  Number.isFinite(p.cycles)
+              );
+
+            if (pts.length) {
+              const rMin = Math.min(...pts.map((p) => p.range));
+              const rMax = Math.max(...pts.map((p) => p.range));
+              const mMin = Math.min(...pts.map((p) => p.mean));
+              const mMax = Math.max(...pts.map((p) => p.mean));
+
+              const rSpan = rMax - rMin || 1;
+              const mSpan = mMax - mMin || 1;
+
+              const xCenters = Array.from({ length: MATRIX_SIZE }, (_, i) => {
+                return rMin + (i + 0.5) * (rSpan / MATRIX_SIZE);
+              });
+              const yCenters = Array.from({ length: MATRIX_SIZE }, (_, j) => {
+                return mMin + (j + 0.5) * (mSpan / MATRIX_SIZE);
+              });
+
+              const mat = Array.from({ length: MATRIX_SIZE }, () =>
+                Array(MATRIX_SIZE).fill(0)
+              );
+
+              const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+              for (const p of pts) {
+                const i = clamp(
+                  Math.floor(((p.range - rMin) / rSpan) * MATRIX_SIZE),
+                  0,
+                  MATRIX_SIZE - 1
+                );
+                const j = clamp(
+                  Math.floor(((p.mean - mMin) / mSpan) * MATRIX_SIZE),
+                  0,
+                  MATRIX_SIZE - 1
+                );
+                mat[i][j] += p.cycles;
+              }
+
+              const data3d = [];
+              for (let i = 0; i < MATRIX_SIZE; i++) {
+                for (let j = 0; j < MATRIX_SIZE; j++) {
+                  const z = mat[i][j];
+                  if (z > 0) data3d.push([i, j, z]);
+                }
+              }
+
+              const TOP_N = 1500;
+              data3d.sort((a, b) => b[2] - a[2]);
+
+              this.markovData = data3d.slice(0, TOP_N);
+              this.markovXCenters = xCenters;
+              this.markovYCenters = yCenters;
+            } else {
+              this.markovData = [];
+              this.markovXCenters = [];
+              this.markovYCenters = [];
+            }
+
+            // --------------------
+            // Existing stats + curve
+            // --------------------
             const ncy = rows
               .map((r) => toNum(r.n_cycles))
               .filter(Number.isFinite);
@@ -203,7 +296,6 @@ export default {
 
             points.sort((a, b) => a[0] - b[0]);
 
-            // y axis rounding
             const ys = points.map((p) => p[1]);
             const yMin = Math.min(...ys);
             const yMax = Math.max(...ys);
@@ -211,13 +303,11 @@ export default {
             const yAxisMin = Math.floor(yMin / yInterval) * yInterval;
             const yAxisMax = Math.ceil(yMax / yInterval) * yInterval;
 
-            // extend x to 100%
             if (points.length) {
               const last = points[points.length - 1];
               if (last[0] < 100) points.push([100, last[1]]);
             }
 
-            // ✅ one single stats object
             this.stats = {
               fullCycleCount,
               halfCycleCount,
