@@ -158,8 +158,8 @@ export default {
           // Increase gap so the x-axis title is not too close to tick labels.
           nameGap: 34,
           nameTextStyle: {
-            fontSize: 16,
-            fontWeight: "bold",
+            fontSize: 20,
+            fontWeight: 400,
           },
           // If bounds are not provided, let ECharts use dataMin/dataMax.
           min: this.xAxisMin != null ? this.xAxisMin : "dataMin",
@@ -169,6 +169,7 @@ export default {
             hideOverlap: true,
             showMaxLabel: true,
             showMinLabel: true,
+            fontSize: 18,
           },
         },
 
@@ -177,10 +178,10 @@ export default {
           name: this.yAxisName,
           nameLocation: "middle",
           // Bigger gap to improve readability (especially with large ticks).
-          nameGap: 60,
+          nameGap: 50,
           nameTextStyle: {
-            fontSize: 16,
-            fontWeight: "bold",
+            fontSize: 20,
+            fontWeight: 400,
           },
 
           // Log axis configuration
@@ -231,6 +232,7 @@ export default {
             hideOverlap: true,
             showMaxLabel: true,
             showMinLabel: true,
+            fontSize: 18,
           },
         },
 

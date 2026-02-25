@@ -7,6 +7,26 @@
 import * as echarts from "echarts";
 import "echarts-gl";
 
+function hexToRgb(hex) {
+  const h = String(hex || "").replace("#", "");
+  const full =
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h;
+  const n = parseInt(full, 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+function mixWithWhite(hex, t) {
+  const { r, g, b } = hexToRgb(hex);
+  const rr = Math.round(r + (255 - r) * t);
+  const gg = Math.round(g + (255 - g) * t);
+  const bb = Math.round(b + (255 - b) * t);
+  return `rgb(${rr},${gg},${bb})`;
+}
+
 export default {
   name: "Markov3D",
   props: {
@@ -42,6 +62,7 @@ export default {
      * (e.g., 1/2/3 columns). We only call resize().
      */
     resizeKey: { type: Number, default: 0 },
+    baseColor: { type: String, default: "#d32f2f" },
   },
 
   data() {
@@ -144,7 +165,7 @@ export default {
               : v[4];
 
             // Simple coloring for readability
-            const cPhys = "#d32f2f";
+            const cPhys = this.baseColor;
             const cBin = "#666";
 
             return [
@@ -175,8 +196,10 @@ export default {
           bottom: 10,
           min: zMin,
           max: zMax,
+          inRange: {
+            color: [mixWithWhite(this.baseColor, 0.85), this.baseColor],
+          },
         },
-
         /**
          * Axes are category-based:
          * - displayed categories are 1..N (human-friendly)
@@ -185,37 +208,42 @@ export default {
         xAxis3D: {
           type: "category",
           name: this.xLabel,
-          nameGap: 20,
-          nameTextStyle: { fontSize: 16 },
+          nameGap: 25,
+          nameTextStyle: { fontSize: 20 },
 
           // Categories are 1..N (NOT 0..N-1)
           data: Array.from({ length: xCount }, (_, i) => i + 1),
 
           axisLabel: {
-            // Show one label every ~8 bins to avoid clutter
             interval: 8,
             rotate: 35,
             showMaxLabel: true,
-
-            // Rich label shows: "bin" + "(MPa)"
             formatter: (v) => {
               const idx = Number(v) - 1;
               const mp = this.xCenters?.[idx];
+
               return `{bin|${v}} {mpa|(${fmtMpa(mp)} MPa)}`;
             },
             rich: {
-              bin: { fontWeight: 600, fontSize: 10, color: "#333" },
-              mpa: { color: "#d32f2f", fontWeight: 700, fontSize: 10 },
+              bin: {
+                color: "#000",
+                fontSize: 16,
+                fontWeight: 400,
+              },
+              mpa: {
+                color: this.baseColor,
+                fontSize: 16,
+                fontWeight: 400,
+              },
             },
           },
-          splitLine: { show: true },
         },
 
         yAxis3D: {
           type: "category",
           name: this.yLabel,
-          nameGap: 20,
-          nameTextStyle: { fontSize: 16 },
+          nameGap: 25,
+          nameTextStyle: { fontSize: 20 },
 
           data: Array.from({ length: yCount }, (_, j) => j + 1),
 
@@ -226,11 +254,20 @@ export default {
             formatter: (v) => {
               const idx = Number(v) - 1;
               const mp = this.yCenters?.[idx];
+
               return `{bin|${v}} {mpa|(${fmtMpa(mp)} MPa)}`;
             },
             rich: {
-              bin: { fontWeight: 600, fontSize: 10, color: "#333" },
-              mpa: { color: "#d32f2f", fontWeight: 700, fontSize: 10 },
+              bin: {
+                color: "#000",
+                fontSize: 16,
+                fontWeight: 400,
+              },
+              mpa: {
+                color: this.baseColor,
+                fontSize: 16,
+                fontWeight: 400,
+              },
             },
           },
           splitLine: { show: true },
@@ -239,6 +276,12 @@ export default {
         zAxis3D: {
           name: this.zLabel,
           nameGap: 20,
+          nameTextStyle: { fontSize: 20 },
+          axisLabel: {
+            textStyle: {
+              fontSize: 18,
+            },
+          },
         },
 
         /**
@@ -248,18 +291,18 @@ export default {
          * - lighting improves depth perception
          */
         grid3D: {
-          boxWidth: 50,
-          boxDepth: 50,
-          boxHeight: 50,
+          boxWidth: 70,
+          boxDepth: 70,
+          boxHeight: 70,
 
           // Leave room at bottom for labels/visualMap
-          top: -30,
-          bottom: 200,
+          top: -100,
+          bottom: 300,
 
           viewControl: {
-            alpha: 10,
+            alpha: 12,
             beta: 45,
-            distance: 105,
+            distance: 150,
           },
 
           light: {

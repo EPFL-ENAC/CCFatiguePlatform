@@ -69,7 +69,7 @@
     </v-card-subtitle>
 
     <v-card-text v-if="stats" class="pt-0">
-      <div class="text-h6 font-weight-bold text-center mb-4">
+      <div style="font-weight: 700; font-size: 23px" class="text-center mb-4">
         Cycle spectrum (Cumulative percentage vs Stress range)
       </div>
 
@@ -150,7 +150,7 @@
         <v-divider />
       </div>
 
-      <div class="text-h6 font-weight-bold text-center mb-2">
+      <div style="font-weight: 700; font-size: 23px" class="text-center mb-2">
         Markov Matrix (Range–Mean Cycle Distribution)
       </div>
 
@@ -179,12 +179,13 @@
             :data="markovByMethod[m].markovData"
             :x-centers="markovByMethod[m].xCenters"
             :y-centers="markovByMethod[m].yCenters"
-            x-label="Stress range [MPa]"
-            y-label="Stress mean [MPa]"
+            x-label="Stress range [Nb bins]"
+            y-label="Stress mean [Nb bins]"
             z-label="Number of cycles"
             title=""
-            :height="700"
+            :height="selectedMethods.length === 1 ? 800 : 700"
             :resize-key="markovLayoutKey"
+            :base-color="methodColors[m]"
           />
 
           <v-card
@@ -200,7 +201,7 @@
                   markovByMethod[m].markovSize
                 }}</b
               >
-              · ΔRangE
+              · ΔRange
               <b>{{ formatNumber(markovByMethod[m].rangeBinSize) }} MPa</b>
               · ΔMean
               <b>{{ formatNumber(markovByMethod[m].meanBinSize) }} MPa</b>
@@ -274,7 +275,7 @@ const COLOR_PALETTE = [
 ];
 const MATRIX_SIZE_DEFAULT = 64;
 const TOP_N_DEFAULT = 1500;
-const Y_INTERVAL = 2;
+const Y_INTERVAL = 5;
 
 /**
  * Convert to number; returns NaN for empty values.
@@ -542,7 +543,7 @@ export default {
     /** MPa formatting (one decimal place for bin sizes, etc.) */
     formatNumber(v) {
       if (v === null || v === undefined || Number.isNaN(v)) return "-";
-      return Number(v).toFixed(1); // 1 decimal (MPa)
+      return Number(v).toFixed(2); // 1 decimal (MPa)
     },
 
     /**
