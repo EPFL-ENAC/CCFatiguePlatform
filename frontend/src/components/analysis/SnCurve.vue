@@ -36,7 +36,7 @@
           </v-file-input>
         </v-col>
       </v-row>
-      <v-row>
+      <v-row align="end">
         <v-col>
           <v-select
             v-model="selectedMethods"
@@ -44,11 +44,13 @@
             :items="methods"
             chips
             multiple
+            variant="underlined"
+            density="comfortable"
             :disabled="loading"
             @change="updateOutput"
-          >
-          </v-select>
+          />
         </v-col>
+
         <v-col>
           <v-select
             v-model="selectedRRatios"
@@ -56,10 +58,25 @@
             :items="rRatios"
             chips
             multiple
+            variant="underlined"
+            density="comfortable"
             :disabled="loading"
             @change="updateOutput"
-          >
-          </v-select>
+          />
+        </v-col>
+
+        <v-col>
+          <v-select
+            v-model="xAxisType"
+            label="X-Axis scale"
+            :items="[
+              { text: 'Cycle count', value: 'value' },
+              { text: 'Log(Cycle count)', value: 'log' },
+            ]"
+            item-title="text"
+            item-value="value"
+            :disabled="loading"
+          />
         </v-col>
       </v-row>
     </v-card-subtitle>
@@ -68,10 +85,12 @@
         :aspect-ratio="2"
         :series="series"
         title="S-N Curves"
-        x-axis-name="N"
+        :x-axis-type="xAxisType"
+        :x-axis-name="
+          xAxisType === 'log' ? 'log₁₀(Number of cycles)' : 'Number of cycles'
+        "
         y-axis-name="σₘₐₓ [MPa]"
-        x-axis-type="log"
-      ></simple-chart>
+      />
     </v-card-text>
     <v-card-actions v-if="hasInput" class="justify-end">
       <v-btn :disabled="loading && outputs != null" @click="downloadOutput">
@@ -117,6 +136,7 @@ export default {
       selectedRRatios: [rRatios[0]],
       outputs: {},
       series: [],
+      xAxisType: "log",
     };
   },
   computed: {

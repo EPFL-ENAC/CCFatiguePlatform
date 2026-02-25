@@ -131,6 +131,19 @@ export default {
       const yLogLimits =
         this.yAxisType === "log" ? computeLogYAxisLimits(this.series) : null;
 
+      const yDataMax = Math.max(
+        ...this.series.flatMap((s) =>
+          (s.data ?? []).map((pt) =>
+            Array.isArray(pt) ? Number(pt[1]) : Number(pt)
+          )
+        )
+      );
+
+      const yNiceMax =
+        Number.isFinite(yDataMax) && this.yAxisType !== "log"
+          ? Math.ceil(yDataMax / 50) * 50
+          : undefined;
+
       return {
         title: {
           text: this.title,
@@ -159,17 +172,30 @@ export default {
           nameGap: 34,
           nameTextStyle: {
             fontSize: 20,
-            fontWeight: 400,
+            fontWeight: "bold",
           },
           // If bounds are not provided, let ECharts use dataMin/dataMax.
           min: this.xAxisMin != null ? this.xAxisMin : "dataMin",
           max: this.xAxisMax != null ? this.xAxisMax : "dataMax",
+          logBase: this.xAxisType === "log" ? 10 : undefined,
           axisLabel: {
-            formatter: this.axisLabelFormatter,
-            hideOverlap: true,
-            showMaxLabel: true,
-            showMinLabel: true,
             fontSize: 18,
+            formatter: (val) => {
+              if (this.xAxisType === "log") {
+                const exp = Math.log10(val);
+                const expRounded = Math.round(exp);
+                if (Math.abs(exp - expRounded) < 1e-10)
+                  return `10^${expRounded}`;
+                return "";
+              }
+
+              const n = Number(val);
+              if (!Number.isFinite(n)) return String(val);
+              return Math.round(n).toLocaleString(undefined, {
+                maximumFractionDigits: 0,
+                useGrouping: false,
+              });
+            },
           },
         },
 
@@ -205,7 +231,7 @@ export default {
               ? yLogLimits.max
               : this.yAxisMax != null
               ? this.yAxisMax
-              : "dataMax",
+              : yNiceMax ?? "dataMax",
 
           // Tick interval applies only to linear scale.
           interval:
@@ -221,14 +247,16 @@ export default {
           boundaryGap: this.yAxisType === "log" ? false : undefined,
 
           axisLabel: {
-            /**
-             * For log axis, show exponent notation: 10^n.
-             * For linear axis, use axisLabelFormatter.
-             */
-            formatter: (val) =>
-              this.yAxisType === "log"
-                ? `10^${Math.round(Math.log10(val))}`
-                : this.axisLabelFormatter(val),
+            formatter: (val) => {
+              if (this.yAxisType === "log") {
+                return `10^${Math.round(Math.log10(val))}`;
+              }
+
+              const n = Number(val);
+              if (!Number.isFinite(n)) return val;
+
+              return Math.round(n); // ← plus de décimales
+            },
             hideOverlap: true,
             showMaxLabel: true,
             showMinLabel: true,
