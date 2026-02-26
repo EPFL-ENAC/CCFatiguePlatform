@@ -23,7 +23,6 @@ import {
 } from "echarts/components";
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
-import { merge } from "lodash";
 import VChart from "vue-echarts";
 
 /**
@@ -131,19 +130,6 @@ export default {
       const yLogLimits =
         this.yAxisType === "log" ? computeLogYAxisLimits(this.series) : null;
 
-      const yDataMax = Math.max(
-        ...this.series.flatMap((s) =>
-          (s.data ?? []).map((pt) =>
-            Array.isArray(pt) ? Number(pt[1]) : Number(pt)
-          )
-        )
-      );
-
-      const yNiceMax =
-        Number.isFinite(yDataMax) && this.yAxisType !== "log"
-          ? Math.ceil(yDataMax / 50) * 50
-          : undefined;
-
       return {
         title: {
           text: this.title,
@@ -229,10 +215,12 @@ export default {
           max:
             this.yAxisType === "log"
               ? yLogLimits.max
-              : this.yAxisMax != null
-              ? this.yAxisMax
-              : yNiceMax ?? "dataMax",
-
+              : (value) => {
+                  const autoMax = value.max * 1.05;
+                  return this.yAxisMax != null
+                    ? Math.max(this.yAxisMax, autoMax)
+                    : autoMax;
+                },
           // Tick interval applies only to linear scale.
           interval:
             this.yAxisType === "log"
@@ -243,7 +231,7 @@ export default {
 
           // Disable "nice" scaling on log axes to avoid unexpected bounds.
           scale: this.yAxisType === "log" ? false : undefined,
-          nice: this.yAxisType === "log" ? false : undefined,
+          nice: false,
           boundaryGap: this.yAxisType === "log" ? false : undefined,
 
           axisLabel: {
@@ -350,7 +338,10 @@ export default {
          * Force showSymbol=false unless a series explicitly overrides it.
          * Improves readability and performance for large datasets.
          */
-        series: this.series.map((serie) => merge(serie, { showSymbol: false })),
+        series: this.series.map((s) => ({
+          ...s,
+          showSymbol: s.showSymbol ?? false,
+        })),
 
         color: this.color,
       };
