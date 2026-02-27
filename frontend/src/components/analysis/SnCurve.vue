@@ -3,6 +3,13 @@
     <v-card-title>
       S-N Curve
       <v-spacer />
+
+      <v-btn icon variant="text" size="small" @click="collapsed = !collapsed">
+        <v-icon>
+          {{ collapsed ? "mdi-chevron-down" : "mdi-chevron-up" }}
+        </v-icon>
+      </v-btn>
+
       <info-tooltip>
         This module plots curves on the (Stress - Number of cycles) plane. The
         curves are associated with 3 different methods (Lin-Log, Log-Log,
@@ -11,100 +18,106 @@
         over the tests with inputs (Cycles to failure - Stress at failure)
       </info-tooltip>
     </v-card-title>
-    <v-card-subtitle>
-      <v-row align="center">
-        <v-col>
-          <v-file-input
-            v-model="file"
-            chips
-            show-size
-            accept=".csv"
-            label="AGG csv file"
-            :disabled="loading"
-            @change="updateOutput"
-          >
-            <template #append>
-              <info-tooltip>
-                See the
-                <a
-                  href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/AGG_Data_Convention.md"
-                >
-                  AGG Data Convention
-                </a>
-              </info-tooltip>
-            </template>
-          </v-file-input>
-        </v-col>
-      </v-row>
-      <v-row align="end">
-        <v-col>
-          <v-select
-            v-model="selectedMethods"
-            label="select S-N curve method(s)"
-            :items="methods"
-            chips
-            multiple
-            variant="underlined"
-            density="comfortable"
-            :disabled="loading"
-            @change="updateOutput"
-          />
-        </v-col>
+    <v-expand-transition>
+      <div v-show="!collapsed">
+        <v-card-subtitle>
+          <v-row align="center">
+            <v-col>
+              <v-file-input
+                v-model="file"
+                chips
+                show-size
+                accept=".csv"
+                label="AGG csv file"
+                :disabled="loading"
+                @change="updateOutput"
+              >
+                <template #append>
+                  <info-tooltip>
+                    See the
+                    <a
+                      href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/AGG_Data_Convention.md"
+                    >
+                      AGG Data Convention
+                    </a>
+                  </info-tooltip>
+                </template>
+              </v-file-input>
+            </v-col>
+          </v-row>
+          <v-row align="end">
+            <v-col>
+              <v-select
+                v-model="selectedMethods"
+                label="select S-N curve method(s)"
+                :items="methods"
+                chips
+                multiple
+                variant="underlined"
+                density="comfortable"
+                :disabled="loading"
+                @change="updateOutput"
+              />
+            </v-col>
 
-        <v-col>
-          <v-select
-            v-model="selectedRRatios"
-            label="select R ratio"
-            :items="rRatios"
-            chips
-            multiple
-            variant="underlined"
-            density="comfortable"
-            :disabled="loading"
-            @change="updateOutput"
-          />
-        </v-col>
+            <v-col>
+              <v-select
+                v-model="selectedRRatios"
+                label="select R ratio"
+                :items="rRatios"
+                chips
+                multiple
+                variant="underlined"
+                density="comfortable"
+                :disabled="loading"
+                @change="updateOutput"
+              />
+            </v-col>
 
-        <v-col>
-          <v-select
-            v-model="xAxisType"
-            label="X-Axis scale"
-            :items="[
-              { text: 'Cycle count', value: 'value' },
-              { text: 'Log(Cycle count)', value: 'log' },
-            ]"
-            item-title="text"
-            item-value="value"
-            :disabled="loading"
+            <v-col>
+              <v-select
+                v-model="xAxisType"
+                label="X-Axis scale"
+                :items="[
+                  { text: 'Cycle count', value: 'value' },
+                  { text: 'Log(Cycle count)', value: 'log' },
+                ]"
+                item-title="text"
+                item-value="value"
+                :disabled="loading"
+              />
+            </v-col>
+          </v-row>
+        </v-card-subtitle>
+        <v-card-text v-if="series.length > 0">
+          <simple-chart
+            :aspect-ratio="2"
+            :series="series"
+            title="S-N Curves"
+            :x-axis-type="xAxisType"
+            :x-axis-name="
+              xAxisType === 'log'
+                ? 'log₁₀(Number of cycles)'
+                : 'Number of cycles'
+            "
+            y-axis-name="σₘₐₓ [MPa]"
           />
-        </v-col>
-      </v-row>
-    </v-card-subtitle>
-    <v-card-text v-if="series.length > 0">
-      <simple-chart
-        :aspect-ratio="2"
-        :series="series"
-        title="S-N Curves"
-        :x-axis-type="xAxisType"
-        :x-axis-name="
-          xAxisType === 'log' ? 'log₁₀(Number of cycles)' : 'Number of cycles'
-        "
-        y-axis-name="σₘₐₓ [MPa]"
-      />
-    </v-card-text>
-    <v-card-actions v-if="hasInput" class="justify-end">
-      <v-btn :disabled="loading && outputs != null" @click="downloadOutput">
-        Download SNC
-        <info-tooltip>
-          See the
-          <a
-            href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/SNC_Data_Convention.md"
-          >
-            SNC Data Convention
-          </a>
-        </info-tooltip>
-      </v-btn>
-    </v-card-actions>
+        </v-card-text>
+        <v-card-actions v-if="hasInput" class="justify-end">
+          <v-btn :disabled="loading && outputs != null" @click="downloadOutput">
+            Download SNC
+            <info-tooltip>
+              See the
+              <a
+                href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/SNC_Data_Convention.md"
+              >
+                SNC Data Convention
+              </a>
+            </info-tooltip>
+          </v-btn>
+        </v-card-actions>
+      </div>
+    </v-expand-transition>
   </v-card>
 </template>
 
@@ -137,6 +150,7 @@ export default {
       outputs: {},
       series: [],
       xAxisType: "log",
+      collapsed: false,
     };
   },
   computed: {
