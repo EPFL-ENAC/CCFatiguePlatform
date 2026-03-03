@@ -113,6 +113,14 @@ def tassos_equation(
     spn = beta * k4
     return spn
 
+def weibull_sigma_e(beta: float, alpha: float, p_survival: float) -> float:
+    # p_survival in (0,1)
+    p = min(max(float(p_survival), 1e-12), 1.0 - 1e-12)
+    return beta * (-math.log(p)) ** (1.0 / alpha)
+
+def sendeckyj_sigma_a(N: float, sigma_e: float, c: float, s: float) -> float:
+    # sigma_e = sigma_a (1 - C + C N)^S  =>  sigma_a = sigma_e / (...)^S
+    return sigma_e / ((1.0 - c + c * N) ** s)
 
 def execute(
     input_file: FilePath | ReadCsvBuffer,
@@ -130,9 +138,8 @@ def execute(
     # Data are grouped by stress_ratio but one experiment
     # can have two separate groups with same stress_ratio so we need to identify
     # the groups
-    samples["stress_ratio_id"] = (
-        samples.stress_ratio != samples.stress_ratio.shift()
-    ).cumsum()
+    # One group per stress_ratio (order-independent)
+    samples["stress_ratio_id"] = samples["stress_ratio"].astype("category").cat.codes
 
     # Prepare SNC output list of cycles to failure
 
@@ -351,7 +358,7 @@ def execute(
         xs = sigmas_e.apply(lambda x: sendeckyj_equation_16(x, g))
 
         # Eq 19
-        beta = sendeckyj_equation_19(g, data_count, censored_data_count, xs, alpha)
+        beta = sendeckyj_equation_19(g, data_count, censored_data_count, xs, alpha_max)
 
         # Prepare output data
         json_df = pd.DataFrame(
@@ -373,24 +380,33 @@ def execute(
 
         stress_max["stress_max"] = stress_max.apply(
             lambda x: tassos_equation(
-                confidence_interval, alpha, c_star, s_star, x, a, beta
+                confidence_interval, alpha_max, c_star, s_star, x, a, beta
             )
         )
 
-        stress_bounds = stress_max.apply(
-            lambda x: snc.stress_at_failure_bounds(
-                stress_ratio_df.sample_count,
-                stress_ratio_df.q,
-                stress_ratio_df.slope,
-                stress_ratio_df.intercept,
-                x.cycles_to_failure,
-                stress_ratio_df.pp,
-                stress_ratio_df.xb,
-            ),  # type: ignore
-            axis=1,
+        # Convert confidence_interval: UI sometimes gives 50, 95 etc (percent).
+        p_mid = confidence_interval
+        if p_mid > 1.0:
+            p_mid = p_mid / 100.0  # 50 -> 0.5
+
+        # "95%" survival bound (conservative)
+        p_low = 0.95
+        # "5%" survival bound (upper curve)
+        p_high = 0.05
+
+        sigma_e_mid = weibull_sigma_e(beta, alpha_max, p_mid)
+        sigma_e_low = weibull_sigma_e(beta, alpha_max, p_low)
+        sigma_e_high = weibull_sigma_e(beta, alpha_max, p_high)
+
+        stress_max["stress_max"] = stress_max["cycles_to_failure"].apply(
+            lambda N: sendeckyj_sigma_a(N, sigma_e_mid, c_star, s_star)
         )
-        stress_max["stress_lowerbound"] = stress_bounds.apply(lambda x: x[0])
-        stress_max["stress_upperbound"] = stress_bounds.apply(lambda x: x[1])
+        stress_max["stress_lowerbound"] = stress_max["cycles_to_failure"].apply(
+            lambda N: sendeckyj_sigma_a(N, sigma_e_low, c_star, s_star)
+        )
+        stress_max["stress_upperbound"] = stress_max["cycles_to_failure"].apply(
+            lambda N: sendeckyj_sigma_a(N, sigma_e_high, c_star, s_star)
+        )
 
         stress_max["stress_ratio"] = stress_ratio
 
