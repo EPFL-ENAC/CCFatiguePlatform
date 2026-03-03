@@ -231,11 +231,15 @@ def execute(
         samples[["stress_ratio_id", "stress_ratio"]].groupby("stress_ratio_id").count()
     )
 
-    # level
+    # Avoid invalid variance when too few samples (need at least 3 points for sample_count-2)
+    stress_ratios_df["variance"] = stress_ratios_df.apply(
+        lambda x: math.sqrt(x.lsse / (x.sample_count - 2)) if x.sample_count > 2 else np.nan,
+        axis=1,
+    )
+
+    # level = number of distinct stress levels per stress ratio
     stress_ratios_df["level"] = (
-        samples[["stress_ratio_id", "stress_cluster_number"]]
-        .groupby("stress_ratio_id")
-        .nunique()
+        samples.groupby("stress_ratio_id")["stress_max"].nunique()
     )
 
     # Variance

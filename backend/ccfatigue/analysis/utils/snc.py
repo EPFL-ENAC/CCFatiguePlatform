@@ -194,11 +194,8 @@ def execute_linlog_loglog(
     # Use log10(cycles_to_failure) instead of cycles_to_failure
     agg_df["log10_cycles_to_failure"] = np.log10(agg_df.cycles_to_failure)
 
-    # Data are grouped by stress_ratio but one experiment
-    # can have two separate groups with same stress_ratio so we need to identify
-    agg_df["stress_ratio_id"] = (
-        agg_df.stress_ratio != agg_df.stress_ratio.shift()
-    ).cumsum()
+    # One group per stress_ratio (order-independent)
+    agg_df["stress_ratio_id"] = agg_df["stress_ratio"].astype("category").cat.codes
 
     # Groups AGG by stress_ratio
     agg_grpby_stress_ratios_df = (
@@ -296,17 +293,17 @@ def execute_linlog_loglog(
     )
 
     # level
+    # Number of distinct stress levels per stress_ratio (no need for stress_cluster_number)
     agg_grpby_stress_ratios_df["stress_cluster_count"] = (
-        agg_df[["stress_ratio_id", "stress_cluster_number"]]
-        .groupby("stress_ratio_id")
-        .nunique()
+        agg_df.groupby("stress_ratio_id")["stress_max"].nunique()
     )
 
     # Eq 6, p4, ref [1]
-    # Variance
-    # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/2_S-NCurves/S-N-Curve-LinLog.for#L333
-    agg_grpby_stress_ratios_df["variance"] = np.sqrt(
-        agg_grpby_stress_ratios_df.lsse / (agg_grpby_stress_ratios_df.sample_count - 2)
+    den = (agg_grpby_stress_ratios_df.sample_count - 2)
+    agg_grpby_stress_ratios_df["variance"] = np.where(
+        den > 0,
+        np.sqrt(agg_grpby_stress_ratios_df.lsse / den),
+        np.nan,
     )
 
     # Fp is given in table 2, p5, ref [1]
