@@ -241,7 +241,7 @@ export default {
 
         for (const r of this.selectedRRatios) {
           const fit = this.getFitForRatio(json, r);
-          const color = this.methodColor(method);
+          const color = this.methodColor(method, r);
 
           cards.push({
             key: `${method}-${r}`,
@@ -425,7 +425,7 @@ export default {
           this.series = [
             ...analysisResults.flatMap((item) =>
               this.selectedRRatios.flatMap((rRatio) => {
-                const color = this.methodColor(item.method);
+                const color = this.methodColor(item.method, rRatio);
 
                 return [
                   {
@@ -513,14 +513,24 @@ export default {
       }
     },
 
-    methodColor(method) {
-      // stable palette
-      const map = {
-        LinLog: "#d62728",
-        LogLog: "#2ca02c",
-        Sendeckyj: "#1f77b4",
+    methodColor(method, rRatio = null) {
+      const palettes = {
+        LinLog: ["#d62728", "#ff6b6b", "#8b0000", "#ff9ea1"],
+        LogLog: ["#2ca02c", "#7bd87b", "#0b6e0b", "#9be79b"],
+        Sendeckyj: ["#1f77b4", "#66b3ff", "#0b4f8a", "#9ccfff"],
       };
-      return map[method] || "#000";
+
+      const palette = palettes[method] || ["#000000"];
+
+      if (rRatio === null || rRatio === undefined) {
+        return palette[0];
+      }
+
+      const idx = this.selectedRRatios.findIndex(
+        (r) => Number(r) === Number(rRatio)
+      );
+
+      return palette[idx >= 0 ? idx % palette.length : 0];
     },
 
     methodEquation(method) {
