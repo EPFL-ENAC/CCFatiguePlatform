@@ -31,7 +31,7 @@
                 accept=".csv"
                 label="AGG csv file"
                 :disabled="loading"
-                @change="updateOutput"
+                @change="onFileChange"
               >
                 <template #append>
                   <info-tooltip>
@@ -278,6 +278,13 @@ export default {
       return undefined;
     },
 
+    onFileChange() {
+      this.outputs = {};
+      this.series = [];
+      this.rRatios = [];
+      this.selectedRRatios = [];
+      this.updateOutput();
+    },
     fmtNumber(v) {
       if (v === undefined || v === null || v === "") return "—";
       const n = Number(v);
@@ -360,129 +367,142 @@ export default {
     },
 
     updateOutput() {
-      if (this.selectedMethods.length > 0 && this.file) {
-        this.loading = true;
-
-        Promise.all([
-          ...this.selectedMethods.map((method) =>
-            this.$analysisApi
-              .runSnCurveFile(method, this.file)
-              .then((analysisResult) => {
-                const results = parse(analysisResult.csv_data, parserConfig);
-                const rows =
-                  this.selectedRRatios.length > 0
-                    ? results.data.filter((row) =>
-                        this.selectedRRatios.includes(Number(row.stress_ratio))
-                      )
-                    : results.data;
-                return { method, analysisResult, rows };
-              })
-          ),
-          parseFile(this.file).then((parsed) => ({ parsedInputFile: parsed })),
-        ])
-          .then((data) => {
-            const analysisResults = data.filter((x) => "analysisResult" in x);
-            const parsedInputFile = data.find(
-              (x) => "parsedInputFile" in x
-            ).parsedInputFile;
-
-            const detectedRRatios = [
-              ...new Set(
-                parsedInputFile.data
-                  .map((row) => Number(row.stress_ratio))
-                  .filter((v) => Number.isFinite(v))
-              ),
-            ].sort((a, b) => a - b);
-
-            this.rRatios = detectedRRatios;
-
-            this.selectedRRatios = this.selectedRRatios.filter((r) =>
-              detectedRRatios.includes(r)
-            );
-
-            if (
-              this.selectedRRatios.length === 0 &&
-              detectedRRatios.length > 0
-            ) {
-              this.selectedRRatios = [detectedRRatios[0]];
-            }
-
-            this.outputs = Object.fromEntries(
-              analysisResults.map((item) => [item.method, item.analysisResult])
-            );
-
-            // Same as initial, with ONLY necessary changes:
-            // - force same color for mean/lower/upper
-            // - hide dashed series from legend
-            this.series = [
-              ...analysisResults.flatMap((item) =>
-                this.selectedRRatios.flatMap((rRatio) => {
-                  const color = this.methodColor(item.method);
-
-                  return [
-                    {
-                      type: "line",
-                      name: `${item.method} ${rRatio}`,
-                      showSymbol: false,
-                      data: item.rows
-                        .filter((row) => row.stress_ratio === rRatio)
-                        .map((row) => [row.cycles_to_failure, row.stress_max]),
-                      lineStyle: { width: 2, color },
-                      itemStyle: { color },
-                    },
-                    {
-                      type: "line",
-                      name: `${item.method} ${rRatio}`,
-                      showSymbol: false,
-                      data: item.rows
-                        .filter((row) => row.stress_ratio === rRatio)
-                        .map((row) => [
-                          row.cycles_to_failure,
-                          row.stress_lowerbound,
-                        ]),
-                      lineStyle: { type: "dashed", width: 1, color },
-                      itemStyle: { color },
-                      silent: true,
-                      showInLegend: false,
-                    },
-                    {
-                      type: "line",
-                      name: `${item.method} ${rRatio}`,
-                      showSymbol: false,
-                      data: item.rows
-                        .filter((row) => row.stress_ratio === rRatio)
-                        .map((row) => [
-                          row.cycles_to_failure,
-                          row.stress_upperbound,
-                        ]),
-                      lineStyle: { type: "dashed", width: 1, color },
-                      itemStyle: { color },
-                      silent: true,
-                      showInLegend: false,
-                    },
-                  ];
-                })
-              ),
-
-              // Input points (unchanged)
-              ...this.selectedRRatios.flatMap((rRatio) => [
-                {
-                  symbolSize: 5,
-                  type: "scatter",
-                  data: parsedInputFile.data
-                    .filter((row) => row.stress_ratio === rRatio)
-                    .map((row) => [row.cycles_to_failure, row.stress_max]),
-                  rRatio,
-                },
-              ]),
-            ];
-          })
-          .catch(() => {
-            this.outputs = {};
-            this.series = [];
-          })
-          .finally(() => (this.loading = false));
+      if (!(this.selectedMethods.length > 0 && this.file)) {
+        this.outputs = {};
+        this.series = [];
+        return;
       }
+
+      this.loading = true;
+
+      parseFile(this.file)
+        .then((parsedInputFile) => {
+          const detectedRRatios = [
+            ...new Set(
+              parsedInputFile.data
+                .map((row) => Number(row.stress_ratio))
+                .filter((v) => Number.isFinite(v))
+            ),
+          ].sort((a, b) => a - b);
+
+          this.rRatios = detectedRRatios;
+
+          // garder seulement les R encore valides
+          this.selectedRRatios = this.selectedRRatios.filter((r) =>
+            detectedRRatios.includes(r)
+          );
+
+          // si rien n’est sélectionné, prendre le premier R disponible
+          if (this.selectedRRatios.length === 0 && detectedRRatios.length > 0) {
+            this.selectedRRatios = [detectedRRatios[0]];
+          }
+
+          return Promise.all(
+            this.selectedMethods.map((method) =>
+              this.$analysisApi
+                .runSnCurveFile(method, this.file)
+                .then((analysisResult) => {
+                  const results = parse(analysisResult.csv_data, parserConfig);
+                  const rows =
+                    this.selectedRRatios.length > 0
+                      ? results.data.filter((row) =>
+                          this.selectedRRatios.includes(
+                            Number(row.stress_ratio)
+                          )
+                        )
+                      : results.data;
+
+                  return { method, analysisResult, rows };
+                })
+            )
+          ).then((analysisResults) => ({ parsedInputFile, analysisResults }));
+        })
+        .then(({ parsedInputFile, analysisResults }) => {
+          this.outputs = Object.fromEntries(
+            analysisResults.map((item) => [item.method, item.analysisResult])
+          );
+
+          this.series = [
+            ...analysisResults.flatMap((item) =>
+              this.selectedRRatios.flatMap((rRatio) => {
+                const color = this.methodColor(item.method);
+
+                return [
+                  {
+                    type: "line",
+                    name: `${item.method} ${rRatio}`,
+                    showSymbol: false,
+                    data: item.rows
+                      .filter(
+                        (row) => Number(row.stress_ratio) === Number(rRatio)
+                      )
+                      .map((row) => [
+                        Number(row.cycles_to_failure),
+                        Number(row.stress_max),
+                      ]),
+                    lineStyle: { width: 2, color },
+                    itemStyle: { color },
+                  },
+                  {
+                    type: "line",
+                    name: `${item.method} ${rRatio}`,
+                    showSymbol: false,
+                    data: item.rows
+                      .filter(
+                        (row) => Number(row.stress_ratio) === Number(rRatio)
+                      )
+                      .map((row) => [
+                        Number(row.cycles_to_failure),
+                        Number(row.stress_lowerbound),
+                      ]),
+                    lineStyle: { type: "dashed", width: 1, color },
+                    itemStyle: { color },
+                    silent: true,
+                    showInLegend: false,
+                  },
+                  {
+                    type: "line",
+                    name: `${item.method} ${rRatio}`,
+                    showSymbol: false,
+                    data: item.rows
+                      .filter(
+                        (row) => Number(row.stress_ratio) === Number(rRatio)
+                      )
+                      .map((row) => [
+                        Number(row.cycles_to_failure),
+                        Number(row.stress_upperbound),
+                      ]),
+                    lineStyle: { type: "dashed", width: 1, color },
+                    itemStyle: { color },
+                    silent: true,
+                    showInLegend: false,
+                  },
+                ];
+              })
+            ),
+
+            ...this.selectedRRatios.flatMap((rRatio) => [
+              {
+                symbolSize: 5,
+                type: "scatter",
+                data: parsedInputFile.data
+                  .filter((row) => Number(row.stress_ratio) === Number(rRatio))
+                  .map((row) => [
+                    Number(row.cycles_to_failure),
+                    Number(row.stress_max),
+                  ]),
+                rRatio,
+              },
+            ]),
+          ];
+        })
+        .catch(() => {
+          this.outputs = {};
+          this.series = [];
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     },
 
     downloadOutput() {
