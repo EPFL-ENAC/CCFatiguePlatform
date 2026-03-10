@@ -158,30 +158,46 @@ export default {
           nameGap: 34,
           nameTextStyle: {
             fontSize: 20,
-            fontWeight: "bold",
           },
           // If bounds are not provided, let ECharts use dataMin/dataMax.
           min: this.xAxisMin != null ? this.xAxisMin : "dataMin",
           max: this.xAxisMax != null ? this.xAxisMax : "dataMax",
           logBase: this.xAxisType === "log" ? 10 : undefined,
           axisLabel: {
-            fontSize: 18,
             formatter: (val) => {
-              if (this.xAxisType === "log") {
-                const exp = Math.log10(val);
-                const expRounded = Math.round(exp);
-                if (Math.abs(exp - expRounded) < 1e-10)
-                  return `10^${expRounded}`;
-                return "";
+              if (this.yAxisType === "log") {
+                return `10^${Math.round(Math.log10(val))}`;
               }
 
               const n = Number(val);
               if (!Number.isFinite(n)) return String(val);
-              return Math.round(n).toLocaleString(undefined, {
-                maximumFractionDigits: 0,
+
+              if (Math.abs(n) >= 1000) {
+                return n.toLocaleString(undefined, {
+                  maximumFractionDigits: 0,
+                  useGrouping: false,
+                });
+              }
+
+              if (Math.abs(n) >= 1) {
+                return n.toLocaleString(undefined, {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2,
+                  useGrouping: false,
+                });
+              }
+
+              return n.toLocaleString(undefined, {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 4,
                 useGrouping: false,
               });
             },
+            hideOverlap: true,
+            showMaxLabel: true,
+            showMinLabel: true,
+            fontSize: 18,
+            fontFamily: "Arial, sans-serif",
           },
         },
 
@@ -235,6 +251,7 @@ export default {
           boundaryGap: this.yAxisType === "log" ? false : undefined,
 
           axisLabel: {
+            fontFamily: "Arial, sans-serif",
             formatter: (val) => {
               if (this.yAxisType === "log") {
                 return `10^${Math.round(Math.log10(val))}`;
