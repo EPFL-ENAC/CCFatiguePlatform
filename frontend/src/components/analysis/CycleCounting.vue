@@ -86,15 +86,17 @@
 
           <v-row>
             <!-- SUMMARY -->
-            <v-col cols="12" sm="4" md="3">
-              <v-card outlined class="pa-3">
-                <div class="mt-2 text-caption font-weight-bold mb-2">
-                  Cycles (Selected)
-                </div>
+            <v-col cols="12" md="3" class="mt-6">
+              <v-card variant="outlined" class="pa-3">
+                <div class="text-subtitle-2 mb-2">Cycles (Selected)</div>
 
                 <v-divider class="my-2" />
 
-                <div v-for="r in methodResults" :key="r.method" class="py-1">
+                <div
+                  v-for="(r, idx) in methodResults"
+                  :key="r.method"
+                  class="py-1"
+                >
                   <div class="d-flex align-center mb-1">
                     <span :style="dotStyle(r.color)" />
                     <span
@@ -104,7 +106,6 @@
                       {{ r.method }}
                     </span>
                   </div>
-
                   <div class="d-flex justify-space-between">
                     <span class="text-body-2">Full cycles</span>
                     <span
@@ -132,6 +133,11 @@
                       {{ r.statsPart.constantAmplitudes }}
                     </span>
                   </div>
+
+                  <v-divider
+                    v-if="idx < methodResults.length - 1"
+                    class="mt-3"
+                  />
                 </div>
 
                 <v-snackbar v-model="showDownloadMessage" timeout="2500">

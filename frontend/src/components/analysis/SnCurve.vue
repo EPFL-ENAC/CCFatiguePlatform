@@ -94,9 +94,21 @@
 
         <!-- Only change: add a small left cartouche + keep same chart -->
         <v-card-text v-if="series.length > 0">
+          <!-- TITRE CENTRÉ SUR TOUTE LA LARGEUR -->
+          <v-row>
+            <v-col cols="12">
+              <div
+                style="font-weight: 700; font-size: 23px; color: #212121"
+                class="text-center mb-4"
+              >
+                Stress vs Number of Cycles (S-N)
+              </div>
+            </v-col>
+          </v-row>
+
+          <!-- BANNIÈRE + GRAPHE -->
           <v-row align="start">
-            <!-- LEFT CARTOUCHE -->
-            <v-col cols="12" md="3">
+            <v-col cols="12" md="3" class="mt-6">
               <v-card variant="outlined" class="pa-3">
                 <div class="text-subtitle-2 mb-2">S-N (Selected)</div>
                 <v-divider class="mb-2" />
@@ -140,10 +152,13 @@
                       :style="{
                         color: m.color,
                         fontFamily: 'monospace',
-                        marginRight: '6px',
+                        fontWeight: 'bold',
+                        fontSize: '14px',
+                        letterSpacing: '2px',
+                        marginRight: '8px',
                       }"
                     >
-                      ----
+                      - - - -
                     </span>
                     <span>: {{ m.dashedMeaning }}</span>
                   </div>
@@ -153,12 +168,10 @@
               </v-card>
             </v-col>
 
-            <!-- RIGHT CHART (same component, same props as initial) -->
             <v-col cols="12" md="9">
               <simple-chart
                 :aspect-ratio="2"
                 :series="series"
-                title="S-N Curves"
                 :x-axis-type="xAxisType"
                 :x-axis-name="
                   xAxisType === 'log'
@@ -526,9 +539,7 @@ export default {
         return palette[0];
       }
 
-      const idx = this.selectedRRatios.findIndex(
-        (r) => Number(r) === Number(rRatio)
-      );
+      const idx = this.rRatios.findIndex((r) => Number(r) === Number(rRatio));
 
       return palette[idx >= 0 ? idx % palette.length : 0];
     },
@@ -541,8 +552,8 @@ export default {
     },
 
     dashedMeaning(method) {
-      if (method === "Sendeckyj") return "Survival probability 95% (P = 0.95)";
-      return "95% band";
+      if (method === "Sendeckyj") return "95% survival probability";
+      return "95% confidence interval";
     },
   },
 };

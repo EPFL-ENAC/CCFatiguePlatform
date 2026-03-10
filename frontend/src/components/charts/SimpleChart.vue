@@ -131,21 +131,18 @@ export default {
         this.yAxisType === "log" ? computeLogYAxisLimits(this.series) : null;
 
       return {
-        title: {
-          text: this.title,
-        },
+        title: this.title
+          ? {
+              text: this.title,
+            }
+          : undefined,
 
-        // Scroll legend is useful when many series are displayed.
         legend: this.showLegend ? { type: "scroll" } : { show: false },
 
-        /**
-         * Grid padding: leave room for axis titles and labels.
-         * containLabel=true ensures labels stay inside the canvas.
-         */
         grid: {
           left: 60,
           top: 40,
-          right: 50,
+          right: 80,
           bottom: 50,
           containLabel: true,
         },
@@ -165,8 +162,9 @@ export default {
           logBase: this.xAxisType === "log" ? 10 : undefined,
           axisLabel: {
             formatter: (val) => {
-              if (this.yAxisType === "log") {
-                return `10^${Math.round(Math.log10(val))}`;
+              if (this.xAxisType === "log") {
+                const exp = Math.round(Math.log10(val));
+                return `10^${exp}`;
               }
 
               const n = Number(val);
@@ -193,9 +191,10 @@ export default {
                 useGrouping: false,
               });
             },
-            hideOverlap: true,
+            hideOverlap: false,
             showMaxLabel: true,
             showMinLabel: true,
+            margin: 12,
             fontSize: 18,
             fontFamily: "Arial, sans-serif",
           },
