@@ -418,15 +418,16 @@ def execute_linlog_loglog(
         snc_current_stress_ratio["stress_ratio"] = stress_ratio_df.stress_ratio
 
         snc_output_csv_df = pd.concat([snc_output_csv_df, snc_current_stress_ratio])
-        a, b = get_a_b(stress_ratio_df)
+        aa = stress_ratio_df.aa
+        bb = stress_ratio_df.bb
 
         # Prepare JSON
         json_df = pd.DataFrame(
             {
                 "stress_ratio": stress_ratio_df.stress_ratio,
                 "confidence_interval": reliability_level,
-                "a": a,
-                "b": b,
+                "a": aa,
+                "b": bb,
                 "lrsq": stress_ratio_df.lrsq,
                 "fp": stress_ratio_df.fp,
             },

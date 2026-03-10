@@ -199,7 +199,6 @@ import download from "downloadjs";
 import { parse } from "papaparse";
 
 const methods = Object.values(new SnCurveMethod());
-const rRatios = [-1, 0.1, 10, 0.5];
 
 export default {
   name: "SnCurve",
@@ -213,12 +212,12 @@ export default {
       loading: false,
       methods: methods,
       selectedMethods: [methods[0]],
-      rRatios: rRatios,
-      selectedRRatios: [rRatios[0]],
       outputs: {},
       series: [],
       xAxisType: "log",
       collapsed: false,
+      rRatios: [],
+      selectedRRatios: [],
     };
   },
   computed: {
@@ -361,11 +360,7 @@ export default {
     },
 
     updateOutput() {
-      if (
-        this.selectedMethods.length > 0 &&
-        this.selectedRRatios.length > 0 &&
-        this.file
-      ) {
+      if (this.selectedMethods.length > 0 && this.file) {
         this.loading = true;
 
         Promise.all([
@@ -374,9 +369,12 @@ export default {
               .runSnCurveFile(method, this.file)
               .then((analysisResult) => {
                 const results = parse(analysisResult.csv_data, parserConfig);
-                const rows = results.data.filter((row) =>
-                  this.selectedRRatios.includes(row.stress_ratio)
-                );
+                const rows =
+                  this.selectedRRatios.length > 0
+                    ? results.data.filter((row) =>
+                        this.selectedRRatios.includes(Number(row.stress_ratio))
+                      )
+                    : results.data;
                 return { method, analysisResult, rows };
               })
           ),
@@ -387,6 +385,27 @@ export default {
             const parsedInputFile = data.find(
               (x) => "parsedInputFile" in x
             ).parsedInputFile;
+
+            const detectedRRatios = [
+              ...new Set(
+                parsedInputFile.data
+                  .map((row) => Number(row.stress_ratio))
+                  .filter((v) => Number.isFinite(v))
+              ),
+            ].sort((a, b) => a - b);
+
+            this.rRatios = detectedRRatios;
+
+            this.selectedRRatios = this.selectedRRatios.filter((r) =>
+              detectedRRatios.includes(r)
+            );
+
+            if (
+              this.selectedRRatios.length === 0 &&
+              detectedRRatios.length > 0
+            ) {
+              this.selectedRRatios = [detectedRRatios[0]];
+            }
 
             this.outputs = Object.fromEntries(
               analysisResults.map((item) => [item.method, item.analysisResult])
@@ -486,7 +505,7 @@ export default {
 
     methodEquation(method) {
       if (method === "LinLog") return "σ_max = A + B·log10(N)";
-      if (method === "LogLog") return "log10(σ_max) = A + B·log10(N)";
+      if (method === "LogLog") return "σ_max = A · N^(-B)";
       if (method === "Sendeckyj") return "σ_max = b + a·(N + c*)^{-s*}";
       return "";
     },
