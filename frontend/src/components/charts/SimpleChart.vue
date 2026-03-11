@@ -1,6 +1,5 @@
 <template>
-  <!-- Wrapper sets a fixed pixel height for ECharts (responsive width) -->
-  <div :style="{ width: '100%', height: height + 'px' }">
+  <div :style="{ width: '100%', height: `${height}px` }">
     <v-chart
       ref="chartInstance"
       autoresize
@@ -25,10 +24,6 @@ import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import VChart from "vue-echarts";
 
-/**
- * Register only the ECharts modules we need.
- * This keeps bundle size smaller than importing full ECharts.
- */
 use([
   DataZoomComponent,
   CanvasRenderer,
@@ -46,63 +41,26 @@ export default {
     VChart,
   },
   props: {
-    /**
-     * NOTE: aspectRatio is kept for backward compatibility,
-     * but the component currently uses `height` (px) for sizing.
-     */
     aspectRatio: { type: Number, default: 1 },
-
-    /** ECharts series array (line/scatter/etc.). */
     series: { type: Array, default: () => [] },
-
-    /** Chart title displayed above the plot. */
     title: { type: String, default: "" },
-
-    /** Axis labels (also used in tooltip logic for some special cases). */
     xAxisName: { type: String, default: "" },
     yAxisName: { type: String, default: "" },
-
-    /** Axis scale type: "value" | "category" | "log" (y only) etc. */
     xAxisType: { type: String, default: "value" },
     yAxisType: { type: String, default: "value" },
-
-    /**
-     * NOTE: dataZoom prop exists but we currently always enable inside zoom
-     * on both axes (see `dataZoom` in computed option).
-     */
     dataZoom: { type: String, default: "" },
-
-    /** Global color palette (one color per series by default). */
     color: { type: Array, default: () => colorPalette },
-
-    /** Optional explicit axis bounds (null => use dataMin/dataMax defaults). */
     xAxisMin: { type: [Number, null], default: null },
     xAxisMax: { type: [Number, null], default: null },
     yAxisMax: { type: [Number, null], default: null },
     yAxisMin: { type: [Number, null], default: null },
-
-    /** Optional tick interval for linear y-axis. Ignored for log scale. */
     yAxisInterval: { type: [Number, null], default: null },
-
-    /** Fixed chart height in px. Width is always 100% and autoresize is enabled. */
     height: { type: Number, default: 480 },
-
-    /**
-     * Axis tick label formatter.
-     * Should accept a number and return a string. Default: format3.
-     */
     axisLabelFormatter: {
       type: Function,
       default: format3,
     },
-
-    /** Show/hide legend. */
     showLegend: { type: Boolean, default: true },
-
-    /**
-     * Tooltip value formatter (Y values).
-     * Should accept a number and return a string. Default: format3.
-     */
     tooltipFormatter: {
       type: Function,
       default: format3,
@@ -110,39 +68,25 @@ export default {
   },
   data() {
     return {
-      /**
-       * ECharts update strategy:
-       * notMerge=true ensures a clean redraw when option changes.
-       * Useful when axis types or bounds change (avoids stale state).
-       */
       updateOptions: {
         notMerge: true,
       },
     };
   },
   computed: {
-    /**
-     * Build the ECharts option object.
-     * This is the single source of truth for chart appearance and behavior.
-     */
     actualOption() {
-      // For log scale, compute safe min/max (avoid <= 0 values).
-      const yLogLimits =
-        this.yAxisType === "log" ? computeLogYAxisLimits(this.series) : null;
+      const isXLog = this.xAxisType === "log";
+      const isYLog = this.yAxisType === "log";
+      const yLogLimits = isYLog ? computeLogYAxisLimits(this.series) : null;
 
       return {
-        title: this.title
-          ? {
-              text: this.title,
-            }
-          : undefined,
-
+        title: this.title ? { text: this.title } : undefined,
         legend: this.showLegend ? { type: "scroll" } : { show: false },
 
         grid: {
           left: 60,
           top: 40,
-          right: 80,
+          right: 90,
           bottom: 50,
           containLabel: true,
         },
@@ -151,24 +95,24 @@ export default {
           type: this.xAxisType,
           name: this.xAxisName,
           nameLocation: "middle",
-          // Increase gap so the x-axis title is not too close to tick labels.
           nameGap: 34,
           nameTextStyle: {
             fontSize: 20,
           },
-          // If bounds are not provided, let ECharts use dataMin/dataMax.
           min: this.xAxisMin != null ? this.xAxisMin : "dataMin",
           max: this.xAxisMax != null ? this.xAxisMax : "dataMax",
-          logBase: this.xAxisType === "log" ? 10 : undefined,
+          logBase: isXLog ? 10 : undefined,
           axisLabel: {
-            formatter: (val) => {
-              if (this.xAxisType === "log") {
-                const exp = Math.round(Math.log10(val));
-                return `10^${exp}`;
+            formatter: (value) => {
+              if (isXLog) {
+                const exp = Math.log10(Number(value));
+                return Math.abs(exp - Math.round(exp)) < 1e-8
+                  ? `10^${Math.round(exp)}`
+                  : "";
               }
 
-              const n = Number(val);
-              if (!Number.isFinite(n)) return String(val);
+              const n = Number(value);
+              if (!Number.isFinite(n)) return String(value);
 
               if (Math.abs(n) >= 1000) {
                 return n.toLocaleString(undefined, {
@@ -204,62 +148,44 @@ export default {
           type: this.yAxisType,
           name: this.yAxisName,
           nameLocation: "middle",
-          // Bigger gap to improve readability (especially with large ticks).
           nameGap: 50,
           nameTextStyle: {
             fontSize: 20,
             fontWeight: 400,
           },
-
-          // Log axis configuration
-          logBase: this.yAxisType === "log" ? 10 : undefined,
-          minorSplitLine: { show: this.yAxisType === "log" },
-
-          /**
-           * Axis bounds:
-           * - log: use computed safe limits
-           * - linear: use provided props or sensible defaults
-           */
-          min:
-            this.yAxisType === "log"
-              ? yLogLimits.min
-              : this.yAxisMin != null
-              ? this.yAxisMin
-              : 0,
-
-          max:
-            this.yAxisType === "log"
-              ? yLogLimits.max
-              : (value) => {
-                  const autoMax = value.max * 1.05;
-                  return this.yAxisMax != null
-                    ? Math.max(this.yAxisMax, autoMax)
-                    : autoMax;
-                },
-          // Tick interval applies only to linear scale.
+          logBase: isYLog ? 10 : undefined,
+          minorSplitLine: { show: isYLog },
+          min: isYLog
+            ? yLogLimits.min
+            : this.yAxisMin != null
+            ? this.yAxisMin
+            : 0,
+          max: isYLog
+            ? yLogLimits.max
+            : (value) => {
+                const autoMax = value.max * 1.05;
+                return this.yAxisMax != null
+                  ? Math.max(this.yAxisMax, autoMax)
+                  : autoMax;
+              },
           interval:
-            this.yAxisType === "log"
-              ? undefined
-              : this.yAxisInterval != null
+            !isYLog && this.yAxisInterval != null
               ? this.yAxisInterval
               : undefined,
-
-          // Disable "nice" scaling on log axes to avoid unexpected bounds.
-          scale: this.yAxisType === "log" ? false : undefined,
+          scale: isYLog ? false : undefined,
           nice: false,
-          boundaryGap: this.yAxisType === "log" ? false : undefined,
-
+          boundaryGap: isYLog ? false : undefined,
           axisLabel: {
             fontFamily: "Arial, sans-serif",
-            formatter: (val) => {
-              if (this.yAxisType === "log") {
-                return `10^${Math.round(Math.log10(val))}`;
+            formatter: (value) => {
+              if (isYLog) {
+                return `10^${Math.round(Math.log10(value))}`;
               }
 
-              const n = Number(val);
-              if (!Number.isFinite(n)) return val;
+              const n = Number(value);
+              if (!Number.isFinite(n)) return value;
 
-              return Math.round(n); // ← plus de décimales
+              return Math.round(n);
             },
             hideOverlap: true,
             showMaxLabel: true,
@@ -271,70 +197,58 @@ export default {
         tooltip: {
           trigger: "axis",
           confine: true,
-
-          /**
-           * Tooltip formatting:
-           * - In some cycle graphs, x-values are internally normalized/logged.
-           *   If a series provides `rawX`, we use it so the tooltip shows the real value.
-           * - Otherwise, default ECharts axisValueLabel is used.
-           */
           formatter: (params) => {
             const formatter = this.tooltipFormatter;
             let xLabel;
 
-            // Special case: show raw (untransformed) cycles when available.
             if (
               this.xAxisName.includes("Number of cycles") ||
               this.xAxisName.includes("Normalized cycles")
             ) {
-              const p = params[0];
+              const firstParam = params[0];
               let rawX = null;
 
-              // Convention: series can optionally provide rawX[] aligned with data indices.
-              if (p.seriesIndex != null && this.series[p.seriesIndex]?.rawX) {
-                const pointIndex = p.dataIndex;
-                rawX = this.series[p.seriesIndex].rawX[pointIndex];
+              if (
+                firstParam.seriesIndex != null &&
+                this.series[firstParam.seriesIndex]?.rawX
+              ) {
+                rawX =
+                  this.series[firstParam.seriesIndex].rawX[
+                    firstParam.dataIndex
+                  ];
               }
 
-              if (rawX != null) {
-                xLabel = Number(rawX).toLocaleString(undefined, {
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                  useGrouping: false,
-                });
-              } else {
-                // Fallback if rawX is not available
-                const xValue = p.value[0] ?? p.value;
-                xLabel = Number(xValue).toLocaleString(undefined, {
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                  useGrouping: false,
-                });
-              }
+              const xValue =
+                rawX != null
+                  ? rawX
+                  : Array.isArray(firstParam.value)
+                  ? firstParam.value[0]
+                  : firstParam.value;
+
+              xLabel = Number(xValue).toLocaleString(undefined, {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+                useGrouping: false,
+              });
             } else {
-              // Default behavior for other charts
               xLabel = params[0].axisValueLabel;
             }
 
             const rows = [`<strong>${xLabel}</strong>`];
 
-            // Add one line per series at this x-position
-            for (const p of params) {
-              const rawY = Array.isArray(p.value) ? p.value[1] : p.value;
-              const yVal = Number(rawY);
-              const formattedY = formatter(yVal);
-              rows.push(`${p.marker}${p.seriesName}: ${formattedY}`);
+            for (const param of params) {
+              const rawY = Array.isArray(param.value)
+                ? param.value[1]
+                : param.value;
+              rows.push(
+                `${param.marker}${param.seriesName}: ${formatter(Number(rawY))}`
+              );
             }
 
             return rows.join("<br/>");
           },
         },
 
-        /**
-         * Inside zoom:
-         * - Works with wheel/pinch and is unobtrusive (no visible slider).
-         * - filterMode="none" keeps all points, only changes viewport.
-         */
         dataZoom: [
           {
             id: "dataZoomX",
@@ -350,13 +264,9 @@ export default {
           },
         ],
 
-        /**
-         * Force showSymbol=false unless a series explicitly overrides it.
-         * Improves readability and performance for large datasets.
-         */
-        series: this.series.map((s) => ({
-          ...s,
-          showSymbol: s.showSymbol ?? false,
+        series: this.series.map((seriesItem) => ({
+          ...seriesItem,
+          showSymbol: seriesItem.showSymbol ?? false,
         })),
 
         color: this.color,
@@ -364,10 +274,6 @@ export default {
     },
   },
   methods: {
-    /**
-     * Access the underlying ECharts instance (imperative API).
-     * Useful for advanced operations (resize, dispatchAction, getDataURL, etc.).
-     */
     getChartInstance() {
       return this.$refs.chartInstance?.chart;
     },

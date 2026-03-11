@@ -80,10 +80,7 @@
               <v-select
                 v-model="xAxisType"
                 label="X-Axis scale"
-                :items="[
-                  { text: 'Cycle count', value: 'value' },
-                  { text: 'Log(Cycle count)', value: 'log' },
-                ]"
+                :items="xAxisOptions"
                 item-title="text"
                 item-value="value"
                 :disabled="loading"
@@ -92,9 +89,7 @@
           </v-row>
         </v-card-subtitle>
 
-        <!-- Only change: add a small left cartouche + keep same chart -->
         <v-card-text v-if="series.length > 0">
-          <!-- TITRE CENTRÉ SUR TOUTE LA LARGEUR -->
           <v-row>
             <v-col cols="12">
               <div
@@ -106,14 +101,17 @@
             </v-col>
           </v-row>
 
-          <!-- BANNIÈRE + GRAPHE -->
           <v-row align="start">
             <v-col cols="12" md="3" class="mt-6">
               <v-card variant="outlined" class="pa-3">
                 <div class="text-subtitle-2 mb-2">S-N (Selected)</div>
                 <v-divider class="mb-2" />
 
-                <div v-for="m in selectedMethodCards" :key="m.key" class="mb-3">
+                <div
+                  v-for="card in selectedMethodCards"
+                  :key="card.key"
+                  class="mb-3"
+                >
                   <div class="d-flex align-center">
                     <span
                       class="mr-2"
@@ -122,27 +120,27 @@
                         width: '10px',
                         height: '10px',
                         borderRadius: '50%',
-                        background: m.color,
+                        background: card.color,
                       }"
                     />
-                    <span class="text-body-2" :style="{ color: m.color }">
-                      <b>{{ m.title }}</b>
+                    <span class="text-body-2" :style="{ color: card.color }">
+                      <b>{{ card.title }}</b>
                     </span>
                   </div>
 
                   <div class="text-caption mt-2">
                     <div><b>Equation</b></div>
                     <div style="white-space: normal">
-                      <code>{{ m.equation }}</code>
+                      <code>{{ card.equation }}</code>
                     </div>
                   </div>
 
                   <div class="text-caption mt-2">
                     <div><b>Parameters</b></div>
-                    <div v-if="m.params.length === 0">No fit data</div>
+                    <div v-if="card.params.length === 0">No fit data</div>
                     <template v-else>
-                      <div v-for="p in m.params" :key="p.name">
-                        {{ p.name }}: {{ p.value }}
+                      <div v-for="param in card.params" :key="param.name">
+                        {{ param.name }}: {{ param.value }}
                       </div>
                     </template>
                   </div>
@@ -150,7 +148,7 @@
                   <div class="text-caption mt-2 d-flex align-center">
                     <span
                       :style="{
-                        color: m.color,
+                        color: card.color,
                         fontFamily: 'monospace',
                         fontWeight: 'bold',
                         fontSize: '14px',
@@ -160,7 +158,7 @@
                     >
                       - - - -
                     </span>
-                    <span>: {{ m.dashedMeaning }}</span>
+                    <span>: {{ card.dashedMeaning }}</span>
                   </div>
 
                   <v-divider class="mt-3" />
@@ -173,11 +171,7 @@
                 :aspect-ratio="2"
                 :series="series"
                 :x-axis-type="xAxisType"
-                :x-axis-name="
-                  xAxisType === 'log'
-                    ? 'log₁₀(Number of cycles)'
-                    : 'Number of cycles'
-                "
+                :x-axis-name="'Number of cycles'"
                 y-axis-name="σₘₐₓ [MPa]"
               />
             </v-col>
@@ -223,7 +217,7 @@ export default {
     return {
       file: null,
       loading: false,
-      methods: methods,
+      methods,
       selectedMethods: [methods[0]],
       outputs: {},
       series: [],
@@ -231,35 +225,40 @@ export default {
       collapsed: false,
       rRatios: [],
       selectedRRatios: [],
+      xAxisOptions: [
+        { text: "Cycle count", value: "value" },
+        { text: "Log(Cycle count)", value: "log" },
+      ],
     };
   },
   computed: {
     hasInput() {
-      return this.file;
+      return !!this.file;
     },
 
     selectedMethodCards() {
       const cards = [];
 
       for (const method of this.selectedMethods) {
-        const out = this.outputs?.[method];
-        if (!out) continue;
+        const output = this.outputs?.[method];
+        if (!output) continue;
 
-        let json = out.json_data;
+        let json = output.json_data;
         try {
-          if (typeof json === "string") json = JSON.parse(json);
-        } catch (e) {
+          if (typeof json === "string") {
+            json = JSON.parse(json);
+          }
+        } catch {
           json = null;
         }
 
-        for (const r of this.selectedRRatios) {
-          const fit = this.getFitForRatio(json, r);
-          const color = this.methodColor(method, r);
+        for (const rRatio of this.selectedRRatios) {
+          const fit = this.getFitForRatio(json, rRatio);
 
           cards.push({
-            key: `${method}-${r}`,
-            title: `${method} R=${r}`,
-            color,
+            key: `${method}-${rRatio}`,
+            title: `${method} R=${rRatio}`,
+            color: this.methodColor(method, rRatio),
             equation: this.methodEquation(method),
             params: this.formatParams(method, fit),
             dashedMeaning: this.dashedMeaning(method),
@@ -271,64 +270,87 @@ export default {
     },
   },
   methods: {
-    deepFindValue(obj, keyAliases) {
-      if (!obj || typeof obj !== "object") return undefined;
-
-      const aliases = (keyAliases || []).map((k) => String(k).toLowerCase());
-
-      // direct keys
-      for (const k of Object.keys(obj)) {
-        if (aliases.includes(String(k).toLowerCase())) return obj[k];
-      }
-
-      // recurse
-      for (const v of Object.values(obj)) {
-        if (v && typeof v === "object") {
-          const found = this.deepFindValue(v, keyAliases);
-          if (found !== undefined) return found;
-        }
-      }
-      return undefined;
-    },
-
-    onFileChange() {
+    resetState() {
       this.outputs = {};
       this.series = [];
       this.rRatios = [];
       this.selectedRRatios = [];
+    },
+
+    onFileChange() {
+      this.resetState();
       this.updateOutput();
     },
-    fmtNumber(v) {
-      if (v === undefined || v === null || v === "") return "—";
-      const n = Number(v);
-      if (Number.isFinite(n)) return n.toPrecision(6); // propre, pas trop long
-      return String(v);
+
+    fmtNumber(value) {
+      if (value === undefined || value === null || value === "") {
+        return "—";
+      }
+
+      const n = Number(value);
+      return Number.isFinite(n) ? n.toPrecision(6) : String(value);
     },
-    // Robust finder: tries several common JSON layouts
-    getFitForRatio(json, r) {
-      if (!json) return null;
-      const rStr = String(r);
 
-      // common formats
-      if (json.by_r && (json.by_r[rStr] || json.by_r[r]))
-        return json.by_r[rStr] || json.by_r[r];
-      if (json.params && (json.params[rStr] || json.params[r]))
-        return json.params[rStr] || json.params[r];
-      if (json.parameters && (json.parameters[rStr] || json.parameters[r]))
-        return json.parameters[rStr] || json.parameters[r];
-      if (json[rStr] || json[r]) return json[rStr] || json[r];
+    deepFindValue(obj, keyAliases) {
+      if (!obj || typeof obj !== "object") {
+        return undefined;
+      }
 
-      const arr =
+      const aliases = (keyAliases || []).map((key) =>
+        String(key).toLowerCase()
+      );
+
+      for (const key of Object.keys(obj)) {
+        if (aliases.includes(String(key).toLowerCase())) {
+          return obj[key];
+        }
+      }
+
+      for (const value of Object.values(obj)) {
+        if (value && typeof value === "object") {
+          const found = this.deepFindValue(value, keyAliases);
+          if (found !== undefined) {
+            return found;
+          }
+        }
+      }
+
+      return undefined;
+    },
+
+    getFitForRatio(json, rRatio) {
+      if (!json) {
+        return null;
+      }
+
+      const key = String(rRatio);
+
+      if (json.by_r?.[key] || json.by_r?.[rRatio]) {
+        return json.by_r[key] || json.by_r[rRatio];
+      }
+
+      if (json.params?.[key] || json.params?.[rRatio]) {
+        return json.params[key] || json.params[rRatio];
+      }
+
+      if (json.parameters?.[key] || json.parameters?.[rRatio]) {
+        return json.parameters[key] || json.parameters[rRatio];
+      }
+
+      if (json[key] || json[rRatio]) {
+        return json[key] || json[rRatio];
+      }
+
+      const fits =
         (Array.isArray(json) && json) ||
         (Array.isArray(json.results) && json.results) ||
         (Array.isArray(json.fits) && json.fits) ||
         null;
 
-      if (arr) {
-        return arr.find((x) => String(x.stress_ratio) === rStr) || null;
+      if (fits) {
+        return fits.find((item) => String(item.stress_ratio) === key) || null;
       }
 
-      // fallback: json itself might already be the fit object
       if (
         json.alpha ||
         json.beta ||
@@ -336,38 +358,36 @@ export default {
         json.B ||
         json.slope ||
         json.intercept
-      )
+      ) {
         return json;
+      }
 
       return null;
     },
 
     formatParams(method, fit) {
-      if (!fit) return [];
+      if (!fit) {
+        return [];
+      }
 
-      // cherche d'abord dans fit.params, sinon dans fit entier (deep)
       const scope =
-        fit?.params && typeof fit.params === "object" ? fit.params : fit;
+        fit.params && typeof fit.params === "object" ? fit.params : fit;
 
       const getAny = (aliases) => this.deepFindValue(scope, aliases);
 
-      if (method === "LinLog") {
-        const A = getAny(["A", "a", "intercept", "c0"]);
-        const B = getAny(["B", "b", "slope", "c1"]);
+      if (method === "LinLog" || method === "LogLog") {
         return [
-          { name: "A", value: this.fmtNumber(A) },
-          { name: "B", value: this.fmtNumber(B) },
+          {
+            name: "A",
+            value: this.fmtNumber(getAny(["A", "a", "intercept", "c0"])),
+          },
+          {
+            name: "B",
+            value: this.fmtNumber(getAny(["B", "b", "slope", "c1"])),
+          },
         ];
       }
 
-      if (method === "LogLog") {
-        const A = getAny(["A", "a", "intercept", "c0"]);
-        const B = getAny(["B", "b", "slope", "c1"]);
-        return [
-          { name: "A", value: this.fmtNumber(A) },
-          { name: "B", value: this.fmtNumber(B) },
-        ];
-      }
       if (method === "Sendeckyj") {
         return [
           { name: "alpha", value: this.fmtNumber(fit.a) },
@@ -376,11 +396,46 @@ export default {
           { name: "c", value: this.fmtNumber(fit.cstar) },
         ];
       }
+
       return [];
     },
 
+    buildLineSeries(method, rRatio, rows, yKey, color, dashed = false) {
+      return {
+        type: "line",
+        name: `${method} ${rRatio}`,
+        showSymbol: false,
+        data: rows.map((row) => [
+          Number(row.cycles_to_failure),
+          Number(row[yKey]),
+        ]),
+        lineStyle: {
+          width: dashed ? 1 : 2,
+          type: dashed ? "dashed" : "solid",
+          color,
+        },
+        itemStyle: { color },
+        silent: dashed,
+        showInLegend: !dashed,
+      };
+    },
+
+    buildScatterSeries(rRatio, data) {
+      return {
+        type: "scatter",
+        symbolSize: 5,
+        data: data
+          .filter((row) => Number(row.stress_ratio) === Number(rRatio))
+          .map((row) => [
+            Number(row.cycles_to_failure),
+            Number(row.stress_max),
+          ]),
+        rRatio,
+      };
+    },
+
     updateOutput() {
-      if (!(this.selectedMethods.length > 0 && this.file)) {
+      if (!this.file || this.selectedMethods.length === 0) {
         this.outputs = {};
         this.series = [];
         return;
@@ -394,18 +449,15 @@ export default {
             ...new Set(
               parsedInputFile.data
                 .map((row) => Number(row.stress_ratio))
-                .filter((v) => Number.isFinite(v))
+                .filter((value) => Number.isFinite(value))
             ),
           ].sort((a, b) => a - b);
 
           this.rRatios = detectedRRatios;
-
-          // garder seulement les R encore valides
-          this.selectedRRatios = this.selectedRRatios.filter((r) =>
-            detectedRRatios.includes(r)
+          this.selectedRRatios = this.selectedRRatios.filter((rRatio) =>
+            detectedRRatios.includes(rRatio)
           );
 
-          // si rien n’est sélectionné, prendre le premier R disponible
           if (this.selectedRRatios.length === 0 && detectedRRatios.length > 0) {
             this.selectedRRatios = [detectedRRatios[0]];
           }
@@ -414,99 +466,75 @@ export default {
             this.selectedMethods.map((method) =>
               this.$analysisApi
                 .runSnCurveFile(method, this.file)
-                .then((analysisResult) => {
-                  const results = parse(analysisResult.csv_data, parserConfig);
+                .then((result) => {
+                  const parsedResult = parse(result.csv_data, parserConfig);
                   const rows =
                     this.selectedRRatios.length > 0
-                      ? results.data.filter((row) =>
+                      ? parsedResult.data.filter((row) =>
                           this.selectedRRatios.includes(
                             Number(row.stress_ratio)
                           )
                         )
-                      : results.data;
+                      : parsedResult.data;
 
-                  return { method, analysisResult, rows };
+                  return {
+                    method,
+                    analysisResult: result,
+                    rows,
+                  };
                 })
             )
-          ).then((analysisResults) => ({ parsedInputFile, analysisResults }));
+          ).then((analysisResults) => ({
+            parsedInputFile,
+            analysisResults,
+          }));
         })
         .then(({ parsedInputFile, analysisResults }) => {
           this.outputs = Object.fromEntries(
-            analysisResults.map((item) => [item.method, item.analysisResult])
+            analysisResults.map(({ method, analysisResult }) => [
+              method,
+              analysisResult,
+            ])
           );
 
           this.series = [
-            ...analysisResults.flatMap((item) =>
+            ...analysisResults.flatMap(({ method, rows }) =>
               this.selectedRRatios.flatMap((rRatio) => {
-                const color = this.methodColor(item.method, rRatio);
+                const filteredRows = rows.filter(
+                  (row) => Number(row.stress_ratio) === Number(rRatio)
+                );
+                const color = this.methodColor(method, rRatio);
 
                 return [
-                  {
-                    type: "line",
-                    name: `${item.method} ${rRatio}`,
-                    showSymbol: false,
-                    data: item.rows
-                      .filter(
-                        (row) => Number(row.stress_ratio) === Number(rRatio)
-                      )
-                      .map((row) => [
-                        Number(row.cycles_to_failure),
-                        Number(row.stress_max),
-                      ]),
-                    lineStyle: { width: 2, color },
-                    itemStyle: { color },
-                  },
-                  {
-                    type: "line",
-                    name: `${item.method} ${rRatio}`,
-                    showSymbol: false,
-                    data: item.rows
-                      .filter(
-                        (row) => Number(row.stress_ratio) === Number(rRatio)
-                      )
-                      .map((row) => [
-                        Number(row.cycles_to_failure),
-                        Number(row.stress_lowerbound),
-                      ]),
-                    lineStyle: { type: "dashed", width: 1, color },
-                    itemStyle: { color },
-                    silent: true,
-                    showInLegend: false,
-                  },
-                  {
-                    type: "line",
-                    name: `${item.method} ${rRatio}`,
-                    showSymbol: false,
-                    data: item.rows
-                      .filter(
-                        (row) => Number(row.stress_ratio) === Number(rRatio)
-                      )
-                      .map((row) => [
-                        Number(row.cycles_to_failure),
-                        Number(row.stress_upperbound),
-                      ]),
-                    lineStyle: { type: "dashed", width: 1, color },
-                    itemStyle: { color },
-                    silent: true,
-                    showInLegend: false,
-                  },
+                  this.buildLineSeries(
+                    method,
+                    rRatio,
+                    filteredRows,
+                    "stress_max",
+                    color
+                  ),
+                  this.buildLineSeries(
+                    method,
+                    rRatio,
+                    filteredRows,
+                    "stress_lowerbound",
+                    color,
+                    true
+                  ),
+                  this.buildLineSeries(
+                    method,
+                    rRatio,
+                    filteredRows,
+                    "stress_upperbound",
+                    color,
+                    true
+                  ),
                 ];
               })
             ),
-
-            ...this.selectedRRatios.flatMap((rRatio) => [
-              {
-                symbolSize: 5,
-                type: "scatter",
-                data: parsedInputFile.data
-                  .filter((row) => Number(row.stress_ratio) === Number(rRatio))
-                  .map((row) => [
-                    Number(row.cycles_to_failure),
-                    Number(row.stress_max),
-                  ]),
-                rRatio,
-              },
-            ]),
+            ...this.selectedRRatios.map((rRatio) =>
+              this.buildScatterSeries(rRatio, parsedInputFile.data)
+            ),
           ];
         })
         .catch(() => {
@@ -519,10 +547,15 @@ export default {
     },
 
     downloadOutput() {
-      for (const [key, value] of Object.entries(this.outputs)) {
-        const outputName = getOutputFileName("AGG", "SNC", this.file.name, key);
-        download(value.csv_data, outputName + ".csv", "text/csv");
-        download(value.json_data, outputName + ".json", "application/json");
+      for (const [method, output] of Object.entries(this.outputs)) {
+        const outputName = getOutputFileName(
+          "AGG",
+          "SNC",
+          this.file.name,
+          method
+        );
+        download(output.csv_data, `${outputName}.csv`, "text/csv");
+        download(output.json_data, `${outputName}.json`, "application/json");
       }
     },
 
@@ -539,9 +572,11 @@ export default {
         return palette[0];
       }
 
-      const idx = this.rRatios.findIndex((r) => Number(r) === Number(rRatio));
+      const index = this.rRatios.findIndex(
+        (value) => Number(value) === Number(rRatio)
+      );
 
-      return palette[idx >= 0 ? idx % palette.length : 0];
+      return palette[index >= 0 ? index % palette.length : 0];
     },
 
     methodEquation(method) {
@@ -552,8 +587,9 @@ export default {
     },
 
     dashedMeaning(method) {
-      if (method === "Sendeckyj") return "95% survival probability";
-      return "95% confidence interval";
+      return method === "Sendeckyj"
+        ? "95% survival probability"
+        : "95% confidence interval";
     },
   },
 };
