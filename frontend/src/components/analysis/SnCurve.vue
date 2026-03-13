@@ -443,9 +443,22 @@ export default {
     },
 
     buildScatterSeries(rRatio, data) {
+      const symbols = ["circle", "triangle", "rect", "cross", "diamond"];
+
+      const index = this.rRatios.findIndex(
+        (value) => Number(value) === Number(rRatio)
+      );
+
+      const symbol = symbols[index % symbols.length];
+
       return {
         type: "scatter",
-        symbolSize: 5,
+        name: `Experiment data R=${rRatio}`,
+        symbol: symbol,
+        symbolSize: 6,
+        itemStyle: {
+          color: "#000000",
+        },
         data: data
           .filter((row) => Number(row.stress_ratio) === Number(rRatio))
           .map((row) => [
