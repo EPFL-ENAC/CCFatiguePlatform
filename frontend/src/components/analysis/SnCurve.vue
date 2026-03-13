@@ -11,11 +11,26 @@
       </v-btn>
 
       <info-tooltip>
-        This module plots curves on the (Stress - Number of cycles) plane. The
-        curves are associated with 3 different methods (Lin-Log, Log-Log,
+        This module plots curves on the (Stress - Number of cycles) plane.
+        <br />
+        The curves are associated with 3 different methods (Lin-log, Log-log,
         Sendeckyj) and can be considered as constitutive laws for fatigue life
-        predictions. On the graphs we also plot the individual results gathered
-        over the tests with inputs (Cycles to failure - Stress at failure)
+        predictions.
+        <br />
+        On the graphs we also plot the individual results gathered over the
+        tests with inputs (Cycles to failure - Stress at failure)
+        <br />
+        <a
+          href="/downloads/SNCurve_methods.pdf"
+          target="_blank"
+          rel="noopener"
+          variant="text"
+          density="compact"
+          class="pa-0 text-decoration-underline"
+          style="color: blue; text-transform: none; min-width: 0"
+        >
+          See detailed description of the methods (PDF)
+        </a>
       </info-tooltip>
     </v-card-title>
 
@@ -37,9 +52,12 @@
                   <info-tooltip>
                     See the
                     <a
-                      href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/AGG_Data_Convention.md"
+                      href="/downloads/AGG_Data_Convention.pdf"
+                      target="_blank"
+                      rel="noopener"
+                      style="color: blue; text-transform: none; min-width: 0"
                     >
-                      AGG Data Convention
+                      AGG Data Convention (PDF)
                     </a>
                   </info-tooltip>
                 </template>
@@ -184,9 +202,12 @@
             <info-tooltip>
               See the
               <a
-                href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/SNC_Data_Convention.md"
+                href="/downloads/SNC_output_guide.pdf"
+                target="_blank"
+                rel="noopener"
+                style="color: blue; text-transform: none; min-width: 0"
               >
-                SNC Data Convention
+                SNC Data Convention (PDF)
               </a>
             </info-tooltip>
           </v-btn>
@@ -225,6 +246,7 @@ export default {
       collapsed: false,
       rRatios: [],
       selectedRRatios: [],
+      requestId: 0,
       xAxisOptions: [
         { text: "Cycle count", value: "value" },
         { text: "Log(Cycle count)", value: "log" },
@@ -441,10 +463,18 @@ export default {
         return;
       }
 
+      const currentRequestId = ++this.requestId;
+      const selectedMethodsSnapshot = [...this.selectedMethods];
+      const selectedRRatiosSnapshot = [...this.selectedRRatios];
+
       this.loading = true;
+      this.outputs = {};
+      this.series = [];
 
       parseFile(this.file)
         .then((parsedInputFile) => {
+          if (currentRequestId !== this.requestId) return null;
+
           const detectedRRatios = [
             ...new Set(
               parsedInputFile.data
@@ -454,26 +484,27 @@ export default {
           ].sort((a, b) => a - b);
 
           this.rRatios = detectedRRatios;
-          this.selectedRRatios = this.selectedRRatios.filter((rRatio) =>
+
+          let activeRRatios = selectedRRatiosSnapshot.filter((rRatio) =>
             detectedRRatios.includes(rRatio)
           );
 
-          if (this.selectedRRatios.length === 0 && detectedRRatios.length > 0) {
-            this.selectedRRatios = [detectedRRatios[0]];
+          if (activeRRatios.length === 0 && detectedRRatios.length > 0) {
+            activeRRatios = [detectedRRatios[0]];
           }
 
+          this.selectedRRatios = activeRRatios;
+
           return Promise.all(
-            this.selectedMethods.map((method) =>
+            selectedMethodsSnapshot.map((method) =>
               this.$analysisApi
                 .runSnCurveFile(method, this.file)
                 .then((result) => {
                   const parsedResult = parse(result.csv_data, parserConfig);
                   const rows =
-                    this.selectedRRatios.length > 0
+                    activeRRatios.length > 0
                       ? parsedResult.data.filter((row) =>
-                          this.selectedRRatios.includes(
-                            Number(row.stress_ratio)
-                          )
+                          activeRRatios.includes(Number(row.stress_ratio))
                         )
                       : parsedResult.data;
 
@@ -487,9 +518,14 @@ export default {
           ).then((analysisResults) => ({
             parsedInputFile,
             analysisResults,
+            activeRRatios,
           }));
         })
-        .then(({ parsedInputFile, analysisResults }) => {
+        .then((payload) => {
+          if (!payload || currentRequestId !== this.requestId) return;
+
+          const { parsedInputFile, analysisResults, activeRRatios } = payload;
+
           this.outputs = Object.fromEntries(
             analysisResults.map(({ method, analysisResult }) => [
               method,
@@ -499,10 +535,11 @@ export default {
 
           this.series = [
             ...analysisResults.flatMap(({ method, rows }) =>
-              this.selectedRRatios.flatMap((rRatio) => {
+              activeRRatios.flatMap((rRatio) => {
                 const filteredRows = rows.filter(
                   (row) => Number(row.stress_ratio) === Number(rRatio)
                 );
+
                 const color = this.methodColor(method, rRatio);
 
                 return [
@@ -532,28 +569,35 @@ export default {
                 ];
               })
             ),
-            ...this.selectedRRatios.map((rRatio) =>
+            ...activeRRatios.map((rRatio) =>
               this.buildScatterSeries(rRatio, parsedInputFile.data)
             ),
           ];
         })
         .catch(() => {
+          if (currentRequestId !== this.requestId) return;
           this.outputs = {};
           this.series = [];
         })
         .finally(() => {
-          this.loading = false;
+          if (currentRequestId === this.requestId) {
+            this.loading = false;
+          }
         });
     },
 
     downloadOutput() {
-      for (const [method, output] of Object.entries(this.outputs)) {
+      for (const method of this.selectedMethods) {
+        const output = this.outputs?.[method];
+        if (!output) continue;
+
         const outputName = getOutputFileName(
           "AGG",
           "SNC",
           this.file.name,
           method
         );
+
         download(output.csv_data, `${outputName}.csv`, "text/csv");
         download(output.json_data, `${outputName}.json`, "application/json");
       }
