@@ -13,9 +13,9 @@
       <info-tooltip>
         This module plots curves on the (Stress - Number of cycles) plane.
         <br />
-        The curves are associated with 3 different methods (Lin-log, Log-log,
-        Sendeckyj) and can be considered as constitutive laws for fatigue life
-        predictions.
+        The curves are associated with 4 different methods (Lin-log, Log-log,
+        Sendeckyj, Whitney) and can be considered as constitutive laws for
+        fatigue life predictions.
         <br />
         On the graphs we also plot the individual results gathered over the
         tests with inputs (Cycles to failure - Stress at failure)
@@ -418,7 +418,14 @@ export default {
           { name: "c", value: this.fmtNumber(fit.cstar) },
         ];
       }
-
+      if (method === "Whitney") {
+        return [
+          { name: "alpha_f", value: this.fmtNumber(fit.alpha_f) },
+          { name: "q0", value: this.fmtNumber(fit.q0) },
+          { name: "sigma0", value: this.fmtNumber(fit.sigma0) },
+          { name: "power", value: this.fmtNumber(fit.power) },
+        ];
+      }
       return [];
     },
 
@@ -587,8 +594,15 @@ export default {
             ),
           ];
         })
-        .catch(() => {
+        .catch((error) => {
           if (currentRequestId !== this.requestId) return;
+          console.error("SnCurve error:", error);
+          alert(
+            error?.response?.data?.detail ||
+              error?.response?.data ||
+              error?.message ||
+              "Whitney failed"
+          );
           this.outputs = {};
           this.series = [];
         })
@@ -621,6 +635,7 @@ export default {
         LinLog: ["#d62728", "#ff6b6b", "#8b0000", "#ff9ea1"],
         LogLog: ["#2ca02c", "#7bd87b", "#0b6e0b", "#9be79b"],
         Sendeckyj: ["#1f77b4", "#66b3ff", "#0b4f8a", "#9ccfff"],
+        Whitney: ["#9467bd", "#c5a3ff", "#5e3a87", "#d8c2ff"],
       };
 
       const palette = palettes[method] || ["#000000"];
@@ -640,11 +655,13 @@ export default {
       if (method === "LinLog") return "σ_max = A + B·log10(N)";
       if (method === "LogLog") return "σ_max = A · N^(-B)";
       if (method === "Sendeckyj") return "σ_max = b + a·(N + c*)^{-s*}";
+      if (method === "Whitney")
+        return "σ_max = sigma0 · (-ln(Ps))^(power/alpha_f) · N^(-power)";
       return "";
     },
 
     dashedMeaning(method) {
-      return method === "Sendeckyj"
+      return method === "Sendeckyj" || method === "Whitney"
         ? "95% survival probability"
         : "95% confidence interval";
     },

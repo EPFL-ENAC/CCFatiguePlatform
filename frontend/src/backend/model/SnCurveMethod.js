@@ -35,6 +35,12 @@ export default class SnCurveMethod {
   Sendeckyj = "Sendeckyj";
 
   /**
+   * value: "Whitney"
+   * @const
+   */
+  Whitney = "Whitney";
+
+  /**
    * Returns a <code>SnCurveMethod</code> enum value from a Javascript object name.
    * @param {Object} data The plain JavaScript object containing the name of the enum value.
    * @return {module:model/SnCurveMethod} The enum <code>SnCurveMethod</code> value.

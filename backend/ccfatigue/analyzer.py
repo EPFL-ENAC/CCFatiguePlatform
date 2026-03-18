@@ -19,6 +19,7 @@ import ccfatigue.analysis.faf_ftpf as faf_ftpf
 import ccfatigue.analysis.snc_linlog as snc_linlog
 import ccfatigue.analysis.snc_loglog as snc_loglog
 import ccfatigue.analysis.snc_sendeckyj as snc_sendeckyj
+import ccfatigue.analysis.snc_whitney as snc_whitney
 from ccfatigue.analysis.utils.faf import FatigueModel
 from ccfatigue.model import (
     AnalysisResult,
@@ -148,10 +149,16 @@ def run_sn_curve(
                 ),
                 file,
             )
+        case SnCurveMethod.WHITNEY:
+            output = run_python(
+                lambda input, csv_output, json_output: snc_whitney.execute(
+                    input, json_output, csv_output
+                ),
+                file,
+            )
         case _:
             raise Exception(f"unknown method {method}")
     return output
-
 
 def run_cycle_counting(
     file: SpooledTemporaryFile[bytes] | IO,
