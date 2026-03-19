@@ -3,11 +3,6 @@
     <v-card-title>
       Cycle Counting
       <v-spacer />
-      <v-btn icon variant="text" size="small" @click="collapsed = !collapsed">
-        <v-icon>
-          {{ collapsed ? "mdi-chevron-down" : "mdi-chevron-up" }}
-        </v-icon>
-      </v-btn>
 
       <info-tooltip>
         Cycle counting is used to summarize irregular load-versus-time histories
@@ -28,244 +23,224 @@
       </info-tooltip>
     </v-card-title>
 
-    <v-expand-transition>
-      <div v-show="!collapsed">
-        <v-card-subtitle>
-          <v-row align="end">
-            <v-col>
-              <v-file-input
-                v-model="file"
-                show-size
-                accept=".csv"
-                :error-messages="errorMessages"
-                :disabled="loading"
-                label="LDS csv file"
-                @change="updateOutput"
-              >
-                <template #append>
-                  <info-tooltip>
-                    See the
-                    <a
-                      href="/downloads/LDS_Data_Convention.pdf"
-                      target="_blank"
-                      rel="noopener"
-                      variant="text"
-                      density="compact"
-                      class="pa-0 text-decoration-underline"
-                      style="color: blue; text-transform: none; min-width: 0"
-                    >
-                      LDS Data Convention (PDF)
-                    </a>
-                  </info-tooltip>
-                </template>
-              </v-file-input>
-            </v-col>
-
-            <v-col>
-              <v-select
-                v-model="selectedMethods"
-                :items="methods"
-                label="Select Methods"
-                multiple
-                chips
-                clearable
-                :disabled="loading"
-                @change="updateOutput"
-              />
-            </v-col>
-          </v-row>
-        </v-card-subtitle>
-
-        <v-card-text v-if="stats" class="pt-0">
-          <div
-            style="font-weight: 700; font-size: 23px"
-            class="text-center mb-4"
+    <v-card-subtitle>
+      <v-row align="end">
+        <v-col>
+          <v-file-input
+            v-model="file"
+            show-size
+            accept=".csv"
+            :error-messages="errorMessages"
+            :disabled="loading"
+            label="LDS csv file"
+            @change="updateOutput"
           >
-            Cycle spectrum (Cumulative percentage vs Stress range)
-          </div>
-
-          <v-row>
-            <!-- SUMMARY -->
-            <v-col cols="12" md="3" class="mt-6">
-              <v-card variant="outlined" class="pa-3">
-                <div class="text-subtitle-2 mb-2">Cycles (Selected)</div>
-
-                <v-divider class="my-2" />
-
-                <div
-                  v-for="(r, idx) in methodResults"
-                  :key="r.method"
-                  class="py-1"
+            <template #append>
+              <info-tooltip>
+                See the
+                <a
+                  href="/downloads/LDS_Data_Convention.pdf"
+                  target="_blank"
+                  rel="noopener"
+                  variant="text"
+                  density="compact"
+                  class="pa-0 text-decoration-underline"
+                  style="color: blue; text-transform: none; min-width: 0"
                 >
-                  <div class="d-flex align-center mb-1">
-                    <span :style="dotStyle(r.color)" />
-                    <span
-                      class="text-body-2 font-weight-bold"
-                      :style="{ color: r.color }"
-                    >
-                      {{ r.method }}
-                    </span>
-                  </div>
-                  <div class="d-flex justify-space-between">
-                    <span class="text-body-2">Full cycles</span>
-                    <span
-                      class="text-body-2 font-weight-bold"
-                      :style="{ color: r.color }"
-                    >
-                      {{ r.statsPart.fullCycleCount }}
-                    </span>
-                  </div>
-                  <div class="d-flex justify-space-between">
-                    <span class="text-body-2">Half cycles</span>
-                    <span
-                      class="text-body-2 font-weight-bold"
-                      :style="{ color: r.color }"
-                    >
-                      {{ r.statsPart.halfCycleCount }}
-                    </span>
-                  </div>
-                  <div class="d-flex justify-space-between">
-                    <span class="text-body-2">Constant amplitudes</span>
-                    <span
-                      class="text-body-2 font-weight-bold"
-                      :style="{ color: r.color }"
-                    >
-                      {{ r.statsPart.constantAmplitudes }}
-                    </span>
-                  </div>
+                  LDS Data Convention (PDF)
+                </a>
+              </info-tooltip>
+            </template>
+          </v-file-input>
+        </v-col>
 
-                  <v-divider
-                    v-if="idx < methodResults.length - 1"
-                    class="mt-3"
-                  />
-                </div>
+        <v-col>
+          <v-select
+            v-model="selectedMethods"
+            :items="methods"
+            label="Select Methods"
+            multiple
+            chips
+            clearable
+            :disabled="loading"
+            @change="updateOutput"
+          />
+        </v-col>
+      </v-row>
+    </v-card-subtitle>
 
-                <v-snackbar v-model="showDownloadMessage" timeout="2500">
-                  {{ downloadMessage }}
-                </v-snackbar>
-              </v-card>
-            </v-col>
+    <v-card-text v-if="stats" class="pt-0">
+      <div style="font-weight: 700; font-size: 23px" class="text-center mb-4">
+        Cycle spectrum (Cumulative percentage vs Stress range)
+      </div>
 
-            <!-- 2D chart -->
-            <v-col cols="12" sm="8" md="9">
-              <simple-chart
-                v-if="series.length"
-                :height="560"
-                :series="series"
-                :y-axis-min="stats.yAxisMin"
-                :y-axis-max="stats.yAxisMax"
-                :y-axis-interval="stats.yInterval"
-                x-axis-name="Cumulative Percentage of Spectrum Cycles"
-                y-axis-name="Stress Range [MPa]"
-                :axis-label-formatter="formatInt"
-                :tooltip-formatter="formatInt"
-              />
-            </v-col>
-          </v-row>
+      <v-row>
+        <!-- SUMMARY -->
+        <v-col cols="12" md="3" class="mt-6">
+          <v-card variant="outlined" class="pa-3">
+            <div class="text-subtitle-2 mb-2">Cycles (Selected)</div>
 
-          <div class="my-8">
-            <v-divider />
-          </div>
+            <v-divider class="my-2" />
 
-          <div
-            style="font-weight: 700; font-size: 23px"
-            class="text-center mb-2"
-          >
-            Markov Matrix (Range–Mean Cycle Distribution)
-          </div>
-
-          <v-row v-if="selectedMethods && selectedMethods.length" dense>
-            <v-col
-              v-for="m in selectedMethods"
-              :key="m"
-              cols="12"
-              :sm="
-                selectedMethods.length === 1
-                  ? 12
-                  : selectedMethods.length === 2
-                  ? 6
-                  : 4
-              "
-            >
-              <div class="d-flex align-center justify-center mb-3">
-                <span :style="dotStyle(methodColors[m])" />
+            <div v-for="(r, idx) in methodResults" :key="r.method" class="py-1">
+              <div class="d-flex align-center mb-1">
+                <span :style="dotStyle(r.color)" />
                 <span
-                  class="font-weight-bold"
-                  :style="{ color: methodColors[m] }"
+                  class="text-body-2 font-weight-bold"
+                  :style="{ color: r.color }"
                 >
-                  {{ m }}
+                  {{ r.method }}
+                </span>
+              </div>
+              <div class="d-flex justify-space-between">
+                <span class="text-body-2">Full cycles</span>
+                <span
+                  class="text-body-2 font-weight-bold"
+                  :style="{ color: r.color }"
+                >
+                  {{ r.statsPart.fullCycleCount }}
+                </span>
+              </div>
+              <div class="d-flex justify-space-between">
+                <span class="text-body-2">Half cycles</span>
+                <span
+                  class="text-body-2 font-weight-bold"
+                  :style="{ color: r.color }"
+                >
+                  {{ r.statsPart.halfCycleCount }}
+                </span>
+              </div>
+              <div class="d-flex justify-space-between">
+                <span class="text-body-2">Constant amplitudes</span>
+                <span
+                  class="text-body-2 font-weight-bold"
+                  :style="{ color: r.color }"
+                >
+                  {{ r.statsPart.constantAmplitudes }}
                 </span>
               </div>
 
-              <Markov3D
-                v-if="markovByMethod[m] && markovByMethod[m].markovData?.length"
-                :data="markovByMethod[m].markovData"
-                :x-centers="markovByMethod[m].xCenters"
-                :y-centers="markovByMethod[m].yCenters"
-                x-label="Stress range [Nb bins]"
-                y-label="Stress mean [Nb bins]"
-                z-label="Number of cycles"
-                title=""
-                :height="selectedMethods.length === 1 ? 800 : 700"
-                :resize-key="markovLayoutKey"
-                :base-color="methodColors[m]"
-              />
-
-              <v-card
-                v-if="markovByMethod[m]"
-                outlined
-                class="pa-2 mt-2"
-                style="background: white; border-radius: 6px"
-              >
-                <div class="text-body-2">
-                  Bin widths:
-                  <b
-                    >{{ markovByMethod[m].markovSize }}×{{
-                      markovByMethod[m].markovSize
-                    }}</b
-                  >
-                  · ΔRange
-                  <b>{{ formatNumber(markovByMethod[m].rangeBinSize) }} MPa</b>
-                  · ΔMean
-                  <b>{{ formatNumber(markovByMethod[m].meanBinSize) }} MPa</b>
-                </div>
-              </v-card>
-
-              <div v-else class="text-caption grey--text text-center mt-2">
-                No Markov data for this method.
-              </div>
-            </v-col>
-          </v-row>
-
-          <div @click="onDownloadClick">
-            <div class="mt-3 d-flex justify-end" style="width: 100%">
-              <v-btn :disabled="downloadDisabled">
-                Download CYC
-                <info-tooltip>
-                  <span v-if="selectedMethods.length !== 1">
-                    Please select just one method to download CYC.
-                  </span>
-                  <span v-else>
-                    See the
-                    <a
-                      href="/downloads/CYC_output_guide.pdf"
-                      target="_blank"
-                      rel="noopener"
-                      variant="text"
-                      density="compact"
-                      class="pa-0 text-decoration-underline"
-                      style="color: blue; text-transform: none; min-width: 0"
-                    >
-                      CYC Data Convention (PDF)
-                    </a>
-                  </span>
-                </info-tooltip>
-              </v-btn>
+              <v-divider v-if="idx < methodResults.length - 1" class="mt-3" />
             </div>
-          </div>
-        </v-card-text>
+
+            <v-snackbar v-model="showDownloadMessage" timeout="2500">
+              {{ downloadMessage }}
+            </v-snackbar>
+          </v-card>
+        </v-col>
+
+        <!-- 2D chart -->
+        <v-col cols="12" sm="8" md="9">
+          <simple-chart
+            v-if="series.length"
+            :height="560"
+            :series="series"
+            :y-axis-min="stats.yAxisMin"
+            :y-axis-max="stats.yAxisMax"
+            :y-axis-interval="stats.yInterval"
+            x-axis-name="Cumulative Percentage of Spectrum Cycles"
+            y-axis-name="Stress Range [MPa]"
+            :axis-label-formatter="formatInt"
+            :tooltip-formatter="formatInt"
+          />
+        </v-col>
+      </v-row>
+
+      <div class="my-8">
+        <v-divider />
       </div>
-    </v-expand-transition>
+
+      <div style="font-weight: 700; font-size: 23px" class="text-center mb-2">
+        Markov Matrix (Range–Mean Cycle Distribution)
+      </div>
+
+      <v-row v-if="selectedMethods && selectedMethods.length" dense>
+        <v-col
+          v-for="m in selectedMethods"
+          :key="m"
+          cols="12"
+          :sm="
+            selectedMethods.length === 1
+              ? 12
+              : selectedMethods.length === 2
+              ? 6
+              : 4
+          "
+        >
+          <div class="d-flex align-center justify-center mb-3">
+            <span :style="dotStyle(methodColors[m])" />
+            <span class="font-weight-bold" :style="{ color: methodColors[m] }">
+              {{ m }}
+            </span>
+          </div>
+
+          <Markov3D
+            v-if="markovByMethod[m] && markovByMethod[m].markovData?.length"
+            :data="markovByMethod[m].markovData"
+            :x-centers="markovByMethod[m].xCenters"
+            :y-centers="markovByMethod[m].yCenters"
+            x-label="Stress range [Nb bins]"
+            y-label="Stress mean [Nb bins]"
+            z-label="Number of cycles"
+            title=""
+            :height="selectedMethods.length === 1 ? 800 : 700"
+            :resize-key="markovLayoutKey"
+            :base-color="methodColors[m]"
+          />
+
+          <v-card
+            v-if="markovByMethod[m]"
+            outlined
+            class="pa-2 mt-2"
+            style="background: white; border-radius: 6px"
+          >
+            <div class="text-body-2">
+              Bin widths:
+              <b
+                >{{ markovByMethod[m].markovSize }}×{{
+                  markovByMethod[m].markovSize
+                }}</b
+              >
+              · ΔRange
+              <b>{{ formatNumber(markovByMethod[m].rangeBinSize) }} MPa</b>
+              · ΔMean
+              <b>{{ formatNumber(markovByMethod[m].meanBinSize) }} MPa</b>
+            </div>
+          </v-card>
+
+          <div v-else class="text-caption grey--text text-center mt-2">
+            No Markov data for this method.
+          </div>
+        </v-col>
+      </v-row>
+
+      <div @click="onDownloadClick">
+        <div class="mt-3 d-flex justify-end" style="width: 100%">
+          <v-btn :disabled="downloadDisabled">
+            Download CYC
+            <info-tooltip>
+              <span v-if="selectedMethods.length !== 1">
+                Please select just one method to download CYC.
+              </span>
+              <span v-else>
+                See the
+                <a
+                  href="/downloads/CYC_output_guide.pdf"
+                  target="_blank"
+                  rel="noopener"
+                  variant="text"
+                  density="compact"
+                  class="pa-0 text-decoration-underline"
+                  style="color: blue; text-transform: none; min-width: 0"
+                >
+                  CYC Data Convention (PDF)
+                </a>
+              </span>
+            </info-tooltip>
+          </v-btn>
+        </div>
+      </div>
+    </v-card-text>
   </v-card>
 </template>
 
@@ -503,7 +478,6 @@ export default {
       markovByMethod: {},
       methodResults: [],
       methodColors: {},
-      collapsed: false,
 
       markovLayoutKey: 0,
     };

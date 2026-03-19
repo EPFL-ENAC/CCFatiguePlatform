@@ -4,12 +4,6 @@
       S-N Curve
       <v-spacer />
 
-      <v-btn icon variant="text" size="small" @click="collapsed = !collapsed">
-        <v-icon>
-          {{ collapsed ? "mdi-chevron-down" : "mdi-chevron-up" }}
-        </v-icon>
-      </v-btn>
-
       <info-tooltip>
         This module plots curves on the (Stress - Number of cycles) plane.
         <br />
@@ -34,186 +28,182 @@
       </info-tooltip>
     </v-card-title>
 
-    <v-expand-transition>
-      <div v-show="!collapsed">
-        <v-card-subtitle>
-          <v-row align="center">
-            <v-col>
-              <v-file-input
-                v-model="file"
-                chips
-                show-size
-                accept=".csv"
-                label="AGG csv file"
-                :disabled="loading"
-                @change="onFileChange"
-              >
-                <template #append>
-                  <info-tooltip>
-                    See the
-                    <a
-                      href="/downloads/AGG_Data_Convention.pdf"
-                      target="_blank"
-                      rel="noopener"
-                      style="color: blue; text-transform: none; min-width: 0"
-                    >
-                      AGG Data Convention (PDF)
-                    </a>
-                  </info-tooltip>
-                </template>
-              </v-file-input>
-            </v-col>
-          </v-row>
-
-          <v-row align="end">
-            <v-col>
-              <v-select
-                v-model="selectedMethods"
-                label="select S-N curve method(s)"
-                :items="methods"
-                chips
-                multiple
-                variant="underlined"
-                density="comfortable"
-                :disabled="loading"
-                @change="updateOutput"
-              />
-            </v-col>
-
-            <v-col>
-              <v-select
-                v-model="selectedRRatios"
-                label="select R ratio"
-                :items="rRatios"
-                chips
-                multiple
-                variant="underlined"
-                density="comfortable"
-                :disabled="loading"
-                @change="updateOutput"
-              />
-            </v-col>
-
-            <v-col>
-              <v-select
-                v-model="xAxisType"
-                label="X-Axis scale"
-                :items="xAxisOptions"
-                item-title="text"
-                item-value="value"
-                :disabled="loading"
-              />
-            </v-col>
-          </v-row>
-        </v-card-subtitle>
-
-        <v-card-text v-if="series.length > 0">
-          <v-row>
-            <v-col cols="12">
-              <div
-                style="font-weight: 700; font-size: 23px; color: #212121"
-                class="text-center mb-4"
-              >
-                Stress vs Number of Cycles (S-N)
-              </div>
-            </v-col>
-          </v-row>
-
-          <v-row align="start">
-            <v-col cols="12" md="3" class="mt-6">
-              <v-card variant="outlined" class="pa-3">
-                <div class="text-subtitle-2 mb-2">S-N (Selected)</div>
-                <v-divider class="mb-2" />
-
-                <div
-                  v-for="card in selectedMethodCards"
-                  :key="card.key"
-                  class="mb-3"
+    <v-card-subtitle>
+      <v-row align="center">
+        <v-col>
+          <v-file-input
+            v-model="file"
+            chips
+            show-size
+            accept=".csv"
+            label="AGG csv file"
+            :disabled="loading"
+            @change="onFileChange"
+          >
+            <template #append>
+              <info-tooltip>
+                See the
+                <a
+                  href="/downloads/AGG_Data_Convention.pdf"
+                  target="_blank"
+                  rel="noopener"
+                  style="color: blue; text-transform: none; min-width: 0"
                 >
-                  <div class="d-flex align-center">
-                    <span
-                      class="mr-2"
-                      :style="{
-                        display: 'inline-block',
-                        width: '10px',
-                        height: '10px',
-                        borderRadius: '50%',
-                        background: card.color,
-                      }"
-                    />
-                    <span class="text-body-2" :style="{ color: card.color }">
-                      <b>{{ card.title }}</b>
-                    </span>
-                  </div>
+                  AGG Data Convention (PDF)
+                </a>
+              </info-tooltip>
+            </template>
+          </v-file-input>
+        </v-col>
+      </v-row>
 
-                  <div class="text-caption mt-2">
-                    <div><b>Equation</b></div>
-                    <div style="white-space: normal">
-                      <code>{{ card.equation }}</code>
-                    </div>
-                  </div>
+      <v-row align="end">
+        <v-col>
+          <v-select
+            v-model="selectedMethods"
+            label="select S-N curve method(s)"
+            :items="methods"
+            chips
+            multiple
+            variant="underlined"
+            density="comfortable"
+            :disabled="loading"
+            @change="updateOutput"
+          />
+        </v-col>
 
-                  <div class="text-caption mt-2">
-                    <div><b>Parameters</b></div>
-                    <div v-if="card.params.length === 0">No fit data</div>
-                    <template v-else>
-                      <div v-for="param in card.params" :key="param.name">
-                        {{ param.name }}: {{ param.value }}
-                      </div>
-                    </template>
-                  </div>
+        <v-col>
+          <v-select
+            v-model="selectedRRatios"
+            label="select R ratio"
+            :items="rRatios"
+            chips
+            multiple
+            variant="underlined"
+            density="comfortable"
+            :disabled="loading"
+            @change="updateOutput"
+          />
+        </v-col>
 
-                  <div class="text-caption mt-2 d-flex align-center">
-                    <span
-                      :style="{
-                        color: card.color,
-                        fontFamily: 'monospace',
-                        fontWeight: 'bold',
-                        fontSize: '14px',
-                        letterSpacing: '2px',
-                        marginRight: '8px',
-                      }"
-                    >
-                      - - - -
-                    </span>
-                    <span>: {{ card.dashedMeaning }}</span>
-                  </div>
+        <v-col>
+          <v-select
+            v-model="xAxisType"
+            label="X-Axis scale"
+            :items="xAxisOptions"
+            item-title="text"
+            item-value="value"
+            :disabled="loading"
+          />
+        </v-col>
+      </v-row>
+    </v-card-subtitle>
 
-                  <v-divider class="mt-3" />
+    <v-card-text v-if="series.length > 0">
+      <v-row>
+        <v-col cols="12">
+          <div
+            style="font-weight: 700; font-size: 23px; color: #212121"
+            class="text-center mb-4"
+          >
+            Stress vs Number of Cycles (S-N)
+          </div>
+        </v-col>
+      </v-row>
+
+      <v-row align="start">
+        <v-col cols="12" md="3" class="mt-6">
+          <v-card variant="outlined" class="pa-3">
+            <div class="text-subtitle-2 mb-2">S-N (Selected)</div>
+            <v-divider class="mb-2" />
+
+            <div
+              v-for="card in selectedMethodCards"
+              :key="card.key"
+              class="mb-3"
+            >
+              <div class="d-flex align-center">
+                <span
+                  class="mr-2"
+                  :style="{
+                    display: 'inline-block',
+                    width: '10px',
+                    height: '10px',
+                    borderRadius: '50%',
+                    background: card.color,
+                  }"
+                />
+                <span class="text-body-2" :style="{ color: card.color }">
+                  <b>{{ card.title }}</b>
+                </span>
+              </div>
+
+              <div class="text-caption mt-2">
+                <div><b>Equation</b></div>
+                <div style="white-space: normal">
+                  <code>{{ card.equation }}</code>
                 </div>
-              </v-card>
-            </v-col>
+              </div>
 
-            <v-col cols="12" md="9">
-              <simple-chart
-                :aspect-ratio="2"
-                :series="series"
-                :x-axis-type="xAxisType"
-                :x-axis-name="'Number of cycles'"
-                y-axis-name="σₘₐₓ [MPa]"
-              />
-            </v-col>
-          </v-row>
-        </v-card-text>
+              <div class="text-caption mt-2">
+                <div><b>Parameters</b></div>
+                <div v-if="card.params.length === 0">No fit data</div>
+                <template v-else>
+                  <div v-for="param in card.params" :key="param.name">
+                    {{ param.name }}: {{ param.value }}
+                  </div>
+                </template>
+              </div>
 
-        <v-card-actions v-if="hasInput" class="justify-end">
-          <v-btn :disabled="loading && outputs != null" @click="downloadOutput">
-            Download SNC
-            <info-tooltip>
-              See the
-              <a
-                href="/downloads/SNC_output_guide.pdf"
-                target="_blank"
-                rel="noopener"
-                style="color: blue; text-transform: none; min-width: 0"
-              >
-                SNC Data Convention (PDF)
-              </a>
-            </info-tooltip>
-          </v-btn>
-        </v-card-actions>
-      </div>
-    </v-expand-transition>
+              <div class="text-caption mt-2 d-flex align-center">
+                <span
+                  :style="{
+                    color: card.color,
+                    fontFamily: 'monospace',
+                    fontWeight: 'bold',
+                    fontSize: '14px',
+                    letterSpacing: '2px',
+                    marginRight: '8px',
+                  }"
+                >
+                  - - - -
+                </span>
+                <span>: {{ card.dashedMeaning }}</span>
+              </div>
+
+              <v-divider class="mt-3" />
+            </div>
+          </v-card>
+        </v-col>
+
+        <v-col cols="12" md="9">
+          <simple-chart
+            :aspect-ratio="2"
+            :series="series"
+            :x-axis-type="xAxisType"
+            :x-axis-name="'Number of cycles'"
+            y-axis-name="σₘₐₓ [MPa]"
+          />
+        </v-col>
+      </v-row>
+    </v-card-text>
+
+    <v-card-actions v-if="hasInput" class="justify-end">
+      <v-btn :disabled="loading && outputs != null" @click="downloadOutput">
+        Download SNC
+        <info-tooltip>
+          See the
+          <a
+            href="/downloads/SNC_output_guide.pdf"
+            target="_blank"
+            rel="noopener"
+            style="color: blue; text-transform: none; min-width: 0"
+          >
+            SNC Data Convention (PDF)
+          </a>
+        </info-tooltip>
+      </v-btn>
+    </v-card-actions>
   </v-card>
 </template>
 
@@ -243,7 +233,6 @@ export default {
       outputs: {},
       series: [],
       xAxisType: "log",
-      collapsed: false,
       rRatios: [],
       selectedRRatios: [],
       requestId: 0,
