@@ -66,7 +66,10 @@ export default {
   },
 
   data() {
-    return { chart: null };
+    return {
+      chart: null,
+      selectedZRange: null,
+    };
   },
 
   watch: {
@@ -91,17 +94,26 @@ export default {
   },
 
   mounted() {
-    // Create chart instance once the DOM node exists
     this.chart = echarts.init(this.$refs.chart);
     this.render();
 
-    // Keep responsive behavior when window resizes
     window.addEventListener("resize", this.onResize);
+
+    this.chart.on("datarangeselected", (params) => {
+      if (!params || !params.selected) return;
+
+      this.selectedZRange = params.selected;
+      this.render();
+    });
   },
 
   beforeDestroy() {
     window.removeEventListener("resize", this.onResize);
-    if (this.chart) this.chart.dispose();
+
+    if (this.chart) {
+      this.chart.off("datarangeselected");
+      this.chart.dispose();
+    }
   },
 
   methods: {
@@ -122,7 +134,32 @@ export default {
       // VisualMap bounds based on z-values
       const zs = data.map((d) => d[2]).filter(Number.isFinite);
       const zMin = zs.length ? Math.min(...zs) : 0;
-      const zMax = zs.length ? Math.max(...zs) : 1;
+      const rawZMax = zs.length ? Math.max(...zs) : 1;
+      const zMax = niceSelectedMax(rawZMax);
+
+      const currentRange =
+        this.selectedZRange &&
+        Array.isArray(this.selectedZRange) &&
+        this.selectedZRange.length === 2
+          ? this.selectedZRange
+          : [zMin, zMax];
+
+      const currentZMaxRaw =
+        currentRange[1] > currentRange[0]
+          ? currentRange[1]
+          : currentRange[0] + 1;
+
+      const currentZMax = niceSelectedMax(currentZMaxRaw);
+      function niceSelectedMax(value) {
+        if (!Number.isFinite(value) || value <= 0) return 1;
+
+        if (value < 100) return Math.ceil(value / 10) * 10;
+        if (value < 1000) return Math.ceil(value / 50) * 50;
+        if (value < 5000) return Math.ceil(value / 100) * 100;
+        if (value < 20000) return Math.ceil(value / 500) * 500;
+
+        return Math.ceil(value / 1000) * 1000;
+      }
 
       // Formatting helpers (MPa shown with one decimal)
       const fmtMpa = (v) => (Number.isFinite(v) ? Number(v).toFixed(1) : "-");
@@ -190,12 +227,13 @@ export default {
          */
         visualMap: {
           show: true,
-          dimension: 2, // z is at index 2 in series data
+          dimension: 2,
           calculable: true,
           left: 10,
           bottom: 10,
           min: zMin,
           max: zMax,
+          range: currentRange,
           inRange: {
             color: [mixWithWhite(this.baseColor, 0.85), this.baseColor],
           },
@@ -275,9 +313,12 @@ export default {
 
         zAxis3D: {
           name: this.zLabel,
+          min: 0,
+          max: currentZMax,
           nameGap: 20,
           nameTextStyle: { fontSize: 20 },
           axisLabel: {
+            formatter: (v) => Math.round(v),
             textStyle: {
               fontSize: 18,
             },
