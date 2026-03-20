@@ -155,7 +155,10 @@
                 </template>
               </div>
 
-              <div class="text-caption mt-2 d-flex align-center">
+              <div
+                v-if="showReliabilityBands"
+                class="text-caption mt-2 d-flex align-center"
+              >
                 <span
                   :style="{
                     color: card.color,
@@ -320,6 +323,9 @@ export default {
       return !!this.file;
     },
 
+    showReliabilityBands() {
+      return this.selectedMethods.length === 1;
+    },
     computedXAxisType() {
       return this.graphType === "linlin" ? "value" : "log";
     },
@@ -801,7 +807,7 @@ export default {
                 );
                 const color = this.methodColor(method, rRatio);
 
-                return [
+                const baseSeries = [
                   this.buildLineSeries(
                     method,
                     rRatio,
@@ -809,23 +815,30 @@ export default {
                     "stress_max",
                     color
                   ),
-                  this.buildLineSeries(
-                    method,
-                    rRatio,
-                    filteredRows,
-                    "stress_lowerbound",
-                    color,
-                    true
-                  ),
-                  this.buildLineSeries(
-                    method,
-                    rRatio,
-                    filteredRows,
-                    "stress_upperbound",
-                    color,
-                    true
-                  ),
                 ];
+
+                if (this.showReliabilityBands) {
+                  baseSeries.push(
+                    this.buildLineSeries(
+                      method,
+                      rRatio,
+                      filteredRows,
+                      "stress_lowerbound",
+                      color,
+                      true
+                    ),
+                    this.buildLineSeries(
+                      method,
+                      rRatio,
+                      filteredRows,
+                      "stress_upperbound",
+                      color,
+                      true
+                    )
+                  );
+                }
+
+                return baseSeries;
               })
             ),
             ...activeRRatios.map((rRatio) =>
