@@ -55,6 +55,9 @@ export default {
     yAxisMax: { type: [Number, null], default: null },
     yAxisMin: { type: [Number, null], default: null },
     yAxisInterval: { type: [Number, null], default: null },
+    showXAxisSlider: { type: Boolean, default: false },
+    xSliderStart: { type: Number, default: 0 },
+    xSliderEnd: { type: Number, default: 100 },
     height: { type: Number, default: 480 },
     axisLabelFormatter: {
       type: Function,
@@ -87,7 +90,7 @@ export default {
           left: 60,
           top: 40,
           right: 90,
-          bottom: 50,
+          bottom: this.showXAxisSlider ? 95 : 50,
           containLabel: true,
         },
 
@@ -113,6 +116,17 @@ export default {
 
               const n = Number(value);
               if (!Number.isFinite(n)) return String(value);
+
+              if (Math.abs(n) >= 1e6) {
+                const exp = Math.floor(Math.log10(Math.abs(n)));
+                const mantissa = n / Math.pow(10, exp);
+                const roundedMantissa =
+                  Math.abs(mantissa) >= 10
+                    ? mantissa.toFixed(0)
+                    : mantissa.toFixed(1).replace(/\.0$/, "");
+
+                return `${roundedMantissa}e${exp}`;
+              }
 
               if (Math.abs(n) >= 1000) {
                 return n.toLocaleString(undefined, {
@@ -143,7 +157,6 @@ export default {
             fontFamily: "Arial, sans-serif",
           },
         },
-
         yAxis: {
           type: this.yAxisType,
           name: this.yAxisName,
@@ -162,12 +175,9 @@ export default {
             : 0,
           max: isYLog
             ? yLogLimits.max
-            : (value) => {
-                const autoMax = value.max * 1.05;
-                return this.yAxisMax != null
-                  ? Math.max(this.yAxisMax, autoMax)
-                  : autoMax;
-              },
+            : this.yAxisMax != null
+            ? this.yAxisMax
+            : (value) => value.max * 1.05,
           interval:
             !isYLog && this.yAxisInterval != null
               ? this.yAxisInterval
@@ -193,7 +203,6 @@ export default {
             fontSize: 18,
           },
         },
-
         tooltip: {
           trigger: "axis",
           confine: true,
@@ -251,17 +260,58 @@ export default {
 
         dataZoom: [
           {
-            id: "dataZoomX",
+            id: "dataZoomXInside",
             xAxisIndex: [0],
             filterMode: "none",
             type: "inside",
           },
           {
-            id: "dataZoomY",
+            id: "dataZoomYInside",
             yAxisIndex: [0],
             filterMode: "none",
             type: "inside",
           },
+          ...(this.showXAxisSlider
+            ? [
+                {
+                  id: "dataZoomXSlider",
+                  type: "slider",
+                  xAxisIndex: [0],
+                  filterMode: "none",
+                  bottom: 20,
+                  height: 30,
+                  start: this.xSliderStart,
+                  end: this.xSliderEnd,
+                  showDetail: true,
+                  labelFormatter: (value) => {
+                    if (isXLog) {
+                      const exp = Math.log10(Number(value));
+                      return Math.abs(exp - Math.round(exp)) < 1e-8
+                        ? `10^${Math.round(exp)}`
+                        : Number(value).toExponential(1);
+                    }
+
+                    const n = Number(value);
+                    if (!Number.isFinite(n)) return String(value);
+
+                    if (Math.abs(n) >= 1e6) {
+                      const exp = Math.floor(Math.log10(Math.abs(n)));
+                      const mantissa = n / Math.pow(10, exp);
+                      const roundedMantissa =
+                        Math.abs(mantissa) >= 10
+                          ? mantissa.toFixed(0)
+                          : mantissa.toFixed(1).replace(/\.0$/, "");
+                      return `${roundedMantissa}e${exp}`;
+                    }
+
+                    return n.toLocaleString(undefined, {
+                      maximumFractionDigits: 0,
+                      useGrouping: false,
+                    });
+                  },
+                },
+              ]
+            : []),
         ],
 
         series: this.series.map((seriesItem) => ({

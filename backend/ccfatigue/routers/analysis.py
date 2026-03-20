@@ -38,9 +38,9 @@ async def run_cycle_counting_file(
 async def run_sn_curve_file(
     file: UploadFile = File(...),
     method: SnCurveMethod = Query(...),
+    confidence_interval: float | None = Query(None, alias="confidenceInterval"),
 ) -> AnalysisResult:
-    return run_sn_curve(file.file, method)
-
+    return run_sn_curve(file.file, method, confidence_interval)
 
 @router.post("/cld/file", response_model=bytes)
 async def run_cld_file(

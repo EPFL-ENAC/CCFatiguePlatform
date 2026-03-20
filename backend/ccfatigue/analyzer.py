@@ -126,6 +126,7 @@ def create_dataframe(output: bytes) -> DataFrame:
 def run_sn_curve(
     file: SpooledTemporaryFile[bytes] | IO,
     method: SnCurveMethod,
+    confidence_interval: float | None = None,
 ) -> AnalysisResult:
     match method:
         case SnCurveMethod.LIN_LOG:
@@ -145,14 +146,24 @@ def run_sn_curve(
         case SnCurveMethod.SENDECKYJ:
             output = run_python(
                 lambda input, csv_output, json_output: snc_sendeckyj.execute(
-                    input, json_output, csv_output
+                    input,
+                    json_output,
+                    csv_output,
+                    confidence_interval=(
+                        confidence_interval if confidence_interval is not None else 50
+                    ),
                 ),
                 file,
             )
         case SnCurveMethod.WHITNEY:
             output = run_python(
                 lambda input, csv_output, json_output: snc_whitney.execute(
-                    input, json_output, csv_output
+                    input,
+                    json_output,
+                    csv_output,
+                    confidence_interval=(
+                        confidence_interval if confidence_interval is not None else 50
+                    ),
                 ),
                 file,
             )
