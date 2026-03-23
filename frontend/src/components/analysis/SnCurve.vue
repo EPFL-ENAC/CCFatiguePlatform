@@ -120,90 +120,116 @@
             <div
               v-for="card in selectedMethodCards"
               :key="card.key"
-              class="mb-3"
+              class="method-banner-card mb-4"
             >
-              <div class="d-flex align-center">
-                <span
-                  class="mr-2"
-                  :style="{
-                    display: 'inline-block',
-                    width: '10px',
-                    height: '10px',
-                    borderRadius: '50%',
-                    background: card.color,
-                  }"
-                />
-                <span class="text-body-2" :style="{ color: card.color }">
-                  <b>{{ card.title }}</b>
+              <div class="d-flex align-center justify-space-between mb-2">
+                <div class="d-flex align-center">
+                  <span
+                    class="mr-2"
+                    :style="{
+                      display: 'inline-block',
+                      width: '12px',
+                      height: '12px',
+                      borderRadius: '50%',
+                      background: card.color,
+                    }"
+                  />
+                  <span
+                    class="method-banner-title"
+                    :style="{ color: card.color }"
+                  >
+                    {{ card.method }}
+                  </span>
+                </div>
+
+                <div class="method-banner-ratio">R = {{ card.rRatio }}</div>
+              </div>
+
+              <div class="method-banner-meta mb-3">
+                <span v-if="card.method === 'Sendeckyj'">
+                  Probability: {{ sendeckyjProbability }}%
+                </span>
+                <span v-else-if="card.method === 'Whitney'">
+                  Probability: {{ whitneyProbability }}%
                 </span>
               </div>
 
-              <div class="text-caption mt-2">
-                <div><b>Equation</b></div>
-                <div style="white-space: normal">
-                  <code>{{ card.equation }}</code>
-                </div>
+              <div class="method-banner-section-label">Equation</div>
+              <div class="method-banner-equation mb-3">
+                <code>{{ card.equation }}</code>
               </div>
 
-              <div class="text-caption mt-2">
-                <div><b>Parameters</b></div>
-                <div v-if="card.params.length === 0">No fit data</div>
-                <template v-else>
-                  <div v-for="param in card.params" :key="param.name">
-                    {{ param.name }}: {{ param.value }}
-                  </div>
-                </template>
+              <div class="method-banner-section-label">Parameters</div>
+              <div
+                v-if="card.params.length === 0"
+                class="method-banner-empty mb-3"
+              >
+                No fit data
+              </div>
+              <div v-else class="method-banner-params mb-3">
+                <div
+                  v-for="param in card.params"
+                  :key="param.name"
+                  class="method-banner-param"
+                >
+                  <span class="param-name">{{ param.name }}</span>
+                  <span class="param-value">{{ param.value }}</span>
+                </div>
               </div>
 
               <div
                 v-if="showReliabilityBands"
-                class="text-caption mt-2 d-flex align-center"
+                class="method-banner-dashed mb-3"
               >
                 <span
                   :style="{
                     color: card.color,
                     fontFamily: 'monospace',
                     fontWeight: 'bold',
-                    fontSize: '14px',
+                    fontSize: '15px',
                     letterSpacing: '2px',
-                    marginRight: '8px',
                   }"
                 >
                   - - - -
                 </span>
-                <span>: {{ card.dashedMeaning }}</span>
+                <span class="ml-2">{{ card.dashedMeaning }}</span>
               </div>
-              <div v-if="card.method === 'Sendeckyj'" class="text-caption mt-2">
-                <div><b>Sendeckyj probability [%]</b></div>
+
+              <div v-if="card.method === 'Sendeckyj'" class="mb-3">
+                <div class="method-banner-section-label">
+                  Sendeckyj probability [%]
+                </div>
                 <v-text-field
                   v-model.number="sendeckyjProbability"
                   type="number"
                   min="1"
                   max="99"
                   step="1"
-                  variant="underlined"
-                  density="compact"
+                  variant="outlined"
+                  density="comfortable"
                   hide-details
                   :disabled="loading"
                   @change="updateOutput"
                 />
               </div>
-              <div v-if="card.method === 'Whitney'" class="text-caption mt-2">
-                <div><b>Whitney probability [%]</b></div>
+
+              <div v-if="card.method === 'Whitney'" class="mb-3">
+                <div class="method-banner-section-label">
+                  Whitney probability [%]
+                </div>
                 <v-text-field
                   v-model.number="whitneyProbability"
                   type="number"
                   min="1"
                   max="99"
                   step="1"
-                  variant="underlined"
-                  density="compact"
+                  variant="outlined"
+                  density="comfortable"
                   hide-details
                   :disabled="loading"
                   @change="updateOutput"
                 />
               </div>
-              <v-divider class="mt-3" />
             </div>
           </v-card>
         </v-col>
@@ -462,12 +488,7 @@ export default {
           return {
             key: `${method}-${rRatio}`,
             method,
-            title:
-              method === "Sendeckyj"
-                ? `${method} R=${rRatio} (${this.sendeckyjProbability}%)`
-                : method === "Whitney"
-                ? `${method} R=${rRatio} (${this.whitneyProbability}%)`
-                : `${method} R=${rRatio}`,
+            rRatio,
             color: this.methodColor(method, rRatio),
             equation: this.methodEquation(method),
             params: this.formatParams(method, fit),
@@ -944,3 +965,87 @@ export default {
   },
 };
 </script>
+<style scoped>
+.method-banner-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  background: #fafafa;
+}
+
+.method-banner-title {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.method-banner-ratio {
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+  background: #f0f0f0;
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+
+.method-banner-meta {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.method-banner-section-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 6px;
+}
+
+.method-banner-equation {
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.method-banner-params {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+}
+
+.method-banner-param {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border: 1px solid #ececec;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.param-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #444;
+}
+
+.param-value {
+  font-size: 14px;
+  color: #111;
+}
+
+.method-banner-dashed {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #555;
+}
+
+.method-banner-empty {
+  font-size: 14px;
+  color: #777;
+  font-style: italic;
+}
+</style>
