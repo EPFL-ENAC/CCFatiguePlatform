@@ -134,15 +134,55 @@ def execute(
 
     # Import input file (AGG format)
     samples = pd.read_csv(input_file)
+
     # Convert columns to numeric (empty cells -> NaN)
     samples["stress_max"] = pd.to_numeric(samples["stress_max"], errors="coerce")
     samples["cycles_to_failure"] = pd.to_numeric(samples["cycles_to_failure"], errors="coerce")
     samples["residual_strength"] = pd.to_numeric(samples["residual_strength"], errors="coerce")
 
-    # Failure case: if residual_strength is empty -> set equal to stress_max
-    samples["residual_strength"] = samples["residual_strength"].fillna(samples["stress_max"])
-    samples = samples.dropna(subset=["stress_ratio", "stress_max", "cycles_to_failure", "residual_strength"])
+    # Keep raw residual_strength to distinguish:
+    # - NaN  => failure
+    # - > 0  => run-out with measured residual strength
+    # - <= 0 => run-out flag only (e.g. -1), not valid for Sendeckyj
+    samples = samples.dropna(subset=["stress_ratio", "stress_max", "cycles_to_failure"])
     samples = samples[(samples["stress_max"] > 0) & (samples["cycles_to_failure"] > 0)]
+
+    samples["is_failure"] = samples["residual_strength"].isna()
+    samples["is_runout_measured"] = samples["residual_strength"] > 0
+    samples["is_runout_flag_only"] = samples["residual_strength"].notna() & (samples["residual_strength"] <= 0)
+
+    invalid_flag_rows = samples[samples["is_runout_flag_only"]]
+
+    if not invalid_flag_rows.empty:
+        invalid_count = len(invalid_flag_rows)
+
+        stress_ratios_with_flags = sorted(
+            invalid_flag_rows["stress_ratio"].dropna().unique().tolist()
+        )
+        stress_ratios_text = ", ".join(str(r) for r in stress_ratios_with_flags)
+
+        csv_line_numbers = (invalid_flag_rows.index + 2).tolist()
+        csv_lines_text = ", ".join(str(i) for i in csv_line_numbers[:10])
+
+        extra_lines_text = ""
+        if len(csv_line_numbers) > 10:
+            extra_lines_text = f" (+{len(csv_line_numbers) - 10} more)"
+
+        raise ValueError(
+            f"Sendeckyj cannot run: {invalid_count} run-out specimen(s) use "
+            f"residual_strength <= 0 (for example -1) as a wear-out flag instead of a "
+            f"measured residual strength value. "
+            f"Affected stress ratio(s): {stress_ratios_text}. "
+            f"CSV line(s): {csv_lines_text}{extra_lines_text}. "
+            f"This convention is accepted for Whitney, but not for Sendeckyj."
+        )
+    # For Sendeckyj:
+    # - failures use sigma_r = stress_max
+    # - measured run-outs use the provided residual_strength
+    samples["residual_strength"] = samples["residual_strength"].where(
+        samples["is_runout_measured"],
+        samples["stress_max"]
+    )
     # Data are grouped by stress_ratio but one experiment
     # can have two separate groups with same stress_ratio so we need to identify
     # the groups

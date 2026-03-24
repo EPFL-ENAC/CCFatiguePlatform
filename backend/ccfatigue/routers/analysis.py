@@ -1,7 +1,7 @@
 """
 Handle /analysis requests
 """
-from fastapi import APIRouter, File, Query, UploadFile
+from fastapi import APIRouter, File, Query, UploadFile, HTTPException
 
 from ccfatigue.analyzer import (
     FatigueModel,
@@ -40,7 +40,16 @@ async def run_sn_curve_file(
     method: SnCurveMethod = Query(...),
     confidence_interval: float | None = Query(None, alias="confidenceInterval"),
 ) -> AnalysisResult:
-    return run_sn_curve(file.file, method, confidence_interval)
+    try:
+        return run_sn_curve(file.file, method, confidence_interval)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"{method} failed: {str(e)}"
+        )
+
 
 @router.post("/cld/file", response_model=bytes)
 async def run_cld_file(

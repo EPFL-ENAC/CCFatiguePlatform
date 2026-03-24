@@ -61,7 +61,7 @@
         <v-col>
           <v-select
             v-model="selectedMethods"
-            label="select S-N curve method(s)"
+            label="Select S-N curve method(s)"
             :items="methods"
             chips
             multiple
@@ -75,7 +75,7 @@
         <v-col>
           <v-select
             v-model="selectedRRatios"
-            label="select R ratio"
+            label="Select R ratio"
             :items="rRatios"
             chips
             multiple
@@ -279,21 +279,32 @@
     </v-card-text>
 
     <v-card-actions v-if="hasInput" class="justify-end">
-      <v-btn :disabled="loading && outputs != null" @click="downloadOutput">
-        Download SNC
-        <info-tooltip>
-          See the
-          <a
-            href="/downloads/SNC_output_guide.pdf"
-            target="_blank"
-            rel="noopener"
-            style="color: blue; text-transform: none; min-width: 0"
-          >
-            SNC Data Convention (PDF)
-          </a>
-        </info-tooltip>
-      </v-btn>
+      <div @click="onDownloadClick">
+        <v-btn :disabled="downloadDisabled">
+          Download SNC
+          <info-tooltip>
+            <span v-if="selectedMethods.length !== 1">
+              Please select just one method to download SNC.
+            </span>
+            <span v-else>
+              See the
+              <a
+                href="/downloads/SNC_output_guide.pdf"
+                target="_blank"
+                rel="noopener"
+                style="color: blue; text-transform: none; min-width: 0"
+              >
+                SNC Data Convention (PDF)
+              </a>
+            </span>
+          </info-tooltip>
+        </v-btn>
+      </div>
     </v-card-actions>
+
+    <v-snackbar v-model="showDownloadMessage" timeout="2500">
+      {{ downloadMessage }}
+    </v-snackbar>
   </v-card>
 </template>
 
@@ -320,12 +331,16 @@ export default {
       file: null,
       loading: false,
 
+      downloadMessage: "",
+      showDownloadMessage: false,
+
       methods,
       selectedMethods: [methods[0]],
       rRatios: [],
       selectedRRatios: [],
       outputs: {},
       series: [],
+
       sendeckyjProbability: 50,
       whitneyProbability: 50,
       requestId: 0,
@@ -349,9 +364,19 @@ export default {
       return !!this.file;
     },
 
+    downloadDisabled() {
+      return (
+        this.loading ||
+        !this.outputs ||
+        Object.keys(this.outputs).length === 0 ||
+        this.selectedMethods.length !== 1
+      );
+    },
+
     showReliabilityBands() {
       return this.selectedMethods.length === 1;
     },
+
     computedXAxisType() {
       return this.graphType === "linlin" ? "value" : "log";
     },
@@ -369,8 +394,11 @@ export default {
         return this.isLogX ? this.logCycleRange : this.linearCycleRange;
       },
       set(value) {
-        if (this.isLogX) this.logCycleRange = value;
-        else this.linearCycleRange = value;
+        if (this.isLogX) {
+          this.logCycleRange = value;
+        } else {
+          this.linearCycleRange = value;
+        }
       },
     },
 
@@ -420,6 +448,7 @@ export default {
 
       const [min, max] = this.linearCycleBounds;
       const span = max - min;
+
       if (span <= 0) {
         return [{ value: min, label: this.formatCycleValue(min) }];
       }
@@ -476,15 +505,11 @@ export default {
         const output = this.outputs?.[method];
         if (!output) return [];
 
-        let json = output.json_data;
-        try {
-          if (typeof json === "string") json = JSON.parse(json);
-        } catch {
-          json = null;
-        }
+        const json = this.parseJsonData(output.json_data);
 
         return this.selectedRRatios.map((rRatio) => {
           const fit = this.getFitForRatio(json, rRatio);
+
           return {
             key: `${method}-${rRatio}`,
             method,
@@ -510,6 +535,14 @@ export default {
     onFileChange() {
       this.resetState();
       this.updateOutput();
+    },
+
+    parseJsonData(json) {
+      try {
+        return typeof json === "string" ? JSON.parse(json) : json;
+      } catch {
+        return null;
+      }
     },
 
     niceLinearCycleMax(value) {
@@ -539,8 +572,9 @@ export default {
       if (n < 1000000) return Math.max(1, Math.floor(n / 10000) * 10000);
       if (n < 10000000) return Math.max(1, Math.floor(n / 100000) * 100000);
       if (n < 100000000) return Math.max(1, Math.floor(n / 1000000) * 1000000);
-      if (n < 1000000000)
+      if (n < 1000000000) {
         return Math.max(1, Math.floor(n / 10000000) * 10000000);
+      }
 
       return Math.max(1, Math.floor(n / 100000000) * 100000000);
     },
@@ -566,6 +600,7 @@ export default {
           Math.abs(mantissa) >= 10
             ? mantissa.toFixed(0)
             : mantissa.toFixed(1).replace(/\.0$/, "");
+
         return `${rounded}e${exp}`;
       }
 
@@ -573,10 +608,6 @@ export default {
         maximumFractionDigits: 0,
         useGrouping: false,
       });
-    },
-
-    formatPowerTick(value) {
-      return `10^${Number(value).toFixed(0)}`;
     },
 
     fmtNumber(value) {
@@ -593,7 +624,9 @@ export default {
       );
 
       for (const key of Object.keys(obj)) {
-        if (aliases.includes(String(key).toLowerCase())) return obj[key];
+        if (aliases.includes(String(key).toLowerCase())) {
+          return obj[key];
+        }
       }
 
       for (const value of Object.values(obj)) {
@@ -788,6 +821,7 @@ export default {
                 .runSnCurveFile(method, this.file, confidenceToSend)
                 .then((result) => {
                   const parsedResult = parse(result.csv_data, parserConfig);
+
                   const rows =
                     activeRRatios.length > 0
                       ? parsedResult.data.filter((row) =>
@@ -826,6 +860,7 @@ export default {
                 const filteredRows = rows.filter(
                   (row) => Number(row.stress_ratio) === Number(rRatio)
                 );
+
                 const color = this.methodColor(method, rRatio);
 
                 const baseSeries = [
@@ -868,11 +903,11 @@ export default {
           ];
 
           const allX = this.series
-            .flatMap((s) => s.data || [])
+            .flatMap((serie) => serie.data || [])
             .map((point) =>
               Array.isArray(point) ? Number(point[0]) : Number(point)
             )
-            .filter((v) => Number.isFinite(v) && v > 0);
+            .filter((value) => Number.isFinite(value) && value > 0);
 
           if (allX.length > 0) {
             const minX = Math.min(...allX);
@@ -895,12 +930,20 @@ export default {
           if (currentRequestId !== this.requestId) return;
 
           console.error("SnCurve error:", error);
-          alert(
+          console.error("SnCurve error.response:", error?.response);
+          console.error("SnCurve error.response.data:", error?.response?.data);
+
+          let errorMessage =
             error?.response?.data?.detail ||
-              error?.response?.data ||
-              error?.message ||
-              "Whitney failed"
-          );
+            error?.response?.data?.message ||
+            error?.response?.data ||
+            error?.message;
+
+          if (typeof errorMessage === "object") {
+            errorMessage = JSON.stringify(errorMessage);
+          }
+
+          alert(errorMessage || "S-N curve analysis failed");
 
           this.outputs = {};
           this.series = [];
@@ -913,20 +956,45 @@ export default {
     },
 
     downloadOutput() {
-      for (const method of this.selectedMethods) {
-        const output = this.outputs?.[method];
-        if (!output) continue;
+      if (!this.file) return;
 
-        const outputName = getOutputFileName(
-          "AGG",
-          "SNC",
-          this.file.name,
-          method
-        );
-
-        download(output.csv_data, `${outputName}.csv`, "text/csv");
-        download(output.json_data, `${outputName}.json`, "application/json");
+      if (this.selectedMethods.length !== 1) {
+        this.downloadMessage = "Please select just one method to download SNC.";
+        this.showDownloadMessage = true;
+        return;
       }
+
+      const method = this.selectedMethods[0];
+      const output = this.outputs?.[method];
+      if (!output) return;
+
+      const outputName = getOutputFileName(
+        "AGG",
+        "SNC",
+        this.file.name,
+        method
+      );
+
+      download(output.csv_data, `${outputName}.csv`, "text/csv");
+      download(output.json_data, `${outputName}.json`, "application/json");
+    },
+
+    onDownloadClick() {
+      if (
+        this.loading ||
+        !this.outputs ||
+        Object.keys(this.outputs).length === 0
+      ) {
+        return;
+      }
+
+      if (this.selectedMethods.length !== 1) {
+        this.downloadMessage = "Please select just one method to download SNC.";
+        this.showDownloadMessage = true;
+        return;
+      }
+
+      this.downloadOutput();
     },
 
     methodColor(method, rRatio = null) {
@@ -965,6 +1033,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .method-banner-card {
   border: 1px solid #e0e0e0;
