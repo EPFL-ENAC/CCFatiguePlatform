@@ -249,6 +249,7 @@
           />
 
           <div class="mt-4 px-3">
+            <div class="text-subtitle-2 mb-2">Number of cycles (X axis)</div>
             <div class="d-flex justify-space-between text-caption mb-1">
               <span>Start: {{ sliderDisplayStart }}</span>
               <span>End: {{ sliderDisplayEnd }}</span>
@@ -267,6 +268,34 @@
             <div class="d-flex justify-space-between text-caption mt-1">
               <span
                 v-for="tick in bottomTicks"
+                :key="tick.label"
+                style="min-width: 40px; text-align: center"
+              >
+                {{ tick.label }}
+              </span>
+            </div>
+          </div>
+          <div class="mt-6 px-3">
+            <div class="text-subtitle-2 mb-2">Stress range (Y axis)</div>
+
+            <div class="d-flex justify-space-between text-caption mb-1">
+              <span>Start: {{ sliderDisplayStressStart }}</span>
+              <span>End: {{ sliderDisplayStressEnd }}</span>
+            </div>
+
+            <v-range-slider
+              v-model="activeStressRange"
+              :min="activeStressBounds[0]"
+              :max="activeStressBounds[1]"
+              :step="activeStressSliderStep"
+              strict
+              hide-details
+              class="mt-0"
+            />
+
+            <div class="d-flex justify-space-between text-caption mt-1">
+              <span
+                v-for="tick in leftTicks"
                 :key="tick.label"
                 style="min-width: 40px; text-align: center"
               >
@@ -356,6 +385,10 @@ export default {
       logCycleBounds: [0, 8],
       linearCycleRange: [1, 100],
       linearCycleBounds: [1, 100],
+      logStressRange: [0, 3],
+      logStressBounds: [0, 3],
+      linearStressRange: [0, 100],
+      linearStressBounds: [0, 100],
     };
   },
 
@@ -373,6 +406,35 @@ export default {
       );
     },
 
+    isLogY() {
+      return this.computedYAxisType === "log";
+    },
+
+    activeStressRange: {
+      get() {
+        return this.isLogY ? this.logStressRange : this.linearStressRange;
+      },
+      set(value) {
+        if (this.isLogY) {
+          this.logStressRange = value;
+        } else {
+          this.linearStressRange = value;
+        }
+      },
+    },
+
+    activeStressBounds() {
+      return this.isLogY ? this.logStressBounds : this.linearStressBounds;
+    },
+
+    activeStressSliderStep() {
+      return this.isLogY
+        ? 0.01
+        : Math.max(
+            (this.linearStressBounds[1] - this.linearStressBounds[0]) / 500,
+            1
+          );
+    },
     showReliabilityBands() {
       return (
         this.selectedMethods.length === 1 && this.selectedRRatios.length === 1
@@ -416,7 +478,6 @@ export default {
             1
           );
     },
-
     computedXAxisMin() {
       return this.isLogX
         ? Math.pow(10, this.logCycleRange[0])
@@ -427,6 +488,53 @@ export default {
       return this.isLogX
         ? Math.pow(10, this.logCycleRange[1])
         : this.linearCycleRange[1];
+    },
+    computedYAxisMin() {
+      return this.isLogY
+        ? Math.pow(10, this.logStressRange[0])
+        : this.linearStressRange[0];
+    },
+
+    computedYAxisMax() {
+      return this.isLogY
+        ? Math.pow(10, this.logStressRange[1])
+        : this.linearStressRange[1];
+    },
+
+    sliderDisplayStressStart() {
+      return this.formatStressValue(this.computedYAxisMin);
+    },
+
+    sliderDisplayStressEnd() {
+      return this.formatStressValue(this.computedYAxisMax);
+    },
+
+    leftTicks() {
+      if (this.isLogY) {
+        const start = Math.ceil(this.logStressBounds[0]);
+        const end = Math.floor(this.logStressBounds[1]);
+
+        return Array.from({ length: end - start + 1 }, (_, i) => ({
+          value: start + i,
+          label: `10^${start + i}`,
+        }));
+      }
+
+      const [min, max] = this.linearStressBounds;
+      const span = max - min;
+
+      if (span <= 0) {
+        return [{ value: min, label: this.formatStressValue(min) }];
+      }
+
+      const step = span / 4;
+      return Array.from({ length: 5 }, (_, i) => {
+        const value = min + i * step;
+        return {
+          value,
+          label: this.formatStressValue(value),
+        };
+      });
     },
 
     sliderDisplayStart() {
@@ -489,19 +597,6 @@ export default {
       };
     },
 
-    computedYAxisMin() {
-      if (this.computedYAxisType === "log" || !this.visibleYBounds) return null;
-      return Math.max(
-        0,
-        this.niceStressBound(this.visibleYBounds.min - 10, "down")
-      );
-    },
-
-    computedYAxisMax() {
-      if (this.computedYAxisType === "log" || !this.visibleYBounds) return null;
-      return this.niceStressBound(this.visibleYBounds.max + 10, "up");
-    },
-
     selectedMethodCards() {
       return this.selectedMethods.flatMap((method) => {
         const output = this.outputs?.[method];
@@ -525,13 +620,96 @@ export default {
       });
     },
   },
-
+  watch: {
+    visibleYBounds: {
+      handler() {
+        this.updateStressBounds();
+      },
+      deep: true,
+      immediate: true,
+    },
+  },
   methods: {
     resetState() {
       this.outputs = {};
       this.series = [];
       this.rRatios = [];
       this.selectedRRatios = [];
+    },
+
+    niceLinearStressMax(value) {
+      const n = Number(value);
+      if (!Number.isFinite(n) || n <= 0) return 10;
+
+      if (n < 10) return Math.ceil(n);
+      if (n < 100) return Math.ceil(n / 5) * 5;
+      if (n < 1000) return Math.ceil(n / 10) * 10;
+      if (n < 10000) return Math.ceil(n / 50) * 50;
+
+      return Math.ceil(n / 100) * 100;
+    },
+
+    niceLinearStressMin(value) {
+      const n = Number(value);
+      if (!Number.isFinite(n) || n <= 0) return 0;
+
+      if (n < 10) return Math.max(0, Math.floor(n));
+      if (n < 100) return Math.max(0, Math.floor(n / 5) * 5);
+      if (n < 1000) return Math.max(0, Math.floor(n / 10) * 10);
+      if (n < 10000) return Math.max(0, Math.floor(n / 50) * 50);
+
+      return Math.max(0, Math.floor(n / 100) * 100);
+    },
+
+    formatStressValue(value) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return "-";
+
+      if (n >= 1000 || n < 0.01) {
+        return n.toExponential(1);
+      }
+
+      return n.toLocaleString(undefined, {
+        maximumFractionDigits: 2,
+        useGrouping: false,
+      });
+    },
+
+    clampRange(range, bounds) {
+      if (!Array.isArray(range) || !Array.isArray(bounds)) return bounds;
+
+      let [r0, r1] = range;
+      const [b0, b1] = bounds;
+
+      r0 = Math.max(b0, Math.min(r0, b1));
+      r1 = Math.max(b0, Math.min(r1, b1));
+
+      if (r0 > r1) return [b0, b1];
+      return [r0, r1];
+    },
+
+    updateStressBounds() {
+      if (!this.visibleYBounds) return;
+
+      const minY = this.visibleYBounds.min;
+      const maxY = this.visibleYBounds.max;
+
+      if (!Number.isFinite(minY) || !Number.isFinite(maxY) || minY <= 0) return;
+
+      this.logStressBounds = [Math.floor(Math.log10(minY)), Math.log10(maxY)];
+      this.logStressRange = this.clampRange(
+        this.logStressRange,
+        this.logStressBounds
+      );
+
+      this.linearStressBounds = [
+        this.niceLinearStressMin(minY),
+        this.niceLinearStressMax(maxY),
+      ];
+      this.linearStressRange = this.clampRange(
+        this.linearStressRange,
+        this.linearStressBounds
+      );
     },
 
     spreadOverlappingPoints(points) {
@@ -645,10 +823,76 @@ export default {
       });
     },
 
-    fmtNumber(value) {
+    fmtNumber(value, name = "") {
       if (value === undefined || value === null || value === "") return "—";
+
       const n = Number(value);
-      return Number.isFinite(n) ? n.toPrecision(6) : String(value);
+      if (!Number.isFinite(n)) return String(value);
+
+      const key = String(name).toLowerCase();
+
+      if (["c", "cstar", "c*"].includes(key)) {
+        return this.formatAdaptiveNumber(n, 8);
+      }
+
+      if (["s", "sstar", "s*", "power"].includes(key)) {
+        return this.formatAdaptiveNumber(n, 5);
+      }
+
+      if (
+        ["alpha", "alpha_f", "beta", "a", "b", "q0", "sigma0"].includes(key)
+      ) {
+        return this.formatAdaptiveNumber(n, 2);
+      }
+
+      return this.formatAdaptiveNumber(n, 4);
+    },
+
+    formatAdaptiveNumber(value, maxDecimals = 4) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return "—";
+
+      const abs = Math.abs(n);
+
+      if (abs === 0) return "0";
+
+      if (abs >= 1000) {
+        return n.toLocaleString(undefined, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+          useGrouping: false,
+        });
+      }
+
+      if (abs >= 100) {
+        return n.toLocaleString(undefined, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: Math.min(maxDecimals, 1),
+          useGrouping: false,
+        });
+      }
+
+      if (abs >= 1) {
+        return n.toLocaleString(undefined, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: Math.min(maxDecimals, 2),
+          useGrouping: false,
+        });
+      }
+
+      if (abs >= 0.01) {
+        return n.toLocaleString(undefined, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: Math.max(maxDecimals, 4),
+          useGrouping: false,
+        });
+      }
+
+      return n.toLocaleString(undefined, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: Math.max(maxDecimals, 8),
+        useGrouping: false,
+      });
     },
 
     deepFindValue(obj, keyAliases) {
@@ -728,33 +972,36 @@ export default {
       const getAny = (aliases) => this.deepFindValue(scope, aliases);
 
       if (method === "LinLog" || method === "LogLog") {
+        const A = getAny(["A", "a", "intercept", "c0"]);
+        const B = getAny(["B", "b", "slope", "c1"]);
+
         return [
           {
             name: "A",
-            value: this.fmtNumber(getAny(["A", "a", "intercept", "c0"])),
+            value: this.fmtNumber(A, "A"),
           },
           {
             name: "B",
-            value: this.fmtNumber(getAny(["B", "b", "slope", "c1"])),
+            value: this.fmtNumber(B, "B"),
           },
         ];
       }
 
       if (method === "Sendeckyj") {
         return [
-          { name: "alpha", value: this.fmtNumber(fit.a) },
-          { name: "beta", value: this.fmtNumber(fit.b) },
-          { name: "s", value: this.fmtNumber(fit.sstar) },
-          { name: "c", value: this.fmtNumber(fit.cstar) },
+          { name: "alpha", value: this.fmtNumber(fit.a, "alpha") },
+          { name: "beta", value: this.fmtNumber(fit.b, "beta") },
+          { name: "s", value: this.fmtNumber(fit.sstar, "s") },
+          { name: "c", value: this.fmtNumber(fit.cstar, "c") },
         ];
       }
 
       if (method === "Whitney") {
         return [
-          { name: "alpha_f", value: this.fmtNumber(fit.alpha_f) },
-          { name: "q0", value: this.fmtNumber(fit.q0) },
-          { name: "sigma0", value: this.fmtNumber(fit.sigma0) },
-          { name: "power", value: this.fmtNumber(fit.power) },
+          { name: "alpha_f", value: this.fmtNumber(fit.alpha_f, "alpha_f") },
+          { name: "q0", value: this.fmtNumber(fit.q0, "q0") },
+          { name: "sigma0", value: this.fmtNumber(fit.sigma0, "sigma0") },
+          { name: "power", value: this.fmtNumber(fit.power, "power") },
         ];
       }
 
@@ -963,6 +1210,27 @@ export default {
               this.niceLinearCycleMax(maxX),
             ];
             this.linearCycleRange = [...this.linearCycleBounds];
+          }
+          const allY = this.series
+            .flatMap((serie) => serie.data || [])
+            .map((point) => (Array.isArray(point) ? Number(point[1]) : null))
+            .filter((value) => Number.isFinite(value) && value > 0);
+
+          if (allY.length > 0) {
+            const minY = Math.min(...allY);
+            const maxY = Math.max(...allY);
+
+            this.logStressBounds = [
+              Math.floor(Math.log10(minY)),
+              Math.log10(maxY),
+            ];
+            this.logStressRange = [...this.logStressBounds];
+
+            this.linearStressBounds = [
+              this.niceLinearStressMin(minY),
+              this.niceLinearStressMax(maxY),
+            ];
+            this.linearStressRange = [...this.linearStressBounds];
           }
         })
         .catch((error) => {

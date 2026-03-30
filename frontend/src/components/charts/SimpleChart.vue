@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { computeLogYAxisLimits, format3 } from "@/utils/formatters";
+import { format3 } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
 import { LineChart, ScatterChart } from "echarts/charts";
 import {
@@ -80,7 +80,6 @@ export default {
     actualOption() {
       const isXLog = this.xAxisType === "log";
       const isYLog = this.yAxisType === "log";
-      const yLogLimits = isYLog ? computeLogYAxisLimits(this.series) : null;
 
       return {
         title: this.title ? { text: this.title } : undefined,
@@ -168,28 +167,37 @@ export default {
           },
           logBase: isYLog ? 10 : undefined,
           minorSplitLine: { show: isYLog },
-          min: isYLog
-            ? yLogLimits.min
-            : this.yAxisMin != null
-            ? this.yAxisMin
-            : 0,
-          max: isYLog
-            ? yLogLimits.max
-            : this.yAxisMax != null
-            ? this.yAxisMax
-            : (value) => value.max * 1.05,
+          min:
+            this.yAxisMin != null
+              ? isYLog
+                ? Math.max(this.yAxisMin, 1e-12)
+                : this.yAxisMin
+              : isYLog
+              ? "dataMin"
+              : 0,
+          max:
+            this.yAxisMax != null
+              ? isYLog
+                ? Math.max(this.yAxisMax, 1e-12)
+                : this.yAxisMax
+              : isYLog
+              ? "dataMax"
+              : (value) => value.max * 1.05,
           interval:
             !isYLog && this.yAxisInterval != null
               ? this.yAxisInterval
               : undefined,
-          scale: isYLog ? false : undefined,
+          scale: true,
+          boundaryGap: false,
           nice: false,
-          boundaryGap: isYLog ? false : undefined,
           axisLabel: {
             fontFamily: "Arial, sans-serif",
             formatter: (value) => {
               if (isYLog) {
-                return `10^${Math.round(Math.log10(value))}`;
+                const exp = Math.log10(Number(value));
+                return Math.abs(exp - Math.round(exp)) < 1e-8
+                  ? `10^${Math.round(exp)}`
+                  : "";
               }
 
               const n = Number(value);
