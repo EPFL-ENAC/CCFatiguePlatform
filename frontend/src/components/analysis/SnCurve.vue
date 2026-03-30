@@ -374,7 +374,9 @@ export default {
     },
 
     showReliabilityBands() {
-      return this.selectedMethods.length === 1;
+      return (
+        this.selectedMethods.length === 1 && this.selectedRRatios.length === 1
+      );
     },
 
     computedXAxisType() {
@@ -530,6 +532,39 @@ export default {
       this.series = [];
       this.rRatios = [];
       this.selectedRRatios = [];
+    },
+
+    spreadOverlappingPoints(points) {
+      const groups = new Map();
+
+      points.forEach((point) => {
+        const key = `${point[0]}__${point[1]}`;
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(point);
+      });
+
+      const spreadPoints = [];
+
+      groups.forEach((group) => {
+        if (group.length === 1) {
+          spreadPoints.push(group[0]);
+          return;
+        }
+
+        const mid = (group.length - 1) / 2;
+
+        group.forEach((point, index) => {
+          const x = Number(point[0]);
+          const y = Number(point[1]);
+
+          const offset = (index - mid) * 0.012; // léger décalage visuel
+          const jitteredX = x * Math.pow(10, offset); // mieux pour axe log
+
+          spreadPoints.push([jitteredX, y]);
+        });
+      });
+
+      return spreadPoints;
     },
 
     onFileChange() {
@@ -753,18 +788,22 @@ export default {
       );
       const symbol = symbols[index % symbols.length];
 
+      const rawPoints = data
+        .filter((row) => Number(row.stress_ratio) === Number(rRatio))
+        .map((row) => [Number(row.cycles_to_failure), Number(row.stress_max)]);
+
+      const displayPoints = this.spreadOverlappingPoints(rawPoints);
+
       return {
         type: "scatter",
         name: `Experiment data R=${rRatio}`,
         symbol,
-        symbolSize: 6,
-        itemStyle: { color: "#000000" },
-        data: data
-          .filter((row) => Number(row.stress_ratio) === Number(rRatio))
-          .map((row) => [
-            Number(row.cycles_to_failure),
-            Number(row.stress_max),
-          ]),
+        symbolSize: 7,
+        itemStyle: {
+          color: "#000000",
+          opacity: 0.8,
+        },
+        data: displayPoints,
         rRatio,
       };
     },

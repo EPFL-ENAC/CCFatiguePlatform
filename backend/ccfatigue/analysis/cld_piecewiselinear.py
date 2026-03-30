@@ -14,13 +14,10 @@ Volume 32, Issue 4, 2010, Pages 659-669, ISSN 0142-1123,
     https://link.springer.com/content/pdf/10.1007/978-1-84996-181-3.pdf
 """
 
-import math
 import os
 
-import numpy as np
 import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
-from scipy import stats
 
 import ccfatigue.analysis.utils.cld as cld
 import ccfatigue.analysis.utils.piecewiselinear as piecewiselinear
@@ -36,7 +33,6 @@ OUTPUT_CSV_FILE = os.path.join(DATA_DIR, OUTPUT_CSV_FILENAME)
 # staticvalue.txt => constants
 DEFAULT_UCS = 27.1
 DEFAULT_UTS = 27.7
-CRITICAL_STRESS_RATIO = 0.1
 
 # Cycles for the isolines (the lines of the CLD)
 CLD_CYCLES_COUNT = [10**x for x in range(3, 10)]  # = 1e3, 1e4, ..., 1e9
@@ -49,7 +45,8 @@ def execute(
     uts: float = DEFAULT_UTS,
 ) -> None:
     """
-    Execute the CLD Harris algorithm
+    Execute the CLD Piecewise Linear algorithm.
+
     Parameters
     ----------
         snc_csv_input_file
@@ -60,15 +57,33 @@ def execute(
             Ultimate compressive stress
         uts
             Ultimate tensile stress
+
     Returns
     -------
         None
     """
 
-    # Import input files (SNC format)
+    # Import input file (SNC format)
     snc_df = pd.read_csv(snc_csv_input_file)
 
-    # Calculate stress amplitude (sigma_a) for each known stress ratios
+    # Basic validation
+    required_columns = {"stress_ratio", "cycles_to_failure", "stress_max"}
+    missing_columns = required_columns - set(snc_df.columns)
+    if missing_columns:
+        raise ValueError(
+            f"Missing required SNC columns: {', '.join(sorted(missing_columns))}"
+        )
+
+    # Keep only the cycles used to build the CLD
+    snc_df = snc_df[snc_df["cycles_to_failure"].isin(CLD_CYCLES_COUNT)].copy()
+
+    if snc_df.empty:
+        raise ValueError(
+            "No SNC rows found for the required CLD cycles: "
+            f"{', '.join(str(x) for x in CLD_CYCLES_COUNT)}"
+        )
+
+    # Calculate stress amplitude sigma_a from SNC points
     snc_df["stress_amplitude"] = snc_df.apply(
         lambda x: piecewiselinear.calculate_stress_amplitude(
             x.stress_ratio, x.stress_max
@@ -76,69 +91,70 @@ def execute(
         axis=1,
     )
 
-    # Get stress ratio (R)
-    stress_ratios_df = pd.DataFrame({"stress_ratio": snc_df.stress_ratio.unique()})
-
-    # Sort R according to sectors, counterclockwise
-    piecewiselinear.sort_by_stress_ratios(stress_ratios_df)
-
-    # Calculate slope A and intercept B (linear regression) for each group of R
-    linregress = snc_df.groupby("stress_ratio").apply(
-        lambda x: stats.linregress(
-            np.log10(x.stress_amplitude),  # type: ignore
-            np.log10(x.cycles_to_failure),  # type: ignore
-        )
+    # Calculate mean stress sigma_m from SNC points
+    snc_df["stress_mean"] = (
+        (1 + snc_df["stress_ratio"])
+        * snc_df["stress_amplitude"]
+        / (1 - snc_df["stress_ratio"])
     )
 
-    # Set stress_ratio as index for linregress groupby import
-    stress_ratios_df.set_index(["stress_ratio"], inplace=True)
-    stress_ratios_df["slope"] = linregress.apply(lambda x: x[1])
-    stress_ratios_df["intercept"] = linregress.apply(lambda x: x[0])
-
-    # Remove index for stress_ratios_df.stress_ratio usage
-    stress_ratios_df.reset_index(["stress_ratio"], inplace=True)
-
-    # Create output df
+    # Create output dataframe
     cld_df = pd.DataFrame()
 
+    # Build one CLD polyline per life level
     for cycles_to_failure in CLD_CYCLES_COUNT:
+        group = snc_df[snc_df["cycles_to_failure"] == cycles_to_failure].copy()
 
-        cld_df = cld.cld_add_row(
-            cld_df,
-            cycles_to_failure,
-            0,
-            uts,
+        if group.empty:
+            continue
+
+        points = []
+
+        # Left bound: compression static strength
+        points.append(
+            {
+                "cycles_to_failure": cycles_to_failure,
+                "stress_amplitude": 0.0,
+                "stress_mean": -float(ucs),
+            }
         )
 
-        # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/cde13599121bceb95d579adfe3e56056ba622d60/CCFatigue_modules/3_CLD/Piecewise-Linear/CLD-Piecewise-Linear.for#L241
-        # Eq not found in doc
-        stress_ratios_df["stress_amplitude"] = 10 ** (
-            -(stress_ratios_df.slope / stress_ratios_df.intercept)
-            + 1 / stress_ratios_df.intercept * math.log10(cycles_to_failure)
-        )
-
-        # Eq 1 p661
-        stress_ratios_df["stress_mean"] = (
-            (1 + stress_ratios_df.stress_ratio)
-            * stress_ratios_df.stress_amplitude
-            / (1 - stress_ratios_df.stress_ratio)
-        )
-
-        for index, stress_ratio in stress_ratios_df.iterrows():
-
-            cld_df = cld.cld_add_row(
-                cld_df,
-                cycles_to_failure,
-                stress_ratio.stress_amplitude,
-                stress_ratio.stress_mean,
+        # Known SNC points for this life level
+        for _, row in group.iterrows():
+            points.append(
+                {
+                    "cycles_to_failure": cycles_to_failure,
+                    "stress_amplitude": float(row["stress_amplitude"]),
+                    "stress_mean": float(row["stress_mean"]),
+                }
             )
 
-        cld_df = cld.cld_add_row(
-            cld_df,
-            cycles_to_failure,
-            0,
-            -ucs,
+        # Right bound: tensile static strength
+        points.append(
+            {
+                "cycles_to_failure": cycles_to_failure,
+                "stress_amplitude": 0.0,
+                "stress_mean": float(uts),
+            }
         )
 
-    # Generate output files
+        # Sort from left to right on the CLD plane
+        points = sorted(points, key=lambda x: x["stress_mean"])
+
+        # Add sorted points to output
+        for p in points:
+            cld_df = cld.cld_add_row(
+                cld_df,
+                p["cycles_to_failure"],
+                p["stress_amplitude"],
+                p["stress_mean"],
+            )
+
+    # Final safety sort
+    cld_df = cld_df.sort_values(
+        by=["cycles_to_failure", "stress_mean"],
+        ascending=[True, True],
+    ).reset_index(drop=True)
+
+    # Generate output file
     cld_df.to_csv(path_or_buf=cld_csv_output_file, index=False)  # type: ignore
