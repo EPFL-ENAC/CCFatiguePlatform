@@ -19,6 +19,7 @@ import ccfatigue.analysis.faf_ftpf as faf_ftpf
 import ccfatigue.analysis.snc_linlog as snc_linlog
 import ccfatigue.analysis.snc_loglog as snc_loglog
 import ccfatigue.analysis.snc_sendeckyj as snc_sendeckyj
+import ccfatigue.analysis.snc_whitney as snc_whitney
 from ccfatigue.analysis.utils.faf import FatigueModel
 from ccfatigue.model import (
     AnalysisResult,
@@ -125,6 +126,7 @@ def create_dataframe(output: bytes) -> DataFrame:
 def run_sn_curve(
     file: SpooledTemporaryFile[bytes] | IO,
     method: SnCurveMethod,
+    confidence_interval: float | None = None,
 ) -> AnalysisResult:
     match method:
         case SnCurveMethod.LIN_LOG:
@@ -144,14 +146,30 @@ def run_sn_curve(
         case SnCurveMethod.SENDECKYJ:
             output = run_python(
                 lambda input, csv_output, json_output: snc_sendeckyj.execute(
-                    input, json_output, csv_output
+                    input,
+                    json_output,
+                    csv_output,
+                    confidence_interval=(
+                        confidence_interval if confidence_interval is not None else 50
+                    ),
+                ),
+                file,
+            )
+        case SnCurveMethod.WHITNEY:
+            output = run_python(
+                lambda input, csv_output, json_output: snc_whitney.execute(
+                    input,
+                    json_output,
+                    csv_output,
+                    confidence_interval=(
+                        confidence_interval if confidence_interval is not None else 50
+                    ),
                 ),
                 file,
             )
         case _:
             raise Exception(f"unknown method {method}")
     return output
-
 
 def run_cycle_counting(
     file: SpooledTemporaryFile[bytes] | IO,

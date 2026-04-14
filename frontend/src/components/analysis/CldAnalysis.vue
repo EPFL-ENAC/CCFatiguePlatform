@@ -134,10 +134,12 @@ export default {
             ).map((cycles_to_failure) => ({
               type: "line",
               name: `${this.method} ${cycles_to_failure[0]}`,
-              data: cycles_to_failure[1].map((item) => [
-                item.stress_mean,
-                item.stress_amplitude,
-              ]),
+              data: [...cycles_to_failure[1]]
+                .sort((a, b) => Number(a.stress_mean) - Number(b.stress_mean))
+                .map((item) => [
+                  Number(item.stress_mean),
+                  Number(item.stress_amplitude),
+                ]),
             }));
             this.errorMessages = null;
           })

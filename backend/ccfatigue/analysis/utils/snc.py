@@ -93,6 +93,50 @@ def stress_at_failure_bounds(
 
     return (stress_lowerbound, stress_upperbound)
 
+def stress_bounds_student(
+    x_train: np.ndarray,
+    y_train: np.ndarray,
+    x0: np.ndarray,
+    confidence: int = 95,
+    prediction_band: bool = True,
+) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Compute confidence/prediction bounds for y at x0 for a simple linear regression y = a + b x.
+    - confidence band: uncertainty on the mean response
+    - prediction band: uncertainty for a new observation (wider)
+    """
+    n = len(x_train)
+    if n <= 2:
+        # Not enough points to estimate variance -> no band
+        yhat0 = np.interp(x0, x_train, y_train) if n > 1 else np.full_like(x0, y_train[0])
+        return yhat0, yhat0
+
+    lr = stats.linregress(x_train, y_train)
+    a, b = lr.intercept, lr.slope
+
+    yhat_train = a + b * x_train
+    resid = y_train - yhat_train
+
+    dof = n - 2
+    s_err = np.sqrt(np.sum(resid**2) / dof)
+
+    xbar = np.mean(x_train)
+    sxx = np.sum((x_train - xbar) ** 2)
+
+    # Standard error at x0
+    base = (1.0 / n) + ((x0 - xbar) ** 2 / sxx)
+    if prediction_band:
+        base = 1.0 + base  # <-- prediction band includes +1
+
+    se0 = s_err * np.sqrt(base)
+
+    alpha = 1.0 - confidence / 100.0
+    tcrit = stats.t.ppf(1.0 - alpha / 2.0, dof)
+
+    yhat0 = a + b * x0
+    lower = yhat0 - tcrit * se0
+    upper = yhat0 + tcrit * se0
+    return lower, upper
 
 def execute_linlog_loglog(
     use_logarithm: bool,
@@ -150,11 +194,8 @@ def execute_linlog_loglog(
     # Use log10(cycles_to_failure) instead of cycles_to_failure
     agg_df["log10_cycles_to_failure"] = np.log10(agg_df.cycles_to_failure)
 
-    # Data are grouped by stress_ratio but one experiment
-    # can have two separate groups with same stress_ratio so we need to identify
-    agg_df["stress_ratio_id"] = (
-        agg_df.stress_ratio != agg_df.stress_ratio.shift()
-    ).cumsum()
+    # One group per stress_ratio (order-independent)
+    agg_df["stress_ratio_id"] = agg_df["stress_ratio"].astype("category").cat.codes
 
     # Groups AGG by stress_ratio
     agg_grpby_stress_ratios_df = (
@@ -252,17 +293,17 @@ def execute_linlog_loglog(
     )
 
     # level
+    # Number of distinct stress levels per stress_ratio (no need for stress_cluster_number)
     agg_grpby_stress_ratios_df["stress_cluster_count"] = (
-        agg_df[["stress_ratio_id", "stress_cluster_number"]]
-        .groupby("stress_ratio_id")
-        .nunique()
+        agg_df.groupby("stress_ratio_id")["stress_max"].nunique()
     )
 
     # Eq 6, p4, ref [1]
-    # Variance
-    # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/2_S-NCurves/S-N-Curve-LinLog.for#L333
-    agg_grpby_stress_ratios_df["variance"] = np.sqrt(
-        agg_grpby_stress_ratios_df.lsse / (agg_grpby_stress_ratios_df.sample_count - 2)
+    den = (agg_grpby_stress_ratios_df.sample_count - 2)
+    agg_grpby_stress_ratios_df["variance"] = np.where(
+        den > 0,
+        np.sqrt(agg_grpby_stress_ratios_df.lsse / den),
+        np.nan,
     )
 
     # Fp is given in table 2, p5, ref [1]
@@ -318,22 +359,53 @@ def execute_linlog_loglog(
             axis=1,
         )
 
-        snc_current_stress_ratio[
-            ["stress_lowerbound", "stress_upperbound"]
-        ] = snc_current_stress_ratio.apply(
-            lambda x: stress_at_failure_bounds(
-                stress_ratio_df.sample_count,
-                stress_ratio_df.q,
-                stress_ratio_df.slope,
-                stress_ratio_df.intercept,
-                x.cycles_to_failure,
-                stress_ratio_df.pp,
-                stress_ratio_df.avg_stress_max,
-            ),  # type: ignore
-            axis=1,
-        ).apply(
-            pd.Series
+        # --- Decide whether ASTM bounds are usable ---
+        # ASTM-style bounds need replicates: sample_count > stress_cluster_count and valid fp/pp
+        astm_ok = (
+            (stress_ratio_df.sample_count > 2)
+            and (stress_ratio_df.sample_count > stress_ratio_df.stress_cluster_count)
+            and np.isfinite(stress_ratio_df.fp)
+            and (stress_ratio_df.pp is not None)
+            and (stress_ratio_df.pp > 0)
+            and (stress_ratio_df.q is not None)
+            and (stress_ratio_df.q > 0)
         )
+
+        if astm_ok:
+            # ASTM bounds (existing implementation)
+            snc_current_stress_ratio[["stress_lowerbound", "stress_upperbound"]] = (
+                snc_current_stress_ratio.apply(
+                    lambda x: stress_at_failure_bounds(
+                        stress_ratio_df.sample_count,
+                        stress_ratio_df.q,
+                        stress_ratio_df.slope,
+                        stress_ratio_df.intercept,
+                        x.cycles_to_failure,
+                        stress_ratio_df.pp,
+                        stress_ratio_df.avg_stress_max,
+                    ),
+                    axis=1,
+                ).apply(pd.Series)
+            )
+        else:
+            # --- Fallback: Student regression band in (x=log10(N), y=stress_max or log10(stress_max)) space ---
+            grp = agg_df[agg_df.stress_ratio_id == stress_ratio_id]
+
+            x_train = grp["log10_cycles_to_failure"].to_numpy(dtype=float)
+            y_train = grp["stress_max"].to_numpy(dtype=float)  # already log10(stress) if use_logarithm=True
+
+            x0 = np.log10(snc_current_stress_ratio["cycles_to_failure"].to_numpy(dtype=float))
+
+            lower, upper = stress_bounds_student(
+                x_train=x_train,
+                y_train=y_train,
+                x0=x0,
+                confidence=confidence,
+                prediction_band=True,  # choose True for a conservative band
+            )
+
+            snc_current_stress_ratio["stress_lowerbound"] = lower
+            snc_current_stress_ratio["stress_upperbound"] = upper
 
         if use_logarithm:
             snc_current_stress_ratio["stress_lowerbound"] = (
@@ -346,15 +418,16 @@ def execute_linlog_loglog(
         snc_current_stress_ratio["stress_ratio"] = stress_ratio_df.stress_ratio
 
         snc_output_csv_df = pd.concat([snc_output_csv_df, snc_current_stress_ratio])
-        a, b = get_a_b(stress_ratio_df)
+        aa = stress_ratio_df.aa
+        bb = stress_ratio_df.bb
 
         # Prepare JSON
         json_df = pd.DataFrame(
             {
                 "stress_ratio": stress_ratio_df.stress_ratio,
                 "confidence_interval": reliability_level,
-                "a": a,
-                "b": b,
+                "a": aa,
+                "b": bb,
                 "lrsq": stress_ratio_df.lrsq,
                 "fp": stress_ratio_df.fp,
             },

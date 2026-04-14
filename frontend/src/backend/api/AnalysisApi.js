@@ -389,7 +389,7 @@ export default class AnalysisApi {
    * @param {File} file
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/AnalysisResult} and HTTP response
    */
-  runSnCurveFileWithHttpInfo(method, file) {
+  runSnCurveFileWithHttpInfo(method, file, confidenceInterval = null) {
     let postBody = null;
     // verify the required parameter 'method' is set
     if (method === undefined || method === null) {
@@ -408,6 +408,10 @@ export default class AnalysisApi {
     let queryParams = {
       method: method,
     };
+
+    if (confidenceInterval !== null && confidenceInterval !== undefined) {
+      queryParams.confidenceInterval = confidenceInterval;
+    }
     let headerParams = {};
     let formParams = {
       file: file,
@@ -439,10 +443,12 @@ export default class AnalysisApi {
    * @param {File} file
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/AnalysisResult}
    */
-  runSnCurveFile(method, file) {
-    return this.runSnCurveFileWithHttpInfo(method, file).then(function (
-      response_and_data
-    ) {
+  runSnCurveFile(method, file, confidenceInterval = null) {
+    return this.runSnCurveFileWithHttpInfo(
+      method,
+      file,
+      confidenceInterval
+    ).then(function (response_and_data) {
       return response_and_data.data;
     });
   }

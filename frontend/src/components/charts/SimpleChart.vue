@@ -1,16 +1,16 @@
 <template>
-  <v-responsive ref="chartContainer" :aspect-ratio="aspectRatio">
+  <div :style="{ width: '100%', height: `${height}px` }">
     <v-chart
       ref="chartInstance"
       autoresize
       :option="actualOption"
       :update-options="updateOptions"
-    ></v-chart>
-  </v-responsive>
+    />
+  </div>
 </template>
 
 <script>
-import { computeLogYAxisLimits, format3 } from "@/utils/formatters";
+import { format3 } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
 import { LineChart, ScatterChart } from "echarts/charts";
 import {
@@ -22,7 +22,6 @@ import {
 } from "echarts/components";
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
-import { merge } from "lodash";
 import VChart from "vue-echarts";
 
 use([
@@ -54,6 +53,12 @@ export default {
     xAxisMin: { type: [Number, null], default: null },
     xAxisMax: { type: [Number, null], default: null },
     yAxisMax: { type: [Number, null], default: null },
+    yAxisMin: { type: [Number, null], default: null },
+    yAxisInterval: { type: [Number, null], default: null },
+    showXAxisSlider: { type: Boolean, default: false },
+    xSliderStart: { type: Number, default: 0 },
+    xSliderEnd: { type: Number, default: 100 },
+    height: { type: Number, default: 480 },
     axisLabelFormatter: {
       type: Function,
       default: format3,
@@ -73,32 +78,82 @@ export default {
   },
   computed: {
     actualOption() {
-      const yLogLimits =
-        this.yAxisType === "log" ? computeLogYAxisLimits(this.series) : null;
+      const isXLog = this.xAxisType === "log";
+      const isYLog = this.yAxisType === "log";
+
       return {
-        title: {
-          text: this.title,
-        },
+        title: this.title ? { text: this.title } : undefined,
         legend: this.showLegend ? { type: "scroll" } : { show: false },
+
         grid: {
-          left: 50,
+          left: 60,
           top: 40,
-          right: 50,
-          bottom: 20,
+          right: 90,
+          bottom: this.showXAxisSlider ? 95 : 50,
           containLabel: true,
         },
+
         xAxis: {
           type: this.xAxisType,
           name: this.xAxisName,
           nameLocation: "middle",
-          nameGap: 26,
+          nameGap: 34,
+          nameTextStyle: {
+            fontSize: 20,
+          },
           min: this.xAxisMin != null ? this.xAxisMin : "dataMin",
           max: this.xAxisMax != null ? this.xAxisMax : "dataMax",
+          logBase: isXLog ? 10 : undefined,
           axisLabel: {
-            formatter: this.axisLabelFormatter,
-            hideOverlap: true,
+            formatter: (value) => {
+              if (isXLog) {
+                const exp = Math.log10(Number(value));
+                return Math.abs(exp - Math.round(exp)) < 1e-8
+                  ? `10^${Math.round(exp)}`
+                  : "";
+              }
+
+              const n = Number(value);
+              if (!Number.isFinite(n)) return String(value);
+
+              if (Math.abs(n) >= 1e6) {
+                const exp = Math.floor(Math.log10(Math.abs(n)));
+                const mantissa = n / Math.pow(10, exp);
+                const roundedMantissa =
+                  Math.abs(mantissa) >= 10
+                    ? mantissa.toFixed(0)
+                    : mantissa.toFixed(1).replace(/\.0$/, "");
+
+                return `${roundedMantissa}e${exp}`;
+              }
+
+              if (Math.abs(n) >= 1000) {
+                return n.toLocaleString(undefined, {
+                  maximumFractionDigits: 0,
+                  useGrouping: false,
+                });
+              }
+
+              if (Math.abs(n) >= 1) {
+                return n.toLocaleString(undefined, {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2,
+                  useGrouping: false,
+                });
+              }
+
+              return n.toLocaleString(undefined, {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 4,
+                useGrouping: false,
+              });
+            },
+            hideOverlap: false,
             showMaxLabel: true,
             showMinLabel: true,
+            margin: 12,
+            fontSize: 18,
+            fontFamily: "Arial, sans-serif",
           },
         },
         yAxis: {
@@ -106,26 +161,54 @@ export default {
           name: this.yAxisName,
           nameLocation: "middle",
           nameGap: 50,
-          logBase: this.yAxisType === "log" ? 10 : undefined,
-          minorSplitLine: { show: this.yAxisType === "log" },
-          min: this.yAxisType === "log" ? yLogLimits.min : 0,
+          nameTextStyle: {
+            fontSize: 20,
+            fontWeight: 400,
+          },
+          logBase: isYLog ? 10 : undefined,
+          minorSplitLine: { show: isYLog },
+          min:
+            this.yAxisMin != null
+              ? isYLog
+                ? Math.max(this.yAxisMin, 1e-12)
+                : this.yAxisMin
+              : isYLog
+              ? "dataMin"
+              : 0,
           max:
-            this.yAxisType === "log"
-              ? yLogLimits.max
-              : this.yAxisMax != null
-              ? this.yAxisMax
-              : "dataMax",
-          scale: this.yAxisType === "log" ? false : undefined,
-          nice: this.yAxisType === "log" ? false : undefined,
-          boundaryGap: this.yAxisType === "log" ? false : undefined,
+            this.yAxisMax != null
+              ? isYLog
+                ? Math.max(this.yAxisMax, 1e-12)
+                : this.yAxisMax
+              : isYLog
+              ? "dataMax"
+              : (value) => value.max * 1.05,
+          interval:
+            !isYLog && this.yAxisInterval != null
+              ? this.yAxisInterval
+              : undefined,
+          scale: true,
+          boundaryGap: false,
+          nice: false,
           axisLabel: {
-            formatter: (val) =>
-              this.yAxisType === "log"
-                ? `10^${Math.round(Math.log10(val))}`
-                : this.axisLabelFormatter(val),
+            fontFamily: "Arial, sans-serif",
+            formatter: (value) => {
+              if (isYLog) {
+                const exp = Math.log10(Number(value));
+                return Math.abs(exp - Math.round(exp)) < 1e-8
+                  ? `10^${Math.round(exp)}`
+                  : "";
+              }
+
+              const n = Number(value);
+              if (!Number.isFinite(n)) return value;
+
+              return Math.round(n);
+            },
             hideOverlap: true,
             showMaxLabel: true,
             showMinLabel: true,
+            fontSize: 18,
           },
         },
         tooltip: {
@@ -139,61 +222,111 @@ export default {
               this.xAxisName.includes("Number of cycles") ||
               this.xAxisName.includes("Normalized cycles")
             ) {
-              const p = params[0];
+              const firstParam = params[0];
               let rawX = null;
 
-              if (p.seriesIndex != null && this.series[p.seriesIndex]?.rawX) {
-                const pointIndex = p.dataIndex;
-                rawX = this.series[p.seriesIndex].rawX[pointIndex];
+              if (
+                firstParam.seriesIndex != null &&
+                this.series[firstParam.seriesIndex]?.rawX
+              ) {
+                rawX =
+                  this.series[firstParam.seriesIndex].rawX[
+                    firstParam.dataIndex
+                  ];
               }
 
-              if (rawX != null) {
-                xLabel = Number(rawX).toLocaleString(undefined, {
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                  useGrouping: false,
-                });
-              } else {
-                // fallback if rawX is not available
-                const xValue = p.value[0] ?? p.value;
-                xLabel = Number(xValue).toLocaleString(undefined, {
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                  useGrouping: false,
-                });
-              }
+              const xValue =
+                rawX != null
+                  ? rawX
+                  : Array.isArray(firstParam.value)
+                  ? firstParam.value[0]
+                  : firstParam.value;
+
+              xLabel = Number(xValue).toLocaleString(undefined, {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+                useGrouping: false,
+              });
             } else {
-              // other graphs: use default value
               xLabel = params[0].axisValueLabel;
             }
 
             const rows = [`<strong>${xLabel}</strong>`];
 
-            for (const p of params) {
-              const rawY = Array.isArray(p.value) ? p.value[1] : p.value;
-              const yVal = Number(rawY);
-              const formattedY = formatter(yVal);
-              rows.push(`${p.marker}${p.seriesName}: ${formattedY}`);
+            for (const param of params) {
+              const rawY = Array.isArray(param.value)
+                ? param.value[1]
+                : param.value;
+              rows.push(
+                `${param.marker}${param.seriesName}: ${formatter(Number(rawY))}`
+              );
             }
 
             return rows.join("<br/>");
           },
         },
+
         dataZoom: [
           {
-            id: "dataZoomX",
+            id: "dataZoomXInside",
             xAxisIndex: [0],
             filterMode: "none",
             type: "inside",
           },
           {
-            id: "dataZoomY",
+            id: "dataZoomYInside",
             yAxisIndex: [0],
             filterMode: "none",
             type: "inside",
           },
+          ...(this.showXAxisSlider
+            ? [
+                {
+                  id: "dataZoomXSlider",
+                  type: "slider",
+                  xAxisIndex: [0],
+                  filterMode: "none",
+                  bottom: 20,
+                  height: 30,
+                  start: this.xSliderStart,
+                  end: this.xSliderEnd,
+                  showDetail: true,
+                  labelFormatter: (value) => {
+                    if (isXLog) {
+                      const exp = Math.log10(Number(value));
+                      return Math.abs(exp - Math.round(exp)) < 1e-8
+                        ? `10^${Math.round(exp)}`
+                        : Number(value).toExponential(1);
+                    }
+
+                    const n = Number(value);
+                    if (!Number.isFinite(n)) return String(value);
+
+                    if (Math.abs(n) >= 1e6) {
+                      const exp = Math.floor(Math.log10(Math.abs(n)));
+                      const mantissa = n / Math.pow(10, exp);
+                      const roundedMantissa =
+                        Math.abs(mantissa) >= 10
+                          ? mantissa.toFixed(0)
+                          : mantissa.toFixed(1).replace(/\.0$/, "");
+                      return `${roundedMantissa}e${exp}`;
+                    }
+
+                    return n.toLocaleString(undefined, {
+                      maximumFractionDigits: 0,
+                      useGrouping: false,
+                    });
+                  },
+                },
+              ]
+            : []),
         ],
-        series: this.series.map((serie) => merge(serie, { showSymbol: false })),
+
+        series: this.series.map((seriesItem) => ({
+          ...seriesItem,
+          showSymbol: seriesItem.showSymbol ?? false,
+        })),
+
         color: this.color,
       };
     },

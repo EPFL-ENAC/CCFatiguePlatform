@@ -51,11 +51,9 @@
             </v-list>
           </v-menu>
         </v-tab>
-        <!--
         <v-tab :to="{ name: 'CCFatigueAnalysis' }" exact class="text-white">
           <em>CCfatigue</em>&nbsp;analysis
         </v-tab>
-        -->
         <v-tab :to="{ name: 'About' }" exact class="text-white">
           <v-icon>mdi-information</v-icon>
         </v-tab>
