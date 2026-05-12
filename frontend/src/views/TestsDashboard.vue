@@ -23,14 +23,17 @@
               <v-card-title>
                 <v-row align="center" class="w-100">
                   <v-col class="d-flex align-center" cols="auto">
-                    <span>Hysteresis Loops</span>
+                    <span>Hysteresis loops</span>
                     <info-tooltip>
                       Ten hysteresis loops selected at intervals corresponding
                       to one-tenth of the specimen’s fatigue life.
                     </info-tooltip>
                   </v-col>
-                  <v-spacer />
-                  <v-col cols="auto">
+                </v-row>
+              </v-card-title>
+              <v-card-text>
+                <v-row class="mb-4" dense align="center">
+                  <v-col cols="12" sm="6">
                     <v-select
                       v-model="selectedLoopIndices"
                       :items="loopIndexOptions"
@@ -38,7 +41,6 @@
                       dense
                       hide-details
                       multiple
-                      style="max-width: 220px"
                     >
                       <template #prepend-item>
                         <v-list-item @click="selectedLoopIndices = []">
@@ -51,8 +53,6 @@
                     </v-select>
                   </v-col>
                 </v-row>
-              </v-card-title>
-              <v-card-text>
                 <simple-chart
                   :series="strainStressSeriesFA"
                   :aspect-ratio="2"
@@ -60,7 +60,6 @@
                   y-axis-name="Stress [MPa]"
                   :x-axis-max="computeXAxisMax(strainStressSeriesFA)"
                   :y-axis-max="computeYAxisMax(strainStressSeriesFA)"
-                  :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
             </v-card>
@@ -77,38 +76,35 @@
                       loop ellipse
                     </info-tooltip>
                   </v-col>
-                  <v-spacer />
-                  <v-col cols="auto" class="d-flex">
+                </v-row>
+              </v-card-title>
+              <v-card-text>
+                <v-row class="mb-4" dense align="center">
+                  <v-col cols="12" sm="6">
                     <v-select
                       v-model="xAxisMode"
                       :items="[
                         { text: 'Cycle count', value: 'normal' },
-                        { text: 'Log(Cycle count)', value: 'log' },
+                        { text: 'Log cycle count', value: 'log' },
                         { text: 'Normalized cycle count', value: 'normalized' },
                       ]"
                       dense
                       hide-details
-                      label="X-Axis scale"
-                      style="max-width: 220px"
+                      label="X-axis scale"
                     />
                   </v-col>
                 </v-row>
-              </v-card-title>
-              <v-card-text>
                 <simple-chart
                   :series="creepSeries"
                   :aspect-ratio="2"
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
+                  :cycle-count-x-axis="xAxisMode === 'normal'"
+                  :normalized-x-axis="xAxisMode === 'normalized'"
                   y-axis-name="Creep [-]"
-                  :x-axis-min="xAxisMode === 'normalized' ? 0 : 1"
-                  :x-axis-max="
-                    xAxisMode === 'normalized'
-                      ? 1
-                      : computeXAxisMax(creepSeries)
-                  "
+                  :x-axis-min="xAxisMinForMode(creepSeries)"
+                  :x-axis-max="xAxisMaxForMode(creepSeries)"
                   :y-axis-max="computeYAxisMax(creepSeries)"
-                  :axis-label-formatter="axisTickFormatter"
                   :tooltip-formatter="format5"
                 />
               </v-card-text>
@@ -126,38 +122,35 @@
                       lives</info-tooltip
                     >
                   </v-col>
-                  <v-spacer />
-                  <v-col cols="auto" class="d-flex">
+                </v-row>
+              </v-card-title>
+              <v-card-text>
+                <v-row class="mb-4" dense align="center">
+                  <v-col cols="12" sm="6">
                     <v-select
                       v-model="xAxisMode"
                       :items="[
                         { text: 'Cycle count', value: 'normal' },
-                        { text: 'Log(Cycle count)', value: 'log' },
+                        { text: 'Log cycle count', value: 'log' },
                         { text: 'Normalized cycle count', value: 'normalized' },
                       ]"
                       dense
                       hide-details
-                      label="X-Axis scale"
-                      style="max-width: 220px"
+                      label="X-axis scale"
                     />
                   </v-col>
                 </v-row>
-              </v-card-title>
-              <v-card-text>
                 <simple-chart
                   :series="hysteresisAreaSeries"
                   :aspect-ratio="2"
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
+                  :cycle-count-x-axis="xAxisMode === 'normal'"
+                  :normalized-x-axis="xAxisMode === 'normalized'"
                   y-axis-name="Hysteresis area [MPa]"
-                  :x-axis-min="xAxisMode === 'normalized' ? 0 : 1"
-                  :x-axis-max="
-                    xAxisMode === 'normalized'
-                      ? 1
-                      : computeXAxisMax(hysteresisAreaSeries)
-                  "
+                  :x-axis-min="xAxisMinForMode(hysteresisAreaSeries)"
+                  :x-axis-max="xAxisMaxForMode(hysteresisAreaSeries)"
                   :y-axis-max="computeYAxisMax(hysteresisAreaSeries)"
-                  :axis-label-formatter="axisTickFormatter"
                   :tooltip-formatter="format5"
                 />
               </v-card-text>
@@ -173,21 +166,21 @@
                 </info-tooltip>
               </v-card-title>
               <v-card-text>
-                <v-row class="mb-6">
-                  <v-col>
+                <v-row class="mb-4" dense align="center">
+                  <v-col cols="12" sm="6">
                     <v-select
                       v-model="xAxisMode"
                       :items="[
                         { text: 'Cycle count', value: 'normal' },
-                        { text: 'Log(Cycle count)', value: 'log' },
+                        { text: 'Log cycle count', value: 'log' },
                         { text: 'Normalized cycle count', value: 'normalized' },
                       ]"
                       dense
                       hide-details
-                      label="X-Axis scale"
+                      label="X-axis scale"
                     />
                   </v-col>
-                  <v-col>
+                  <v-col cols="12" sm="6">
                     <v-select
                       v-model="yAxisStiffnessMode"
                       :items="[
@@ -196,7 +189,7 @@
                       ]"
                       dense
                       hide-details
-                      label="Y-Axis scale"
+                      label="Y-axis scale"
                     />
                   </v-col>
                 </v-row>
@@ -205,15 +198,13 @@
                   :aspect-ratio="2"
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
+                  :cycle-count-x-axis="xAxisMode === 'normal'"
+                  :normalized-x-axis="xAxisMode === 'normalized'"
+                  :normalized-y-axis="yAxisStiffnessMode === 'normalized'"
                   :y-axis-name="computedYAxisStiffnessLabel"
                   :y-axis-max="computeYAxisMax(stiffnessSeries)"
-                  :x-axis-min="xAxisMode === 'normalized' ? 0 : 1"
-                  :x-axis-max="
-                    xAxisMode === 'normalized'
-                      ? 1
-                      : computeXAxisMax(stiffnessSeries)
-                  "
-                  :axis-label-formatter="axisTickFormatter"
+                  :x-axis-min="xAxisMinForMode(stiffnessSeries)"
+                  :x-axis-max="xAxisMaxForMode(stiffnessSeries)"
                 />
               </v-card-text>
             </v-card>
@@ -256,7 +247,7 @@
                   :values="cycleAtFailure"
                   :colors="valueColors"
                   value-type="bigNumber"
-                  tooltip="Number of cycles to failure. Plotted values can be up to the last DIC recorded value"
+                  tooltip="Cycle count at failure. Plotted values can be up to the last DIC recorded value"
                 />
               </li>
               <li>
@@ -293,62 +284,61 @@
     <v-row v-else-if="experimentType === 'FA' && isFracture">
       <v-col cols="10">
         <v-row>
-          <v-col cols="6">
+          <v-col cols="12">
             <v-card :loading="loading">
               <v-card-title>
                 <v-row align="center" class="w-100">
                   <v-col class="d-flex align-center" cols="auto">
-                    Crack length & Load vs Number of cycles
+                    Crack length & Load vs Cycle count
                     <info-tooltip>
                       The graph shows the evolution of the crack length (dotted
                       lines) and load (solid line) during the test.
                     </info-tooltip>
                   </v-col>
-                  <v-spacer />
-                  <v-col cols="auto" class="d-flex">
+                </v-row>
+              </v-card-title>
+              <v-card-text>
+                <v-row class="mb-4" dense align="center">
+                  <v-col cols="12" sm="6">
                     <v-select
                       v-model="xAxisMode"
                       :items="[
                         { text: 'Cycle count', value: 'normal' },
-                        { text: 'Log(Cycle count)', value: 'log' },
+                        { text: 'Log cycle count', value: 'log' },
                         { text: 'Normalized cycle count', value: 'normalized' },
                       ]"
                       dense
                       hide-details
-                      label="X-Axis scale"
-                      style="max-width: 220px"
+                      label="X-axis scale"
                     />
                   </v-col>
                 </v-row>
-              </v-card-title>
-              <v-card-text>
                 <double-chart
                   :series="crackFaFractureSeries"
                   :aspect-ratio="2"
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
-                  :x-axis-min="xAxisMode === 'normalized' ? 0 : 1"
-                  :x-axis-max="
-                    xAxisMode === 'normalized'
-                      ? 1
-                      : computeXAxisMax(stiffnessSeries)
-                  "
+                  :cycle-count-x-axis="xAxisMode === 'normal'"
+                  :normalized-x-axis="xAxisMode === 'normalized'"
+                  :x-axis-min="xAxisMinForMode(crackFaFractureSeries)"
+                  :x-axis-max="xAxisMaxForMode(crackFaFractureSeries)"
                   :y1-axis-name="'Load [kN]'"
                   :y1-axis-max="y1AxisMaxDoubleChart"
                   :y1-axis-min="y1AxisMinDoubleChart"
-                  :y2-axis-name="'Crack Length [mm]'"
+                  :y2-axis-name="'Crack length [mm]'"
                   :y2-axis-max="y2AxisMaxDoubleChart"
                   :y2-axis-min="y2AxisMinDoubleChart"
-                  :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
             </v-card>
           </v-col>
+        </v-row>
 
+        <v-row>
           <v-col cols="6">
             <v-card :loading="loading">
               <v-card-title>
-                Fracture Energy vs Number of Cycles
+                Fracture energy vs Cycle count
                 <info-tooltip>
                   The graph shows the evolution of the fracture energy
                   calculated with different methods:
@@ -361,12 +351,12 @@
               </v-card-title>
 
               <v-card-text>
-                <v-row class="mb-6">
-                  <v-col>
+                <v-row class="mb-4" dense align="center">
+                  <v-col cols="12" sm="6">
                     <v-select
                       v-model="selectedFractureEnergyMethods"
                       :items="fractureEnergyMethodOptions"
-                      label="Fracture Energy Types"
+                      label="Fracture energy types"
                       dense
                       hide-details
                       multiple
@@ -383,17 +373,17 @@
                       </template>
                     </v-select>
                   </v-col>
-                  <v-col>
+                  <v-col cols="12" sm="6">
                     <v-select
                       v-model="xAxisMode"
                       :items="[
                         { text: 'Cycle count', value: 'normal' },
-                        { text: 'Log(Cycle count)', value: 'log' },
+                        { text: 'Log cycle count', value: 'log' },
                         { text: 'Normalized cycle count', value: 'normalized' },
                       ]"
                       dense
                       hide-details
-                      label="X-Axis scale"
+                      label="X-axis scale"
                     />
                   </v-col>
                 </v-row>
@@ -403,28 +393,27 @@
                   :aspect-ratio="2"
                   :x-axis-name="computedXAxisLabel"
                   :x-axis-type="xAxisChartType"
-                  :x-axis-min="xAxisMode === 'normalized' ? 0 : 1"
-                  :x-axis-max="
-                    xAxisMode === 'normalized'
-                      ? 1
-                      : computeXAxisMax(fractureEnergyVsCyclesSeriesCombined)
+                  :cycle-count-x-axis="xAxisMode === 'normal'"
+                  :normalized-x-axis="xAxisMode === 'normalized'"
+                  :x-axis-min="
+                    xAxisMinForMode(fractureEnergyVsCyclesSeriesCombined)
                   "
-                  y-axis-name="Fracture Energy [J/m²]"
+                  :x-axis-max="
+                    xAxisMaxForMode(fractureEnergyVsCyclesSeriesCombined)
+                  "
+                  y-axis-name="Fracture energy [J/m²]"
                   :y-axis-max="
                     computeYAxisMax2(fractureEnergyVsCyclesSeriesCombined)
                   "
-                  :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
             </v-card>
           </v-col>
-        </v-row>
 
-        <v-row>
           <v-col cols="6">
             <v-card :loading="loading">
               <v-card-title>
-                Crack growth rate vs fracture energy
+                Crack growth rate vs Fracture energy
                 <info-tooltip>
                   Crack growth rate vs fracture energy.
                   <ul>
@@ -436,16 +425,15 @@
               </v-card-title>
 
               <v-card-text>
-                <v-row class="mb-6">
-                  <v-col>
+                <v-row class="mb-4" dense align="center">
+                  <v-col cols="12" sm="6">
                     <v-select
                       v-model="selectedFractureEnergyMethods"
                       :items="fractureEnergyMethodOptions"
-                      label="Fracture Energy Types"
+                      label="Fracture energy types"
                       dense
                       hide-details
                       multiple
-                      style="max-width: 220px"
                     >
                       <template #prepend-item>
                         <v-list-item
@@ -472,7 +460,6 @@
                   :x-axis-min="computeXAxisMin(daDnVsGSeriesCombined)"
                   :x-axis-max="computeXAxisMax2(daDnVsGSeriesCombined)"
                   :y-axis-split-number="yAxisLogLimits_daDnVsG.splitNumber"
-                  :axis-label-formatter="axisTickFormatter"
                   :tooltip-formatter="formatScientific2"
                 />
               </v-card-text>
@@ -498,7 +485,7 @@
                   :values="cycleAtFailure"
                   :colors="valueColors"
                   value-type="bigNumber"
-                  tooltip="Number of cycles to failure. Plotted values can be up to the last DIC recorded value"
+                  tooltip="Cycle count at failure. Plotted values can be up to the last DIC recorded value"
                 />
               </li>
               <li>
@@ -515,7 +502,7 @@
         <!-- MBT -->
         <v-card v-if="showMethod('mbt')" :loading="loading" class="mt-4">
           <v-card-title class="text-subtitle-1 font-weight-medium"
-            >MBT Values</v-card-title
+            >MBT values</v-card-title
           >
           <v-card-text>
             <ul>
@@ -551,7 +538,7 @@
         <!-- MCC -->
         <v-card v-if="showMethod('mcc')" :loading="loading" class="mt-4">
           <v-card-title class="text-subtitle-1 font-weight-medium"
-            >MCC Values</v-card-title
+            >MCC values</v-card-title
           >
           <v-card-text>
             <ul>
@@ -587,7 +574,7 @@
         <!-- ECM -->
         <v-card v-if="showMethod('ecm')" :loading="loading" class="mt-4">
           <v-card-title class="text-subtitle-1 font-weight-medium"
-            >ECM Values</v-card-title
+            >ECM values</v-card-title
           >
           <v-card-text>
             <ul>
@@ -626,21 +613,25 @@
         <v-card :loading="loading">
           <v-card-title>Strain vs Stress</v-card-title>
           <v-card-text>
-            <v-row>
-              <v-col>
+            <v-row class="mb-4" dense align="center">
+              <v-col cols="12" sm="6">
                 <v-select
                   v-model="strainOption"
                   :items="strainOptions"
                   :disabled="strainOptions.length < 2"
                   label="Strain"
+                  dense
+                  hide-details
                 />
               </v-col>
-              <v-col>
+              <v-col cols="12" sm="6">
                 <v-select
                   v-model="stressOption"
                   :items="stressOptions"
                   :disabled="stressOptions.length < 2"
                   label="Stress"
+                  dense
+                  hide-details
                 />
               </v-col>
             </v-row>
@@ -649,9 +640,9 @@
               :aspect-ratio="2"
               x-axis-name="Strain [-]"
               y-axis-name="Stress [MPa]"
+              :x-axis-min="0"
               :y-axis-max="computeYAxisMax(strainStressSeriesQS)"
               :x-axis-max="computeXAxisMax(strainStressSeriesQS)"
-              :axis-label-formatter="axisTickFormatter"
             />
           </v-card-text>
         </v-card>
@@ -725,10 +716,10 @@
     <v-row v-else-if="experimentType === 'QS' && isFracture">
       <v-col cols="10">
         <v-row>
-          <v-col cols="6">
+          <v-col cols="12">
             <v-card :loading="loading">
               <v-card-title>
-                <v-span>Load & Crack length vs Displacement</v-span>
+                <span>Load & Crack length vs Displacement</span>
                 <info-tooltip>
                   The graph shows the evolution of the crack length (dotted
                   lines) and load (straight line) during the Displacement
@@ -745,10 +736,9 @@
                   :y1-axis-name="'Load [kN]'"
                   :y1-axis-max="y1AxisMaxDoubleChart"
                   :y1-axis-min="y1AxisMinDoubleChart"
-                  :y2-axis-name="'Crack Length [mm]'"
+                  :y2-axis-name="'Crack length [mm]'"
                   :y2-axis-max="y2AxisMaxDoubleChart"
                   :y2-axis-min="y2AxisMinDoubleChart"
-                  :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
             </v-card>
@@ -758,7 +748,7 @@
               <v-card-title>
                 <v-row align="center" class="w-100">
                   <v-col class="d-flex align-center" cols="auto">
-                    Fracture Energy vs Crack Length
+                    Fracture energy vs Crack length
                     <info-tooltip>
                       The graph shows the evolution of the fracture energy
                       calculated with different methods as a function of the
@@ -780,16 +770,18 @@
                       </ul>
                     </info-tooltip>
                   </v-col>
-                  <v-spacer />
-                  <v-col cols="auto">
+                </v-row>
+              </v-card-title>
+              <v-card-text>
+                <v-row class="mb-4" dense align="center">
+                  <v-col cols="12" sm="6">
                     <v-select
                       v-model="selectedFractureEnergyMethods"
                       :items="fractureEnergyMethodOptions"
-                      label="Fracture Energy Types"
+                      label="Fracture energy types"
                       dense
                       hide-details
                       multiple
-                      style="max-width: 220px"
                     >
                       <template #prepend-item>
                         <v-list-item
@@ -804,18 +796,15 @@
                     </v-select>
                   </v-col>
                 </v-row>
-              </v-card-title>
-              <v-card-text>
                 <simple-chart
                   :series="fractureEnergySeriesCombined"
                   :aspect-ratio="2"
-                  x-axis-name="Crack Length [mm]"
-                  y-axis-name="Fracture Energy [J/m²]"
+                  x-axis-name="Crack length [mm]"
+                  y-axis-name="Fracture energy [J/m²]"
                   :y-axis-min="computeYAxisMin(fractureEnergySeriesCombined)"
                   :y-axis-max="computeYAxisMax(fractureEnergySeriesCombined)"
                   :x-axis-min="computeXAxisMin(fractureEnergySeriesCombined)"
                   :x-axis-max="computeXAxisMax(fractureEnergySeriesCombined)"
-                  :axis-label-formatter="axisTickFormatter"
                 />
               </v-card-text>
             </v-card>
@@ -869,7 +858,7 @@
         <!-- MBT -->
         <v-card v-if="showMethod('mbt')" :loading="loading" class="mt-4">
           <v-card-title class="text-subtitle-1 font-weight-medium"
-            >MBT Values</v-card-title
+            >MBT values</v-card-title
           >
           <v-card-text>
             <ul>
@@ -904,7 +893,7 @@
         <!-- MCC -->
         <v-card v-if="showMethod('mcc')" :loading="loading" class="mt-4">
           <v-card-title class="text-subtitle-1 font-weight-medium"
-            >MCC Values</v-card-title
+            >MCC values</v-card-title
           >
           <v-card-text>
             <ul>
@@ -939,7 +928,7 @@
         <!-- ECM -->
         <v-card v-if="showMethod('ecm')" :loading="loading" class="mt-4">
           <v-card-title class="text-subtitle-1 font-weight-medium"
-            >ECM Values</v-card-title
+            >ECM values</v-card-title
           >
           <v-card-text>
             <ul>
@@ -989,12 +978,10 @@ import {
   computeYAxisMax,
   computeYAxisMax2,
   computeYAxisMin,
-  format0,
   format2,
   format4,
   format5,
   formatScientific2,
-  formatTick,
 } from "@/utils/formatters";
 import { colorPalette } from "@/utils/style";
 import { zip } from "lodash";
@@ -1330,11 +1317,11 @@ export default {
       // X axis label for fatigue charts
       switch (this.xAxisMode) {
         case "log":
-          return "log₁₀(Number of cycles) [-]";
+          return "Cycle count [-], log scale";
         case "normalized":
-          return "Normalized cycles (Number of cycles / Cycles at failure) [-]";
+          return "Normalized cycle count [-]";
         default:
-          return "Number of cycles [-]";
+          return "Cycle count [-]";
       }
     },
     xAxisChartType() {
@@ -1400,13 +1387,6 @@ export default {
         this.daDnVsGSeriesCombined
       );
       return { min, max, splitNumber };
-    },
-    // --- Chart Formatting & Tooltip ---
-    axisTickFormatter() {
-      return formatTick;
-    },
-    xAxisTickFormatter() {
-      return this.xAxisMode === "normal" ? format0 : this.axisTickFormatter;
     },
     // --- Value Formatting for UI ---
     valueColors() {
@@ -1617,6 +1597,16 @@ export default {
     goBack() {
       this.$router.go(-1);
     },
+    xAxisMinForMode(series) {
+      if (this.xAxisMode === "normalized") return 0;
+      if (this.xAxisMode === "log") return null;
+      return computeXAxisMin(series);
+    },
+    xAxisMaxForMode(series) {
+      if (this.xAxisMode === "normalized") return 1;
+      if (this.xAxisMode === "log") return null;
+      return computeXAxisMax(series);
+    },
     transformXAxis(xValues, nFail) {
       if (this.xAxisMode === "normalized") {
         return xValues.map((x) => x / (nFail || 1)); // avoid division by zero
@@ -1636,7 +1626,6 @@ export default {
         this.selectedFractureEnergyMethods.includes(method)
       );
     },
-    format0,
     format2,
     format4,
     format5,
