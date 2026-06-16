@@ -8,8 +8,12 @@ import pandas as pd
 from pandas._typing import ReadCsvBuffer, WriteBuffer
 from pandas.core.frame import DataFrame
 
+import ccfatigue.analysis.cld_boerstra as cld_boerstra
 import ccfatigue.analysis.cld_harris as cld_harris
+import ccfatigue.analysis.cld_kawai as cld_kawai
 import ccfatigue.analysis.cld_piecewiselinear as cld_piecewiselinear
+import ccfatigue.analysis.cld_piecewisenonlinear as cld_piecewisenonlinear
+import ccfatigue.analysis.cyc_rainflow as cyc_rainflow
 import ccfatigue.analysis.cyc_rangemean as cyc_rangemean
 import ccfatigue.analysis.cyc_rangepair as cyc_rangepair
 import ccfatigue.analysis.cyc_simplifiedrainflow as cyc_simplifiedrainflow
@@ -171,6 +175,37 @@ def run_sn_curve(
             raise Exception(f"unknown method {method}")
     return output
 
+
+def run_cld_piecewiselinear_from_sn(
+    file: SpooledTemporaryFile[bytes] | IO,
+    sn_method: SnCurveMethod,
+    ucs: float,
+    uts: float,
+    confidence_interval: float | None = None,
+) -> AnalysisResult:
+    snc_result = run_sn_curve(file, sn_method, confidence_interval)
+    snc_buffer = io.BytesIO(snc_result.csv_data)
+    return run_python(
+        lambda inp, csv_out, _: cld_piecewiselinear.execute(inp, csv_out, ucs, uts),
+        snc_buffer,
+    )
+
+
+def run_cld_piecewisenonlinear_from_sn(
+    file: SpooledTemporaryFile[bytes] | IO,
+    sn_method: SnCurveMethod,
+    ucs: float,
+    uts: float,
+    confidence_interval: float | None = None,
+) -> AnalysisResult:
+    snc_result = run_sn_curve(file, sn_method, confidence_interval)
+    snc_buffer = io.BytesIO(snc_result.csv_data)
+    return run_python(
+        lambda inp, csv_out, _: cld_piecewisenonlinear.execute(inp, csv_out, ucs, uts),
+        snc_buffer,
+    )
+
+
 def run_cycle_counting(
     file: SpooledTemporaryFile[bytes] | IO,
     method: CycleCountingMethod,
@@ -193,6 +228,11 @@ def run_cycle_counting(
                 ),
                 file,
             )
+        case CycleCountingMethod.RAINFLOW:
+            output = run_python(
+                lambda input, csv_output, _: cyc_rainflow.execute(input, csv_output),
+                file,
+            )
         case _:
             raise Exception(f"unknown method {method}")
     return output.csv_data
@@ -203,7 +243,12 @@ def run_cld(
     method: CldMethod,
     ucs: float,
     uts: float,
-) -> bytes:
+    np_reference: float | None = None,
+    m0_init: float | None = None,
+    d_init: float | None = None,
+    alpha_t_init: float | None = None,
+    alpha_c_init: float | None = None,
+) -> AnalysisResult:
     match method:
         case CldMethod.HARRIS:
             output = run_python(
@@ -219,9 +264,44 @@ def run_cld(
                 ),
                 file,
             )
+        case CldMethod.PIECEWISENONLINEAR:
+            output = run_python(
+                lambda input, csv_output, _: cld_piecewisenonlinear.execute(
+                    input, csv_output, ucs, uts
+                ),
+                file,
+            )
+        case CldMethod.KAWAI:
+            output = run_python(
+                lambda input, csv_output, _: cld_kawai.execute(
+                    input, csv_output, ucs, uts
+                ),
+                file,
+            )
+        case CldMethod.BOERSTRA:
+            np_ref = (
+                np_reference
+                if np_reference is not None
+                else cld_boerstra.DEFAULT_NP_REFERENCE
+            )
+            output = run_python(
+                lambda input, csv_output, json_output: cld_boerstra.execute(
+                    input,
+                    csv_output,
+                    json_output,
+                    ucs,
+                    uts,
+                    np_ref,
+                    m0_init,
+                    d_init,
+                    alpha_t_init,
+                    alpha_c_init,
+                ),
+                file,
+            )
         case _:
             raise Exception(f"unknown method {method}")
-    return output.csv_data
+    return output
 
 
 def run_fatigue_failure(

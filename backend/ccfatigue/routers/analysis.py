@@ -1,11 +1,14 @@
 """
 Handle /analysis requests
 """
-from fastapi import APIRouter, File, Query, UploadFile, HTTPException
+
+from fastapi import APIRouter, File, HTTPException, Query, UploadFile
 
 from ccfatigue.analyzer import (
     FatigueModel,
     run_cld,
+    run_cld_piecewiselinear_from_sn,
+    run_cld_piecewisenonlinear_from_sn,
     run_cycle_counting,
     run_damage_summation,
     run_fatigue_failure,
@@ -45,20 +48,74 @@ async def run_sn_curve_file(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"{method} failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"{method} failed: {str(e)}")
 
 
-@router.post("/cld/file", response_model=bytes)
+@router.post("/cld/file", response_model=AnalysisResult)
 async def run_cld_file(
     file: UploadFile = File(...),
     method: CldMethod = Query(...),
     ucs: float = Query(...),
     uts: float = Query(...),
-) -> bytes:
-    return run_cld(file.file, method, ucs, uts)
+    np_reference: float | None = Query(default=None),
+    m0_init: float | None = Query(default=None),
+    d_init: float | None = Query(default=None),
+    alpha_t_init: float | None = Query(default=None),
+    alpha_c_init: float | None = Query(default=None),
+) -> AnalysisResult:
+    return run_cld(
+        file.file,
+        method,
+        ucs,
+        uts,
+        np_reference,
+        m0_init,
+        d_init,
+        alpha_t_init,
+        alpha_c_init,
+    )
+
+
+@router.post("/cld/piecewiselinear-from-sn/file", response_model=AnalysisResult)
+async def run_cld_piecewiselinear_from_sn_file(
+    file: UploadFile = File(...),
+    sn_method: SnCurveMethod = Query(..., alias="snMethod"),
+    ucs: float = Query(...),
+    uts: float = Query(...),
+    confidence_interval: float | None = Query(None, alias="confidenceInterval"),
+) -> AnalysisResult:
+    try:
+        return run_cld_piecewiselinear_from_sn(
+            file.file, sn_method, ucs, uts, confidence_interval
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"PiecewiseLinear from SN failed: {str(e)}",
+        )
+
+
+@router.post("/cld/piecewisenonlinear-from-sn/file", response_model=AnalysisResult)
+async def run_cld_piecewisenonlinear_from_sn_file(
+    file: UploadFile = File(...),
+    sn_method: SnCurveMethod = Query(..., alias="snMethod"),
+    ucs: float = Query(...),
+    uts: float = Query(...),
+    confidence_interval: float | None = Query(None, alias="confidenceInterval"),
+) -> AnalysisResult:
+    try:
+        return run_cld_piecewisenonlinear_from_sn(
+            file.file, sn_method, ucs, uts, confidence_interval
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"PiecewiseNonLinear from SN failed: {str(e)}",
+        )
 
 
 @router.post("/fatigueFailure/file", response_model=AnalysisResult)

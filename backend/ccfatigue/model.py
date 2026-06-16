@@ -54,11 +54,15 @@ class CycleCountingMethod(str, Enum):
     RANGE_MEAN = "RangeMean"
     RANGE_PAIR = "RangePair"
     SIMPLIFIED_RAINFLOW = "SimplifiedRainflow"
+    RAINFLOW = "Rainflow"
 
 
 class CldMethod(str, Enum):
     HARRIS = "Harris"
     PIECEWISELINEAR = "PiecewiseLinear"
+    PIECEWISENONLINEAR = "PiecewiseNonLinear"
+    KAWAI = "Kawai"
+    BOERSTRA = "Boerstra"
 
 
 class FatigueFailureMethod(str, Enum):

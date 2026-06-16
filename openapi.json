@@ -834,7 +834,10 @@
         "title": "CldMethod",
         "enum": [
           "Harris",
-          "PiecewiseLinear"
+          "PiecewiseLinear",
+          "PiecewiseNonLinear",
+          "Kawai",
+          "Boerstra"
         ],
         "type": "string",
         "description": "An enumeration."
@@ -844,7 +847,8 @@
         "enum": [
           "RangeMean",
           "RangePair",
-          "SimplifiedRainflow"
+          "SimplifiedRainflow",
+          "Rainflow"
         ],
         "type": "string",
         "description": "An enumeration."
