@@ -39,7 +39,8 @@ export default class AnalysisApi {
    * @param {File} file
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link File} and HTTP response
    */
-  runCldFileWithHttpInfo(method, ucs, uts, file) {
+  runCldFileWithHttpInfo(method, ucs, uts, file, opts) {
+    opts = opts || {};
     let postBody = null;
     // verify the required parameter 'method' is set
     if (method === undefined || method === null) {
@@ -71,6 +72,11 @@ export default class AnalysisApi {
       method: method,
       ucs: ucs,
       uts: uts,
+      ...(opts.npReference != null && { np_reference: opts.npReference }),
+      ...(opts.m0Init != null && { m0_init: opts.m0Init }),
+      ...(opts.dInit != null && { d_init: opts.dInit }),
+      ...(opts.alphaTInit != null && { alpha_t_init: opts.alphaTInit }),
+      ...(opts.alphaCInit != null && { alpha_c_init: opts.alphaCInit }),
     };
     let headerParams = {};
     let formParams = {
@@ -80,7 +86,7 @@ export default class AnalysisApi {
     let authNames = [];
     let contentTypes = ["multipart/form-data"];
     let accepts = ["application/json"];
-    let returnType = File;
+    let returnType = AnalysisResult;
     return this.apiClient.callApi(
       "/analysis/cld/file",
       "POST",
@@ -105,10 +111,110 @@ export default class AnalysisApi {
    * @param {File} file
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link File}
    */
-  runCldFile(method, ucs, uts, file) {
-    return this.runCldFileWithHttpInfo(method, ucs, uts, file).then(function (
+  runCldFile(method, ucs, uts, file, opts) {
+    return this.runCldFileWithHttpInfo(method, ucs, uts, file, opts).then(function (
       response_and_data
     ) {
+      return response_and_data.data;
+    });
+  }
+
+  /**
+   * Run CLD PiecewiseLinear from SN curve fitting (AGG input)
+   * @param {String} snMethod
+   * @param {Number} ucs
+   * @param {Number} uts
+   * @param {File} file
+   * @return {Promise} with data of type {@link module:model/AnalysisResult}
+   */
+  runCldPiecewiseLinearFromSnFileWithHttpInfo(
+    snMethod,
+    ucs,
+    uts,
+    file,
+    opts
+  ) {
+    opts = opts || {};
+    let queryParams = {
+      snMethod,
+      ucs,
+      uts,
+      ...(opts.confidenceInterval != null && {
+        confidenceInterval: opts.confidenceInterval,
+      }),
+    };
+    let formParams = { file };
+    let authNames = [];
+    let contentTypes = ["multipart/form-data"];
+    let accepts = ["application/json"];
+    let returnType = AnalysisResult;
+    return this.apiClient.callApi(
+      "/analysis/cld/piecewiselinear-from-sn/file",
+      "POST",
+      {},
+      queryParams,
+      {},
+      formParams,
+      null,
+      authNames,
+      contentTypes,
+      accepts,
+      returnType,
+      null
+    );
+  }
+
+  runCldPiecewiseLinearFromSnFile(snMethod, ucs, uts, file, opts) {
+    return this.runCldPiecewiseLinearFromSnFileWithHttpInfo(
+      snMethod,
+      ucs,
+      uts,
+      file,
+      opts
+    ).then(function (response_and_data) {
+      return response_and_data.data;
+    });
+  }
+
+  runCldPiecewiseNonLinearFromSnFileWithHttpInfo(snMethod, ucs, uts, file, opts) {
+    opts = opts || {};
+    let queryParams = {
+      snMethod,
+      ucs,
+      uts,
+      ...(opts.confidenceInterval != null && {
+        confidenceInterval: opts.confidenceInterval,
+      }),
+    };
+    let formParams = { file };
+    let authNames = [];
+    let contentTypes = ["multipart/form-data"];
+    let accepts = ["application/json"];
+    let returnType = AnalysisResult;
+    return this.apiClient.callApi(
+      "/analysis/cld/piecewisenonlinear-from-sn/file",
+      "POST",
+      {},
+      queryParams,
+      {},
+      formParams,
+      null,
+      authNames,
+      contentTypes,
+      accepts,
+      returnType,
+      null
+    );
+  }
+
+  runCldPiecewiseNonLinearFromSnFile(snMethod, ucs, uts, file, opts) {
+    return this.runCldPiecewiseNonLinearFromSnFileWithHttpInfo(
+      snMethod,
+      ucs,
+      uts,
+      file,
+      opts
+    ).then(function (response_and_data) {
       return response_and_data.data;
     });
   }
