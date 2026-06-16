@@ -1,5 +1,8 @@
 {
   "editor.formatOnSave": false,
+  "git.decorations.enabled": true,
+  "explorer.decorations.badges": true,
+  "explorer.decorations.colors": true,
   "python.analysis.stubPath": "${workspaceFolder}/backend/",
   "python.analysis.extraPaths": [
     "${workspaceFolder}/backend/.venv/Lib/site-packages",
