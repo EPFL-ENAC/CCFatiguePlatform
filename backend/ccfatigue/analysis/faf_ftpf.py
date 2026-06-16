@@ -65,7 +65,7 @@ def get_linlog_stress(a: float, b: float, cycles_to_failure) -> float:
         stress: float
     """
     # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/FTPF/Fatigue-Failure-FTPF.for#L183
-    stress = a + b * cycles_to_failure
+    stress = a + b * np.log10(cycles_to_failure)
     return stress
 
 
@@ -208,7 +208,7 @@ def execute(
     m = np.sin(theta) ** 4
     mn = np.sin(theta) ** 2 * np.cos(theta) ** 2
 
-    stress_ratio = r_x if r_x == r_y == r_f else 0
+    stress_ratio = r_x if r_x == r_y == r_f else 1
     confidence_interval: float = (
         snc_x_df.iloc[0].confidence_interval
         if snc_x_df.iloc[0].confidence_interval

@@ -199,7 +199,7 @@ def get_loglog_sn_case3(
 
     ft2 = (ff1 * ff2 * (const2 - const1)) / (ff1 * (1 + const2) - ff2 * (1 + const1))
     fs2 = (-ff1 * ft2) / (ff1 * const1 - ft2 * (1 + const1))
-    if ft2 < 0:
+    if ft2 <= 0:
         # go to 10 ! Ignore the current line
         return None
     else:
