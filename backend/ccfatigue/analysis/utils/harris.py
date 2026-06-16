@@ -25,7 +25,7 @@ def calculate_stress_mean(stress_ratio: float, stress_max: float) -> float:
     # Src: https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/3_CLD/Harris/CLD-Harris.for#L68  # noqa
     #      lines 68-74
 
-    if abs(stress_ratio) > 1:
+    if stress_ratio > 1:
         stress_mean = -(1 + (1 / stress_ratio)) * stress_max / 2
     else:
         stress_mean = (1 + stress_ratio) * stress_max / 2
@@ -78,7 +78,7 @@ def calculate_stress_amplitude(stress_ratio: float, stress_max: float) -> float:
     # Src: https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/3_CLD/Harris/CLD-Harris.for#L68  # noqa
     #      lines 68-74
 
-    if abs(stress_ratio) > 1:
+    if stress_ratio > 1:
         stress_amplitude = (1 - (1 / stress_ratio)) * stress_max / 2
     else:
         stress_amplitude = (1 - stress_ratio) * stress_max / 2
