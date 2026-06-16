@@ -50,7 +50,9 @@ export default class ExperimentsApi {
   }
 
   getExperiments(opts) {
-    return this.getExperimentsWithHttpInfo(opts).then(function (response_and_data) {
+    return this.getExperimentsWithHttpInfo(opts).then(function (
+      response_and_data
+    ) {
       return response_and_data.data;
     });
   }
@@ -58,10 +60,14 @@ export default class ExperimentsApi {
   getFatigueTestWithHttpInfo(experimentId, testId) {
     let postBody = null;
     if (experimentId === undefined || experimentId === null) {
-      throw new Error("Missing the required parameter 'experimentId' when calling getFatigueTest");
+      throw new Error(
+        "Missing the required parameter 'experimentId' when calling getFatigueTest"
+      );
     }
     if (testId === undefined || testId === null) {
-      throw new Error("Missing the required parameter 'testId' when calling getFatigueTest");
+      throw new Error(
+        "Missing the required parameter 'testId' when calling getFatigueTest"
+      );
     }
 
     let pathParams = {
@@ -94,7 +100,9 @@ export default class ExperimentsApi {
   }
 
   getFatigueTest(experimentId, testId) {
-    return this.getFatigueTestWithHttpInfo(experimentId, testId).then(function (response_and_data) {
+    return this.getFatigueTestWithHttpInfo(experimentId, testId).then(function (
+      response_and_data
+    ) {
       console.log("📡 RAW API RESPONSE FATIGUE TEST", response_and_data);
       return response_and_data.data;
     });
@@ -103,7 +111,9 @@ export default class ExperimentsApi {
   getFieldDistinctWithHttpInfo(field) {
     let postBody = null;
     if (field === undefined || field === null) {
-      throw new Error("Missing the required parameter 'field' when calling getFieldDistinct");
+      throw new Error(
+        "Missing the required parameter 'field' when calling getFieldDistinct"
+      );
     }
 
     let pathParams = {
@@ -135,7 +145,9 @@ export default class ExperimentsApi {
   }
 
   getFieldDistinct(field) {
-    return this.getFieldDistinctWithHttpInfo(field).then(function (response_and_data) {
+    return this.getFieldDistinctWithHttpInfo(field).then(function (
+      response_and_data
+    ) {
       return response_and_data.data;
     });
   }
@@ -180,16 +192,20 @@ export default class ExperimentsApi {
   }
 
   getQuasiStaticTest(experimentId, testId) {
-    return this.getQuasiStaticTestWithHttpInfo(experimentId, testId).then(function (response_and_data) {
-      console.log("📡 RAW API RESPONSE QUASI STATIC TEST", response_and_data);
-      return response_and_data.data;
-    });
+    return this.getQuasiStaticTestWithHttpInfo(experimentId, testId).then(
+      function (response_and_data) {
+        console.log("📡 RAW API RESPONSE QUASI STATIC TEST", response_and_data);
+        return response_and_data.data;
+      }
+    );
   }
 
   postDataPreprocessCheckWithHttpInfo(file) {
     let postBody = null;
     if (file === undefined || file === null) {
-      throw new Error("Missing the required parameter 'file' when calling postDataPreprocessCheck");
+      throw new Error(
+        "Missing the required parameter 'file' when calling postDataPreprocessCheck"
+      );
     }
 
     let pathParams = {};
@@ -219,7 +235,9 @@ export default class ExperimentsApi {
   }
 
   postDataPreprocessCheck(file) {
-    return this.postDataPreprocessCheckWithHttpInfo(file).then(function (response_and_data) {
+    return this.postDataPreprocessCheckWithHttpInfo(file).then(function (
+      response_and_data
+    ) {
       return response_and_data.data;
     });
   }
