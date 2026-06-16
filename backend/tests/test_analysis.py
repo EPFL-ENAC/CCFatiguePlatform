@@ -1,7 +1,11 @@
 import os
 
+import ccfatigue.analysis.cld_boerstra as cld_boerstra
 import ccfatigue.analysis.cld_harris as cld_harris
+import ccfatigue.analysis.cld_kawai as cld_kawai
 import ccfatigue.analysis.cld_piecewiselinear as cld_piecewiselinear
+import ccfatigue.analysis.cld_piecewisenonlinear as cld_piecewisenonlinear
+import ccfatigue.analysis.cyc_rainflow as cyc_rainflow
 import ccfatigue.analysis.cyc_rangemean as cyc_rangemean
 import ccfatigue.analysis.cyc_rangepair as cyc_rangepair
 import ccfatigue.analysis.cyc_simplifiedrainflow as cyc_simplifiedrainflow
@@ -47,6 +51,11 @@ CYC_SIMPLIFIEDRAINFLOW_CSV_OUTPUT_FILE = os.path.join(
     OUTPUT_DIR, "CYC_sample_2022-11_SimplifiedRainflow.csv"
 )
 
+# Mod 1 - Cycle counting - Rainflow
+CYC_RAINFLOW_CSV_OUTPUT_FILE = os.path.join(
+    OUTPUT_DIR, "CYC_sample_2022-11_Rainflow.csv"
+)
+
 # Mod 2 - S-N Curve - LogLog
 SNC_LOGLOG_JSON_OUTPUT_FILE = os.path.join(OUTPUT_DIR, "SNC_sample_2022-09_LogLog.json")
 SNC_LOGLOG_CSV_OUTPUT_FILE = os.path.join(OUTPUT_DIR, "SNC_sample_2022-09_LogLog.csv")
@@ -76,6 +85,25 @@ CLD_PIECEWISELINEAR_OUTPUT_CSV_FILE = os.path.join(
 )
 CLD_PIECEWISELINEAR_UCS = 27.1
 CLD_PIECEWISELINEAR_UTS = 27.7
+
+# Mod 3 - Constant life diagram - Piecewise Non-Linear
+CLD_PIECEWISENONLINEAR_OUTPUT_CSV_FILE = os.path.join(
+    OUTPUT_DIR, "CLD_sample_2022-09_PiecewiseNonLinear.csv"
+)
+CLD_PIECEWISENONLINEAR_UCS = 27.1
+CLD_PIECEWISENONLINEAR_UTS = 27.7
+
+# Mod 3 - Constant life diagram - Kawai
+CLD_KAWAI_OUTPUT_CSV_FILE = os.path.join(OUTPUT_DIR, "CLD_sample_2022-09_Kawai.csv")
+CLD_KAWAI_UCS = 27.1
+CLD_KAWAI_UTS = 27.7
+
+# Mod 3 - Constant life diagram - Boerstra
+CLD_BOERSTRA_OUTPUT_CSV_FILE = os.path.join(
+    OUTPUT_DIR, "CLD_sample_2022-09_Boerstra.csv"
+)
+CLD_BOERSTRA_UCS = 27.1
+CLD_BOERSTRA_UTS = 27.7
 
 # Mod 4 - Fatigue failture - FTPF
 FAF_FTPF_CSV_OUTPUT_FILE = os.path.join(OUTPUT_DIR, "FAF_sample_2022-10_ftpf.csv")
@@ -145,6 +173,10 @@ def test_cyc_simplifiedrainflow():
     )
 
 
+def test_cyc_rainflow():
+    cyc_rainflow.execute(LDS_CSV_1_INPUT_FILE, CYC_RAINFLOW_CSV_OUTPUT_FILE)
+
+
 # Module 2 - S-N curve
 
 
@@ -186,6 +218,33 @@ def test_cld_piecewiselinear() -> None:
         CLD_PIECEWISELINEAR_OUTPUT_CSV_FILE,
         CLD_PIECEWISELINEAR_UCS,
         CLD_PIECEWISELINEAR_UTS,
+    )
+
+
+def test_cld_piecewisenonlinear() -> None:
+    cld_piecewisenonlinear.execute(
+        SNC_CSV_1_INPUT_FILE,
+        CLD_PIECEWISENONLINEAR_OUTPUT_CSV_FILE,
+        CLD_PIECEWISENONLINEAR_UCS,
+        CLD_PIECEWISENONLINEAR_UTS,
+    )
+
+
+def test_cld_kawai() -> None:
+    cld_kawai.execute(
+        SNC_CSV_1_INPUT_FILE,
+        CLD_KAWAI_OUTPUT_CSV_FILE,
+        CLD_KAWAI_UCS,
+        CLD_KAWAI_UTS,
+    )
+
+
+def test_cld_boerstra() -> None:
+    cld_boerstra.execute(
+        SNC_CSV_1_INPUT_FILE,
+        CLD_BOERSTRA_OUTPUT_CSV_FILE,
+        ucs=CLD_BOERSTRA_UCS,
+        uts=CLD_BOERSTRA_UTS,
     )
 
 
