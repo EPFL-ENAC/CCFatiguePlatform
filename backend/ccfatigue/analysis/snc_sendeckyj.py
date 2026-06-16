@@ -113,14 +113,17 @@ def tassos_equation(
     spn = beta * k4
     return spn
 
+
 def weibull_sigma_e(beta: float, alpha: float, p_survival: float) -> float:
     # p_survival in (0,1)
     p = min(max(float(p_survival), 1e-12), 1.0 - 1e-12)
     return beta * (-math.log(p)) ** (1.0 / alpha)
 
+
 def sendeckyj_sigma_a(N: float, sigma_e: float, c: float, s: float) -> float:
     N_eff = max(float(N), 2.0)
     return sigma_e / ((1.0 - c + c * N_eff) ** s)
+
 
 def execute(
     input_file: FilePath | ReadCsvBuffer,
@@ -137,8 +140,15 @@ def execute(
 
     # Convert columns to numeric (empty cells -> NaN)
     samples["stress_max"] = pd.to_numeric(samples["stress_max"], errors="coerce")
-    samples["cycles_to_failure"] = pd.to_numeric(samples["cycles_to_failure"], errors="coerce")
-    samples["residual_strength"] = pd.to_numeric(samples["residual_strength"], errors="coerce")
+    samples["cycles_to_failure"] = pd.to_numeric(
+        samples["cycles_to_failure"], errors="coerce"
+    )
+    if "residual_strength" not in samples.columns:
+        samples["residual_strength"] = np.nan  # no run-out data → treat all as failures
+    else:
+        samples["residual_strength"] = pd.to_numeric(
+            samples["residual_strength"], errors="coerce"
+        )
 
     # Keep raw residual_strength to distinguish:
     # - NaN  => failure
@@ -149,7 +159,9 @@ def execute(
 
     samples["is_failure"] = samples["residual_strength"].isna()
     samples["is_runout_measured"] = samples["residual_strength"] > 0
-    samples["is_runout_flag_only"] = samples["residual_strength"].notna() & (samples["residual_strength"] <= 0)
+    samples["is_runout_flag_only"] = samples["residual_strength"].notna() & (
+        samples["residual_strength"] <= 0
+    )
 
     invalid_flag_rows = samples[samples["is_runout_flag_only"]]
 
@@ -180,8 +192,7 @@ def execute(
     # - failures use sigma_r = stress_max
     # - measured run-outs use the provided residual_strength
     samples["residual_strength"] = samples["residual_strength"].where(
-        samples["is_runout_measured"],
-        samples["stress_max"]
+        samples["is_runout_measured"], samples["stress_max"]
     )
     # Data are grouped by stress_ratio but one experiment
     # can have two separate groups with same stress_ratio so we need to identify
@@ -284,21 +295,19 @@ def execute(
         samples[["stress_ratio_id", "stress_ratio"]].groupby("stress_ratio_id").count()
     )
 
-    # Avoid invalid variance when too few samples (need at least 3 points for sample_count-2)
+    # Avoid invalid variance when too few samples
+    # (need at least 3 points for sample_count-2)
     stress_ratios_df["variance"] = stress_ratios_df.apply(
-        lambda x: math.sqrt(x.lsse / (x.sample_count - 2)) if x.sample_count > 2 else np.nan,
+        lambda x: math.sqrt(x.lsse / (x.sample_count - 2))
+        if x.sample_count > 2
+        else np.nan,
         axis=1,
     )
 
     # level = number of distinct stress levels per stress ratio
-    stress_ratios_df["level"] = (
-        samples.groupby("stress_ratio_id")["stress_max"].nunique()
-    )
-
-    # Variance
-    stress_ratios_df["variance"] = stress_ratios_df.apply(
-        lambda x: math.sqrt(x.lsse / (x.sample_count - 2)), axis=1
-    )
+    stress_ratios_df["level"] = samples.groupby("stress_ratio_id")[
+        "stress_max"
+    ].nunique()
 
     # Fp
     stress_ratios_df["fp"] = stress_ratios_df.apply(
@@ -323,25 +332,32 @@ def execute(
         alpha_old = 0.0
         c = C_MIN
         c_increment = C_INITIAL_INCREMENT
-        c_star = C_MIN       # IMPORTANT: never leave at 0
-        s_star = S_MIN       # IMPORTANT: never leave at 0
+        c_star = C_MIN  # IMPORTANT: never leave at 0
+        s_star = S_MIN  # IMPORTANT: never leave at 0
         alpha_c_old = 0.0
 
         data_count = len(stress_ratio_sample_df)
 
         censored_data_count = int(
-            (stress_ratio_sample_df["stress_max"] != stress_ratio_sample_df["residual_strength"]).sum()
+            (
+                stress_ratio_sample_df["stress_max"]
+                != stress_ratio_sample_df["residual_strength"]
+            ).sum()
         )
 
         # Force numpy float64 for Fortran
-        residual_strength = stress_ratio_sample_df["residual_strength"].to_numpy(dtype=np.float64)
+        residual_strength = stress_ratio_sample_df["residual_strength"].to_numpy(
+            dtype=np.float64
+        )
         stress_max = stress_ratio_sample_df["stress_max"].to_numpy(dtype=np.float64)
-        cycles_to_failure = stress_ratio_sample_df["cycles_to_failure"].to_numpy(dtype=np.float64)
+        cycles_to_failure = stress_ratio_sample_df["cycles_to_failure"].to_numpy(
+            dtype=np.float64
+        )
 
         counter = 0
 
         while c < c_max_data:
-            p = 1 
+            p = 1
             s = S_MIN
             alpha_old = -np.inf  # reset for this c
 
@@ -396,11 +412,18 @@ def execute(
             c += c_increment
 
         # ---- Guard rail AFTER the search ----
-        if (not np.isfinite(alpha_max)) or (c_star <= 0) or (not np.isfinite(c_star)) or (not np.isfinite(s_star)):
+        if (
+            (not np.isfinite(alpha_max))
+            or (c_star <= 0)
+            or (not np.isfinite(c_star))
+            or (not np.isfinite(s_star))
+        ):
             raise ValueError(
-                f"Sendeckyj optimisation failed: alpha_max={alpha_max}, c_star={c_star}, s_star={s_star}, c_max_data={c_max_data}"
+                f"Sendeckyj optimisation failed: alpha_max={alpha_max},"
+                f" c_star={c_star}, s_star={s_star},"
+                f" c_max_data={c_max_data}"
             )
-        
+
         # Eq 1
         sigmas_e = stress_ratio_sample_df.apply(
             lambda x: sendeckyj_equation_1(
@@ -415,11 +438,12 @@ def execute(
 
         # Check BEFORE Eq17
         if data_count - censored_data_count <= 0:
-            raise ValueError(f"Invalid censored count: m={data_count}, k={censored_data_count}")
+            raise ValueError(
+                f"Invalid censored count: m={data_count}, k={censored_data_count}"
+            )
 
         # Eq 17
         g = sendeckyj_equation_17(data_count, censored_data_count, sigmas_e)
-
 
         # Eq 16
         xs = sigmas_e.apply(lambda x: sendeckyj_equation_16(x, g))
@@ -441,15 +465,7 @@ def execute(
         )
         snc_output_json_df = pd.concat([snc_output_json_df, json_df], ignore_index=True)
 
-        a = -(1 - c_star) / c_star
-
         stress_max = pd.DataFrame(LIST_CYCLES_TO_FAILURE, columns=["cycles_to_failure"])
-
-        stress_max["stress_max"] = stress_max.apply(
-            lambda x: tassos_equation(
-                confidence_interval, alpha_max, c_star, s_star, x, a, beta
-            )
-        )
 
         # Convert confidence_interval: UI sometimes gives 50, 95 etc (percent).
         p_mid = confidence_interval
