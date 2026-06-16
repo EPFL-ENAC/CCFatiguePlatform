@@ -73,7 +73,7 @@ class FatigueTest {
     crackLength,
     crackDisplacement,
     crackLoad,
-    crackNCycles, 
+    crackNCycles,
     da_dN,
     G_MBT,
     G_MCC,
@@ -86,7 +86,7 @@ class FatigueTest {
     G_th_mcc,
     m_paris_ecm,
     c_paris_ecm,
-    G_th_ecm,
+    G_th_ecm
   ) {
     FatigueTest.initialize(
       this,
@@ -110,7 +110,7 @@ class FatigueTest {
       crackNCycles,
       da_dN,
       G_MBT,
-      G_MCC, 
+      G_MCC,
       G_ECM,
       m_paris_mbt, // Paris law exponent for MBT
       c_paris_mbt, // Paris law coefficient for MBT
@@ -120,7 +120,7 @@ class FatigueTest {
       G_th_mcc, // Threshold energy release rate for MCC
       m_paris_ecm, // Paris law exponent for ECM
       c_paris_ecm, // Paris law coefficient for ECM
-      G_th_ecm, // Threshold energy release rate for ECM
+      G_th_ecm // Threshold energy release rate for ECM
     );
   }
 
@@ -148,10 +148,10 @@ class FatigueTest {
     crackLength,
     crackDisplacement,
     crackLoad,
-    crackNCycles, 
+    crackNCycles,
     da_dN,
     G_MBT,
-    G_MCC, 
+    G_MCC,
     G_ECM,
     m_paris_mbt, // Paris law exponent for MBT
     c_paris_mbt, // Paris law coefficient for MBT
@@ -161,7 +161,7 @@ class FatigueTest {
     G_th_mcc, // Threshold energy release rate for MCC
     m_paris_ecm, // Paris law exponent for ECM
     c_paris_ecm, // Paris law coefficient for ECM
-    G_th_ecm, // Threshold energy release rate for ECM
+    G_th_ecm // Threshold energy release rate for ECM
   ) {
     obj["specimen_id"] = specimenId;
     obj["specimen_name"] = specimenName;
@@ -279,10 +279,9 @@ class FatigueTest {
         );
       }
       if (data.hasOwnProperty("crack_length")) {
-        obj["crack_length"] = ApiClient.convertToType(
-          data["crack_length"],
-          ["Number"]
-        );
+        obj["crack_length"] = ApiClient.convertToType(data["crack_length"], [
+          "Number",
+        ]);
       }
       if (data.hasOwnProperty("crack_displacement")) {
         obj["crack_displacement"] = ApiClient.convertToType(
@@ -291,10 +290,9 @@ class FatigueTest {
         );
       }
       if (data.hasOwnProperty("crack_load")) {
-        obj["crack_load"] = ApiClient.convertToType(
-          data["crack_load"],
-          ["Number"]
-        );
+        obj["crack_load"] = ApiClient.convertToType(data["crack_load"], [
+          "Number",
+        ]);
       }
       if (data.hasOwnProperty("crack_n_cycles")) {
         obj["crack_n_cycles"] = ApiClient.convertToType(
@@ -467,40 +465,40 @@ FatigueTest.prototype["G_MCC"] = undefined;
  */
 FatigueTest.prototype["G_ECM"] = undefined;
 /**
-  * @member {Number} m_paris_mbt - Paris law exponent for MBT
-  */
+ * @member {Number} m_paris_mbt - Paris law exponent for MBT
+ */
 FatigueTest.prototype["m_paris_mbt"] = undefined;
 /**
-  * @member {Number} c_paris_mbt - Paris law coefficient for MBT
-  */
+ * @member {Number} c_paris_mbt - Paris law coefficient for MBT
+ */
 FatigueTest.prototype["c_paris_mbt"] = undefined;
 /**
-  * @member {Number} G_th_mbt - Threshold energy release rate for MBT
-  */
+ * @member {Number} G_th_mbt - Threshold energy release rate for MBT
+ */
 FatigueTest.prototype["G_th_mbt"] = undefined;
 /**
-  * @member {Number} m_paris_mcc - Paris law exponent for MCC
-  */
+ * @member {Number} m_paris_mcc - Paris law exponent for MCC
+ */
 FatigueTest.prototype["m_paris_mcc"] = undefined;
 /**
-  * @member {Number} c_paris_mcc - Paris law coefficient for MCC
-  */
+ * @member {Number} c_paris_mcc - Paris law coefficient for MCC
+ */
 FatigueTest.prototype["c_paris_mcc"] = undefined;
 /**
-  * @member {Number} G_th_mcc - Threshold energy release rate for MCC
-  */
+ * @member {Number} G_th_mcc - Threshold energy release rate for MCC
+ */
 FatigueTest.prototype["G_th_mcc"] = undefined;
 /**
-  * @member {Number} m_paris_ecm - Paris law exponent for ECM
-  */
+ * @member {Number} m_paris_ecm - Paris law exponent for ECM
+ */
 FatigueTest.prototype["m_paris_ecm"] = undefined;
 /**
-  * @member {Number} c_paris_ecm - Paris law coefficient for ECM
-  */
+ * @member {Number} c_paris_ecm - Paris law coefficient for ECM
+ */
 FatigueTest.prototype["c_paris_ecm"] = undefined;
 /**
-  * @member {Number} G_th_ecm - Threshold energy release rate for ECM
-  */
+ * @member {Number} G_th_ecm - Threshold energy release rate for ECM
+ */
 FatigueTest.prototype["G_th_ecm"] = undefined;
 
 export default FatigueTest;

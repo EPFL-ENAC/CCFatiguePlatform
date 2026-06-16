@@ -22,19 +22,19 @@ class QuasiStaticTest {
     toughness,
     initial_crack_length,
     crack_fractureenergy_mbt,
-    crack_fractureenergy_mcc, 
+    crack_fractureenergy_mcc,
     crack_fractureenergy_ecm,
     young_modulus,
     poisson_ratio,
-    g_init_mbt, 
+    g_init_mbt,
     bridginglength_mbt,
     g_plateau_mbt,
-    g_init_mcc, 
+    g_init_mcc,
     bridginglength_mcc,
     g_plateau_mcc,
-    g_init_ecm, 
+    g_init_ecm,
     bridginglength_ecm,
-    g_plateau_ecm,
+    g_plateau_ecm
   ) {
     QuasiStaticTest.initialize(
       this,
@@ -57,12 +57,12 @@ class QuasiStaticTest {
       g_init_mbt,
       bridginglength_mbt,
       g_plateau_mbt,
-      g_init_mcc, 
+      g_init_mcc,
       bridginglength_mcc,
       g_plateau_mcc,
-      g_init_ecm, 
+      g_init_ecm,
       bridginglength_ecm,
-      g_plateau_ecm,
+      g_plateau_ecm
     );
   }
 
@@ -87,12 +87,12 @@ class QuasiStaticTest {
     g_init_mbt,
     bridginglength_mbt,
     g_plateau_mbt,
-    g_init_mcc, 
+    g_init_mcc,
     bridginglength_mcc,
     g_plateau_mcc,
-    g_init_ecm, 
+    g_init_ecm,
     bridginglength_ecm,
-    g_plateau_ecm,
+    g_plateau_ecm
   ) {
     obj["specimen_name"] = specimenName;
     obj["crack_displacement"] = crackDisplacement;
@@ -126,79 +126,145 @@ class QuasiStaticTest {
       obj = obj || new QuasiStaticTest();
 
       if (data.hasOwnProperty("specimen_name")) {
-        obj["specimen_name"] = ApiClient.convertToType(data["specimen_name"], "String");
+        obj["specimen_name"] = ApiClient.convertToType(
+          data["specimen_name"],
+          "String"
+        );
       }
       if (data.hasOwnProperty("crack_displacement")) {
-        obj["crack_displacement"] = ApiClient.convertToType(data["crack_displacement"], ["Number"]);
+        obj["crack_displacement"] = ApiClient.convertToType(
+          data["crack_displacement"],
+          ["Number"]
+        );
       }
       if (data.hasOwnProperty("crack_load")) {
-        obj["crack_load"] = ApiClient.convertToType(data["crack_load"], ["Number"]);
+        obj["crack_load"] = ApiClient.convertToType(data["crack_load"], [
+          "Number",
+        ]);
       }
       if (data.hasOwnProperty("crack_length")) {
-        obj["crack_length"] = ApiClient.convertToType(data["crack_length"], ["Number"]);
+        obj["crack_length"] = ApiClient.convertToType(data["crack_length"], [
+          "Number",
+        ]);
       }
       if (data.hasOwnProperty("displacement")) {
-        obj["displacement"] = ApiClient.convertToType(data["displacement"], { String: ["Number"] });
+        obj["displacement"] = ApiClient.convertToType(data["displacement"], {
+          String: ["Number"],
+        });
       }
       if (data.hasOwnProperty("load")) {
-        obj["load"] = ApiClient.convertToType(data["load"], { String: ["Number"] });
+        obj["load"] = ApiClient.convertToType(data["load"], {
+          String: ["Number"],
+        });
       }
       if (data.hasOwnProperty("strain")) {
-        obj["strain"] = ApiClient.convertToType(data["strain"], { String: ["Number"] });
+        obj["strain"] = ApiClient.convertToType(data["strain"], {
+          String: ["Number"],
+        });
       }
       if (data.hasOwnProperty("stress")) {
-        obj["stress"] = ApiClient.convertToType(data["stress"], { String: ["Number"] });
+        obj["stress"] = ApiClient.convertToType(data["stress"], {
+          String: ["Number"],
+        });
       }
       if (data.hasOwnProperty("specimen_id")) {
-        obj["specimen_id"] = ApiClient.convertToType(data["specimen_id"], "Number");
+        obj["specimen_id"] = ApiClient.convertToType(
+          data["specimen_id"],
+          "Number"
+        );
       }
       if (data.hasOwnProperty("toughness")) {
         obj["toughness"] = ApiClient.convertToType(data["toughness"], "Number");
       }
       if (data.hasOwnProperty("initial_crack_length")) {
-        obj["initial_crack_length"] = ApiClient.convertToType(data["initial_crack_length"], "Number");
+        obj["initial_crack_length"] = ApiClient.convertToType(
+          data["initial_crack_length"],
+          "Number"
+        );
       }
       if (data.hasOwnProperty("crack_fractureenergy_mbt")) {
-        obj["crack_fractureenergy_mbt"] = ApiClient.convertToType(data["crack_fractureenergy_mbt"], ["Number"]);
+        obj["crack_fractureenergy_mbt"] = ApiClient.convertToType(
+          data["crack_fractureenergy_mbt"],
+          ["Number"]
+        );
       }
       if (data.hasOwnProperty("crack_fractureenergy_mcc")) {
-        obj["crack_fractureenergy_mcc"] = ApiClient.convertToType(data["crack_fractureenergy_mcc"], ["Number"]);
+        obj["crack_fractureenergy_mcc"] = ApiClient.convertToType(
+          data["crack_fractureenergy_mcc"],
+          ["Number"]
+        );
       }
       if (data.hasOwnProperty("crack_fractureenergy_ecm")) {
-        obj["crack_fractureenergy_ecm"] = ApiClient.convertToType(data["crack_fractureenergy_ecm"], ["Number"]);
+        obj["crack_fractureenergy_ecm"] = ApiClient.convertToType(
+          data["crack_fractureenergy_ecm"],
+          ["Number"]
+        );
       }
       if (data.hasOwnProperty("young_modulus")) {
-        obj["young_modulus"] = ApiClient.convertToType(data["young_modulus"], "Number");
+        obj["young_modulus"] = ApiClient.convertToType(
+          data["young_modulus"],
+          "Number"
+        );
       }
       if (data.hasOwnProperty("poisson_ratio")) {
-        obj["poisson_ratio"] = ApiClient.convertToType(data["poisson_ratio"], "Number");
+        obj["poisson_ratio"] = ApiClient.convertToType(
+          data["poisson_ratio"],
+          "Number"
+        );
       }
       if (data.hasOwnProperty("g_init_mbt")) {
-        obj["g_init_mbt"] = ApiClient.convertToType(data["g_init_mbt"], "Number");
+        obj["g_init_mbt"] = ApiClient.convertToType(
+          data["g_init_mbt"],
+          "Number"
+        );
       }
       if (data.hasOwnProperty("bridginglength_mbt")) {
-        obj["bridginglength_mbt"] = ApiClient.convertToType(data["bridginglength_mbt"], "Number");
+        obj["bridginglength_mbt"] = ApiClient.convertToType(
+          data["bridginglength_mbt"],
+          "Number"
+        );
       }
       if (data.hasOwnProperty("g_plateau_mbt")) {
-        obj["g_plateau_mbt"] = ApiClient.convertToType(data["g_plateau_mbt"], "Number");
+        obj["g_plateau_mbt"] = ApiClient.convertToType(
+          data["g_plateau_mbt"],
+          "Number"
+        );
       }
       if (data.hasOwnProperty("g_init_mcc")) {
-        obj["g_init_mcc"] = ApiClient.convertToType(data["g_init_mcc"], "Number");
+        obj["g_init_mcc"] = ApiClient.convertToType(
+          data["g_init_mcc"],
+          "Number"
+        );
       }
       if (data.hasOwnProperty("bridginglength_mcc")) {
-        obj["bridginglength_mcc"] = ApiClient.convertToType(data["bridginglength_mcc"], "Number");
+        obj["bridginglength_mcc"] = ApiClient.convertToType(
+          data["bridginglength_mcc"],
+          "Number"
+        );
       }
       if (data.hasOwnProperty("g_plateau_mcc")) {
-        obj["g_plateau_mcc"] = ApiClient.convertToType(data["g_plateau_mcc"], "Number");
+        obj["g_plateau_mcc"] = ApiClient.convertToType(
+          data["g_plateau_mcc"],
+          "Number"
+        );
       }
-            if (data.hasOwnProperty("g_init_ecm")) {
-        obj["g_init_ecm"] = ApiClient.convertToType(data["g_init_ecm"], "Number");
+      if (data.hasOwnProperty("g_init_ecm")) {
+        obj["g_init_ecm"] = ApiClient.convertToType(
+          data["g_init_ecm"],
+          "Number"
+        );
       }
       if (data.hasOwnProperty("bridginglength_ecm")) {
-        obj["bridginglength_ecm"] = ApiClient.convertToType(data["bridginglength_ecm"], "Number");
+        obj["bridginglength_ecm"] = ApiClient.convertToType(
+          data["bridginglength_ecm"],
+          "Number"
+        );
       }
       if (data.hasOwnProperty("g_plateau_ecm")) {
-        obj["g_plateau_ecm"] = ApiClient.convertToType(data["g_plateau_ecm"], "Number");
+        obj["g_plateau_ecm"] = ApiClient.convertToType(
+          data["g_plateau_ecm"],
+          "Number"
+        );
       }
     }
     return obj;

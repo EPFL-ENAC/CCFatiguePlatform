@@ -141,7 +141,6 @@ TestModel.prototype["sequential_number"] = undefined;
  */
 TestModel.prototype["specimen_name"] = undefined;
 
-
 /**
  * @member {Number} maximum_load
  */
@@ -191,6 +190,5 @@ TestModel.prototype["initial_crack_length"] = undefined;
  * @member {Number} number_of_cycles
  */
 TestModel.prototype["number_of_cycles"] = undefined;
-
 
 export default TestModel;
