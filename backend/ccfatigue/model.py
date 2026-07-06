@@ -59,6 +59,7 @@ class CycleCountingMethod(str, Enum):
 
 class CldMethod(str, Enum):
     HARRIS = "Harris"
+    SIMPLIFIED_HARRIS = "SimplifiedHarris"
     PIECEWISELINEAR = "PiecewiseLinear"
     PIECEWISENONLINEAR = "PiecewiseNonLinear"
     KAWAI = "Kawai"

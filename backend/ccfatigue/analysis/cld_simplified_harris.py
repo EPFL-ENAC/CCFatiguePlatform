@@ -1,23 +1,13 @@
 #!/usr/bin/env python
 """
-Harris CLD — 3-parameter OLS fitting f, u, v at each N level.
+Simplified Harris CLD: same as Harris but with u(N) = v(N).
 
-Harris's CLD equation (Eq. 4.10):
-    σ_a = f · UTS · (1 − σ_m/UTS)^u · (UCS/UTS + σ_m/UTS)^v
+At each N level, f and u(=v) are jointly estimated via 2-parameter OLS
+with intercept under the u=v constraint:
+    log10(σ_a/UTS) = log10(f) + u·(x1 + x2)
+where x1 = log10(1 − σ_m/UTS), x2 = log10(UCS/UTS + σ_m/UTS).
 
-At each N level, f, u and v are jointly estimated via 3-parameter OLS
-(with intercept) on the log-space linearisation:
-    log10(σ_a/UTS) = log10(f) + u·log10(1−σ_m/UTS) + v·log10(UCS/UTS+σ_m/UTS)
-
-f, u and v are then each regressed linearly against log10(N) to obtain
-smooth estimates at the output cycle counts.
-
-References
-----------
-[1] https://link.springer.com/book/10.1007/978-1-84996-181-3
-    Fatigue of Fiber-reinforced Composites (Vassilopoulos, Keller)
-[2] https://doi.org/10.1016/0142-1123(94)90478-2
-[3] https://doi.org/10.1016/S0266-3538(97)00121-8
+f and u are then each regressed linearly against log10(N).
 """
 
 import numpy as np
@@ -31,8 +21,7 @@ import ccfatigue.analysis.utils.harris as harris
 DEFAULT_UCS = 27.1
 DEFAULT_UTS = 27.7
 
-# Cycles for the isolines (the lines of the CLD)
-CLD_CYCLES_COUNT = [10**x for x in range(3, 10)]  # = 1e3, 1e4, ..., 1e9
+CLD_CYCLES_COUNT = [10**x for x in range(3, 10)]
 
 
 def execute(
@@ -40,29 +29,7 @@ def execute(
     output_csv_file: FilePath | WriteBuffer,
     ucs: float = DEFAULT_UCS,
     uts: float = DEFAULT_UTS,
-    u_fixed: float | None = None,
-    v_fixed: float | None = None,
 ) -> None:
-    """
-    Execute the Harris CLD algorithm.
-
-    Parameters
-    ----------
-        input_file
-            SNC csv file (columns: stress_ratio, cycles_to_failure, stress_max)
-        output_csv_file
-            CLD csv output
-        ucs
-            Ultimate compressive stress (positive value)
-        uts
-            Ultimate tensile stress (positive value)
-        u_fixed
-            If provided together with v_fixed, skip OLS fitting and use this
-            constant value for u at all cycle levels (f is still fitted).
-        v_fixed
-            If provided together with u_fixed, skip OLS fitting and use this
-            constant value for v at all cycle levels (f is still fitted).
-    """
     snc_df = pd.read_csv(input_file)
     snc_df = snc_df.copy()
     snc_df["stress_ratio"] = pd.to_numeric(snc_df["stress_ratio"], errors="coerce")
@@ -74,7 +41,9 @@ def execute(
 
     r_ratios = sorted(snc_df["stress_ratio"].unique())
     if len(r_ratios) < 3:
-        raise Exception("Input data is not enough to apply Harris' method.")
+        raise Exception(
+            "Input data needs at least 3 R-ratios for Simplified Harris method."
+        )
 
     ucs = abs(float(ucs))
     uts = abs(float(uts))
@@ -100,79 +69,56 @@ def execute(
         c for c in CLD_CYCLES_COUNT if log_n_min - 1.0 <= np.log10(c) <= log_n_max + 1.0
     ]
 
+    # Step 3: 2-parameter OLS with intercept, enforcing u = v:
+    #   y = log10(f) + u·z   where z = log10(d1) + log10(d2) = x1 + x2
+    #   X = [1, z],  β = [log10(f), u]
     log_n_fit: list[float] = []
     f_fit: list[float] = []
     u_fit: list[float] = []
-    v_fit: list[float] = []
 
-    # Step 3: 3-parameter OLS with intercept at each N level
-    # Model: log10(σ_a/UTS) = log10(f) + u·x1 + v·x2
     for cycles in fitting_cycles:
         log_n = np.log10(float(cycles))
-
-        x1_vals, x2_vals, y_vals = [], [], []
+        z_vals: list[float] = []
+        y_vals: list[float] = []
         for r, (b, a) in sn_fits.items():
             r_log_min, r_log_max = sn_ranges[r]
             if not (r_log_min - 1.0 <= log_n <= r_log_max + 1.0):
                 continue
-
             sigma_max = 10.0 ** (a + b * log_n)
             sigma_a = harris.calculate_stress_amplitude(r, sigma_max)
             sigma_m = harris.calculate_stress_mean(r, sigma_max)
-
             if sigma_a <= 0:
                 continue
             d1 = 1.0 - sigma_m / uts
             d2 = ucs / uts + sigma_m / uts
             if d1 <= 0 or d2 <= 0:
                 continue
-
             y_vals.append(np.log10(sigma_a / uts))
-            x1_vals.append(np.log10(d1))
-            x2_vals.append(np.log10(d2))
-
-        if len(x1_vals) < 3:
+            z_vals.append(np.log10(d1) + np.log10(d2))
+        if len(z_vals) < 2:
             continue
-
-        # OLS with intercept: X = [1, x1, x2], β = [log10(f), u, v]
-        X = np.column_stack([np.ones(len(x1_vals)), x1_vals, x2_vals])
+        X = np.column_stack([np.ones(len(z_vals)), z_vals])
         coeffs, _, _, _ = np.linalg.lstsq(X, np.array(y_vals), rcond=None)
         log_n_fit.append(log_n)
         f_fit.append(10.0 ** float(coeffs[0]))
         u_fit.append(float(coeffs[1]))
-        v_fit.append(float(coeffs[2]))
 
     if len(log_n_fit) < 2:
-        raise Exception("Not enough cycle levels within data range to fit Harris CLD.")
+        raise Exception(
+            "Not enough cycle levels within data range to fit Simplified Harris CLD."
+        )
 
-    # Step 4: linear regression of f, u, v vs log10(N)
-    # f is regressed directly (not log f) per Harris.for lines 146-173
+    # Step 4: linear regression of f and u(=v) vs log10(N)
     log_n_arr = np.array(log_n_fit)
     lr_f = stats.linregress(log_n_arr, f_fit)
     lr_u = stats.linregress(log_n_arr, u_fit)
-    lr_v = stats.linregress(log_n_arr, v_fit)
-
-    if u_fixed is not None and v_fixed is not None:
-        uu_const = float(u_fixed)
-        vv_const = float(v_fixed)
-
-        def get_fuv(log_n: float) -> tuple[float, float, float]:
-            ff = float(lr_f.slope * log_n + lr_f.intercept)  # type: ignore
-            return ff, uu_const, vv_const
-
-    else:
-
-        def get_fuv(log_n: float) -> tuple[float, float, float]:
-            ff = float(lr_f.slope * log_n + lr_f.intercept)  # type: ignore
-            uu = float(lr_u.slope * log_n + lr_u.intercept)  # type: ignore
-            vv = float(lr_v.slope * log_n + lr_v.intercept)  # type: ignore
-            return ff, uu, vv
 
     cld_df = pd.DataFrame()
 
     for cycles_to_failure in CLD_CYCLES_COUNT:
         log_n = np.log10(float(cycles_to_failure))
-        ff, uu, vv = get_fuv(log_n)
+        ff = float(lr_f.slope * log_n + lr_f.intercept)  # type: ignore
+        uv_val = float(lr_u.slope * log_n + lr_u.intercept)  # type: ignore
 
         cld_df = cld.cld_add_row(cld_df, cycles_to_failure, 0, -ucs)
 
@@ -180,8 +126,8 @@ def execute(
         start = -ucs
         stop = uts
         for sm in np.arange(start, stop, increment):
-            c2 = ff * (1 - sm / uts) ** uu
-            c3 = ((ucs / uts) + (sm / uts)) ** vv
+            c2 = ff * (1 - sm / uts) ** uv_val
+            c3 = ((ucs / uts) + (sm / uts)) ** uv_val
             stress_amplitude = c2 * c3 * uts
 
             cld_df = cld.cld_add_row(

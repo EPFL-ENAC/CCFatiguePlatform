@@ -13,6 +13,7 @@ import ccfatigue.analysis.cld_harris as cld_harris
 import ccfatigue.analysis.cld_kawai as cld_kawai
 import ccfatigue.analysis.cld_piecewiselinear as cld_piecewiselinear
 import ccfatigue.analysis.cld_piecewisenonlinear as cld_piecewisenonlinear
+import ccfatigue.analysis.cld_simplified_harris as cld_simplified_harris
 import ccfatigue.analysis.cyc_rainflow as cyc_rainflow
 import ccfatigue.analysis.cyc_rangemean as cyc_rangemean
 import ccfatigue.analysis.cyc_rangepair as cyc_rangepair
@@ -248,11 +249,25 @@ def run_cld(
     d_init: float | None = None,
     alpha_t_init: float | None = None,
     alpha_c_init: float | None = None,
+    u_fixed: float | None = None,
+    v_fixed: float | None = None,
 ) -> AnalysisResult:
     match method:
         case CldMethod.HARRIS:
             output = run_python(
                 lambda input, csv_output, _: cld_harris.execute(
+                    input,
+                    csv_output,
+                    ucs,
+                    uts,
+                    u_fixed,
+                    v_fixed,
+                ),
+                file,
+            )
+        case CldMethod.SIMPLIFIED_HARRIS:
+            output = run_python(
+                lambda input, csv_output, _: cld_simplified_harris.execute(
                     input, csv_output, ucs, uts
                 ),
                 file,
