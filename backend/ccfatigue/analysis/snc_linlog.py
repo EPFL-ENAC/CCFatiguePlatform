@@ -25,13 +25,16 @@ import ccfatigue.analysis.utils.snc as snc
 # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/2_S-NCurves/S-N-Curve-LinLog.for#L409
 # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/2_S-NCurves/S-N-Curve-LinLog.for#L422
 # ...
-LIST_CYCLES_TO_FAILURE = list(
-    chain(
-        range(1, 1000, 50),
-        range(1000, 1001),
-        range(10000, 2000000, 10000),
-        range(2000000, 20000000, 1000000),
-        range(30000000, 1400000000, 100000000),
+LIST_CYCLES_TO_FAILURE = sorted(
+    set(
+        chain(
+            range(1, 1000, 50),
+            range(1000, 1001),
+            range(10000, 2000000, 10000),
+            range(2000000, 20000000, 1000000),
+            range(30000000, 1400000000, 100000000),
+            [100_000_000, 1_000_000_000],  # 10^8 and 10^9 missing from above range
+        )
     )
 )
 
