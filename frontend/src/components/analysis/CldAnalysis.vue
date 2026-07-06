@@ -37,6 +37,7 @@
           <v-select
             v-model="selectedMethods"
             :items="methods"
+            :item-text="methodLabel"
             label="Select Method(s)"
             chips
             multiple
@@ -106,7 +107,7 @@
                   :stroke-dasharray="methodDashArray(m)"
                 />
               </svg>
-              <span style="font-size: 13px">{{ m }}</span>
+              <span style="font-size: 13px">{{ methodLabel(m) }}</span>
             </div>
 
             <template v-if="selectedMethods.includes('Boerstra')">
@@ -156,12 +157,14 @@
 
         <!-- Chart -->
         <v-col cols="12" :md="showPanel ? 9 : 12">
-          <simple-chart
-            :aspect-ratio="2"
-            :series="chartSeries"
-            x-axis-name="Mean Stress [MPa]"
-            y-axis-name="Stress Amplitude [MPa]"
-          ></simple-chart>
+          <div style="max-width: 1000px; margin: 0 auto">
+            <simple-chart
+              :height="500"
+              :series="chartSeries"
+              x-axis-name="Mean Stress [MPa]"
+              y-axis-name="Stress Amplitude [MPa]"
+            ></simple-chart>
+          </div>
         </v-col>
       </v-row>
 
@@ -170,7 +173,7 @@
         <v-col>
           <v-card variant="outlined" class="pa-4">
             <div class="text-subtitle-2 mb-3" style="font-weight: 700">
-              R-ratio &amp; Fatigue Life Analysis
+              CLD Analysis
             </div>
             <v-row>
               <v-col cols="12" md="3">
@@ -200,13 +203,30 @@
                   persistent-hint
                 />
               </v-col>
+              <v-col v-if="showExpSnMethodSelector" cols="12" md="3">
+                <v-select
+                  v-model="expSnMethod"
+                  :items="snCurveMethods"
+                  label="Experimental SN method"
+                  density="compact"
+                  variant="outlined"
+                  hide-details="auto"
+                  hint="R-ratio found in input — select method to fit experimental SN curve"
+                  persistent-hint
+                  :loading="expSnLoading"
+                />
+              </v-col>
             </v-row>
 
             <template v-if="rRatioValid && rRatioIntersectionRows.length > 0">
               <v-divider class="my-3" />
-              <div class="param-section-label mb-2">
-                σ<sub>max</sub> at intersection with R =
-                {{ parseFloat(desiredR).toFixed(2) }}
+              <div class="d-flex align-center mb-2">
+                <span class="param-section-label">
+                  σ<sub>max</sub> at intersection with R =
+                  {{ parseFloat(desiredR).toFixed(2) }}
+                </span>
+                <v-spacer />
+                <v-btn @click="downloadRRatioTable"> Download Analysis </v-btn>
               </div>
               <v-simple-table dense class="r-ratio-table mt-2">
                 <template #default>
@@ -216,9 +236,12 @@
                       <th v-for="m in selectedMethods" :key="m">
                         σ<sub>max</sub>
                         <template v-if="selectedMethods.length > 1">
-                          — {{ m }}
+                          — {{ methodLabel(m) }}
                         </template>
                         [MPa]
+                      </th>
+                      <th v-if="desiredRFoundInInput && expSnData">
+                        σ<sub>max</sub> exp. [MPa]
                       </th>
                     </tr>
                   </thead>
@@ -236,6 +259,9 @@
                       </td>
                       <td v-for="m in selectedMethods" :key="m">
                         {{ formatSigmaMax(row.perMethod[m]) }}
+                      </td>
+                      <td v-if="desiredRFoundInInput && expSnData">
+                        {{ formatSigmaMax(row.expSigmaMax) }}
                       </td>
                     </tr>
                   </tbody>
@@ -270,8 +296,11 @@ import { getOutputFileName } from "@/utils/analysis";
 import { parseFile, parserConfig } from "@/utils/papaparse";
 import download from "downloadjs";
 import { groupBy } from "lodash";
-import { parse } from "papaparse";
+import { parse, unparse } from "papaparse";
 
+const METHOD_LABELS = {
+  SimplifiedHarris: "Simplified Harris",
+};
 const methods = Object.values(new CldMethod());
 
 const CYCLE_LEVELS = [1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 1e9];
@@ -300,7 +329,7 @@ export default {
       selectedMethods: [methods[0]],
       ucs: 27.1,
       uts: 27.7,
-      npReference: 100,
+      npReference: null,
       series: [],
       cldDataByMethod: {},
       desiredR: "",
@@ -309,6 +338,10 @@ export default {
       snCurveMethods: ["LinLog", "LogLog", "Sendeckyj", "Whitney"],
       errorMessages: null,
       requestId: 0,
+      parsedInputData: [],
+      expSnMethod: null,
+      expSnData: null,
+      expSnLoading: false,
     };
   },
   computed: {
@@ -453,7 +486,12 @@ export default {
           perMethod[m] =
             data[N]?.sigma_max ?? this.interpolateSigmaMax(N, data);
         }
-        return { N, perMethod, isDesired: false };
+        return {
+          N,
+          perMethod,
+          isDesired: false,
+          expSigmaMax: this.interpolateExpSigmaMax(N),
+        };
       });
 
       if (this.desiredNValid) {
@@ -465,7 +503,12 @@ export default {
             this.rRatioIntersectionsData[m] ?? {}
           );
         }
-        rows.push({ N: Nd, perMethod, isDesired: true });
+        rows.push({
+          N: Nd,
+          perMethod,
+          isDesired: true,
+          expSigmaMax: this.interpolateExpSigmaMax(Nd),
+        });
       }
 
       return rows;
@@ -482,7 +525,7 @@ export default {
           const points = this.buildDesiredIsolifeCurve(byN, Nd);
           if (points.length === 0) return null;
           const name = multiMethod
-            ? `N = ${this.formatN(Nd)} ★ (${method})`
+            ? `N = ${this.formatN(Nd)} ★ (${this.methodLabel(method)})`
             : `N = ${this.formatN(Nd)} ★`;
           return {
             type: "line",
@@ -536,8 +579,64 @@ export default {
         { name: "N<sub>p</sub>", value: fmt(this.boerstraParams.np_reference) },
       ];
     },
+
+    inputRRatios() {
+      const ratios = new Set();
+      for (const row of this.parsedInputData) {
+        const r = parseFloat(row.stress_ratio);
+        if (Number.isFinite(r)) ratios.add(r);
+      }
+      return ratios;
+    },
+
+    matchingInputR() {
+      if (!this.rRatioValid) return null;
+      const R = parseFloat(this.desiredR);
+      for (const r of this.inputRRatios) {
+        if (Math.abs(r - R) < 1e-4) return r;
+      }
+      return null;
+    },
+
+    desiredRFoundInInput() {
+      return this.matchingInputR !== null;
+    },
+
+    showExpSnMethodSelector() {
+      if (!this.desiredRFoundInInput) return false;
+      if (
+        (this.isPiecewiseLinear || this.isPiecewiseNonLinear) &&
+        this.snCurveMethod
+      )
+        return false;
+      return true;
+    },
+
+    effectiveExpSnMethod() {
+      if (
+        (this.isPiecewiseLinear || this.isPiecewiseNonLinear) &&
+        this.snCurveMethod
+      )
+        return this.snCurveMethod;
+      return this.expSnMethod;
+    },
+  },
+  watch: {
+    desiredR() {
+      this.maybeRunExpSn();
+    },
+    expSnMethod(val) {
+      if (val) this.runExperimentalSn();
+    },
+    snCurveMethod() {
+      this.maybeRunExpSn();
+    },
   },
   methods: {
+    methodLabel(method) {
+      return METHOD_LABELS[method] ?? method;
+    },
+
     superscript(n) {
       const sup = "⁰¹²³⁴⁵⁶⁷⁸⁹";
       const exp = Math.log10(Number(n));
@@ -558,6 +657,7 @@ export default {
     methodLineStyle(method) {
       const styles = {
         Harris: "solid",
+        SimplifiedHarris: [6, 3, 2, 3],
         PiecewiseLinear: "dashed",
         PiecewiseNonLinear: [10, 3, 3, 3],
         Kawai: "dotted",
@@ -569,6 +669,7 @@ export default {
     methodDashArray(method) {
       const da = {
         Harris: "none",
+        SimplifiedHarris: "6 3 2 3",
         PiecewiseLinear: "8 4",
         PiecewiseNonLinear: "10 3 3 3",
         Kawai: "2 4",
@@ -613,7 +714,7 @@ export default {
     interpolateSigmaMax(N, byN) {
       const entries = Object.entries(byN)
         .map(([k, v]) => [Number(k), v.sigma_max])
-        .filter(([, sm]) => sm != null && sm > 0)
+        .filter(([, sm]) => sm != null && Number.isFinite(sm))
         .sort(([a], [b]) => a - b);
       if (entries.length === 0) return null;
       if (entries.length === 1) return entries[0][1];
@@ -626,7 +727,12 @@ export default {
         if (N >= n1 && N <= n2) {
           const t =
             (Math.log(N) - Math.log(n1)) / (Math.log(n2) - Math.log(n1));
-          return Math.exp(Math.log(sm1) + t * (Math.log(sm2) - Math.log(sm1)));
+          if (sm1 > 0 && sm2 > 0) {
+            return Math.exp(
+              Math.log(sm1) + t * (Math.log(sm2) - Math.log(sm1))
+            );
+          }
+          return sm1 + t * (sm2 - sm1);
         }
       }
       return null;
@@ -737,6 +843,8 @@ export default {
       this.outputs = {};
       this.series = [];
       this.cldDataByMethod = {};
+      this.parsedInputData = [];
+      this.expSnData = null;
 
       Promise.all([
         parseFile(this.file),
@@ -765,6 +873,7 @@ export default {
           if (method === "Boerstra") {
             opts.npReference = this.npReference;
           }
+
           return this.$analysisApi
             .runCldFile(
               method,
@@ -780,6 +889,7 @@ export default {
           if (currentRequestId !== this.requestId) return;
 
           const [parsedInput, ...methodResults] = results;
+          this.parsedInputData = parsedInput.data;
 
           this.outputs = Object.fromEntries(
             methodResults.map(({ method, result }) => [method, result])
@@ -862,11 +972,13 @@ export default {
               type: "scatter",
               name: "Experimental data",
               symbolSize: 6,
+              showSymbol: true,
               itemStyle: { color: "#444", opacity: 0.8 },
               data: scatterPoints,
             },
           ];
           this.errorMessages = null;
+          this.maybeRunExpSn();
         })
         .catch((error) => {
           if (currentRequestId !== this.requestId) return;
@@ -887,6 +999,80 @@ export default {
         });
     },
 
+    interpolateExpSigmaMax(N) {
+      if (!this.expSnData) return null;
+      const entries = Object.entries(this.expSnData)
+        .map(([k, v]) => [Number(k), Number(v)])
+        .filter(([, v]) => Number.isFinite(v) && v !== 0)
+        .sort(([a], [b]) => a - b);
+      if (entries.length === 0) return null;
+      if (entries.length === 1) return entries[0][1];
+      if (N <= entries[0][0]) return entries[0][1];
+      if (N >= entries[entries.length - 1][0])
+        return entries[entries.length - 1][1];
+      for (let i = 0; i < entries.length - 1; i++) {
+        const [n1, sm1] = entries[i];
+        const [n2, sm2] = entries[i + 1];
+        if (N >= n1 && N <= n2) {
+          const t =
+            (Math.log(N) - Math.log(n1)) / (Math.log(n2) - Math.log(n1));
+          if (sm1 > 0 && sm2 > 0) {
+            return Math.exp(
+              Math.log(sm1) + t * (Math.log(sm2) - Math.log(sm1))
+            );
+          }
+          return sm1 + t * (sm2 - sm1);
+        }
+      }
+      return null;
+    },
+
+    maybeRunExpSn() {
+      if (this.desiredRFoundInInput && this.effectiveExpSnMethod) {
+        this.runExperimentalSn();
+      } else {
+        this.expSnData = null;
+      }
+    },
+
+    async runExperimentalSn() {
+      if (!this.desiredRFoundInInput || !this.effectiveExpSnMethod) return;
+
+      const R = this.matchingInputR;
+      const filtered = this.parsedInputData.filter(
+        (row) => Math.abs(parseFloat(row.stress_ratio) - R) < 1e-4
+      );
+      if (filtered.length === 0) return;
+
+      const csvStr = unparse(filtered);
+      const blob = new Blob([csvStr], { type: "text/csv" });
+      const file = new File([blob], "exp_sn_input.csv", { type: "text/csv" });
+
+      this.expSnLoading = true;
+      try {
+        const result = await this.$analysisApi.runSnCurveFile(
+          this.effectiveExpSnMethod,
+          file
+        );
+        const parsed = parse(result.csv_data, parserConfig);
+        const map = {};
+        for (const row of parsed.data) {
+          const n = Number(row.cycles_to_failure);
+          const sm = Number(row.stress_max);
+          // For R > 1 (both compressive) the SNC convention stores |σ_min| as
+          // stress_max (a positive magnitude). Convert to algebraic σ_max = −|σ_min|/R.
+          const sigmaMax = R > 1 ? -sm / R : sm;
+          if (Number.isFinite(n) && Number.isFinite(sigmaMax) && sigmaMax !== 0)
+            map[n] = sigmaMax;
+        }
+        this.expSnData = map;
+      } catch {
+        this.expSnData = null;
+      } finally {
+        this.expSnLoading = false;
+      }
+    },
+
     downloadOutput() {
       if (!this.file || Object.keys(this.outputs).length === 0) return;
       Object.entries(this.outputs).forEach(([method, result]) => {
@@ -900,6 +1086,40 @@ export default {
           download(result.csv_data, outputName + ".csv", "text/csv");
         }
       });
+    },
+
+    downloadRRatioTable() {
+      if (!this.rRatioValid || this.rRatioIntersectionRows.length === 0) return;
+      const R = parseFloat(this.desiredR).toFixed(2);
+      const showExp = this.desiredRFoundInInput && this.expSnData;
+
+      const headers = [
+        "N_cycles",
+        ...this.selectedMethods.map((m) => `sigma_max_${m}_MPa`),
+        ...(showExp ? ["sigma_max_exp_MPa"] : []),
+      ];
+
+      const rows = this.rRatioIntersectionRows.map((row) => [
+        row.N,
+        ...this.selectedMethods.map((m) =>
+          row.perMethod[m] != null && Number.isFinite(row.perMethod[m])
+            ? row.perMethod[m].toFixed(4)
+            : ""
+        ),
+        ...(showExp
+          ? [
+              row.expSigmaMax != null && Number.isFinite(row.expSigmaMax)
+                ? row.expSigmaMax.toFixed(4)
+                : "",
+            ]
+          : []),
+      ]);
+
+      const csv = unparse({ fields: headers, data: rows });
+      const baseName = this.file
+        ? this.file.name.replace(/\.[^.]+$/, "")
+        : "cld";
+      download(csv, `${baseName}_R${R}_sigma_max.csv`, "text/csv");
     },
   },
 };
