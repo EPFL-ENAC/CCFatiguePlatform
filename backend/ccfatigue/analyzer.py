@@ -279,11 +279,6 @@ def run_cld(
                 file,
             )
         case CldMethod.BOERSTRA:
-            np_ref = (
-                np_reference
-                if np_reference is not None
-                else cld_boerstra.DEFAULT_NP_REFERENCE
-            )
             output = run_python(
                 lambda input, csv_output, json_output: cld_boerstra.execute(
                     input,
@@ -291,7 +286,7 @@ def run_cld(
                     json_output,
                     ucs,
                     uts,
-                    np_ref,
+                    np_reference,
                     m0_init,
                     d_init,
                     alpha_t_init,

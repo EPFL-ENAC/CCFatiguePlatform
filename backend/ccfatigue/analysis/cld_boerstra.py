@@ -13,7 +13,7 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
-from scipy import optimize, stats
+from scipy.optimize import minimize as _scipy_minimize
 
 import ccfatigue.analysis.utils.cld as cld
 import ccfatigue.analysis.utils.harris as harris
@@ -103,147 +103,233 @@ def _theoretical_stress_amplitude(
     return np.maximum(stress_amplitude, 0.0)
 
 
-def _signed_distance(delta_sigma: np.ndarray, delta_cycles: np.ndarray) -> np.ndarray:
-    """Return Boerstra's signed shortest-distance residual.
-
-    Book formula: Δt = sign(Δσ_a) / sqrt(1/Δσ_a² + 1/Δn²)
-    """
-    result = np.zeros_like(delta_sigma)
-    valid = (np.abs(delta_sigma) > EPSILON) & (np.abs(delta_cycles) > EPSILON)
-    ds = delta_sigma[valid]
-    dn = delta_cycles[valid]
-    result[valid] = np.sign(ds) / np.sqrt((1.0 / ds**2) + (1.0 / dn**2))
-    return result
-
-
-def _initial_m0(snc_df: pd.DataFrame) -> float:
-    """Estimate a reasonable initial m0 from log-log S-N slopes."""
-    estimates = []
-
-    for _, group in snc_df.groupby("stress_ratio"):
-        if len(group) < 2:
-            continue
-
-        log_n = np.log(group["cycles_to_failure"].to_numpy(dtype=float))
-        log_sigma_a = np.log(group["stress_amplitude"].to_numpy(dtype=float))
-
-        if np.unique(log_sigma_a).size < 2:
-            continue
-
-        regression = stats.linregress(log_sigma_a, log_n)
-        if np.isfinite(regression.slope) and regression.slope < 0:
-            estimates.append(-regression.slope)
-
-    if estimates:
-        return float(np.clip(np.median(estimates), 1.0, 200.0))
-
-    return 10.0
-
-
 def _fit_parameters(
     snc_df: pd.DataFrame,
     uts: float,
     ucs: float,
-    np_reference: float,
-    m0_init: float | None = None,
-    d_init: float | None = None,
-    alpha_t_init: float | None = None,
-    alpha_c_init: float | None = None,
+    np_fixed: float | None = None,
 ) -> BoerstraParameters:
-    """Estimate Boerstra's m0, D, alphaT, and alphaC parameters for a fixed Np."""
-    stress_mean = snc_df["stress_mean"].to_numpy(dtype=float)
-    stress_amplitude = snc_df["stress_amplitude"].to_numpy(dtype=float)
-    cycles_to_failure = snc_df["cycles_to_failure"].to_numpy(dtype=float)
-    strength = max(uts, ucs)
+    """
+    Direct translation of the Fortran Boerstra coordinate descent.
 
-    def unpack(log_params) -> tuple[float, float, float, float]:
-        return tuple(np.exp(log_params))  # type: ignore
+    20 outer iterations; each iteration grid-searches D, m0, Np, αC, αT in
+    sequence to minimise std(Δt) — the Fortran SDt objective.  All five
+    sweeps are vectorised over their candidate values via NumPy broadcasting.
+    """
+    sa = snc_df["stress_amplitude"].to_numpy(dtype=float)
+    sm = snc_df["stress_mean"].to_numpy(dtype=float)
+    N = snc_df["cycles_to_failure"].to_numpy(dtype=float)
 
-    def _estimate_sigma_apex(m0, d, alpha_t, alpha_c) -> float:
-        provisional_params = BoerstraParameters(
-            m0=m0,
-            d=d,
-            np_reference=np_reference,
-            alpha_t=alpha_t,
-            alpha_c=alpha_c,
-            sigma_apex=1.0,
-        )
-        sigma_ap = _project_to_reference_life(
-            stress_amplitude, cycles_to_failure, stress_mean, provisional_params
-        )
-        factor = _stress_amplitude_factor(stress_mean, uts, ucs, alpha_t, alpha_c)
-        # Geometric mean in log space — robust against outliers near ±UCS/UTS
-        return float(np.exp(np.mean(np.log(np.maximum(sigma_ap / factor, EPSILON)))))
+    tensile = sm > 0
+    ratio_t = np.clip(sm / uts, 0.0, 1.0)
+    ratio_c = np.clip(-sm / ucs, 0.0, 1.0)
 
-    def residuals(log_params) -> np.ndarray:
-        m0, d, alpha_t, alpha_c = unpack(log_params)
-        sigma_apex = _estimate_sigma_apex(m0, d, alpha_t, alpha_c)
-
-        params = BoerstraParameters(
-            m0=m0,
-            d=d,
-            np_reference=np_reference,
-            alpha_t=alpha_t,
-            alpha_c=alpha_c,
-            sigma_apex=sigma_apex,
-        )
-        sigma_a_mod = _theoretical_stress_amplitude(
-            np_reference, stress_mean, params, uts, ucs
-        )
-        provisional_params = BoerstraParameters(
-            m0=m0,
-            d=d,
-            np_reference=np_reference,
-            alpha_t=alpha_t,
-            alpha_c=alpha_c,
-            sigma_apex=1.0,
-        )
-        sigma_ap = _project_to_reference_life(
-            stress_amplitude, cycles_to_failure, stress_mean, provisional_params
-        )
-        m = _slope_m(stress_mean, m0, d)
-        cycles_estimated = np_reference * (sigma_a_mod / stress_amplitude) ** m
-
-        delta_sigma = np.log(np.maximum(sigma_ap, EPSILON)) - np.log(
-            np.maximum(sigma_a_mod, EPSILON)
-        )
-        delta_cycles = np.log(cycles_to_failure) - np.log(
-            np.maximum(cycles_estimated, EPSILON)
-        )
-
-        return _signed_distance(delta_sigma, delta_cycles)
-
-    lower_bounds = np.log([1.0, strength * 0.05, 0.1, 0.1])
-    upper_bounds = np.log([200.0, strength * 50.0, 20.0, 20.0])
-    initial = np.clip(
-        np.log(
-            [
-                m0_init if m0_init is not None else _initial_m0(snc_df),
-                d_init if d_init is not None else strength,
-                alpha_t_init if alpha_t_init is not None else 2.0,
-                alpha_c_init if alpha_c_init is not None else 2.0,
-            ]
-        ),
-        lower_bounds,
-        upper_bounds,
+    # Starting values from the Fortran source
+    m0, D, Np, aT, aC = (
+        10.0,
+        100.0,
+        np_fixed if np_fixed is not None else 100.0,
+        0.1,
+        0.1,
     )
 
-    result = optimize.least_squares(
-        residuals,
-        initial,
-        bounds=(lower_bounds, upper_bounds),
-        max_nfev=3000,
+    def _sdt(Sap, fac, Np_arg, m_arg) -> np.ndarray:
+        """
+        Vectorised SDt for a batch of candidate configurations.
+
+        Sap    : (n_cand, n) or (n,)  — stress amplitude projected to Np
+        fac    : (n_cand, n) or (n,)  — Boerstra mean-stress factor
+        Np_arg : scalar or (n_cand, 1)
+        m_arg  : (n_cand, n) or (n,)
+        Returns (n_cand,) — sample std of Δt for each candidate.
+        """
+        SAAp = Sap / fac  # → (n_cand, n)
+        SApav = SAAp.mean(axis=1, keepdims=True)  # → (n_cand, 1)
+        Sapmod = SApav * fac  # → (n_cand, n)
+
+        dSa = np.log(np.maximum(Sap, EPSILON)) - np.log(np.maximum(Sapmod, EPSILON))
+        Ne = Np_arg * (Sapmod / np.maximum(sa, EPSILON)) ** m_arg
+        dN = np.log(N) - np.log(np.maximum(Ne, EPSILON))
+
+        ok = (np.abs(dSa) > EPSILON) & (np.abs(dN) > EPSILON)
+        ds = np.where(ok, dSa, 1.0)
+        dn = np.where(ok, dN, 1.0)
+        dt = np.where(ok, np.sign(ds) / np.sqrt(1.0 / ds**2 + 1.0 / dn**2), 0.0)
+
+        nv = ok.sum(axis=1)
+        mu = (dt * ok).sum(axis=1) / np.maximum(nv, 1)
+        var = ((dt - mu[:, None]) ** 2 * ok).sum(axis=1) / np.maximum(nv - 1, 1)
+        return np.where(nv >= 2, np.sqrt(var), np.inf)
+
+    D_arr = np.arange(100.0, 1001.0, 1.0)  # (901,)   — fixed grids
+    m0_arr = 1.0 + np.arange(381) * 0.05  # (381,)
+    Np_arr = 1.0 + np.arange(10_000) * 1000.0  # (10000,)
+    aC_arr = 0.05 + np.arange(496) * 0.01  # (496,)
+    aT_arr = 0.05 + np.arange(496) * 0.01  # (496,)
+
+    # Cache-friendly chunk size for Np sweep (~200 × n_data × 8 bytes fits in L3)
+    _NP_CHUNK = 200
+
+    def _sdt_Np_sweep(m_1d, fac, candidates):
+        """
+        Grid-search Np over `candidates` using log-space precomputation.
+        Eliminates the expensive (N/Np)**(1/m) power operation by working in
+        log-space: log_Sap = log_sa + (log_N − log_Np) / m.
+        Processed in cache-friendly chunks.
+        """
+        log_sa = np.log(np.maximum(sa, EPSILON))
+        log_N_ = np.log(N)
+        inv_m = 1.0 / m_1d
+        log_fac = np.log(np.maximum(fac, EPSILON))
+        A = log_sa + log_N_ * inv_m  # (n,)
+        precomp_Ne = m_1d * (log_sa - log_fac)  # (n,)
+
+        sdt_all = np.empty(len(candidates))
+        for i in range(0, len(candidates), _NP_CHUNK):
+            sl = slice(i, i + _NP_CHUNK)
+            chunk = candidates[sl]  # (c,)
+            log_Np = np.log(chunk)[:, None]  # (c,1)
+            log_SAAp = A - log_Np * inv_m - log_fac  # (c,n)
+            SAAp = np.exp(log_SAAp)  # (c,n) — only exp
+            SApav = SAAp.mean(axis=1, keepdims=True)  # (c,1)
+            log_SApav = np.log(np.maximum(SApav, EPSILON))  # (c,1)
+            dSa = log_SAAp - log_SApav  # (c,n)
+            log_Ne = log_Np + m_1d * log_SApav - precomp_Ne  # (c,n)
+            dN = log_N_ - log_Ne  # (c,n)
+            ok = (np.abs(dSa) > EPSILON) & (np.abs(dN) > EPSILON)
+            ds = np.where(ok, dSa, 1.0)
+            dn = np.where(ok, dN, 1.0)
+            dt = np.where(ok, np.sign(ds) / np.sqrt(1.0 / ds**2 + 1.0 / dn**2), 0.0)
+            nv = ok.sum(axis=1)
+            mu = (dt * ok).sum(axis=1) / np.maximum(nv, 1)
+            var = ((dt - mu[:, None]) ** 2 * ok).sum(axis=1) / np.maximum(nv - 1, 1)
+            sdt_all[sl] = np.where(nv >= 2, np.sqrt(var), np.inf)
+        return float(candidates[np.argmin(sdt_all)])
+
+    for iter_idx in range(20):
+        prev = (m0, D, Np, aT, aC)
+
+        fac = np.where(
+            tensile,
+            np.maximum(1.0 - ratio_t**aT, EPSILON),
+            np.maximum(1.0 - ratio_c**aC, EPSILON),
+        )  # (n,) — recomputed at the start of each outer iteration
+
+        # Sweep D: 100 → 1000, step 1  (901 candidates)
+        m_2d = np.maximum(m0 * np.exp(-sm / D_arr[:, None]), EPSILON)  # (901, n)
+        Sap_2d = sa * (N / Np) ** (1.0 / m_2d)
+        D = float(D_arr[np.argmin(_sdt(Sap_2d, fac, Np, m_2d))])
+
+        # Sweep m0: 1 → 20, step 0.05  (381 candidates)
+        m_2d = np.maximum(m0_arr[:, None] * np.exp(-sm / D), EPSILON)  # (381, n)
+        Sap_2d = sa * (N / Np) ** (1.0 / m_2d)
+        m0 = float(m0_arr[np.argmin(_sdt(Sap_2d, fac, Np, m_2d))])
+
+        # Sweep Np: 1 → 1e7, step 1000  (10 000 candidates, log-space)
+        m_1d = np.maximum(m0 * np.exp(-sm / D), EPSILON)  # (n,)
+        if np_fixed is None:
+            if iter_idx == 0:
+                # Global search on the full Fortran grid
+                Np = _sdt_Np_sweep(m_1d, fac, Np_arr)
+            else:
+                # Warm-start: search ±200 grid steps around current Np.
+                # Coordinate descent cannot move the optimum more than 200 000
+                # in one iteration, so this is numerically equivalent to the
+                # full search while reducing the sweep from 10 000 → ≤ 401 candidates.
+                Np_idx = int(round((Np - 1.0) / 1000.0))
+                lo = max(0, Np_idx - 200)
+                hi = min(len(Np_arr), Np_idx + 201)
+                Np = _sdt_Np_sweep(m_1d, fac, Np_arr[lo:hi])
+
+        # Sweep αC: 0.05 → 5, step 0.01  (496 candidates)
+        Sap_1d = sa * (N / Np) ** (1.0 / m_1d)  # (n,)
+        fac_2d = np.where(
+            tensile,
+            np.maximum(1.0 - ratio_t**aT, EPSILON),
+            np.maximum(1.0 - ratio_c ** aC_arr[:, None], EPSILON),
+        )  # (496, n)
+        aC = float(aC_arr[np.argmin(_sdt(Sap_1d, fac_2d, Np, m_1d))])
+
+        # Sweep αT: 0.05 → 5, step 0.01  (496 candidates)
+        fac_2d = np.where(
+            tensile,
+            np.maximum(1.0 - ratio_t ** aT_arr[:, None], EPSILON),
+            np.maximum(1.0 - ratio_c**aC, EPSILON),
+        )  # (496, n)
+        aT = float(aT_arr[np.argmin(_sdt(Sap_1d, fac_2d, Np, m_1d))])
+
+        if (m0, D, Np, aT, aC) == prev:
+            break  # converged — grid resolution exhausted
+
+    # ── Nelder-Mead refinement (continuous local search from grid optimum) ───
+    # Log-transform all parameters so the optimizer works in unconstrained space
+    # and positivity is guaranteed (exp(x) > 0 always).
+    def _sdt_scalar(log_params: np.ndarray) -> float:
+        m0_r = float(np.exp(log_params[0]))
+        D_r = float(np.exp(log_params[1]))
+        aC_r = float(np.exp(log_params[2]))
+        aT_r = float(np.exp(log_params[3]))
+        Np_r = np_fixed if np_fixed is not None else float(np.exp(log_params[4]))
+
+        m = np.maximum(m0_r * np.exp(-sm / D_r), EPSILON)
+        Sap = sa * (N / Np_r) ** (1.0 / m)
+        fac = np.where(
+            tensile,
+            np.maximum(1.0 - ratio_t**aT_r, EPSILON),
+            np.maximum(1.0 - ratio_c**aC_r, EPSILON),
+        )
+        SAAp = Sap / fac
+        SApav = SAAp.mean()
+        Sapmod = SApav * fac
+        dSa = np.log(np.maximum(Sap, EPSILON)) - np.log(np.maximum(Sapmod, EPSILON))
+        Ne = Np_r * (Sapmod / np.maximum(sa, EPSILON)) ** m
+        dN = np.log(N) - np.log(np.maximum(Ne, EPSILON))
+        ok = (np.abs(dSa) > EPSILON) & (np.abs(dN) > EPSILON)
+        nv = int(ok.sum())
+        if nv < 2:
+            return np.inf
+        ds = np.where(ok, dSa, 1.0)
+        dn = np.where(ok, dN, 1.0)
+        dt = np.where(ok, np.sign(ds) / np.sqrt(1.0 / ds**2 + 1.0 / dn**2), 0.0)
+        mu = (dt * ok).sum() / nv
+        var = ((dt - mu) ** 2 * ok).sum() / (nv - 1)
+        return float(np.sqrt(max(var, 0.0)))
+
+    x0 = [np.log(m0), np.log(D), np.log(aC), np.log(aT)]
+    if np_fixed is None:
+        x0.append(np.log(Np))
+
+    res = _scipy_minimize(
+        _sdt_scalar,
+        x0,
+        method="Nelder-Mead",
+        options={"xatol": 1e-8, "fatol": 1e-10, "maxiter": 10_000, "maxfev": 50_000},
     )
 
-    m0, d, alpha_t, alpha_c = unpack(result.x)
-    sigma_apex = _estimate_sigma_apex(m0, d, alpha_t, alpha_c)
+    if np.isfinite(res.fun):
+        m0 = float(np.exp(res.x[0]))
+        D = float(np.exp(res.x[1]))
+        aC = float(np.exp(res.x[2]))
+        aT = float(np.exp(res.x[3]))
+        if np_fixed is None:
+            Np = float(np.exp(res.x[4]))
+
+    # Final σ_apex = arithmetic mean of SAAp  (Fortran: SApav = mean(SAAp(j)))
+    m_1d = np.maximum(m0 * np.exp(-sm / D), EPSILON)
+    Sap_1d = sa * (N / Np) ** (1.0 / m_1d)
+    fac = np.where(
+        tensile,
+        np.maximum(1.0 - ratio_t**aT, EPSILON),
+        np.maximum(1.0 - ratio_c**aC, EPSILON),
+    )
+    sigma_apex = float(np.mean(Sap_1d / fac))
 
     return BoerstraParameters(
         m0=m0,
-        d=d,
-        np_reference=np_reference,
-        alpha_t=alpha_t,
-        alpha_c=alpha_c,
+        d=D,
+        np_reference=Np,
+        alpha_t=aT,
+        alpha_c=aC,
         sigma_apex=sigma_apex,
     )
 
@@ -298,16 +384,13 @@ def _prepare_input(input_file: FilePath | ReadCsvBuffer, uts: float, ucs: float)
     return snc_df
 
 
-DEFAULT_NP_REFERENCE = 100  # recommended by Boerstra (Table 2: minimises SDt)
-
-
 def execute(
     snc_csv_input_file: FilePath | ReadCsvBuffer,
     cld_csv_output_file: FilePath | WriteBuffer,
     cld_json_output_file=None,
     ucs: float = DEFAULT_UCS,
     uts: float = DEFAULT_UTS,
-    np_reference: float = DEFAULT_NP_REFERENCE,
+    np_reference: float | None = None,
     m0_init: float | None = None,
     d_init: float | None = None,
     alpha_t_init: float | None = None,
@@ -318,16 +401,7 @@ def execute(
     uts = abs(float(uts))
 
     snc_df = _prepare_input(snc_csv_input_file, uts, ucs)
-    params = _fit_parameters(
-        snc_df,
-        uts,
-        ucs,
-        float(np_reference),
-        m0_init,
-        d_init,
-        alpha_t_init,
-        alpha_c_init,
-    )
+    params = _fit_parameters(snc_df, uts, ucs, np_fixed=np_reference)
 
     cld_df = pd.DataFrame()
 
