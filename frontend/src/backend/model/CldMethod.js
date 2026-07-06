@@ -23,6 +23,12 @@ export default class CldMethod {
   Harris = "Harris";
 
   /**
+   * value: "SimplifiedHarris"
+   * @const
+   */
+  SimplifiedHarris = "SimplifiedHarris";
+
+  /**
    * value: "PiecewiseLinear"
    * @const
    */
