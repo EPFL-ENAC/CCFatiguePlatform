@@ -28,7 +28,6 @@ DEFAULT_UTS = 27.7
 # Output N levels – same as Harris (7 powers of 10)
 CLD_CYCLES_COUNT = [10**x for x in range(3, 10)]
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -41,14 +40,25 @@ def _stress_amplitude(r: float, sigma_max: float) -> float:
     return (1.0 - r) * sigma_max / 2.0
 
 
-def _interp_sigma_a(
-    n_arr: np.ndarray, sigma_a_arr: np.ndarray, n_target: float
-) -> float:
-    """Log-log interpolation (flat extrapolation at boundaries) of σ_a at n_target."""
-    order = np.argsort(n_arr)
-    log_n = np.log10(n_arr[order])
-    log_s = np.log10(sigma_a_arr[order])
-    return 10.0 ** float(np.interp(np.log10(float(n_target)), log_n, log_s))
+def _fit_sn_regression(
+    n_arr: np.ndarray, sigma_a_arr: np.ndarray
+) -> tuple[float, float]:
+    """OLS fit of log10(N) = A + B·log10(σ_a), matching the Fortran algorithm.
+
+    Returns (A, B) such that σ_a(N) = 10^((log10(N) - A) / B).
+    """
+    X = np.log10(sigma_a_arr)
+    Y = np.log10(n_arr)
+    Xb = X.mean()
+    Yb = Y.mean()
+    B = float(np.sum((X - Xb) * (Y - Yb)) / np.sum((X - Xb) ** 2))
+    A = float(Yb - B * Xb)
+    return A, B
+
+
+def _sigma_a_from_regression(n_target: float, A: float, B: float) -> float:
+    """Invert log10(N) = A + B·log10(σ_a) to obtain σ_a at a given N."""
+    return 10.0 ** ((np.log10(float(n_target)) - A) / B)
 
 
 # ---------------------------------------------------------------------------
@@ -138,6 +148,15 @@ def execute(
     n_r2, sa_r2 = _group_arrays(R2)
     n_r3, sa_r3 = _group_arrays(R3) if R3 is not None else (None, None)
 
+    # OLS regression per R group: log10(N) = A + B·log10(σ_a)  (Fortran algorithm)
+    def _make_sn_getter(n_arr: np.ndarray, sa_arr: np.ndarray):
+        A, B = _fit_sn_regression(n_arr, sa_arr)
+        return lambda n: _sigma_a_from_regression(n, A, B)
+
+    get_sm1 = _make_sn_getter(n_r1, sa_r1)
+    get_sinf = _make_sn_getter(n_r2, sa_r2)
+    get_s0 = _make_sn_getter(n_r3, sa_r3) if R3 is not None else None
+
     # Sign convention: UCS is negative internally (compressive)
     ucs_neg = -abs(float(ucs))
     uts_pos = abs(float(uts))
@@ -156,9 +175,9 @@ def execute(
     cld_df = pd.DataFrame()
 
     for n_cycles in CLD_CYCLES_COUNT:
-        Sm1 = _interp_sigma_a(n_r1, sa_r1, n_cycles)
-        Sinf = _interp_sigma_a(n_r2, sa_r2, n_cycles)
-        S0 = _interp_sigma_a(n_r3, sa_r3, n_cycles) if R3 is not None else None
+        Sm1 = get_sm1(n_cycles)
+        Sinf = get_sinf(n_cycles)
+        S0 = get_s0(n_cycles) if get_s0 is not None else None
 
         # --- Domain I & IV parameters (Eq. 4.27-4.28) ---
         INF_THRESHOLD = 100.0  # |R2| ≥ 100 → treat as ±∞
@@ -241,6 +260,16 @@ def execute(
                 continue
             sm = (1.0 + RR) / (1.0 - RR) * sa
             cld_df = cld.cld_add_row(cld_df, n_cycles, sa, sm)
+
+        # Junction between Domain I and IV: both converge to (σ_a=−A_I, σ_m=A_I)
+        # as R→±∞, but the scans only reach |R|=30. B_I ≠ B_IV so the last Domain I
+        # point (R=−30) and last Domain IV point (R=30) don't quite meet, causing a
+        # visible kink between the two R-ratio data lines. Adding the exact limit point
+        # closes that gap without introducing any domain-boundary slope discontinuity.
+        sa_junct = -A_I  # A_I < 0 in all physical cases
+        sm_junct = A_I
+        if sa_junct > 0:
+            cld_df = cld.cld_add_row(cld_df, n_cycles, sa_junct, sm_junct)
 
         # Domain IV: R ≥ 1
         for RR in r_IV:
