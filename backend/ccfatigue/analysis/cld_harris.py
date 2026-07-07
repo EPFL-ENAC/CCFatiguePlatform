@@ -20,6 +20,8 @@ References
 [3] https://doi.org/10.1016/S0266-3538(97)00121-8
 """
 
+import json
+
 import numpy as np
 import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
@@ -34,14 +36,40 @@ DEFAULT_UTS = 27.7
 # Cycles for the isolines (the lines of the CLD)
 CLD_CYCLES_COUNT = [10**x for x in range(3, 10)]  # = 1e3, 1e4, ..., 1e9
 
+_SUPERSCRIPT_DIGITS = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
+
+
+def _format_cycles(cycles: float) -> str:
+    """Format a power-of-10 cycle count as '10⁹', matching the CLD legend."""
+    exponent = int(round(np.log10(cycles)))
+    return f"10{str(exponent).translate(_SUPERSCRIPT_DIGITS)}"
+
+
+def _write_warnings(output_json_file, dropped_cycles: list[float]) -> None:
+    if output_json_file is None:
+        return
+    warnings = []
+    if dropped_cycles:
+        levels = ", ".join(_format_cycles(c) for c in dropped_cycles)
+        warnings.append(
+            f"Excluded N = {levels}: fitted exponent (u or v) is non-positive "
+            "after extrapolation, which would diverge instead of decaying "
+            "toward the UCS/UTS bounds."
+        )
+    json_bytes = json.dumps({"warnings": warnings}).encode()
+    if hasattr(output_json_file, "write"):
+        output_json_file.write(json_bytes)
+    else:
+        with open(output_json_file, "wb") as f:
+            f.write(json_bytes)
+
 
 def execute(
     input_file: FilePath | ReadCsvBuffer,
     output_csv_file: FilePath | WriteBuffer,
+    output_json_file: FilePath | WriteBuffer | None = None,
     ucs: float = DEFAULT_UCS,
     uts: float = DEFAULT_UTS,
-    u_fixed: float | None = None,
-    v_fixed: float | None = None,
 ) -> None:
     """
     Execute the Harris CLD algorithm.
@@ -52,16 +80,14 @@ def execute(
             SNC csv file (columns: stress_ratio, cycles_to_failure, stress_max)
         output_csv_file
             CLD csv output
+        output_json_file
+            Optional JSON output; if provided, receives
+            {"warnings": [...]} listing any life levels excluded because
+            their fitted exponent came out non-positive.
         ucs
             Ultimate compressive stress (positive value)
         uts
             Ultimate tensile stress (positive value)
-        u_fixed
-            If provided together with v_fixed, skip OLS fitting and use this
-            constant value for u at all cycle levels (f is still fitted).
-        v_fixed
-            If provided together with u_fixed, skip OLS fitting and use this
-            constant value for v at all cycle levels (f is still fitted).
     """
     snc_df = pd.read_csv(input_file)
     snc_df = snc_df.copy()
@@ -137,10 +163,18 @@ def execute(
         # OLS with intercept: X = [1, x1, x2], β = [log10(f), u, v]
         X = np.column_stack([np.ones(len(x1_vals)), x1_vals, x2_vals])
         coeffs, _, _, _ = np.linalg.lstsq(X, np.array(y_vals), rcond=None)
+        u_k, v_k = float(coeffs[1]), float(coeffs[2])
+
+        # A non-positive exponent means (1-m)^u or (c+m)^u diverges instead of
+        # decaying toward the UCS/UTS boundaries - discard this N-level rather
+        # than let it poison the cross-N smoothing regression below.
+        if u_k <= 0 or v_k <= 0:
+            continue
+
         log_n_fit.append(log_n)
         f_fit.append(10.0 ** float(coeffs[0]))
-        u_fit.append(float(coeffs[1]))
-        v_fit.append(float(coeffs[2]))
+        u_fit.append(u_k)
+        v_fit.append(v_k)
 
     if len(log_n_fit) < 2:
         raise Exception("Not enough cycle levels within data range to fit Harris CLD.")
@@ -152,27 +186,25 @@ def execute(
     lr_u = stats.linregress(log_n_arr, u_fit)
     lr_v = stats.linregress(log_n_arr, v_fit)
 
-    if u_fixed is not None and v_fixed is not None:
-        uu_const = float(u_fixed)
-        vv_const = float(v_fixed)
-
-        def get_fuv(log_n: float) -> tuple[float, float, float]:
-            ff = float(lr_f.slope * log_n + lr_f.intercept)  # type: ignore
-            return ff, uu_const, vv_const
-
-    else:
-
-        def get_fuv(log_n: float) -> tuple[float, float, float]:
-            ff = float(lr_f.slope * log_n + lr_f.intercept)  # type: ignore
-            uu = float(lr_u.slope * log_n + lr_u.intercept)  # type: ignore
-            vv = float(lr_v.slope * log_n + lr_v.intercept)  # type: ignore
-            return ff, uu, vv
+    def get_fuv(log_n: float) -> tuple[float, float, float]:
+        ff = float(lr_f.slope * log_n + lr_f.intercept)  # type: ignore
+        uu = float(lr_u.slope * log_n + lr_u.intercept)  # type: ignore
+        vv = float(lr_v.slope * log_n + lr_v.intercept)  # type: ignore
+        return ff, uu, vv
 
     cld_df = pd.DataFrame()
+    dropped_cycles: list[float] = []
 
     for cycles_to_failure in CLD_CYCLES_COUNT:
         log_n = np.log10(float(cycles_to_failure))
         ff, uu, vv = get_fuv(log_n)
+
+        # The f/u/v-vs-log(N) trend is extrapolated to every output life level;
+        # even with clean inputs, extrapolation can push u or v through zero at
+        # the far ends, which diverges instead of decaying at the UCS/UTS bounds.
+        if uu <= 0 or vv <= 0:
+            dropped_cycles.append(cycles_to_failure)
+            continue
 
         cld_df = cld.cld_add_row(cld_df, cycles_to_failure, 0, -ucs)
 
@@ -195,3 +227,4 @@ def execute(
     ).reset_index(drop=True)
 
     cld_df.to_csv(path_or_buf=output_csv_file, index=False)  # type: ignore
+    _write_warnings(output_json_file, dropped_cycles)

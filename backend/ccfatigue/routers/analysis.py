@@ -62,8 +62,6 @@ async def run_cld_file(
     d_init: float | None = Query(default=None),
     alpha_t_init: float | None = Query(default=None),
     alpha_c_init: float | None = Query(default=None),
-    u_fixed: float | None = Query(default=None),
-    v_fixed: float | None = Query(default=None),
 ) -> AnalysisResult:
     try:
         return run_cld(
@@ -76,8 +74,6 @@ async def run_cld_file(
             d_init,
             alpha_t_init,
             alpha_c_init,
-            u_fixed,
-            v_fixed,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

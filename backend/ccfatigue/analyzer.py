@@ -249,26 +249,23 @@ def run_cld(
     d_init: float | None = None,
     alpha_t_init: float | None = None,
     alpha_c_init: float | None = None,
-    u_fixed: float | None = None,
-    v_fixed: float | None = None,
 ) -> AnalysisResult:
     match method:
         case CldMethod.HARRIS:
             output = run_python(
-                lambda input, csv_output, _: cld_harris.execute(
+                lambda input, csv_output, json_output: cld_harris.execute(
                     input,
                     csv_output,
+                    json_output,
                     ucs,
                     uts,
-                    u_fixed,
-                    v_fixed,
                 ),
                 file,
             )
         case CldMethod.SIMPLIFIED_HARRIS:
             output = run_python(
-                lambda input, csv_output, _: cld_simplified_harris.execute(
-                    input, csv_output, ucs, uts
+                lambda input, csv_output, json_output: cld_simplified_harris.execute(
+                    input, csv_output, json_output, ucs, uts
                 ),
                 file,
             )

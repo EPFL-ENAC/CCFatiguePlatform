@@ -10,6 +10,8 @@ where x1 = log10(1 − σ_m/UTS), x2 = log10(UCS/UTS + σ_m/UTS).
 f and u are then each regressed linearly against log10(N).
 """
 
+import json
+
 import numpy as np
 import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
@@ -23,10 +25,38 @@ DEFAULT_UTS = 27.7
 
 CLD_CYCLES_COUNT = [10**x for x in range(3, 10)]
 
+_SUPERSCRIPT_DIGITS = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
+
+
+def _format_cycles(cycles: float) -> str:
+    """Format a power-of-10 cycle count as '10⁹', matching the CLD legend."""
+    exponent = int(round(np.log10(cycles)))
+    return f"10{str(exponent).translate(_SUPERSCRIPT_DIGITS)}"
+
+
+def _write_warnings(output_json_file, dropped_cycles: list[float]) -> None:
+    if output_json_file is None:
+        return
+    warnings = []
+    if dropped_cycles:
+        levels = ", ".join(_format_cycles(c) for c in dropped_cycles)
+        warnings.append(
+            f"Excluded N = {levels}: fitted exponent u is non-positive after "
+            "extrapolation, which would diverge instead of decaying toward "
+            "the UCS/UTS bounds."
+        )
+    json_bytes = json.dumps({"warnings": warnings}).encode()
+    if hasattr(output_json_file, "write"):
+        output_json_file.write(json_bytes)
+    else:
+        with open(output_json_file, "wb") as f:
+            f.write(json_bytes)
+
 
 def execute(
     input_file: FilePath | ReadCsvBuffer,
     output_csv_file: FilePath | WriteBuffer,
+    output_json_file: FilePath | WriteBuffer | None = None,
     ucs: float = DEFAULT_UCS,
     uts: float = DEFAULT_UTS,
 ) -> None:
@@ -99,9 +129,17 @@ def execute(
             continue
         X = np.column_stack([np.ones(len(z_vals)), z_vals])
         coeffs, _, _, _ = np.linalg.lstsq(X, np.array(y_vals), rcond=None)
+        u_k = float(coeffs[1])
+
+        # A non-positive exponent means (1-m)^u and (c+m)^u diverge instead of
+        # decaying toward the UCS/UTS boundaries - discard this N-level rather
+        # than let it poison the cross-N smoothing regression below.
+        if u_k <= 0:
+            continue
+
         log_n_fit.append(log_n)
         f_fit.append(10.0 ** float(coeffs[0]))
-        u_fit.append(float(coeffs[1]))
+        u_fit.append(u_k)
 
     if len(log_n_fit) < 2:
         raise Exception(
@@ -114,11 +152,19 @@ def execute(
     lr_u = stats.linregress(log_n_arr, u_fit)
 
     cld_df = pd.DataFrame()
+    dropped_cycles: list[float] = []
 
     for cycles_to_failure in CLD_CYCLES_COUNT:
         log_n = np.log10(float(cycles_to_failure))
         ff = float(lr_f.slope * log_n + lr_f.intercept)  # type: ignore
         uv_val = float(lr_u.slope * log_n + lr_u.intercept)  # type: ignore
+
+        # The f/u-vs-log(N) trend is extrapolated to every output life level;
+        # even with clean inputs, extrapolation can push u through zero at the
+        # far ends, which diverges instead of decaying at the UCS/UTS bounds.
+        if uv_val <= 0:
+            dropped_cycles.append(cycles_to_failure)
+            continue
 
         cld_df = cld.cld_add_row(cld_df, cycles_to_failure, 0, -ucs)
 
@@ -141,3 +187,4 @@ def execute(
     ).reset_index(drop=True)
 
     cld_df.to_csv(path_or_buf=output_csv_file, index=False)  # type: ignore
+    _write_warnings(output_json_file, dropped_cycles)
