@@ -80,6 +80,22 @@
     </v-card-subtitle>
 
     <v-card-text v-if="series.length > 0">
+      <v-alert
+        v-if="methodWarnings.length > 0"
+        type="warning"
+        icon="mdi-alert"
+        outlined
+        dense
+        class="mb-4"
+      >
+        <div v-for="(item, idx) in methodWarnings" :key="idx">
+          <strong v-if="selectedMethods.length > 1">
+            {{ methodLabel(item.method) }}:
+          </strong>
+          {{ item.warning }}
+        </div>
+      </v-alert>
+
       <v-row align="start">
         <!-- Side panel: method legend + Boerstra params -->
         <v-col v-if="showPanel" cols="12" md="3" class="mt-2">
@@ -389,6 +405,27 @@ export default {
       } catch {
         return null;
       }
+    },
+
+    methodWarnings() {
+      const messages = [];
+      for (const method of this.selectedMethods) {
+        const out = this.outputs[method];
+        if (!out?.json_data) continue;
+        let parsed;
+        try {
+          parsed =
+            typeof out.json_data === "string"
+              ? JSON.parse(out.json_data)
+              : out.json_data;
+        } catch {
+          continue;
+        }
+        for (const warning of parsed?.warnings ?? []) {
+          messages.push({ method, warning });
+        }
+      }
+      return messages;
     },
 
     rRatioValid() {

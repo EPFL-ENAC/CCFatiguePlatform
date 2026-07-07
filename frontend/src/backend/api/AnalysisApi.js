@@ -77,8 +77,6 @@ export default class AnalysisApi {
       ...(opts.dInit != null && { d_init: opts.dInit }),
       ...(opts.alphaTInit != null && { alpha_t_init: opts.alphaTInit }),
       ...(opts.alphaCInit != null && { alpha_c_init: opts.alphaCInit }),
-      ...(opts.uFixed != null && { u_fixed: opts.uFixed }),
-      ...(opts.vFixed != null && { v_fixed: opts.vFixed }),
     };
     let headerParams = {};
     let formParams = {
