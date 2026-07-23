@@ -28,7 +28,7 @@
     "vuex": "^3.6.2"
   },
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.5.2",
+    "@openapitools/openapi-generator-cli": "^2.40.0",
     "@types/downloadjs": "^1.4.3",
     "@types/papaparse": "^5.3.5",
     "@volar/vue-typescript": "^1.0.9",
