@@ -279,13 +279,13 @@
         "tags": [
           "experiments"
         ],
-        "summary": "Post Data Preprocess Check",
-        "operationId": "post_data_preprocess_check",
+        "summary": "Post Data Preprocess Check V2",
+        "operationId": "post_data_preprocess_check_v2",
         "requestBody": {
           "content": {
             "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/Body_post_data_preprocess_check_experiments_data_preprocess_check_post"
+                "$ref": "#/components/schemas/Body_post_data_preprocess_check_v2_experiments_data_preprocess_check_post"
               }
             }
           },
@@ -449,6 +449,15 @@
             },
             "name": "method",
             "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Confidenceinterval",
+              "type": "number"
+            },
+            "name": "confidenceInterval",
+            "in": "query"
           }
         ],
         "requestBody": {
@@ -518,6 +527,51 @@
             },
             "name": "uts",
             "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Np Reference",
+              "type": "number"
+            },
+            "name": "np_reference",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "M0 Init",
+              "type": "number"
+            },
+            "name": "m0_init",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "D Init",
+              "type": "number"
+            },
+            "name": "d_init",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Alpha T Init",
+              "type": "number"
+            },
+            "name": "alpha_t_init",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Alpha C Init",
+              "type": "number"
+            },
+            "name": "alpha_c_init",
+            "in": "query"
           }
         ],
         "requestBody": {
@@ -536,9 +590,163 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Response Run Cld File Analysis Cld File Post",
-                  "type": "string",
-                  "format": "binary"
+                  "$ref": "#/components/schemas/AnalysisResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analysis/cld/piecewiselinear-from-sn/file": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run Cld Piecewiselinear From Sn File",
+        "operationId": "run_cld_piecewiselinear_from_sn_file",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/SnCurveMethod"
+            },
+            "name": "snMethod",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Ucs",
+              "type": "number"
+            },
+            "name": "ucs",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Uts",
+              "type": "number"
+            },
+            "name": "uts",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Confidenceinterval",
+              "type": "number"
+            },
+            "name": "confidenceInterval",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_cld_piecewiselinear_from_sn_file_analysis_cld_piecewiselinear_from_sn_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analysis/cld/piecewisenonlinear-from-sn/file": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run Cld Piecewisenonlinear From Sn File",
+        "operationId": "run_cld_piecewisenonlinear_from_sn_file",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/SnCurveMethod"
+            },
+            "name": "snMethod",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Ucs",
+              "type": "number"
+            },
+            "name": "ucs",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Uts",
+              "type": "number"
+            },
+            "name": "uts",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Confidenceinterval",
+              "type": "number"
+            },
+            "name": "confidenceInterval",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_cld_piecewisenonlinear_from_sn_file_analysis_cld_piecewisenonlinear_from_sn_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResult"
                 }
               }
             }
@@ -597,6 +805,96 @@
             },
             "name": "offAxisAngle",
             "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Offaxisangle2",
+              "type": "number"
+            },
+            "name": "offAxisAngle2",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Tensile Transverse Strength",
+              "type": "number"
+            },
+            "name": "tensile_transverse_strength",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Compressive Transverse Strength",
+              "type": "number"
+            },
+            "name": "compressive_transverse_strength",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Shear Strength",
+              "type": "number"
+            },
+            "name": "shear_strength",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Tensile Strength1",
+              "type": "number"
+            },
+            "name": "tensile_strength1",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Compressive Strength1",
+              "type": "number"
+            },
+            "name": "compressive_strength1",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Tensile Strength2",
+              "type": "number"
+            },
+            "name": "tensile_strength2",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Compressive Strength2",
+              "type": "number"
+            },
+            "name": "compressive_strength2",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Tensile Strength At Desirable Angle",
+              "type": "number"
+            },
+            "name": "tensile_strength_at_desirable_angle",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Compressive Strength At Desirable Angle",
+              "type": "number"
+            },
+            "name": "compressive_strength_at_desirable_angle",
+            "in": "query"
           }
         ],
         "requestBody": {
@@ -604,6 +902,341 @@
             "multipart/form-data": {
               "schema": {
                 "$ref": "#/components/schemas/Body_run_fatigue_failure_file_analysis_fatigueFailure_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analysis/fatigueFailure/shokriehTaheri/file": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run Fatigue Failure Shokriehtaheri File",
+        "operationId": "run_fatigue_failure_shokriehtaheri_file",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Referenceangle",
+              "type": "number"
+            },
+            "name": "referenceAngle",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Referencestressratio",
+              "type": "number"
+            },
+            "name": "referenceStressRatio",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Desirableangle",
+              "type": "number"
+            },
+            "name": "desirableAngle",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Targetstressratio",
+              "type": "number"
+            },
+            "name": "targetStressRatio",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Tensile Axial Strength",
+              "type": "number"
+            },
+            "name": "tensile_axial_strength",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Compressive Axial Strength",
+              "type": "number"
+            },
+            "name": "compressive_axial_strength",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Tensile Transverse Strength",
+              "type": "number"
+            },
+            "name": "tensile_transverse_strength",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Compressive Transverse Strength",
+              "type": "number"
+            },
+            "name": "compressive_transverse_strength",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Shear Strength",
+              "type": "number"
+            },
+            "name": "shear_strength",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_fatigue_failure_shokriehtaheri_file_analysis_fatigueFailure_shokriehTaheri_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analysis/fatigueFailure/fawazEllyin/file": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run Fatigue Failure Fawazellyin File",
+        "operationId": "run_fatigue_failure_fawazellyin_file",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/FatigueModel"
+            },
+            "name": "snModel",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Referenceangle",
+              "type": "number"
+            },
+            "name": "referenceAngle",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Referencestaticstrength",
+              "type": "number"
+            },
+            "name": "referenceStaticStrength",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Desirableangle",
+              "type": "number"
+            },
+            "name": "desirableAngle",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Targetstressratio",
+              "type": "number"
+            },
+            "name": "targetStressRatio",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Targetstaticstrength",
+              "type": "number"
+            },
+            "name": "targetStaticStrength",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_fatigue_failure_fawazellyin_file_analysis_fatigueFailure_fawazEllyin_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analysis/fatigueFailure/kawai/file": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run Fatigue Failure Kawai File",
+        "operationId": "run_fatigue_failure_kawai_file",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Referenceangle",
+              "type": "number"
+            },
+            "name": "referenceAngle",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Referencestressratio",
+              "type": "number"
+            },
+            "name": "referenceStressRatio",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Referencestaticstrength",
+              "type": "number"
+            },
+            "name": "referenceStaticStrength",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Desirableangle",
+              "type": "number"
+            },
+            "name": "desirableAngle",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Targetstressratio",
+              "type": "number"
+            },
+            "name": "targetStressRatio",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Tensile Axial Strength",
+              "type": "number"
+            },
+            "name": "tensile_axial_strength",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Tensile Transverse Strength",
+              "type": "number"
+            },
+            "name": "tensile_transverse_strength",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Shear Strength",
+              "type": "number"
+            },
+            "name": "shear_strength",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_fatigue_failure_kawai_file_analysis_fatigueFailure_kawai_file_post"
               }
             }
           },
@@ -685,6 +1318,79 @@
           }
         }
       }
+    },
+    "/experiments/integrate_dataset": {
+      "post": {
+        "summary": "Integrate Dataset",
+        "operationId": "integrate_dataset_experiments_integrate_dataset_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_integrate_dataset_experiments_integrate_dataset_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/downloads_zip": {
+      "get": {
+        "summary": "Download Zip",
+        "operationId": "download_zip_downloads_zip_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Folder Name",
+              "type": "string"
+            },
+            "name": "folder_name",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -728,8 +1434,22 @@
         },
         "description": "App Info"
       },
-      "Body_post_data_preprocess_check_experiments_data_preprocess_check_post": {
-        "title": "Body_post_data_preprocess_check_experiments_data_preprocess_check_post",
+      "Body_integrate_dataset_experiments_integrate_dataset_post": {
+        "title": "Body_integrate_dataset_experiments_integrate_dataset_post",
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "Body_post_data_preprocess_check_v2_experiments_data_preprocess_check_post": {
+        "title": "Body_post_data_preprocess_check_v2_experiments_data_preprocess_check_post",
         "required": [
           "file"
         ],
@@ -744,6 +1464,34 @@
       },
       "Body_run_cld_file_analysis_cld_file_post": {
         "title": "Body_run_cld_file_analysis_cld_file_post",
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "Body_run_cld_piecewiselinear_from_sn_file_analysis_cld_piecewiselinear_from_sn_file_post": {
+        "title": "Body_run_cld_piecewiselinear_from_sn_file_analysis_cld_piecewiselinear_from_sn_file_post",
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "Body_run_cld_piecewisenonlinear_from_sn_file_analysis_cld_piecewisenonlinear_from_sn_file_post": {
+        "title": "Body_run_cld_piecewisenonlinear_from_sn_file_analysis_cld_piecewisenonlinear_from_sn_file_post",
         "required": [
           "file"
         ],
@@ -790,6 +1538,20 @@
           }
         }
       },
+      "Body_run_fatigue_failure_fawazellyin_file_analysis_fatigueFailure_fawazEllyin_file_post": {
+        "title": "Body_run_fatigue_failure_fawazellyin_file_analysis_fatigueFailure_fawazEllyin_file_post",
+        "required": [
+          "sncFile"
+        ],
+        "type": "object",
+        "properties": {
+          "sncFile": {
+            "title": "Sncfile",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
       "Body_run_fatigue_failure_file_analysis_fatigueFailure_file_post": {
         "title": "Body_run_fatigue_failure_file_analysis_fatigueFailure_file_post",
         "required": [
@@ -816,6 +1578,34 @@
           }
         }
       },
+      "Body_run_fatigue_failure_kawai_file_analysis_fatigueFailure_kawai_file_post": {
+        "title": "Body_run_fatigue_failure_kawai_file_analysis_fatigueFailure_kawai_file_post",
+        "required": [
+          "aggFile"
+        ],
+        "type": "object",
+        "properties": {
+          "aggFile": {
+            "title": "Aggfile",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "Body_run_fatigue_failure_shokriehtaheri_file_analysis_fatigueFailure_shokriehTaheri_file_post": {
+        "title": "Body_run_fatigue_failure_shokriehtaheri_file_analysis_fatigueFailure_shokriehTaheri_file_post",
+        "required": [
+          "aggFile"
+        ],
+        "type": "object",
+        "properties": {
+          "aggFile": {
+            "title": "Aggfile",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
       "Body_run_sn_curve_file_analysis_snCurve_file_post": {
         "title": "Body_run_sn_curve_file_analysis_snCurve_file_post",
         "required": [
@@ -834,6 +1624,7 @@
         "title": "CldMethod",
         "enum": [
           "Harris",
+          "SimplifiedHarris",
           "PiecewiseLinear",
           "PiecewiseNonLinear",
           "Kawai",
@@ -865,21 +1656,41 @@
       "ExperimentFieldNames": {
         "title": "ExperimentFieldNames",
         "enum": [
-          "fracture_mode",
+          "experiment_type",
+          "fa_experiment_type",
+          "qs_experiment_type",
+          "ot_experiment_type",
+          "fracture_mode_fm",
+          "control_mode",
+          "fatigue_loading_type_flt",
+          "material_tested",
+          "material_type_sample_type",
+          "sample_type_add_info",
           "material_type_fiber_material",
+          "material_type_fiber_form",
+          "material_type_area_density",
           "material_type_resin",
-          "laminates_and_assemblies_stacking_sequence"
+          "material_type_hardener",
+          "material_type_mixing_ratio",
+          "other_polymers_add_info",
+          "glue",
+          "laminates_and_assemblies_stacking_sequence",
+          "laminates_and_assemblies_fiber_volume_ratio",
+          "fatigue_r_ratio",
+          "fatigue_frequency",
+          "curing_time",
+          "curing_temperature",
+          "curing_pressure"
         ],
         "type": "string",
-        "description": "Enumerate all fields that can be requested as distinct"
+        "description": "An enumeration."
       },
       "ExperimentModel": {
         "title": "ExperimentModel",
         "required": [
           "id",
           "researcher",
-          "experiment_type",
-          "fracture"
+          "experiment_type"
         ],
         "type": "object",
         "properties": {
@@ -903,60 +1714,64 @@
             "title": "Experiment Type",
             "type": "string"
           },
-          "fracture": {
-            "title": "Fracture",
-            "type": "boolean"
-          },
-          "fracture_mode": {
-            "title": "Fracture Mode",
+          "fa_experiment_type": {
+            "title": "Fa Experiment Type",
             "type": "string"
           },
-          "fatigue_test_type": {
-            "title": "Fatigue Test Type",
+          "qs_experiment_type": {
+            "title": "Qs Experiment Type",
             "type": "string"
           },
-          "quasi_static_test_type": {
-            "title": "Quasi Static Test Type",
+          "ot_experiment_type": {
+            "title": "Ot Experiment Type",
             "type": "string"
           },
-          "temperature_test_type": {
-            "title": "Temperature Test Type",
+          "ot_add_info": {
+            "title": "Ot Add Info",
+            "type": "string"
+          },
+          "fracture_mode_fm": {
+            "title": "Fracture Mode Fm",
+            "type": "string"
+          },
+          "fm_add_info": {
+            "title": "Fm Add Info",
+            "type": "string"
+          },
+          "control_mode": {
+            "title": "Control Mode",
+            "type": "string"
+          },
+          "fatigue_loading_type_flt": {
+            "title": "Fatigue Loading Type Flt",
+            "type": "string"
+          },
+          "flt_add_info": {
+            "title": "Flt Add Info",
             "type": "string"
           },
           "measuring_equipment": {
             "title": "Measuring Equipment",
             "type": "string"
           },
-          "reliability_level": {
-            "title": "Reliability Level",
+          "loading_rate": {
+            "title": "Loading Rate",
             "type": "number"
-          },
-          "control_mode": {
-            "title": "Control Mode",
-            "type": "string"
-          },
-          "publication_title": {
-            "title": "Publication Title",
-            "type": "string"
-          },
-          "publication_author": {
-            "title": "Publication Author",
-            "type": "string"
-          },
-          "publication_year": {
-            "title": "Publication Year",
-            "type": "string"
           },
           "publication_doi": {
             "title": "Publication Doi",
             "type": "string"
           },
-          "publication_images_repository": {
-            "title": "Publication Images Repository",
+          "material_tested": {
+            "title": "Material Tested",
             "type": "string"
           },
           "material_type_sample_type": {
             "title": "Material Type Sample Type",
+            "type": "string"
+          },
+          "sample_type_add_info": {
+            "title": "Sample Type Add Info",
             "type": "string"
           },
           "material_type_fiber_material": {
@@ -969,7 +1784,7 @@
           },
           "material_type_area_density": {
             "title": "Material Type Area Density",
-            "type": "number"
+            "type": "string"
           },
           "material_type_resin": {
             "title": "Material Type Resin",
@@ -983,40 +1798,67 @@
             "title": "Material Type Mixing Ratio",
             "type": "string"
           },
-          "laminates_and_assemblies_curing_time": {
-            "title": "Laminates And Assemblies Curing Time",
+          "other_polymers_add_info": {
+            "title": "Other Polymers Add Info",
+            "type": "string"
+          },
+          "curing_time": {
+            "title": "Curing Time",
             "type": "number"
           },
-          "laminates_and_assemblies_curing_temperature": {
-            "title": "Laminates And Assemblies Curing Temperature",
+          "curing_temperature": {
+            "title": "Curing Temperature",
             "type": "number"
           },
-          "laminates_and_assemblies_curing_pressure": {
-            "title": "Laminates And Assemblies Curing Pressure",
+          "curing_pressure": {
+            "title": "Curing Pressure",
             "type": "number"
           },
-          "laminates_and_assemblies_fiber_volume_ratio": {
-            "title": "Laminates And Assemblies Fiber Volume Ratio",
+          "postcuring_time": {
+            "title": "Postcuring Time",
+            "type": "number"
+          },
+          "postcuring_temperature": {
+            "title": "Postcuring Temperature",
+            "type": "number"
+          },
+          "postcuring_pressure": {
+            "title": "Postcuring Pressure",
+            "type": "number"
+          },
+          "glue": {
+            "title": "Glue",
+            "type": "string"
+          },
+          "glue_curing_time": {
+            "title": "Glue Curing Time",
+            "type": "number"
+          },
+          "glue_curing_temperature": {
+            "title": "Glue Curing Temperature",
+            "type": "number"
+          },
+          "glue_curing_pressure": {
+            "title": "Glue Curing Pressure",
             "type": "number"
           },
           "laminates_and_assemblies_stacking_sequence": {
             "title": "Laminates And Assemblies Stacking Sequence",
             "type": "string"
           },
-          "measurement_measuring_points": {
-            "title": "Measurement Measuring Points",
-            "type": "integer"
+          "laminates_and_assemblies_fiber_volume_ratio": {
+            "title": "Laminates And Assemblies Fiber Volume Ratio",
+            "type": "number"
           },
-          "dic_analysis_subset_size": {
-            "title": "Dic Analysis Subset Size",
-            "type": "integer"
+          "fatigue_r_ratio": {
+            "title": "Fatigue R Ratio",
+            "type": "number"
           },
-          "dic_analysis_step_size": {
-            "title": "Dic Analysis Step Size",
-            "type": "integer"
+          "fatigue_frequency": {
+            "title": "Fatigue Frequency",
+            "type": "number"
           }
-        },
-        "description": "Defines how experiment is seen on the API"
+        }
       },
       "Experiment_Data_Preprocessed": {
         "title": "Experiment_Data_Preprocessed",
@@ -1040,7 +1882,12 @@
       "FatigueFailureMethod": {
         "title": "FatigueFailureMethod",
         "enum": [
-          "FTPT"
+          "FTPT",
+          "HashinRotem",
+          "ShokriehTaheri",
+          "FawazEllyin",
+          "SimsBrogdon",
+          "Kawai"
         ],
         "type": "string",
         "description": "An enumeration."
@@ -1059,17 +1906,17 @@
         "required": [
           "specimen_id",
           "specimen_name",
-          "total_dissipated_energy",
           "run_out",
-          "stress_ratio",
           "hysteresis_loops",
           "n_cycles",
           "creep",
           "hysteresis_area",
           "stiffness",
-          "stress_at_failure",
-          "strain_at_failure",
-          "n_fail"
+          "warning_messages",
+          "crack_displacement",
+          "crack_load",
+          "crack_length",
+          "crack_n_cycles"
         ],
         "type": "object",
         "properties": {
@@ -1083,15 +1930,11 @@
           },
           "total_dissipated_energy": {
             "title": "Total Dissipated Energy",
-            "type": "integer"
+            "type": "number"
           },
           "run_out": {
             "title": "Run Out",
             "type": "boolean"
-          },
-          "stress_ratio": {
-            "title": "Stress Ratio",
-            "type": "number"
           },
           "hysteresis_loops": {
             "title": "Hysteresis Loops",
@@ -1139,6 +1982,102 @@
           "n_fail": {
             "title": "N Fail",
             "type": "integer"
+          },
+          "warning_messages": {
+            "title": "Warning Messages",
+            "type": "boolean"
+          },
+          "crack_displacement": {
+            "title": "Crack Displacement",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "crack_load": {
+            "title": "Crack Load",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "crack_length": {
+            "title": "Crack Length",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "crack_n_cycles": {
+            "title": "Crack N Cycles",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "da_dN": {
+            "title": "Da Dn",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "G_MBT": {
+            "title": "G Mbt",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "G_MCC": {
+            "title": "G Mcc",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "G_ECM": {
+            "title": "G Ecm",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "c_paris_mbt": {
+            "title": "C Paris Mbt",
+            "type": "number"
+          },
+          "m_paris_mbt": {
+            "title": "M Paris Mbt",
+            "type": "number"
+          },
+          "G_th_mbt": {
+            "title": "G Th Mbt",
+            "type": "number"
+          },
+          "c_paris_mcc": {
+            "title": "C Paris Mcc",
+            "type": "number"
+          },
+          "m_paris_mcc": {
+            "title": "M Paris Mcc",
+            "type": "number"
+          },
+          "G_th_mcc": {
+            "title": "G Th Mcc",
+            "type": "number"
+          },
+          "c_paris_ecm": {
+            "title": "C Paris Ecm",
+            "type": "number"
+          },
+          "m_paris_ecm": {
+            "title": "M Paris Ecm",
+            "type": "number"
+          },
+          "G_th_ecm": {
+            "title": "G Th Ecm",
+            "type": "number"
           }
         }
       },
@@ -1259,19 +2198,27 @@
         "title": "QuasiStaticTest",
         "required": [
           "specimen_name",
+          "specimen_id",
           "crack_displacement",
           "crack_load",
           "crack_length",
           "displacement",
           "load",
           "strain",
-          "stress"
+          "stress",
+          "crack_fractureenergy_mbt",
+          "crack_fractureenergy_mcc",
+          "crack_fractureenergy_ecm"
         ],
         "type": "object",
         "properties": {
           "specimen_name": {
             "title": "Specimen Name",
             "type": "string"
+          },
+          "specimen_id": {
+            "title": "Specimen Id",
+            "type": "integer"
           },
           "crack_displacement": {
             "title": "Crack Displacement",
@@ -1333,6 +2280,79 @@
                 "type": "number"
               }
             }
+          },
+          "toughness": {
+            "title": "Toughness",
+            "type": "number"
+          },
+          "initial_crack_length": {
+            "title": "Initial Crack Length",
+            "type": "number"
+          },
+          "young_modulus": {
+            "title": "Young Modulus",
+            "type": "number"
+          },
+          "poisson_ratio": {
+            "title": "Poisson Ratio",
+            "type": "number"
+          },
+          "crack_fractureenergy_mbt": {
+            "title": "Crack Fractureenergy Mbt",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "crack_fractureenergy_mcc": {
+            "title": "Crack Fractureenergy Mcc",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "crack_fractureenergy_ecm": {
+            "title": "Crack Fractureenergy Ecm",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "g_init_mbt": {
+            "title": "G Init Mbt",
+            "type": "number"
+          },
+          "bridginglength_mbt": {
+            "title": "Bridginglength Mbt",
+            "type": "number"
+          },
+          "g_plateau_mbt": {
+            "title": "G Plateau Mbt",
+            "type": "number"
+          },
+          "g_init_mcc": {
+            "title": "G Init Mcc",
+            "type": "number"
+          },
+          "bridginglength_mcc": {
+            "title": "Bridginglength Mcc",
+            "type": "number"
+          },
+          "g_plateau_mcc": {
+            "title": "G Plateau Mcc",
+            "type": "number"
+          },
+          "g_init_ecm": {
+            "title": "G Init Ecm",
+            "type": "number"
+          },
+          "bridginglength_ecm": {
+            "title": "Bridginglength Ecm",
+            "type": "number"
+          },
+          "g_plateau_ecm": {
+            "title": "G Plateau Ecm",
+            "type": "number"
           }
         }
       },
@@ -1341,7 +2361,8 @@
         "enum": [
           "LinLog",
           "LogLog",
-          "Sendeckyj"
+          "Sendeckyj",
+          "Whitney"
         ],
         "type": "string",
         "description": "An enumeration."
@@ -1362,37 +2383,25 @@
             "title": "Experiment Id",
             "type": "integer"
           },
-          "specimen_number": {
-            "title": "Specimen Number",
+          "sequential_number": {
+            "title": "Sequential Number",
             "type": "integer"
           },
           "specimen_name": {
             "title": "Specimen Name",
             "type": "string"
           },
-          "stress_ratio": {
-            "title": "Stress Ratio",
-            "type": "number"
+          "number_of_cycles": {
+            "title": "Number Of Cycles",
+            "type": "integer"
           },
-          "maximum_stress": {
-            "title": "Maximum Stress",
-            "type": "number"
-          },
-          "frequency": {
-            "title": "Frequency",
+          "maximum_load": {
+            "title": "Maximum Load",
             "type": "number"
           },
           "run_out": {
             "title": "Run Out",
             "type": "boolean"
-          },
-          "displacement_controlled_loading_rate": {
-            "title": "Displacement Controlled Loading Rate",
-            "type": "number"
-          },
-          "load_controlled_loading_rate": {
-            "title": "Load Controlled Loading Rate",
-            "type": "number"
           },
           "length": {
             "title": "Length",
@@ -1402,8 +2411,20 @@
             "title": "Width",
             "type": "number"
           },
+          "t": {
+            "title": "T",
+            "type": "number"
+          },
+          "l_prime": {
+            "title": "L Prime",
+            "type": "number"
+          },
           "thickness": {
             "title": "Thickness",
+            "type": "number"
+          },
+          "initial_crack_length": {
+            "title": "Initial Crack Length",
             "type": "number"
           },
           "temperature": {
@@ -1414,12 +2435,15 @@
             "title": "Humidity",
             "type": "number"
           },
-          "initial_crack_length": {
-            "title": "Initial Crack Length",
+          "subset_size": {
+            "title": "Subset Size",
+            "type": "number"
+          },
+          "step_size": {
+            "title": "Step Size",
             "type": "number"
           }
-        },
-        "description": "Defines how test is seen on the API"
+        }
       },
       "UnitInfo": {
         "title": "UnitInfo",

@@ -68,6 +68,11 @@ class CldMethod(str, Enum):
 
 class FatigueFailureMethod(str, Enum):
     FTPT = "FTPT"
+    HASHIN_ROTEM = "HashinRotem"
+    SHOKRIEH_TAHERI = "ShokriehTaheri"
+    FAWAZ_ELLYIN = "FawazEllyin"
+    SIMS_BROGDON = "SimsBrogdon"
+    KAWAI = "Kawai"
 
 
 class DamageSummationMethod(str, Enum):

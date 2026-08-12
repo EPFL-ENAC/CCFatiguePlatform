@@ -20,7 +20,12 @@ import ccfatigue.analysis.cyc_rangepair as cyc_rangepair
 import ccfatigue.analysis.cyc_simplifiedrainflow as cyc_simplifiedrainflow
 import ccfatigue.analysis.das_harris as das_harris
 import ccfatigue.analysis.das_piecewiselinear as das_piecewiselinear
+import ccfatigue.analysis.faf_fawazellyin as faf_fawazellyin
 import ccfatigue.analysis.faf_ftpf as faf_ftpf
+import ccfatigue.analysis.faf_hashinrotem as faf_hashinrotem
+import ccfatigue.analysis.faf_kawai as faf_kawai
+import ccfatigue.analysis.faf_shokriehtaheri as faf_shokriehtaheri
+import ccfatigue.analysis.faf_simsbrogdon as faf_simsbrogdon
 import ccfatigue.analysis.snc_linlog as snc_linlog
 import ccfatigue.analysis.snc_loglog as snc_loglog
 import ccfatigue.analysis.snc_sendeckyj as snc_sendeckyj
@@ -319,6 +324,16 @@ def run_fatigue_failure(
     snModel: FatigueModel,
     desirable_angle: float,
     off_axis_angle: float,
+    off_axis_angle2: float | None = None,
+    tensile_transverse_strength: float | None = None,
+    compressive_transverse_strength: float | None = None,
+    shear_strength: float | None = None,
+    tensile_strength1: float | None = None,
+    compressive_strength1: float | None = None,
+    tensile_strength2: float | None = None,
+    compressive_strength2: float | None = None,
+    tensile_strength_at_desirable_angle: float | None = None,
+    compressive_strength_at_desirable_angle: float | None = None,
 ) -> AnalysisResult:
     match method:
         case FatigueFailureMethod.FTPT:
@@ -337,9 +352,136 @@ def run_fatigue_failure(
                 y_file,
                 f_file,
             )
+        case FatigueFailureMethod.SIMS_BROGDON:
+            output = run_python_3(
+                lambda x_input, y_input, f_input, csv, json: faf_simsbrogdon.execute(
+                    x_input,
+                    y_input,
+                    f_input,
+                    csv,
+                    json,
+                    snModel,
+                    desirable_angle,
+                    off_axis_angle,
+                ),
+                x_file,
+                y_file,
+                f_file,
+            )
+        case FatigueFailureMethod.HASHIN_ROTEM:
+            output = run_python_3(
+                lambda x_input, y_input, f_input, csv, json: faf_hashinrotem.execute(
+                    x_input,
+                    y_input,
+                    f_input,
+                    csv,
+                    json,
+                    snModel,
+                    desirable_angle,
+                    off_axis_angle,
+                    off_axis_angle2,
+                    tensile_transverse_strength,
+                    compressive_transverse_strength,
+                    shear_strength,
+                    tensile_strength1,
+                    compressive_strength1,
+                    tensile_strength2,
+                    compressive_strength2,
+                    tensile_strength_at_desirable_angle,
+                    compressive_strength_at_desirable_angle,
+                ),
+                x_file,
+                y_file,
+                f_file,
+            )
         case _:
             raise Exception(f"unknown method {method}")
     return output
+
+
+def run_fatigue_failure_shokriehtaheri(
+    agg_file: SpooledTemporaryFile[bytes] | IO,
+    reference_angle: float,
+    reference_stress_ratio: float,
+    desirable_angle: float,
+    target_stress_ratio: float,
+    tensile_axial_strength: float,
+    compressive_axial_strength: float,
+    tensile_transverse_strength: float,
+    compressive_transverse_strength: float,
+    shear_strength: float,
+) -> AnalysisResult:
+    return run_python(
+        lambda input, csv_output, json_output: faf_shokriehtaheri.execute(
+            input,
+            csv_output,
+            json_output,
+            reference_angle,
+            reference_stress_ratio,
+            desirable_angle,
+            target_stress_ratio,
+            tensile_axial_strength,
+            compressive_axial_strength,
+            tensile_transverse_strength,
+            compressive_transverse_strength,
+            shear_strength,
+        ),
+        agg_file,
+    )
+
+
+def run_fatigue_failure_fawazellyin(
+    snc_file: SpooledTemporaryFile[bytes] | IO,
+    sn_model: FatigueModel,
+    reference_angle: float,
+    reference_static_strength: float,
+    desirable_angle: float,
+    target_stress_ratio: float,
+    target_static_strength: float,
+) -> AnalysisResult:
+    return run_python(
+        lambda input, csv_output, json_output: faf_fawazellyin.execute(
+            input,
+            csv_output,
+            json_output,
+            sn_model,
+            reference_angle,
+            reference_static_strength,
+            desirable_angle,
+            target_stress_ratio,
+            target_static_strength,
+        ),
+        snc_file,
+    )
+
+
+def run_fatigue_failure_kawai(
+    agg_file: SpooledTemporaryFile[bytes] | IO,
+    reference_angle: float,
+    reference_stress_ratio: float,
+    reference_static_strength: float,
+    desirable_angle: float,
+    target_stress_ratio: float,
+    tensile_axial_strength: float,
+    tensile_transverse_strength: float,
+    shear_strength: float,
+) -> AnalysisResult:
+    return run_python(
+        lambda input, csv_output, json_output: faf_kawai.execute(
+            input,
+            csv_output,
+            json_output,
+            reference_angle,
+            reference_stress_ratio,
+            reference_static_strength,
+            desirable_angle,
+            target_stress_ratio,
+            tensile_axial_strength,
+            tensile_transverse_strength,
+            shear_strength,
+        ),
+        agg_file,
+    )
 
 
 def run_damage_summation(

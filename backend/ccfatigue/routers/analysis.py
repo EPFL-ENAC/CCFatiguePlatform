@@ -12,6 +12,9 @@ from ccfatigue.analyzer import (
     run_cycle_counting,
     run_damage_summation,
     run_fatigue_failure,
+    run_fatigue_failure_fawazellyin,
+    run_fatigue_failure_kawai,
+    run_fatigue_failure_shokriehtaheri,
     run_sn_curve,
 )
 from ccfatigue.model import (
@@ -132,16 +135,129 @@ async def run_fatigue_failure_file(
     sn_model: FatigueModel = Query(..., alias="snModel"),
     desirable_angle: float = Query(..., alias="desirableAngle"),
     off_axis_angle: float = Query(..., alias="offAxisAngle"),
+    off_axis_angle2: float | None = Query(default=None, alias="offAxisAngle2"),
+    tensile_transverse_strength: float | None = Query(default=None),
+    compressive_transverse_strength: float | None = Query(default=None),
+    shear_strength: float | None = Query(default=None),
+    tensile_strength1: float | None = Query(default=None),
+    compressive_strength1: float | None = Query(default=None),
+    tensile_strength2: float | None = Query(default=None),
+    compressive_strength2: float | None = Query(default=None),
+    tensile_strength_at_desirable_angle: float | None = Query(default=None),
+    compressive_strength_at_desirable_angle: float | None = Query(default=None),
 ) -> AnalysisResult:
-    return run_fatigue_failure(
-        x_file.file,
-        y_file.file,
-        f_file.file,
-        method,
-        sn_model,
-        desirable_angle,
-        off_axis_angle,
-    )
+    try:
+        return run_fatigue_failure(
+            x_file.file,
+            y_file.file,
+            f_file.file,
+            method,
+            sn_model,
+            desirable_angle,
+            off_axis_angle,
+            off_axis_angle2,
+            tensile_transverse_strength,
+            compressive_transverse_strength,
+            shear_strength,
+            tensile_strength1,
+            compressive_strength1,
+            tensile_strength2,
+            compressive_strength2,
+            tensile_strength_at_desirable_angle,
+            compressive_strength_at_desirable_angle,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"{method} failed: {str(e)}")
+
+
+@router.post("/fatigueFailure/shokriehTaheri/file", response_model=AnalysisResult)
+async def run_fatigue_failure_shokriehtaheri_file(
+    agg_file: UploadFile = File(..., alias="aggFile"),
+    reference_angle: float = Query(..., alias="referenceAngle"),
+    reference_stress_ratio: float = Query(..., alias="referenceStressRatio"),
+    desirable_angle: float = Query(..., alias="desirableAngle"),
+    target_stress_ratio: float = Query(..., alias="targetStressRatio"),
+    tensile_axial_strength: float = Query(...),
+    compressive_axial_strength: float = Query(...),
+    tensile_transverse_strength: float = Query(...),
+    compressive_transverse_strength: float = Query(...),
+    shear_strength: float = Query(...),
+) -> AnalysisResult:
+    try:
+        return run_fatigue_failure_shokriehtaheri(
+            agg_file.file,
+            reference_angle,
+            reference_stress_ratio,
+            desirable_angle,
+            target_stress_ratio,
+            tensile_axial_strength,
+            compressive_axial_strength,
+            tensile_transverse_strength,
+            compressive_transverse_strength,
+            shear_strength,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"ShokriehTaheri failed: {str(e)}")
+
+
+@router.post("/fatigueFailure/fawazEllyin/file", response_model=AnalysisResult)
+async def run_fatigue_failure_fawazellyin_file(
+    snc_file: UploadFile = File(..., alias="sncFile"),
+    sn_model: FatigueModel = Query(..., alias="snModel"),
+    reference_angle: float = Query(..., alias="referenceAngle"),
+    reference_static_strength: float = Query(..., alias="referenceStaticStrength"),
+    desirable_angle: float = Query(..., alias="desirableAngle"),
+    target_stress_ratio: float = Query(..., alias="targetStressRatio"),
+    target_static_strength: float = Query(..., alias="targetStaticStrength"),
+) -> AnalysisResult:
+    try:
+        return run_fatigue_failure_fawazellyin(
+            snc_file.file,
+            sn_model,
+            reference_angle,
+            reference_static_strength,
+            desirable_angle,
+            target_stress_ratio,
+            target_static_strength,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"FawazEllyin failed: {str(e)}")
+
+
+@router.post("/fatigueFailure/kawai/file", response_model=AnalysisResult)
+async def run_fatigue_failure_kawai_file(
+    agg_file: UploadFile = File(..., alias="aggFile"),
+    reference_angle: float = Query(..., alias="referenceAngle"),
+    reference_stress_ratio: float = Query(..., alias="referenceStressRatio"),
+    reference_static_strength: float = Query(..., alias="referenceStaticStrength"),
+    desirable_angle: float = Query(..., alias="desirableAngle"),
+    target_stress_ratio: float = Query(..., alias="targetStressRatio"),
+    tensile_axial_strength: float = Query(...),
+    tensile_transverse_strength: float = Query(...),
+    shear_strength: float = Query(...),
+) -> AnalysisResult:
+    try:
+        return run_fatigue_failure_kawai(
+            agg_file.file,
+            reference_angle,
+            reference_stress_ratio,
+            reference_static_strength,
+            desirable_angle,
+            target_stress_ratio,
+            tensile_axial_strength,
+            tensile_transverse_strength,
+            shear_strength,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Kawai failed: {str(e)}")
 
 
 @router.post("/damageSummation/file", response_model=bytes)
