@@ -37,6 +37,7 @@ from ccfatigue.model import (
     CycleCountingMethod,
     DamageSummationMethod,
     FatigueFailureMethod,
+    HashinRotemPanelType,
     SnCurveMethod,
 )
 
@@ -336,22 +337,6 @@ def run_fatigue_failure(
     compressive_strength_at_desirable_angle: float | None = None,
 ) -> AnalysisResult:
     match method:
-        case FatigueFailureMethod.FTPT:
-            output = run_python_3(
-                lambda x_input, y_input, f_input, csv, json: faf_ftpf.execute(
-                    x_input,
-                    y_input,
-                    f_input,
-                    csv,
-                    json,
-                    snModel,
-                    desirable_angle,
-                    off_axis_angle,
-                ),
-                x_file,
-                y_file,
-                f_file,
-            )
         case FatigueFailureMethod.SIMS_BROGDON:
             output = run_python_3(
                 lambda x_input, y_input, f_input, csv, json: faf_simsbrogdon.execute(
@@ -368,35 +353,99 @@ def run_fatigue_failure(
                 y_file,
                 f_file,
             )
-        case FatigueFailureMethod.HASHIN_ROTEM:
-            output = run_python_3(
-                lambda x_input, y_input, f_input, csv, json: faf_hashinrotem.execute(
-                    x_input,
-                    y_input,
-                    f_input,
-                    csv,
-                    json,
-                    snModel,
-                    desirable_angle,
-                    off_axis_angle,
-                    off_axis_angle2,
-                    tensile_transverse_strength,
-                    compressive_transverse_strength,
-                    shear_strength,
-                    tensile_strength1,
-                    compressive_strength1,
-                    tensile_strength2,
-                    compressive_strength2,
-                    tensile_strength_at_desirable_angle,
-                    compressive_strength_at_desirable_angle,
-                ),
-                x_file,
-                y_file,
-                f_file,
-            )
         case _:
             raise Exception(f"unknown method {method}")
     return output
+
+
+def run_fatigue_failure_ftpf(
+    x_file: SpooledTemporaryFile[bytes] | IO,
+    y_file: SpooledTemporaryFile[bytes] | IO,
+    f_file: SpooledTemporaryFile[bytes] | IO,
+    snModel: FatigueModel,
+    desirable_angle: float,
+    off_axis_angle: float,
+    xc_file: SpooledTemporaryFile[bytes] | IO | None = None,
+    yc_file: SpooledTemporaryFile[bytes] | IO | None = None,
+) -> AnalysisResult:
+    with (
+        NamedTemporaryFile() as output_csv_file,
+        NamedTemporaryFile() as output_json_file,
+    ):
+        x_file.seek(0)
+        y_file.seek(0)
+        f_file.seek(0)
+        if xc_file is not None:
+            xc_file.seek(0)
+        if yc_file is not None:
+            yc_file.seek(0)
+        faf_ftpf.execute(
+            x_file,
+            y_file,
+            f_file,
+            output_csv_file,
+            output_json_file,
+            snModel,
+            desirable_angle,
+            off_axis_angle,
+            xc_file,
+            yc_file,
+        )
+        output_csv_file.seek(0)
+        output_json_file.seek(0)
+        return AnalysisResult(
+            csv_data=output_csv_file.read(),
+            json_data=output_json_file.read(),
+        )
+
+
+def run_fatigue_failure_hashinrotem(
+    x_file: SpooledTemporaryFile[bytes] | IO,
+    panel2_file: SpooledTemporaryFile[bytes] | IO,
+    panel3_file: SpooledTemporaryFile[bytes] | IO,
+    snModel: FatigueModel,
+    desirable_angle: float,
+    off_axis_angle1: float,
+    off_axis_angle2: float,
+    tensile_transverse_strength: float,
+    shear_strength: float,
+    tensile_strength1: float,
+    tensile_strength2: float,
+    tensile_strength_at_desirable_angle: float,
+    panel2_type: HashinRotemPanelType,
+    panel3_type: HashinRotemPanelType,
+) -> AnalysisResult:
+    with (
+        NamedTemporaryFile() as output_csv_file,
+        NamedTemporaryFile() as output_json_file,
+    ):
+        x_file.seek(0)
+        panel2_file.seek(0)
+        panel3_file.seek(0)
+        faf_hashinrotem.execute(
+            x_file,
+            panel2_file,
+            panel3_file,
+            output_csv_file,
+            output_json_file,
+            snModel,
+            desirable_angle,
+            off_axis_angle1,
+            off_axis_angle2,
+            tensile_transverse_strength,
+            shear_strength,
+            tensile_strength1,
+            tensile_strength2,
+            tensile_strength_at_desirable_angle,
+            panel2_type,
+            panel3_type,
+        )
+        output_csv_file.seek(0)
+        output_json_file.seek(0)
+        return AnalysisResult(
+            csv_data=output_csv_file.read(),
+            json_data=output_json_file.read(),
+        )
 
 
 def run_fatigue_failure_shokriehtaheri(

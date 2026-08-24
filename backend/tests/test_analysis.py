@@ -33,6 +33,8 @@ SNC_CSV_2_INPUT_FILE = os.path.join(DATA_DIR, "SNC_sample_2022-10.csv")
 SNC_JSON_F1_INPUT_FILE = os.path.join(DATA_DIR, "SNC_sampleF_2022-10.json")
 SNC_JSON_X1_INPUT_FILE = os.path.join(DATA_DIR, "SNC_sampleX_2022-10.json")
 SNC_JSON_Y1_INPUT_FILE = os.path.join(DATA_DIR, "SNC_sampleY_2022-10.json")
+SNC_JSON_XC1_INPUT_FILE = os.path.join(DATA_DIR, "SNC_sampleXC_2022-10.json")
+SNC_JSON_YC1_INPUT_FILE = os.path.join(DATA_DIR, "SNC_sampleYC_2022-10.json")
 SNC_JSON_F2_INPUT_FILE = os.path.join(DATA_DIR, "SNC_sampleF_2022-11.json")
 SNC_JSON_X2_INPUT_FILE = os.path.join(DATA_DIR, "SNC_sampleX_2022-11.json")
 SNC_JSON_Y2_INPUT_FILE = os.path.join(DATA_DIR, "SNC_sampleY_2022-11.json")
@@ -317,6 +319,8 @@ def test_faf_ftpf():
         faf.FatigueModel.LOG_LOG,
         FAF_FTPF_DESIRABLE_ANGLE,
         FAF_FTPF_OFF_AXIS_ANGLE,
+        SNC_JSON_XC1_INPUT_FILE,
+        SNC_JSON_YC1_INPUT_FILE,
     )
 
 

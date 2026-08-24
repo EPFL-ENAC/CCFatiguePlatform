@@ -67,12 +67,18 @@ class CldMethod(str, Enum):
 
 
 class FatigueFailureMethod(str, Enum):
-    FTPT = "FTPT"
+    FTPF = "FTPF"
     HASHIN_ROTEM = "HashinRotem"
     SHOKRIEH_TAHERI = "ShokriehTaheri"
     FAWAZ_ELLYIN = "FawazEllyin"
     SIMS_BROGDON = "SimsBrogdon"
     KAWAI = "Kawai"
+
+
+class HashinRotemPanelType(str, Enum):
+    TRANSVERSE = "Transverse"
+    SHEAR = "Shear"
+    OFF_AXIS = "Off-axis"
 
 
 class DamageSummationMethod(str, Enum):

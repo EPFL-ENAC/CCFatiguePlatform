@@ -223,7 +223,9 @@ def execute(
 
     # Create output files
     faf_json_df.to_json(faf_output_json_file, orient="records")  # type: ignore
-    faf_csv_df[["stress_ratio", "cycles_to_failure", "stress_max", "s"]].to_csv(
+    faf_csv_df[
+        ["stress_ratio", "cycles_to_failure", "stress_max", "x", "y", "s"]
+    ].to_csv(
         faf_output_csv_file,  # type: ignore
         index=False,
     )

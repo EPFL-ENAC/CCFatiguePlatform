@@ -17,6 +17,7 @@ import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 
 import ccfatigue.analysis.utils.faf as faf
+from ccfatigue.model import HashinRotemPanelType
 
 LIST_CYCLES_TO_FAILURE = list(
     chain(
@@ -54,598 +55,190 @@ def hashin_equation_23(
     return f
 
 
-def get_loglog_sn_case1(
-    cycles_to_failure: int,
-    a_t: float,
-    b_t: float,
-    a_s: float,
-    b_s: float,
-    transverse_strength: float,
-    shear_strength: float,
-    strength_at_desirable_angle: float,
-    theta: float,
-) -> float:
+def get_loglog_stress(a: float, b: float, cycles_to_failure) -> float:
     """
+    Get stress according to a log-log slope
     Parameters
     ----------
-        cycles_to_failure: int
-        a_t: float
-        b_t: float
-        a_s: float
-        b_s: float
-        transverse_strength: float
-        shear_strength: float
-        strength_at_desirable_angle: float
-        theta: float
+        a: float
+        b: float
+        cycles_to_failure: float
+            Number of cycles to failure (N) [-]
     Returns
     -------
-        stress_max
-            Max stress (sigma_max) [MPa]
+        stress: float
     """
-    # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/HR/Fatigue-Failure-Hashin-Rotem.for#L120
-
-    sigmat = a_t * cycles_to_failure ** (-b_t)
-    Sigmas = a_s * cycles_to_failure ** (-b_s)
-
-    ft = sigmat / transverse_strength
-    fs = Sigmas / shear_strength
-    stress_max = strength_at_desirable_angle * hashin_equation_23(
-        f_tau=fs,
-        tau_s=shear_strength,
-        theta=theta,
-        sigma_s_t=transverse_strength,
-        f_t=ft,
-    )
-
-    return stress_max
+    stress = a * cycles_to_failure**-b
+    return stress
 
 
-def get_loglog_sn_case2(
-    cycles_to_failure: int,
-    a_t: float,
-    b_t: float,
-    a_2: float,
-    b_2: float,
-    transverse_strength: float,
-    shear_strength: float,
-    strength_at_desirable_angle: float,
-    strength2: float,
-    oangle2: float,
-    theta: float,
-) -> float:
+def get_linlog_stress(a: float, b: float, cycles_to_failure) -> float:
     """
+    Get stress according to a lin-log slope
     Parameters
     ----------
-        cycles_to_failure: int,
-        a_t: float,
-        b_t: float,
-        a_2: float,
-        b_2: float,
-        transverse_strength: float,
-        shear_strength: float,
-        strength_at_desirable_angle: float,
-        strength2: float,
-        oangle2: float,
-        theta: float,
+        a: float
+        b: float
+        cycles_to_failure: float
+            Number of cycles to failure (N) [-]
     Returns
     -------
-        stress_max
-            Max stress (sigma_max) [MPa]
+        stress: float
     """
-
-    # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/HR/Fatigue-Failure-Hashin-Rotem.for#L140
-
-    sigmat = a_t * cycles_to_failure ** (-b_t)
-
-    ft = sigmat / transverse_strength
-    const1 = ((shear_strength / transverse_strength) * np.tan(oangle2)) ** 2
-    ff = ((a_2 * cycles_to_failure ** (-b_2)) / strength2) ** 2
-    fs = np.sqrt((ff * ft**2) / ((1 + const1) * ft**2 - (ff * const1)))
-    stress_max = strength_at_desirable_angle * hashin_equation_23(
-        f_tau=fs,
-        tau_s=shear_strength,
-        theta=theta,
-        sigma_s_t=transverse_strength,
-        f_t=ft,
-    )
-
-    return stress_max
+    stress = a + b * np.log10(cycles_to_failure)
+    return stress
 
 
-def get_loglog_sn_case3(
-    cycles_to_failure: int,
-    a_1: float,
-    b_1: float,
-    a_2: float,
-    b_2: float,
-    transverse_strength: float,
-    shear_strength: float,
-    strength_at_desirable_angle: float,
-    strength1: float,
-    strength2: float,
-    oangle1: float,
-    oangle2: float,
-    theta: float,
-) -> Optional[float]:
-    """
-    Parameters
-    ----------
-        cycles_to_failure: int,
-        a_1: float,
-        b_1: float,
-        a_2: float,
-        b_2: float,
-        transverse_strength: float,
-        shear_strength: float,
-        strength_at_desirable_angle: float,
-        strength1: float,
-        strength2: float,
-        oangle1: float,
-        oangle2: float,
-        theta: float,
-    Returns
-    -------
-        stress_max
-            Max stress (sigma_max) [MPa]
-    """
-
-    # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/HR/Fatigue-Failure-Hashin-Rotem.for#L180
-
-    const1 = ((shear_strength / transverse_strength) * np.tan(oangle1)) ** 2
-    const2 = ((shear_strength / transverse_strength) * np.tan(oangle2)) ** 2
-
-    ff1 = ((a_1 * cycles_to_failure ** (-b_1)) / strength1) ** 2
-    ff2 = ((a_2 * cycles_to_failure ** (-b_2)) / strength2) ** 2
-
-    ft2 = (ff1 * ff2 * (const2 - const1)) / (ff1 * (1 + const2) - ff2 * (1 + const1))
-    fs2 = (-ff1 * ft2) / (ff1 * const1 - ft2 * (1 + const1))
-    if ft2 <= 0:
-        # go to 10 ! Ignore the current line
-        return None
-    else:
-
-        ft = np.sqrt(ft2)
-        fs = np.sqrt(fs2)
-
-    stress_max = strength_at_desirable_angle * hashin_equation_23(
-        f_tau=fs,
-        tau_s=shear_strength,
-        theta=theta,
-        sigma_s_t=transverse_strength,
-        f_t=ft,
-    )
-
-    return stress_max
-
-
-def get_loglog_sn(
+def reconstruct_s2f_s12f(
+    panel2_type: HashinRotemPanelType,
+    panel2_curve: pd.Series,
+    panel3_type: HashinRotemPanelType,
+    panel3_curve: pd.Series,
     off_axis_angle1: float,
     off_axis_angle2: float,
-    cycles_to_failure: int,
-    a_t: float,
-    b_t: float,
-    a_s: float,
-    b_s: float,
-    a_1: float,
-    b_1: float,
-    a_2: float,
-    b_2: float,
-    tensile_transverse_strength: float,
-    shear_strength: float,
-    tensile_strength_at_desirable_angle: float,
-    compressive_transverse_strength: float,
-    compressive_strength_at_desirable_angle: float,
     tensile_strength1: float,
     tensile_strength2: float,
-    compressive_strength1: float,
-    compressive_strength2: float,
-    oangle1: float,
-    oangle2: float,
-    stress_ratio: float,
-    theta: float,
-) -> float | None:
-    """
-    Get max stress, loglog version.
-    Parameters
-    ----------
-        off_axis_angle1: float
-        off_axis_angle2: float
-        cycles_to_failure: int
-        a_t: float
-        b_t: float
-        a_s: float
-        b_s: float
-        a_1: float
-        b_1: float
-        a_2: float
-        b_2: float
-        tensile_transverse_strength: float
-        shear_strength: float
-        tensile_strength_at_desirable_angle: float
-        compressive_transverse_strength: float
-        compressive_strength_at_desirable_angle: float
-        tensile_strength1: float
-        tensile_strength2: float
-        compressive_strength1: float
-        compressive_strength2: float
-        oangle1: float
-        oangle2: float
-        stress_ratio: float
-        theta: float
-    Returns
-    -------
-        stress_max
-            Max stress (sigma_max) [MPa]
-    """
-
-    if stress_ratio >= 0 and stress_ratio < 1:
-        transverse_strength = tensile_transverse_strength
-        strength1 = tensile_strength1
-        strength2 = tensile_strength2
-        strength_at_desirable_angle = tensile_strength_at_desirable_angle
-
-    elif stress_ratio > 1:
-        transverse_strength = compressive_transverse_strength
-        strength1 = compressive_strength1
-        strength2 = compressive_strength2
-        strength_at_desirable_angle = compressive_strength_at_desirable_angle
-
-    else:  # stress_ratio == 1 or stress_ratio < 0
-        raise NotImplementedError("stress_ratio = " + str(stress_ratio))
-
-    if off_axis_angle1 == 0 and off_axis_angle2 == 0:
-        stress_max = get_loglog_sn_case1(
-            cycles_to_failure=cycles_to_failure,
-            a_t=a_t,
-            b_t=b_t,
-            a_s=a_s,
-            b_s=b_s,
-            transverse_strength=transverse_strength,
-            shear_strength=shear_strength,
-            strength_at_desirable_angle=strength_at_desirable_angle,
-            theta=theta,
-        )
-
-    elif off_axis_angle1 == 90:
-        stress_max = get_loglog_sn_case2(
-            cycles_to_failure=cycles_to_failure,
-            a_t=a_t,
-            b_t=b_t,
-            a_2=a_2,
-            b_2=b_2,
-            transverse_strength=transverse_strength,
-            shear_strength=shear_strength,
-            strength_at_desirable_angle=strength_at_desirable_angle,
-            strength2=strength2,
-            oangle2=oangle2,
-            theta=theta,
-        )
-
-    elif off_axis_angle1 != 0 and off_axis_angle2 != 0 and off_axis_angle1 != 90:
-
-        stress_max = get_loglog_sn_case3(
-            cycles_to_failure=cycles_to_failure,
-            a_1=a_1,
-            b_1=b_1,
-            a_2=a_2,
-            b_2=b_2,
-            transverse_strength=transverse_strength,
-            shear_strength=shear_strength,
-            strength_at_desirable_angle=strength_at_desirable_angle,
-            strength1=strength1,
-            strength2=strength2,
-            oangle1=oangle1,
-            oangle2=oangle2,
-            theta=theta,
-        )
-
-    else:  # Not implemented in Tassos algo
-        # TODO for instance off_axis_angle1=0 and off_axis_angle2=90
-        raise NotImplementedError(f"{off_axis_angle1=}, {off_axis_angle2=}")
-
-    return stress_max
-
-
-def get_linlog_sn_case1(
-    cycles_to_failure: int,
-    a_t: float,
-    b_t: float,
-    a_s: float,
-    b_s: float,
-    transverse_strength: float,
     shear_strength: float,
-    strength_at_desirable_angle: float,
-    theta: float,
-) -> float:
-    """
-    Parameters
-    ----------
-        cycles_to_failure: int
-        a_t: float
-        b_t: float
-        a_s: float
-        b_s: float
-        transverse_strength: float
-        shear_strength: float
-        strength_at_desirable_angle: float
-        theta: float
-    Returns
-    -------
-        stress_max
-            Max stress (sigma_max) [MPa]
-    """
-
-    # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/HR/Fatigue-Failure-Hashin-Rotem.for#L449
-
-    sigmat = a_t + b_t * np.log10(cycles_to_failure)
-    sigmas = a_s + b_s * np.log10(cycles_to_failure)
-
-    ft = sigmat / transverse_strength
-    fs = sigmas / shear_strength
-    stress_max = strength_at_desirable_angle * hashin_equation_23(
-        f_tau=fs,
-        tau_s=shear_strength,
-        theta=theta,
-        sigma_s_t=transverse_strength,
-        f_t=ft,
-    )
-
-    return stress_max
-
-
-def get_linlog_sn_case2(
-    cycles_to_failure: int,
-    a_t: float,
-    b_t: float,
-    a_2: float,
-    b_2: float,
-    transverse_strength: float,
-    shear_strength: float,
-    strength_at_desirable_angle: float,
-    strength2: float,
-    oangle2: float,
-    theta: float,
-) -> float:
-    """
-    Parameters
-    ----------
-        cycles_to_failure: int
-        a_t: float
-        b_t: float
-        a_2: float
-        b_2: float
-        transverse_strength: float
-        shear_strength: float
-        strength_at_desirable_angle: float
-        strength2: float
-        oangle2: float
-        theta: float
-    Returns
-    -------
-        stress_max
-            Max stress (sigma_max) [MPa]
-    """
-
-    # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/HR/Fatigue-Failure-Hashin-Rotem.for#L474
-
-    sigmat = a_t + b_t * np.log10(cycles_to_failure)
-
-    ft = sigmat / transverse_strength
-    const1 = ((shear_strength / transverse_strength) * np.tan(oangle2)) ** 2
-    ff = ((a_2 + b_2 * np.log10(cycles_to_failure)) / strength2) ** 2
-    fs = np.sqrt((ff * ft**2) / ((1 + const1) * ft**2 - (ff * const1)))
-    stress_max = strength_at_desirable_angle * hashin_equation_23(
-        f_tau=fs,
-        tau_s=shear_strength,
-        theta=theta,
-        sigma_s_t=transverse_strength,
-        f_t=ft,
-    )
-
-    return stress_max
-
-
-def get_linlog_sn_case3(
-    cycles_to_failure: int,
-    a_1: float,
-    b_1: float,
-    a_2: float,
-    b_2: float,
-    transverse_strength: float,
-    shear_strength: float,
-    strength_at_desirable_angle: float,
-    strength1: float,
-    strength2: float,
-    oangle1: float,
-    oangle2: float,
-    theta: float,
-) -> float | None:
-    """
-    Parameters
-    ----------
-        cycles_to_failure: int
-        a_1: float
-        b_1: float
-        a_2: float
-        b_2: float
-        transverse_strength: float
-        shear_strength: float
-        strength_at_desirable_angle: float
-        strength1: float
-        strength2: float
-        oangle1: float
-        oangle2: float
-        theta: float
-    Returns
-    -------
-        stress_max
-            Max stress (sigma_max) [MPa]
-    """
-
-    # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/CCFatigue_modules/4_FatigueFailure/HR/Fatigue-Failure-Hashin-Rotem.for#L514
-
-    const1 = ((shear_strength / transverse_strength) * np.tan(oangle1)) ** 2
-    const2 = ((shear_strength / transverse_strength) * np.tan(oangle2)) ** 2
-
-    ff1 = ((a_1 + b_1 * np.log10(cycles_to_failure)) / strength1) ** 2
-    ff2 = ((a_2 + b_2 * np.log10(cycles_to_failure)) / strength2) ** 2
-
-    ft2 = (ff1 * ff2 * (const2 - const1)) / (ff1 * (1 + const2) - ff2 * (1 + const1))
-    fs2 = (-ff1 * ft2) / (ff1 * const1 - ft2 * (1 + const1))
-
-    if ft2 <= 0:
-        # go to 50
-        return None
-
-    else:
-        ft = np.sqrt(ft2)
-        fs = np.sqrt(fs2)
-
-    stress_max = strength_at_desirable_angle * hashin_equation_23(
-        f_tau=fs,
-        tau_s=shear_strength,
-        theta=theta,
-        sigma_s_t=transverse_strength,
-        f_t=ft,
-    )
-
-    return stress_max
-
-
-def get_linlog_sn(
-    off_axis_angle1: float,
-    off_axis_angle2: float,
-    cycles_to_failure: int,
-    a_t: float,
-    b_t: float,
-    a_s: float,
-    b_s: float,
-    a_1: float,
-    b_1: float,
-    a_2: float,
-    b_2: float,
     tensile_transverse_strength: float,
-    shear_strength: float,
-    tensile_strength_at_desirable_angle: float,
-    compressive_transverse_strength: float,
-    compressive_strength_at_desirable_angle: float,
-    tensile_strength1: float,
-    tensile_strength2: float,
-    compressive_strength1: float,
-    compressive_strength2: float,
-    oangle1: float,
-    oangle2: float,
-    stress_ratio: float,
-    theta: float,
-) -> float | None:
+):
     """
-    Get max stress, lin-log version.
+    Reconstruct S2f(N) and S12f(N) from whichever two of {Transverse, Shear,
+    Off-axis} panel2/panel3 actually are (book Sec. 6.2.1, Eq. 6.3).
+    Resolved point-by-point across the N grid - panel2_curve/panel3_curve
+    are already per-N Series, never collapsed to a single global value.
     Parameters
     ----------
+        panel2_type: HashinRotemPanelType
+        panel2_curve: pd.Series
+            Panel 2's own fitted S-N curve, evaluated over the N grid.
+        panel3_type: HashinRotemPanelType
+        panel3_curve: pd.Series
         off_axis_angle1: float
+            theta1 [degrees] - only meaningful if panel2_type is OFF_AXIS.
         off_axis_angle2: float
-        cycles_to_failure: int
-        a_t: float
-        b_t: float
-        a_s: float
-        b_s: float
-        a_1: float
-        b_1: float
-        a_2: float
-        b_2: float
-        tensile_transverse_strength: float
-        shear_strength: float
-        tensile_strength_at_desirable_angle: float
-        compressive_transverse_strength: float
-        compressive_strength_at_desirable_angle: float
+            theta2 [degrees] - only meaningful if panel3_type is OFF_AXIS.
         tensile_strength1: float
+            Static strength at theta1 - only meaningful if panel2_type is
+            OFF_AXIS.
         tensile_strength2: float
-        compressive_strength1: float
-        compressive_strength2: float
-        oangle1: float
-        oangle2: float
-        stress_ratio: float
-        theta: float
+            Static strength at theta2 - only meaningful if panel3_type is
+            OFF_AXIS.
+        shear_strength: float
+            ss, static shear strength.
+        tensile_transverse_strength: float
+            sigma_sT, static transverse strength.
     Returns
     -------
-        stress_max
-            Max stress (sigma_max) [MPa]
+        (s2f: pd.Series, s12f: pd.Series)
     """
+    transverse = HashinRotemPanelType.TRANSVERSE
+    shear = HashinRotemPanelType.SHEAR
+    off_axis = HashinRotemPanelType.OFF_AXIS
 
-    if stress_ratio >= 0 and stress_ratio < 1:
-        transverse_strength = tensile_transverse_strength
-        strength1 = tensile_strength1
-        strength2 = tensile_strength2
-        strength_at_desirable_angle = tensile_strength_at_desirable_angle
-
-    elif stress_ratio > 1 or stress_ratio == -1:
-        transverse_strength = compressive_transverse_strength
-        strength1 = compressive_strength1
-        strength2 = compressive_strength2
-        strength_at_desirable_angle = compressive_strength_at_desirable_angle
-
-    else:  # stress_ratio == 1 or stress_ratio < 0
-        raise NotImplementedError("stress_ratio = " + str(stress_ratio))
-
-    if off_axis_angle1 == 0 and off_axis_angle2 == 0:
-
-        stress_max = get_linlog_sn_case1(
-            cycles_to_failure=cycles_to_failure,
-            a_t=a_t,
-            b_t=b_t,
-            a_s=a_s,
-            b_s=b_s,
-            transverse_strength=transverse_strength,
-            shear_strength=shear_strength,
-            strength_at_desirable_angle=strength_at_desirable_angle,
-            theta=theta,
+    if panel2_type == panel3_type and panel2_type != off_axis:
+        raise ValueError(
+            f"HashinRotem: panels cannot both be '{panel2_type.value}' - "
+            "pick distinct types (Transverse / Shear / Off-axis)."
         )
 
-    elif off_axis_angle1 == 90:
+    def curve_for(target_type):
+        return panel2_curve if panel2_type == target_type else panel3_curve
 
-        stress_max = get_linlog_sn_case2(
-            cycles_to_failure=cycles_to_failure,
-            a_t=a_t,
-            b_t=b_t,
-            a_2=a_2,
-            b_2=b_2,
-            transverse_strength=transverse_strength,
-            shear_strength=shear_strength,
-            strength_at_desirable_angle=strength_at_desirable_angle,
-            strength2=strength2,
-            oangle2=oangle2,
-            theta=theta,
+    r = shear_strength / tensile_transverse_strength
+    types = {panel2_type, panel3_type}
+
+    if types == {transverse, shear}:
+        # Direct mode - the two curves already are S2f/S12f themselves.
+        return curve_for(transverse), curve_for(shear)
+
+    if types == {transverse, off_axis}:
+        transverse_curve = curve_for(transverse)
+        off_axis_curve = curve_for(off_axis)
+        off_axis_angle = off_axis_angle1 if panel2_type == off_axis else off_axis_angle2
+        off_axis_strength = (
+            tensile_strength1 if panel2_type == off_axis else tensile_strength2
+        )
+        t2 = np.tan(np.radians(off_axis_angle)) ** 2
+        fT = transverse_curve / tensile_transverse_strength
+        F2 = off_axis_curve / off_axis_strength
+        radicand = (1 + r**2 * t2) - (F2**2 * r**2 * t2) / fT**2
+        if (radicand < 0).any():
+            raise ValueError(
+                "HashinRotem: case 2 reconstruction hit a negative value "
+                "under a square root - check the off-axis/transverse "
+                "strength inputs."
+            )
+        fs = F2 / np.sqrt(radicand)
+        return transverse_curve, fs * shear_strength
+
+    if types == {shear, off_axis}:
+        shear_curve = curve_for(shear)
+        off_axis_curve = curve_for(off_axis)
+        off_axis_angle = off_axis_angle1 if panel2_type == off_axis else off_axis_angle2
+        off_axis_strength = (
+            tensile_strength1 if panel2_type == off_axis else tensile_strength2
+        )
+        t1 = np.tan(np.radians(off_axis_angle)) ** 2
+        fs = shear_curve / shear_strength
+        F1 = off_axis_curve / off_axis_strength
+        radicand = fs**2 * (1 + r**2 * t1) - F1**2
+        if (radicand < 0).any():
+            raise ValueError(
+                "HashinRotem: case 3 reconstruction hit a negative value "
+                "under a square root - check the off-axis/shear strength "
+                "inputs."
+            )
+        fT = (F1 * r * np.sqrt(t1) * fs) / np.sqrt(radicand)
+        return fT * tensile_transverse_strength, shear_curve
+
+    # types == {off_axis} - both panels are off-axis (panel2 <-> theta1,
+    # panel3 <-> theta2, by construction of how off_axis_angle1/2 and
+    # tensile_strength1/2 are wired to panel2/panel3 respectively).
+    if np.isclose(off_axis_angle1, off_axis_angle2):
+        raise ValueError(
+            "HashinRotem: case 1 reconstruction needs two distinct "
+            "off-axis angles (theta1 != theta2)."
+        )
+    t1 = np.tan(np.radians(off_axis_angle1)) ** 2
+    t2 = np.tan(np.radians(off_axis_angle2)) ** 2
+    F1 = panel2_curve / tensile_strength1
+    F2 = panel3_curve / tensile_strength2
+
+    det = (1 + r**2 * t1) * (-(F2**2) * r**2 * t2) - (
+        -(F1**2) * r**2 * t1
+    ) * (1 + r**2 * t2)
+    if (np.abs(det) < 1e-12).any():
+        raise ValueError(
+            "HashinRotem: case 1 reconstruction is degenerate (determinant "
+            "near zero) for at least one N - check the off-axis angles and "
+            "strengths."
         )
 
-    elif off_axis_angle1 != 0 and off_axis_angle2 != 0 and off_axis_angle1 != 90:
+    u = (
+        F1**2 * (-(F2**2) * r**2 * t2) - (-(F1**2) * r**2 * t1) * F2**2
+    ) / det
+    w = ((1 + r**2 * t1) * F2**2 - F1**2 * (1 + r**2 * t2)) / det
 
-        stress_max = get_linlog_sn_case3(
-            cycles_to_failure=cycles_to_failure,
-            a_1=a_1,
-            b_1=b_1,
-            a_2=a_2,
-            b_2=b_2,
-            transverse_strength=transverse_strength,
-            shear_strength=shear_strength,
-            strength_at_desirable_angle=strength_at_desirable_angle,
-            strength1=strength1,
-            strength2=strength2,
-            oangle1=oangle1,
-            oangle2=oangle2,
-            theta=theta,
+    if (u < 0).any():
+        raise ValueError(
+            "HashinRotem: case 1 reconstruction hit a negative value under "
+            "a square root (fs) - check the off-axis strength inputs."
+        )
+    if (w <= 0).any():
+        raise ValueError(
+            "HashinRotem: case 1 reconstruction hit a non-positive value "
+            "under a square root (fT) - check the off-axis strength inputs."
         )
 
-    else:  # Not implemented in Tassos algo
-        # TODO for instance off_axis_angle1=0 and off_axis_angle2=90
-        raise NotImplementedError(f"{off_axis_angle1=}, {off_axis_angle2=}")
-
-    return stress_max
+    fs = np.sqrt(u)
+    fT = fs / np.sqrt(w)
+    return fT * tensile_transverse_strength, fs * shear_strength
 
 
 def execute(
     snc_input_x_json_file: FilePath | ReadCsvBuffer,
-    snc_input_y_json_file: FilePath | ReadCsvBuffer,
-    snc_input_f_json_file: FilePath | ReadCsvBuffer,
+    snc_input_panel2_json_file: FilePath | ReadCsvBuffer,
+    snc_input_panel3_json_file: FilePath | ReadCsvBuffer,
     faf_output_csv_file: FilePath | WriteBuffer,
     faf_output_json_file: Optional[FilePath | WriteBuffer],
     fatigue_model: faf.FatigueModel,
@@ -653,37 +246,44 @@ def execute(
     off_axis_angle1: float,
     off_axis_angle2: float,
     tensile_transverse_strength: float,
-    compressive_transverse_strength: float,
     shear_strength: float,
     tensile_strength1: float,
-    compressive_strength1: float,
     tensile_strength2: float,
-    compressive_strength2: float,
     tensile_strength_at_desirable_angle: float,
-    compressive_strength_at_desirable_angle: float,
+    panel2_type: HashinRotemPanelType,
+    panel3_type: HashinRotemPanelType,
 ) -> None:
     """
-    Execute the CLD Hashin-Rotem algorithm
+    Execute the Hashin-Rotem algorithm. Tension loading only.
     Parameters
     ----------
         snc_input_x_json_file: FilePath | ReadCsvBuffer
-        snc_input_y_json_file: FilePath | ReadCsvBuffer
-        snc_input_f_json_file: FilePath | ReadCsvBuffer
+            Longitudinal (X) fatigue data - always required, S1f(N) source.
+        snc_input_panel2_json_file: FilePath | ReadCsvBuffer
+            Panel 2 fatigue data - meaning set by panel2_type.
+        snc_input_panel3_json_file: FilePath | ReadCsvBuffer
+            Panel 3 fatigue data - meaning set by panel3_type.
         faf_output_csv_file: FilePath | WriteBuffer
         faf_output_json_file: Optional[FilePath | WriteBuffer]
         fatigue_model: faf.FatigueModel
         desirable_angle: float
         off_axis_angle1: float
+            theta1 [degrees] - panel 2's off-axis angle, only meaningful if
+            panel2_type is OFF_AXIS.
         off_axis_angle2: float
+            theta2 [degrees] - panel 3's off-axis angle, only meaningful if
+            panel3_type is OFF_AXIS.
         tensile_transverse_strength: float
-        compressive_transverse_strength: float
         shear_strength: float
         tensile_strength1: float
-        compressive_strength1: float
+            Static strength at theta1, only meaningful if panel2_type is
+            OFF_AXIS.
         tensile_strength2: float
-        compressive_strength2: float
+            Static strength at theta2, only meaningful if panel3_type is
+            OFF_AXIS.
         tensile_strength_at_desirable_angle: float
-        compressive_strength_at_desirable_angle: float
+        panel2_type: HashinRotemPanelType
+        panel3_type: HashinRotemPanelType
     Returns
     -------
         None
@@ -691,39 +291,22 @@ def execute(
 
     # Import input files (SNC format)
     snc_1_df = pd.read_json(snc_input_x_json_file, orient="records")
-    snc_2_df = pd.read_json(snc_input_y_json_file, orient="records")
-    snc_a_df = pd.read_json(snc_input_f_json_file, orient="records")
+    snc_2_df = pd.read_json(snc_input_panel2_json_file, orient="records")
+    snc_a_df = pd.read_json(snc_input_panel3_json_file, orient="records")
 
     r1 = snc_1_df.iloc[0].stress_ratio
     r2 = snc_2_df.iloc[0].stress_ratio
     ra = snc_a_df.iloc[0].stress_ratio
 
-    at = 0
-    bt = 0
-    a1 = 0
-    b1 = 0
-    a2 = 0
-    b2 = 0
-    a_s = 0
-    b_s = 0
-
-    if off_axis_angle1 == 0 and off_axis_angle2 == 0:
-        at = snc_1_df.iloc[0].a
-        bt = snc_1_df.iloc[0].b
-        a_s = snc_2_df.iloc[0].a
-        b_s = snc_2_df.iloc[0].b
-
-    if off_axis_angle1 == 90:
-        at = snc_1_df.iloc[0].a
-        bt = snc_1_df.iloc[0].b
-        a2 = snc_2_df.iloc[0].a
-        b2 = snc_2_df.iloc[0].b
-
-    if off_axis_angle1 != 0 and off_axis_angle2 != 0 and off_axis_angle1 != 90:
-        a1 = snc_1_df.iloc[0].a
-        b1 = snc_1_df.iloc[0].b
-        a2 = snc_2_df.iloc[0].a
-        b2 = snc_2_df.iloc[0].b
+    # Checked on each file's own stress_ratio individually, not on the
+    # reconciled/averaged value below - that reconciliation silently falls
+    # back to 1 whenever the 3 files disagree, which would let a single
+    # compression-side file (stress_ratio > 1) slip through undetected if
+    # the other two happened to average close enough to mask it.
+    if r1 > 1 or r2 > 1 or ra > 1:
+        raise ValueError(
+            "Hashin-Rotem only supports tension loading, stress_ratio must " "be <= 1"
+        )
 
     theta = np.radians(desirable_angle)
     oangle1 = np.radians(off_axis_angle1)
@@ -759,58 +342,68 @@ def execute(
 
     faf_csv_df["stress_ratio"] = stress_ratio
 
-    # Select approriate SN function to solve equation
+    # Select appropriate stress function (log-log vs lin-log)
     if fatigue_model == "Log-Log":
-        get_sn = get_loglog_sn
+        get_stress = get_loglog_stress
     else:
-        get_sn = get_linlog_sn
+        get_stress = get_linlog_stress
 
-    faf_csv_df["stress_max"] = faf_csv_df.apply(
-        lambda z: get_sn(
-            off_axis_angle1=off_axis_angle1,
-            off_axis_angle2=off_axis_angle2,
-            cycles_to_failure=z.cycles_to_failure,  # type: ignore
-            a_t=at,
-            b_t=bt,
-            a_s=a_s,
-            b_s=b_s,
-            a_1=a1,
-            b_1=b1,
-            a_2=a2,
-            b_2=b2,
-            tensile_transverse_strength=tensile_transverse_strength,
-            shear_strength=shear_strength,
-            tensile_strength_at_desirable_angle=tensile_strength_at_desirable_angle,
-            compressive_transverse_strength=compressive_transverse_strength,
-            compressive_strength_at_desirable_angle=compressive_strength_at_desirable_angle,  # noqa: E501
-            tensile_strength1=tensile_strength1,
-            tensile_strength2=tensile_strength2,
-            compressive_strength1=compressive_strength1,
-            compressive_strength2=compressive_strength2,
-            oangle1=oangle1,
-            oangle2=oangle2,
-            stress_ratio=stress_ratio,
-            theta=theta,
-        ),
-        axis=1,
+    # S1f/S2f/S12f (book Sec. 6.2.1) - each panel's own fitted curve
+    # evaluated directly over the N grid, S2f/S12f then reconstructed from
+    # whichever two of {Transverse, Shear, Off-axis} panel2/panel3 actually
+    # are.
+    a_x, b_x = snc_1_df.iloc[0].a, snc_1_df.iloc[0].b
+    a_panel2, b_panel2 = snc_2_df.iloc[0].a, snc_2_df.iloc[0].b
+    a_panel3, b_panel3 = snc_a_df.iloc[0].a, snc_a_df.iloc[0].b
+
+    faf_csv_df["s1f"] = get_stress(a_x, b_x, faf_csv_df.cycles_to_failure)
+    panel2_curve = get_stress(a_panel2, b_panel2, faf_csv_df.cycles_to_failure)
+    panel3_curve = get_stress(a_panel3, b_panel3, faf_csv_df.cycles_to_failure)
+
+    faf_csv_df["s2f"], faf_csv_df["s12f"] = reconstruct_s2f_s12f(
+        panel2_type=panel2_type,
+        panel2_curve=panel2_curve,
+        panel3_type=panel3_type,
+        panel3_curve=panel3_curve,
+        off_axis_angle1=off_axis_angle1,
+        off_axis_angle2=off_axis_angle2,
+        tensile_strength1=tensile_strength1,
+        tensile_strength2=tensile_strength2,
+        shear_strength=shear_strength,
+        tensile_transverse_strength=tensile_transverse_strength,
     )
+
+    # S-N curve at the desired angle (book Eq. 6.3, hashin_equation_23),
+    # derived exclusively from the verified s2f/s12f reconstruction above -
+    # replaces the old legacy case1/2/3 blend, which was never verified
+    # against the book (it cited a different reference, "Eq 23, ref [2]").
+    fT = faf_csv_df["s2f"] / tensile_transverse_strength
+    fs = faf_csv_df["s12f"] / shear_strength
+    f_prime = hashin_equation_23(
+        f_tau=fs,
+        tau_s=shear_strength,
+        theta=theta,
+        sigma_s_t=tensile_transverse_strength,
+        f_t=fT,
+    )
+    faf_csv_df["stress_max"] = tensile_strength_at_desirable_angle * f_prime
 
     faf_json_df = pd.DataFrame(
         {
             "stress_ratio": [stress_ratio],
             "confidence_interval": [confidence_interval],
-            "a1": a1,
-            "b1": b1,
-            "a2": a2,
-            "b2": b2,
             "off_axis_angle1": oangle1,
             "off_axis_angle2": oangle2,
+            "panel2_type": panel2_type.value,
+            "panel3_type": panel3_type.value,
         }
     )
 
     # Create output files
     faf_json_df.to_json(faf_output_json_file, orient="records")  # type: ignore
-    faf_csv_df[["stress_ratio", "cycles_to_failure", "stress_max"]].to_csv(
+    faf_csv_df[
+        ["stress_ratio", "cycles_to_failure", "stress_max", "s1f", "s2f", "s12f"]
+    ].to_csv(
         faf_output_csv_file,  # type: ignore
         index=False,
     )

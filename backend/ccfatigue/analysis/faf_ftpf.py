@@ -145,6 +145,134 @@ def get_ssqr(x: float, y: float, tnc: float, tm: float, tmn: float, t: float) ->
     return ssqr
 
 
+def get_f66_from_offaxis(
+    f11: float,
+    f22: float,
+    f12: float,
+    f1: float,
+    f2: float,
+    t: float,
+    tnc: float,
+    tm: float,
+    tmn: float,
+    t_cos2: float,
+    t_sin2: float,
+) -> float:
+    """
+    Back-calculate F66 (1/S**2) from a single off-axis S-N curve t(N), by
+    solving the full Tsai-Wu quadratic (with the F1/F2 linear terms, valid
+    for X' != X and Y' != Y) at the off-axis angle instead of the
+    F1=F2=0 simplification used by get_ssqr().
+    Parameters
+    ----------
+        f11: float
+        f22: float
+        f12: float
+        f1: float
+        f2: float
+        t: float
+            Off-axis stress to failure at this N
+        tnc: float
+            cos(off_axis_angle)**4
+        tm: float
+            sin(off_axis_angle)**4
+        tmn: float
+            sin(off_axis_angle)**2 * cos(off_axis_angle)**2
+        t_cos2: float
+            cos(off_axis_angle)**2
+        t_sin2: float
+            sin(off_axis_angle)**2
+    Returns
+    -------
+        f66: float
+    """
+    a_partial = f11 * tnc + f22 * tm + 2 * f12 * tmn
+    b_off = f1 * t_cos2 + f2 * t_sin2
+    a_total = (1 - b_off * t) / t**2
+    return (a_total - a_partial) / tmn
+
+
+def get_ftpf_stress_max(
+    f11: float,
+    f22: float,
+    f66: float,
+    f12: float,
+    f1: float,
+    f2: float,
+    nc: float,
+    m: float,
+    mn: float,
+    cos2: float,
+    sin2: float,
+) -> float:
+    """
+    Predicted stress to failure at the desirable angle, solving the full
+    (dissymmetric) Tsai-Wu quadratic A*stress**2 + B*stress - 1 = 0 -
+    replaces get_loglog_sn()/get_linlog_sn(), which assume F1=F2=0
+    (X' = X, Y' = Y).
+    Parameters
+    ----------
+        f11: float
+        f22: float
+        f66: float
+        f12: float
+        f1: float
+        f2: float
+        nc: float
+            cos(desirable_angle)**4
+        m: float
+            sin(desirable_angle)**4
+        mn: float
+            sin(desirable_angle)**2 * cos(desirable_angle)**2
+        cos2: float
+            cos(desirable_angle)**2
+        sin2: float
+            sin(desirable_angle)**2
+    Returns
+    -------
+        stress_max: float
+    """
+    a = f11 * nc + f22 * m + mn * (2 * f12 + f66)
+    b = f1 * cos2 + f2 * sin2
+    return (-b + np.sqrt(b**2 + 4 * a)) / (2 * a)
+
+
+def get_compression_curve(
+    get_stress,
+    cycles_to_failure,
+    curve_file: Optional[FilePath | ReadCsvBuffer],
+):
+    """
+    Evaluate the compression-side fatigue curve for the Tsai-Wu/FTPF tensor
+    coefficients (F11, F22 need X', Y' - the compression-side counterparts
+    of the tension curves X(N), Y(N)).
+
+    Unlike shear (which has a documented back-calculation from an off-axis
+    curve), the book (Tassos red book, §6.2.4, Eq. 6.10-6.18) has no
+    approximation method for X'/Y' - a compression SNC curve is required.
+    Parameters
+    ----------
+        get_stress: Callable
+            get_loglog_stress or get_linlog_stress, matching sn_model
+        cycles_to_failure: pd.Series
+        curve_file: Optional[FilePath | ReadCsvBuffer]
+            Compression SNC curve file
+    Returns
+    -------
+        compression_stress: pd.Series
+    """
+    if curve_file is None:
+        raise ValueError(
+            "FTPF needs a compression SNC curve file for each direction "
+            "(longitudinal and transverse) - Xc and Yc are required."
+        )
+
+    curve_df = pd.read_json(curve_file, orient="records")
+    a_c = curve_df.iloc[0].a
+    b_c = curve_df.iloc[0].b
+    return get_stress(a_c, b_c, cycles_to_failure)
+
+
 def execute(
     snc_input_x_json_file: FilePath | ReadCsvBuffer,
     snc_input_y_json_file: FilePath | ReadCsvBuffer,
@@ -154,6 +282,8 @@ def execute(
     sn_model: faf.FatigueModel,
     desirable_angle: float,
     off_axis_angle: float,
+    snc_input_xc_json_file: Optional[FilePath | ReadCsvBuffer] = None,
+    snc_input_yc_json_file: Optional[FilePath | ReadCsvBuffer] = None,
 ) -> None:
     """
     Execute the CLD Harris algorithm
@@ -175,6 +305,10 @@ def execute(
             Desirable angle [degrees]
         off_axis_angle: float
             Off-axis angle [degrees]
+        snc_input_xc_json_file: Optional[FilePath | ReadCsvBuffer]
+            Longitudinal compression SNC curve (X'(N)) - required
+        snc_input_yc_json_file: Optional[FilePath | ReadCsvBuffer]
+            Transverse compression SNC curve (Y'(N)) - required
     Returns
     -------
         None
@@ -203,10 +337,14 @@ def execute(
     tm = np.sin(off_axis_rad) ** 4
     tnc = np.cos(off_axis_rad) ** 4
     tmn = np.sin(off_axis_rad) ** 2 * np.cos(off_axis_rad) ** 2
+    t_cos2 = np.cos(off_axis_rad) ** 2
+    t_sin2 = np.sin(off_axis_rad) ** 2
 
     nc = np.cos(theta) ** 4
     m = np.sin(theta) ** 4
     mn = np.sin(theta) ** 2 * np.cos(theta) ** 2
+    cos2 = np.cos(theta) ** 2
+    sin2 = np.sin(theta) ** 2
 
     stress_ratio = r_x if r_x == r_y == r_f else 1
     confidence_interval: float = (
@@ -230,39 +368,78 @@ def execute(
 
     if sn_model == faf.FatigueModel.LOG_LOG:
         get_stress = get_loglog_stress
-        get_sn = get_loglog_sn
     else:
         get_stress = get_linlog_stress
-        get_sn = get_linlog_sn
 
     faf_csv_df["x"] = get_stress(a_x, b_x, faf_csv_df.cycles_to_failure)
     faf_csv_df["y"] = get_stress(a_y, b_y, faf_csv_df.cycles_to_failure)
+
+    # Tsai-Wu/FTPF tensor coefficients (F11, F22, F1, F2, F12) - computed
+    # before stress_max/F66 below, since the dissymmetric (X' != X, Y' !=
+    # Y) form of stress_max and of the off-axis F66 back-calculation both
+    # need them.
+    faf_csv_df["xc"] = get_compression_curve(
+        get_stress,
+        faf_csv_df.cycles_to_failure,
+        snc_input_xc_json_file,
+    )
+    faf_csv_df["yc"] = get_compression_curve(
+        get_stress,
+        faf_csv_df.cycles_to_failure,
+        snc_input_yc_json_file,
+    )
+    faf_csv_df["f11"] = 1 / (faf_csv_df["x"] * faf_csv_df["xc"])
+    faf_csv_df["f22"] = 1 / (faf_csv_df["y"] * faf_csv_df["yc"])
+    faf_csv_df["f1"] = 1 / faf_csv_df["x"] - 1 / faf_csv_df["xc"]
+    faf_csv_df["f2"] = 1 / faf_csv_df["y"] - 1 / faf_csv_df["yc"]
+    faf_csv_df["f12"] = -0.5 * np.sqrt(faf_csv_df["f11"] * faf_csv_df["f22"])
 
     if not np.isclose(off_axis_angle, 0):
 
         faf_csv_df["t"] = get_stress(a_f, b_f, faf_csv_df.cycles_to_failure)
 
-        faf_csv_df["ssqr"] = faf_csv_df.apply(
-            lambda z: get_ssqr(z.x, z.y, tnc, tm, tmn, z.t), axis=1
+        faf_csv_df["f66"] = faf_csv_df.apply(
+            lambda z: get_f66_from_offaxis(
+                z.f11, z.f22, z.f12, z.f1, z.f2, z.t, tnc, tm, tmn, t_cos2, t_sin2
+            ),
+            axis=1,
         )
 
-        # Remove rows where ssqr < 0
-        faf_csv_df.drop(faf_csv_df[faf_csv_df.ssqr < 0].index, inplace=True)
-        faf_csv_df["s"] = 1 / np.sqrt(faf_csv_df.ssqr)
+        # Remove rows with no real solution for s (f66 <= 0)
+        faf_csv_df.drop(faf_csv_df[faf_csv_df.f66 <= 0].index, inplace=True)
+        faf_csv_df["s"] = 1 / np.sqrt(faf_csv_df.f66)
 
     else:
         faf_csv_df["s"] = get_stress(a_f, b_f, faf_csv_df.cycles_to_failure)
-
-    if np.isclose(off_axis_angle, 22.5):
-        faf_csv_df["s"] = faf_csv_df["t"] / 2.2
+        faf_csv_df["f66"] = 1 / (faf_csv_df["s"] ** 2)
 
     faf_csv_df["stress_max"] = faf_csv_df.apply(
-        lambda z: get_sn(z.x, z.y, nc, m, mn, z.s), axis=1
+        lambda z: get_ftpf_stress_max(
+            z.f11, z.f22, z.f66, z.f12, z.f1, z.f2, nc, m, mn, cos2, sin2
+        ),
+        axis=1,
     )
 
     # Create output files
     faf_json_df.to_json(faf_output_json_file, orient="records")  # type: ignore
-    faf_csv_df[["stress_ratio", "cycles_to_failure", "stress_max", "s"]].to_csv(
+    faf_csv_df[
+        [
+            "stress_ratio",
+            "cycles_to_failure",
+            "stress_max",
+            "x",
+            "y",
+            "s",
+            "xc",
+            "yc",
+            "f11",
+            "f22",
+            "f66",
+            "f1",
+            "f2",
+            "f12",
+        ]
+    ].to_csv(
         faf_output_csv_file,  # type: ignore
         index=False,
     )

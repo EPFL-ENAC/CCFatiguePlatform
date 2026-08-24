@@ -13,6 +13,8 @@ from ccfatigue.analyzer import (
     run_damage_summation,
     run_fatigue_failure,
     run_fatigue_failure_fawazellyin,
+    run_fatigue_failure_ftpf,
+    run_fatigue_failure_hashinrotem,
     run_fatigue_failure_kawai,
     run_fatigue_failure_shokriehtaheri,
     run_sn_curve,
@@ -23,6 +25,7 @@ from ccfatigue.model import (
     CycleCountingMethod,
     DamageSummationMethod,
     FatigueFailureMethod,
+    HashinRotemPanelType,
     SnCurveMethod,
 )
 
@@ -170,6 +173,74 @@ async def run_fatigue_failure_file(
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{method} failed: {str(e)}")
+
+
+@router.post("/fatigueFailure/ftpf/file", response_model=AnalysisResult)
+async def run_fatigue_failure_ftpf_file(
+    x_file: UploadFile = File(..., alias="xFile"),
+    y_file: UploadFile = File(..., alias="yFile"),
+    f_file: UploadFile = File(..., alias="fFile"),
+    sn_model: FatigueModel = Query(..., alias="snModel"),
+    desirable_angle: float = Query(..., alias="desirableAngle"),
+    off_axis_angle: float = Query(..., alias="offAxisAngle"),
+    xc_file: UploadFile | None = File(default=None, alias="xcFile"),
+    yc_file: UploadFile | None = File(default=None, alias="ycFile"),
+) -> AnalysisResult:
+    try:
+        return run_fatigue_failure_ftpf(
+            x_file.file,
+            y_file.file,
+            f_file.file,
+            sn_model,
+            desirable_angle,
+            off_axis_angle,
+            xc_file.file if xc_file is not None else None,
+            yc_file.file if yc_file is not None else None,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"FTPF failed: {str(e)}")
+
+
+@router.post("/fatigueFailure/hashinRotem/file", response_model=AnalysisResult)
+async def run_fatigue_failure_hashinrotem_file(
+    x_file: UploadFile = File(..., alias="xFile"),
+    panel2_file: UploadFile = File(..., alias="panel2File"),
+    panel3_file: UploadFile = File(..., alias="panel3File"),
+    sn_model: FatigueModel = Query(..., alias="snModel"),
+    desirable_angle: float = Query(..., alias="desirableAngle"),
+    off_axis_angle1: float = Query(..., alias="offAxisAngle1"),
+    off_axis_angle2: float = Query(..., alias="offAxisAngle2"),
+    tensile_transverse_strength: float = Query(...),
+    shear_strength: float = Query(...),
+    tensile_strength1: float = Query(...),
+    tensile_strength2: float = Query(...),
+    tensile_strength_at_desirable_angle: float = Query(...),
+    panel2_type: HashinRotemPanelType = Query(..., alias="panel2Type"),
+    panel3_type: HashinRotemPanelType = Query(..., alias="panel3Type"),
+) -> AnalysisResult:
+    try:
+        return run_fatigue_failure_hashinrotem(
+            x_file.file,
+            panel2_file.file,
+            panel3_file.file,
+            sn_model,
+            desirable_angle,
+            off_axis_angle1,
+            off_axis_angle2,
+            tensile_transverse_strength,
+            shear_strength,
+            tensile_strength1,
+            tensile_strength2,
+            tensile_strength_at_desirable_angle,
+            panel2_type,
+            panel3_type,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"HashinRotem failed: {str(e)}")
 
 
 @router.post("/fatigueFailure/shokriehTaheri/file", response_model=AnalysisResult)

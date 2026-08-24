@@ -931,6 +931,214 @@
         }
       }
     },
+    "/analysis/fatigueFailure/ftpf/file": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run Fatigue Failure Ftpf File",
+        "operationId": "run_fatigue_failure_ftpf_file",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/FatigueModel"
+            },
+            "name": "snModel",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Desirableangle",
+              "type": "number"
+            },
+            "name": "desirableAngle",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Offaxisangle",
+              "type": "number"
+            },
+            "name": "offAxisAngle",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_fatigue_failure_ftpf_file_analysis_fatigueFailure_ftpf_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analysis/fatigueFailure/hashinRotem/file": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run Fatigue Failure Hashinrotem File",
+        "operationId": "run_fatigue_failure_hashinrotem_file",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/FatigueModel"
+            },
+            "name": "snModel",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Desirableangle",
+              "type": "number"
+            },
+            "name": "desirableAngle",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Offaxisangle1",
+              "type": "number"
+            },
+            "name": "offAxisAngle1",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Offaxisangle2",
+              "type": "number"
+            },
+            "name": "offAxisAngle2",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Tensile Transverse Strength",
+              "type": "number"
+            },
+            "name": "tensile_transverse_strength",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Shear Strength",
+              "type": "number"
+            },
+            "name": "shear_strength",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Tensile Strength1",
+              "type": "number"
+            },
+            "name": "tensile_strength1",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Tensile Strength2",
+              "type": "number"
+            },
+            "name": "tensile_strength2",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Tensile Strength At Desirable Angle",
+              "type": "number"
+            },
+            "name": "tensile_strength_at_desirable_angle",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/HashinRotemPanelType"
+            },
+            "name": "panel2Type",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/HashinRotemPanelType"
+            },
+            "name": "panel3Type",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_fatigue_failure_hashinrotem_file_analysis_fatigueFailure_hashinRotem_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/analysis/fatigueFailure/shokriehTaheri/file": {
       "post": {
         "tags": [
@@ -1578,6 +1786,68 @@
           }
         }
       },
+      "Body_run_fatigue_failure_ftpf_file_analysis_fatigueFailure_ftpf_file_post": {
+        "title": "Body_run_fatigue_failure_ftpf_file_analysis_fatigueFailure_ftpf_file_post",
+        "required": [
+          "xFile",
+          "yFile",
+          "fFile"
+        ],
+        "type": "object",
+        "properties": {
+          "xFile": {
+            "title": "Xfile",
+            "type": "string",
+            "format": "binary"
+          },
+          "yFile": {
+            "title": "Yfile",
+            "type": "string",
+            "format": "binary"
+          },
+          "fFile": {
+            "title": "Ffile",
+            "type": "string",
+            "format": "binary"
+          },
+          "xcFile": {
+            "title": "Xcfile",
+            "type": "string",
+            "format": "binary"
+          },
+          "ycFile": {
+            "title": "Ycfile",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "Body_run_fatigue_failure_hashinrotem_file_analysis_fatigueFailure_hashinRotem_file_post": {
+        "title": "Body_run_fatigue_failure_hashinrotem_file_analysis_fatigueFailure_hashinRotem_file_post",
+        "required": [
+          "xFile",
+          "panel2File",
+          "panel3File"
+        ],
+        "type": "object",
+        "properties": {
+          "xFile": {
+            "title": "Xfile",
+            "type": "string",
+            "format": "binary"
+          },
+          "panel2File": {
+            "title": "Panel2File",
+            "type": "string",
+            "format": "binary"
+          },
+          "panel3File": {
+            "title": "Panel3File",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
       "Body_run_fatigue_failure_kawai_file_analysis_fatigueFailure_kawai_file_post": {
         "title": "Body_run_fatigue_failure_kawai_file_analysis_fatigueFailure_kawai_file_post",
         "required": [
@@ -1882,7 +2152,7 @@
       "FatigueFailureMethod": {
         "title": "FatigueFailureMethod",
         "enum": [
-          "FTPT",
+          "FTPF",
           "HashinRotem",
           "ShokriehTaheri",
           "FawazEllyin",
@@ -2093,6 +2363,16 @@
             }
           }
         }
+      },
+      "HashinRotemPanelType": {
+        "title": "HashinRotemPanelType",
+        "enum": [
+          "Transverse",
+          "Shear",
+          "Off-axis"
+        ],
+        "type": "string",
+        "description": "An enumeration."
       },
       "HysteresisLoop": {
         "title": "HysteresisLoop",
