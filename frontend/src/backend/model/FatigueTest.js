@@ -25,102 +25,48 @@ class FatigueTest {
    * @alias module:model/FatigueTest
    * @param specimenId {Number}
    * @param specimenName {String}
-   * @param totalDissipatedEnergy {Number}
    * @param runOut {Boolean}
-   * @param stressRatio {Number}
    * @param hysteresisLoops {Array.<module:model/HysteresisLoop>}
    * @param nCycles {Array.<Number>}
    * @param creep {Array.<Number>}
    * @param hysteresisArea {Array.<Number>}
    * @param stiffness {Array.<Number>}
-   * @param stressAtFailure {Number}
-   * @param strainAtFailure {Number}
-   * @param nFail {Number}
    * @param warningMessages {Boolean}
-   * @param crackLength {Array.<Number>}
    * @param crackDisplacement {Array.<Number>}
-   * @param crackLoad {Array.<Number>tring}
+   * @param crackLoad {Array.<Number>}
+   * @param crackLength {Array.<Number>}
    * @param crackNCycles {Array.<Number>}
-   * @param da_dN {Array.<Number>}
-   * @param G_MBT {Array.<Number>}
-   * @param G_MCC {Array.<Number>}
-   * @param G_ECM {Array.<Number>}
-   * @param m_paris_mbt {Number} ! None
-   * @param c_paris_mbt {Number} ! None
-   * @param G_th_mbt {Number} ! None
-   * @param m_paris_mcc {Number} ! None
-   * @param c_paris_mcc {Number} ! None
-   * @param G_th_mcc {Number} ! None
-   * @param m_paris_ecm {Number} ! None
-   * @param c_paris_ecm {Number} ! None
-   * @param G_th_ecm {Number} ! None
    */
   constructor(
     specimenId,
     specimenName,
-    totalDissipatedEnergy,
     runOut,
-    stressRatio,
     hysteresisLoops,
     nCycles,
     creep,
     hysteresisArea,
     stiffness,
-    stressAtFailure,
-    strainAtFailure,
-    nFail,
     warningMessages,
-    crackLength,
     crackDisplacement,
     crackLoad,
-    crackNCycles,
-    da_dN,
-    G_MBT,
-    G_MCC,
-    G_ECM,
-    m_paris_mbt,
-    c_paris_mbt,
-    G_th_mbt,
-    m_paris_mcc,
-    c_paris_mcc,
-    G_th_mcc,
-    m_paris_ecm,
-    c_paris_ecm,
-    G_th_ecm
+    crackLength,
+    crackNCycles
   ) {
     FatigueTest.initialize(
       this,
       specimenId,
       specimenName,
-      totalDissipatedEnergy,
       runOut,
-      stressRatio,
       hysteresisLoops,
       nCycles,
       creep,
       hysteresisArea,
       stiffness,
-      stressAtFailure,
-      strainAtFailure,
-      nFail,
       warningMessages,
-      crackLength,
       crackDisplacement,
       crackLoad,
-      crackNCycles,
-      da_dN,
-      G_MBT,
-      G_MCC,
-      G_ECM,
-      m_paris_mbt, // Paris law exponent for MBT
-      c_paris_mbt, // Paris law coefficient for MBT
-      G_th_mbt, // Threshold energy release rate for MBT
-      m_paris_mcc, // Paris law exponent for MCC
-      c_paris_mcc, // Paris law coefficient for MCC
-      G_th_mcc, // Threshold energy release rate for MCC
-      m_paris_ecm, // Paris law exponent for ECM
-      c_paris_ecm, // Paris law coefficient for ECM
-      G_th_ecm // Threshold energy release rate for ECM
+      crackLength,
+      crackNCycles
     );
   }
 
@@ -133,67 +79,31 @@ class FatigueTest {
     obj,
     specimenId,
     specimenName,
-    totalDissipatedEnergy,
     runOut,
-    stressRatio,
     hysteresisLoops,
     nCycles,
     creep,
     hysteresisArea,
     stiffness,
-    stressAtFailure,
-    strainAtFailure,
-    nFail,
     warningMessages,
-    crackLength,
     crackDisplacement,
     crackLoad,
-    crackNCycles,
-    da_dN,
-    G_MBT,
-    G_MCC,
-    G_ECM,
-    m_paris_mbt, // Paris law exponent for MBT
-    c_paris_mbt, // Paris law coefficient for MBT
-    G_th_mbt, // Threshold energy release rate for MBT
-    m_paris_mcc, // Paris law exponent for MCC
-    c_paris_mcc, // Paris law coefficient for MCC
-    G_th_mcc, // Threshold energy release rate for MCC
-    m_paris_ecm, // Paris law exponent for ECM
-    c_paris_ecm, // Paris law coefficient for ECM
-    G_th_ecm // Threshold energy release rate for ECM
+    crackLength,
+    crackNCycles
   ) {
     obj["specimen_id"] = specimenId;
     obj["specimen_name"] = specimenName;
-    obj["total_dissipated_energy"] = totalDissipatedEnergy;
     obj["run_out"] = runOut;
-    obj["stress_ratio"] = stressRatio;
     obj["hysteresis_loops"] = hysteresisLoops;
     obj["n_cycles"] = nCycles;
     obj["creep"] = creep;
     obj["hysteresis_area"] = hysteresisArea;
     obj["stiffness"] = stiffness;
-    obj["stress_at_failure"] = stressAtFailure;
-    obj["strain_at_failure"] = strainAtFailure;
-    obj["n_fail"] = nFail;
     obj["warning_messages"] = warningMessages;
-    obj["crack_length"] = crackLength;
     obj["crack_displacement"] = crackDisplacement;
     obj["crack_load"] = crackLoad;
+    obj["crack_length"] = crackLength;
     obj["crack_n_cycles"] = crackNCycles;
-    obj["da_dN"] = da_dN;
-    obj["G_MBT"] = G_MBT;
-    obj["G_MCC"] = G_MCC;
-    obj["G_ECM"] = G_ECM;
-    obj["m_paris_mbt"] = m_paris_mbt; // Paris law exponent for MBT
-    obj["c_paris_mbt"] = c_paris_mbt; // Paris law coefficient for MBT
-    obj["G_th_mbt"] = G_th_mbt; // Threshold energy release rate for MBT
-    obj["m_paris_mcc"] = m_paris_mcc; // Paris law exponent for MCC
-    obj["c_paris_mcc"] = c_paris_mcc; // Paris law coefficient for MCC
-    obj["G_th_mcc"] = G_th_mcc; // Threshold energy release rate for MCC
-    obj["m_paris_ecm"] = m_paris_ecm; // Paris law exponent for ECM
-    obj["c_paris_ecm"] = c_paris_ecm; // Paris law coefficient for ECM
-    obj["G_th_ecm"] = G_th_ecm; // Threshold energy release rate for ECM
   }
 
   /**
@@ -227,12 +137,6 @@ class FatigueTest {
       }
       if (data.hasOwnProperty("run_out")) {
         obj["run_out"] = ApiClient.convertToType(data["run_out"], "Boolean");
-      }
-      if (data.hasOwnProperty("stress_ratio")) {
-        obj["stress_ratio"] = ApiClient.convertToType(
-          data["stress_ratio"],
-          "Number"
-        );
       }
       if (data.hasOwnProperty("hysteresis_loops")) {
         obj["hysteresis_loops"] = ApiClient.convertToType(
@@ -278,11 +182,6 @@ class FatigueTest {
           "Boolean"
         );
       }
-      if (data.hasOwnProperty("crack_length")) {
-        obj["crack_length"] = ApiClient.convertToType(data["crack_length"], [
-          "Number",
-        ]);
-      }
       if (data.hasOwnProperty("crack_displacement")) {
         obj["crack_displacement"] = ApiClient.convertToType(
           data["crack_displacement"],
@@ -291,6 +190,11 @@ class FatigueTest {
       }
       if (data.hasOwnProperty("crack_load")) {
         obj["crack_load"] = ApiClient.convertToType(data["crack_load"], [
+          "Number",
+        ]);
+      }
+      if (data.hasOwnProperty("crack_length")) {
+        obj["crack_length"] = ApiClient.convertToType(data["crack_length"], [
           "Number",
         ]);
       }
@@ -312,26 +216,20 @@ class FatigueTest {
       if (data.hasOwnProperty("G_ECM")) {
         obj["G_ECM"] = ApiClient.convertToType(data["G_ECM"], ["Number"]);
       }
-      if (data.hasOwnProperty("m_paris_mbt")) {
-        obj["m_paris_mbt"] = ApiClient.convertToType(
-          data["m_paris_mbt"],
-          "Number"
-        );
-      }
       if (data.hasOwnProperty("c_paris_mbt")) {
         obj["c_paris_mbt"] = ApiClient.convertToType(
           data["c_paris_mbt"],
           "Number"
         );
       }
-      if (data.hasOwnProperty("G_th_mbt")) {
-        obj["G_th_mbt"] = ApiClient.convertToType(data["G_th_mbt"], "Number");
-      }
-      if (data.hasOwnProperty("m_paris_mcc")) {
-        obj["m_paris_mcc"] = ApiClient.convertToType(
-          data["m_paris_mcc"],
+      if (data.hasOwnProperty("m_paris_mbt")) {
+        obj["m_paris_mbt"] = ApiClient.convertToType(
+          data["m_paris_mbt"],
           "Number"
         );
+      }
+      if (data.hasOwnProperty("G_th_mbt")) {
+        obj["G_th_mbt"] = ApiClient.convertToType(data["G_th_mbt"], "Number");
       }
       if (data.hasOwnProperty("c_paris_mcc")) {
         obj["c_paris_mcc"] = ApiClient.convertToType(
@@ -339,18 +237,24 @@ class FatigueTest {
           "Number"
         );
       }
-      if (data.hasOwnProperty("G_th_mcc")) {
-        obj["G_th_mcc"] = ApiClient.convertToType(data["G_th_mcc"], "Number");
-      }
-      if (data.hasOwnProperty("m_paris_ecm")) {
-        obj["m_paris_ecm"] = ApiClient.convertToType(
-          data["m_paris_ecm"],
+      if (data.hasOwnProperty("m_paris_mcc")) {
+        obj["m_paris_mcc"] = ApiClient.convertToType(
+          data["m_paris_mcc"],
           "Number"
         );
+      }
+      if (data.hasOwnProperty("G_th_mcc")) {
+        obj["G_th_mcc"] = ApiClient.convertToType(data["G_th_mcc"], "Number");
       }
       if (data.hasOwnProperty("c_paris_ecm")) {
         obj["c_paris_ecm"] = ApiClient.convertToType(
           data["c_paris_ecm"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("m_paris_ecm")) {
+        obj["m_paris_ecm"] = ApiClient.convertToType(
+          data["m_paris_ecm"],
           "Number"
         );
       }
@@ -381,11 +285,6 @@ FatigueTest.prototype["total_dissipated_energy"] = undefined;
  * @member {Boolean} run_out
  */
 FatigueTest.prototype["run_out"] = undefined;
-
-/**
- * @member {Number} stress_ratio
- */
-FatigueTest.prototype["stress_ratio"] = undefined;
 
 /**
  * @member {Array.<module:model/HysteresisLoop>} hysteresis_loops
@@ -433,71 +332,87 @@ FatigueTest.prototype["n_fail"] = undefined;
 FatigueTest.prototype["warning_messages"] = undefined;
 
 /**
- * @member {Array.<Number>} crack_length
- */
-FatigueTest.prototype["crack_length"] = undefined;
-/**
  * @member {Array.<Number>} crack_displacement
  */
 FatigueTest.prototype["crack_displacement"] = undefined;
+
 /**
  * @member {Array.<Number>} crack_load
  */
 FatigueTest.prototype["crack_load"] = undefined;
+
+/**
+ * @member {Array.<Number>} crack_length
+ */
+FatigueTest.prototype["crack_length"] = undefined;
+
 /**
  * @member {Array.<Number>} crack_n_cycles
  */
 FatigueTest.prototype["crack_n_cycles"] = undefined;
+
 /**
  * @member {Array.<Number>} da_dN
  */
 FatigueTest.prototype["da_dN"] = undefined;
+
 /**
  * @member {Array.<Number>} G_MBT
  */
 FatigueTest.prototype["G_MBT"] = undefined;
+
 /**
- * @member {Number} m_value_paris - Paris law exponent
+ * @member {Array.<Number>} G_MCC
  */
 FatigueTest.prototype["G_MCC"] = undefined;
+
 /**
- * @member {Number} m_value_paris - Paris law exponent
+ * @member {Array.<Number>} G_ECM
  */
 FatigueTest.prototype["G_ECM"] = undefined;
+
 /**
- * @member {Number} m_paris_mbt - Paris law exponent for MBT
- */
-FatigueTest.prototype["m_paris_mbt"] = undefined;
-/**
- * @member {Number} c_paris_mbt - Paris law coefficient for MBT
+ * @member {Number} c_paris_mbt
  */
 FatigueTest.prototype["c_paris_mbt"] = undefined;
+
 /**
- * @member {Number} G_th_mbt - Threshold energy release rate for MBT
+ * @member {Number} m_paris_mbt
+ */
+FatigueTest.prototype["m_paris_mbt"] = undefined;
+
+/**
+ * @member {Number} G_th_mbt
  */
 FatigueTest.prototype["G_th_mbt"] = undefined;
+
 /**
- * @member {Number} m_paris_mcc - Paris law exponent for MCC
- */
-FatigueTest.prototype["m_paris_mcc"] = undefined;
-/**
- * @member {Number} c_paris_mcc - Paris law coefficient for MCC
+ * @member {Number} c_paris_mcc
  */
 FatigueTest.prototype["c_paris_mcc"] = undefined;
+
 /**
- * @member {Number} G_th_mcc - Threshold energy release rate for MCC
+ * @member {Number} m_paris_mcc
+ */
+FatigueTest.prototype["m_paris_mcc"] = undefined;
+
+/**
+ * @member {Number} G_th_mcc
  */
 FatigueTest.prototype["G_th_mcc"] = undefined;
+
 /**
- * @member {Number} m_paris_ecm - Paris law exponent for ECM
- */
-FatigueTest.prototype["m_paris_ecm"] = undefined;
-/**
- * @member {Number} c_paris_ecm - Paris law coefficient for ECM
+ * @member {Number} c_paris_ecm
  */
 FatigueTest.prototype["c_paris_ecm"] = undefined;
+
 /**
- * @member {Number} G_th_ecm - Threshold energy release rate for ECM
+ * @member {Number} m_paris_ecm
+ */
+FatigueTest.prototype["m_paris_ecm"] = undefined;
+
+/**
+ * @member {Number} G_th_ecm
  */
 FatigueTest.prototype["G_th_ecm"] = undefined;
 

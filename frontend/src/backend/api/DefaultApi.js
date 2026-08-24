@@ -33,6 +33,60 @@ export default class DefaultApi {
   }
 
   /**
+   * Download Zip
+   * @param {String} folderName
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link Object} and HTTP response
+   */
+  downloadZipDownloadsZipGetWithHttpInfo(folderName) {
+    let postBody = null;
+    // verify the required parameter 'folderName' is set
+    if (folderName === undefined || folderName === null) {
+      throw new Error(
+        "Missing the required parameter 'folderName' when calling downloadZipDownloadsZipGet"
+      );
+    }
+
+    let pathParams = {};
+    let queryParams = {
+      folder_name: folderName,
+    };
+    let headerParams = {};
+    let formParams = {};
+
+    let authNames = [];
+    let contentTypes = [];
+    let accepts = ["application/json"];
+    let returnType = Object;
+    return this.apiClient.callApi(
+      "/downloads_zip",
+      "GET",
+      pathParams,
+      queryParams,
+      headerParams,
+      formParams,
+      postBody,
+      authNames,
+      contentTypes,
+      accepts,
+      returnType,
+      null
+    );
+  }
+
+  /**
+   * Download Zip
+   * @param {String} folderName
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link Object}
+   */
+  downloadZipDownloadsZipGet(folderName) {
+    return this.downloadZipDownloadsZipGetWithHttpInfo(folderName).then(
+      function (response_and_data) {
+        return response_and_data.data;
+      }
+    );
+  }
+
+  /**
    * Get Units
    * Get All standardized units
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link Array.<module:model/UnitInfo>} and HTTP response
@@ -72,6 +126,60 @@ export default class DefaultApi {
    */
   getUnits() {
     return this.getUnitsWithHttpInfo().then(function (response_and_data) {
+      return response_and_data.data;
+    });
+  }
+
+  /**
+   * Integrate Dataset
+   * @param {File} file
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link Object} and HTTP response
+   */
+  integrateDatasetExperimentsIntegrateDatasetPostWithHttpInfo(file) {
+    let postBody = null;
+    // verify the required parameter 'file' is set
+    if (file === undefined || file === null) {
+      throw new Error(
+        "Missing the required parameter 'file' when calling integrateDatasetExperimentsIntegrateDatasetPost"
+      );
+    }
+
+    let pathParams = {};
+    let queryParams = {};
+    let headerParams = {};
+    let formParams = {
+      file: file,
+    };
+
+    let authNames = [];
+    let contentTypes = ["multipart/form-data"];
+    let accepts = ["application/json"];
+    let returnType = Object;
+    return this.apiClient.callApi(
+      "/experiments/integrate_dataset",
+      "POST",
+      pathParams,
+      queryParams,
+      headerParams,
+      formParams,
+      postBody,
+      authNames,
+      contentTypes,
+      accepts,
+      returnType,
+      null
+    );
+  }
+
+  /**
+   * Integrate Dataset
+   * @param {File} file
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link Object}
+   */
+  integrateDatasetExperimentsIntegrateDatasetPost(file) {
+    return this.integrateDatasetExperimentsIntegrateDatasetPostWithHttpInfo(
+      file
+    ).then(function (response_and_data) {
       return response_and_data.data;
     });
   }

@@ -37,7 +37,13 @@ export default class AnalysisApi {
    * @param {Number} ucs
    * @param {Number} uts
    * @param {File} file
-   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link File} and HTTP response
+   * @param {Object} opts Optional parameters
+   * @param {Number} opts.npReference
+   * @param {Number} opts.m0Init
+   * @param {Number} opts.dInit
+   * @param {Number} opts.alphaTInit
+   * @param {Number} opts.alphaCInit
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/AnalysisResult} and HTTP response
    */
   runCldFileWithHttpInfo(method, ucs, uts, file, opts) {
     opts = opts || {};
@@ -72,11 +78,11 @@ export default class AnalysisApi {
       method: method,
       ucs: ucs,
       uts: uts,
-      ...(opts.npReference != null && { np_reference: opts.npReference }),
-      ...(opts.m0Init != null && { m0_init: opts.m0Init }),
-      ...(opts.dInit != null && { d_init: opts.dInit }),
-      ...(opts.alphaTInit != null && { alpha_t_init: opts.alphaTInit }),
-      ...(opts.alphaCInit != null && { alpha_c_init: opts.alphaCInit }),
+      np_reference: opts["npReference"],
+      m0_init: opts["m0Init"],
+      d_init: opts["dInit"],
+      alpha_t_init: opts["alphaTInit"],
+      alpha_c_init: opts["alphaCInit"],
     };
     let headerParams = {};
     let formParams = {
@@ -109,7 +115,13 @@ export default class AnalysisApi {
    * @param {Number} ucs
    * @param {Number} uts
    * @param {File} file
-   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link File}
+   * @param {Object} opts Optional parameters
+   * @param {Number} opts.npReference
+   * @param {Number} opts.m0Init
+   * @param {Number} opts.dInit
+   * @param {Number} opts.alphaTInit
+   * @param {Number} opts.alphaCInit
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/AnalysisResult}
    */
   runCldFile(method, ucs, uts, file, opts) {
     return this.runCldFileWithHttpInfo(method, ucs, uts, file, opts).then(
@@ -120,24 +132,55 @@ export default class AnalysisApi {
   }
 
   /**
-   * Run CLD PiecewiseLinear from SN curve fitting (AGG input)
-   * @param {String} snMethod
+   * Run Cld Piecewiselinear From Sn File
+   * @param {module:model/SnCurveMethod} snMethod
    * @param {Number} ucs
    * @param {Number} uts
    * @param {File} file
-   * @return {Promise} with data of type {@link module:model/AnalysisResult}
+   * @param {Object} opts Optional parameters
+   * @param {Number} opts.confidenceInterval
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/AnalysisResult} and HTTP response
    */
-  runCldPiecewiseLinearFromSnFileWithHttpInfo(snMethod, ucs, uts, file, opts) {
+  runCldPiecewiselinearFromSnFileWithHttpInfo(snMethod, ucs, uts, file, opts) {
     opts = opts || {};
+    let postBody = null;
+    // verify the required parameter 'snMethod' is set
+    if (snMethod === undefined || snMethod === null) {
+      throw new Error(
+        "Missing the required parameter 'snMethod' when calling runCldPiecewiselinearFromSnFile"
+      );
+    }
+    // verify the required parameter 'ucs' is set
+    if (ucs === undefined || ucs === null) {
+      throw new Error(
+        "Missing the required parameter 'ucs' when calling runCldPiecewiselinearFromSnFile"
+      );
+    }
+    // verify the required parameter 'uts' is set
+    if (uts === undefined || uts === null) {
+      throw new Error(
+        "Missing the required parameter 'uts' when calling runCldPiecewiselinearFromSnFile"
+      );
+    }
+    // verify the required parameter 'file' is set
+    if (file === undefined || file === null) {
+      throw new Error(
+        "Missing the required parameter 'file' when calling runCldPiecewiselinearFromSnFile"
+      );
+    }
+
+    let pathParams = {};
     let queryParams = {
-      snMethod,
-      ucs,
-      uts,
-      ...(opts.confidenceInterval != null && {
-        confidenceInterval: opts.confidenceInterval,
-      }),
+      snMethod: snMethod,
+      ucs: ucs,
+      uts: uts,
+      confidenceInterval: opts["confidenceInterval"],
     };
-    let formParams = { file };
+    let headerParams = {};
+    let formParams = {
+      file: file,
+    };
+
     let authNames = [];
     let contentTypes = ["multipart/form-data"];
     let accepts = ["application/json"];
@@ -145,11 +188,11 @@ export default class AnalysisApi {
     return this.apiClient.callApi(
       "/analysis/cld/piecewiselinear-from-sn/file",
       "POST",
-      {},
+      pathParams,
       queryParams,
-      {},
+      headerParams,
       formParams,
-      null,
+      postBody,
       authNames,
       contentTypes,
       accepts,
@@ -158,8 +201,18 @@ export default class AnalysisApi {
     );
   }
 
-  runCldPiecewiseLinearFromSnFile(snMethod, ucs, uts, file, opts) {
-    return this.runCldPiecewiseLinearFromSnFileWithHttpInfo(
+  /**
+   * Run Cld Piecewiselinear From Sn File
+   * @param {module:model/SnCurveMethod} snMethod
+   * @param {Number} ucs
+   * @param {Number} uts
+   * @param {File} file
+   * @param {Object} opts Optional parameters
+   * @param {Number} opts.confidenceInterval
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/AnalysisResult}
+   */
+  runCldPiecewiselinearFromSnFile(snMethod, ucs, uts, file, opts) {
+    return this.runCldPiecewiselinearFromSnFileWithHttpInfo(
       snMethod,
       ucs,
       uts,
@@ -170,7 +223,17 @@ export default class AnalysisApi {
     });
   }
 
-  runCldPiecewiseNonLinearFromSnFileWithHttpInfo(
+  /**
+   * Run Cld Piecewisenonlinear From Sn File
+   * @param {module:model/SnCurveMethod} snMethod
+   * @param {Number} ucs
+   * @param {Number} uts
+   * @param {File} file
+   * @param {Object} opts Optional parameters
+   * @param {Number} opts.confidenceInterval
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/AnalysisResult} and HTTP response
+   */
+  runCldPiecewisenonlinearFromSnFileWithHttpInfo(
     snMethod,
     ucs,
     uts,
@@ -178,15 +241,44 @@ export default class AnalysisApi {
     opts
   ) {
     opts = opts || {};
+    let postBody = null;
+    // verify the required parameter 'snMethod' is set
+    if (snMethod === undefined || snMethod === null) {
+      throw new Error(
+        "Missing the required parameter 'snMethod' when calling runCldPiecewisenonlinearFromSnFile"
+      );
+    }
+    // verify the required parameter 'ucs' is set
+    if (ucs === undefined || ucs === null) {
+      throw new Error(
+        "Missing the required parameter 'ucs' when calling runCldPiecewisenonlinearFromSnFile"
+      );
+    }
+    // verify the required parameter 'uts' is set
+    if (uts === undefined || uts === null) {
+      throw new Error(
+        "Missing the required parameter 'uts' when calling runCldPiecewisenonlinearFromSnFile"
+      );
+    }
+    // verify the required parameter 'file' is set
+    if (file === undefined || file === null) {
+      throw new Error(
+        "Missing the required parameter 'file' when calling runCldPiecewisenonlinearFromSnFile"
+      );
+    }
+
+    let pathParams = {};
     let queryParams = {
-      snMethod,
-      ucs,
-      uts,
-      ...(opts.confidenceInterval != null && {
-        confidenceInterval: opts.confidenceInterval,
-      }),
+      snMethod: snMethod,
+      ucs: ucs,
+      uts: uts,
+      confidenceInterval: opts["confidenceInterval"],
     };
-    let formParams = { file };
+    let headerParams = {};
+    let formParams = {
+      file: file,
+    };
+
     let authNames = [];
     let contentTypes = ["multipart/form-data"];
     let accepts = ["application/json"];
@@ -194,11 +286,11 @@ export default class AnalysisApi {
     return this.apiClient.callApi(
       "/analysis/cld/piecewisenonlinear-from-sn/file",
       "POST",
-      {},
+      pathParams,
       queryParams,
-      {},
+      headerParams,
       formParams,
-      null,
+      postBody,
       authNames,
       contentTypes,
       accepts,
@@ -207,8 +299,18 @@ export default class AnalysisApi {
     );
   }
 
-  runCldPiecewiseNonLinearFromSnFile(snMethod, ucs, uts, file, opts) {
-    return this.runCldPiecewiseNonLinearFromSnFileWithHttpInfo(
+  /**
+   * Run Cld Piecewisenonlinear From Sn File
+   * @param {module:model/SnCurveMethod} snMethod
+   * @param {Number} ucs
+   * @param {Number} uts
+   * @param {File} file
+   * @param {Object} opts Optional parameters
+   * @param {Number} opts.confidenceInterval
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/AnalysisResult}
+   */
+  runCldPiecewisenonlinearFromSnFile(snMethod, ucs, uts, file, opts) {
+    return this.runCldPiecewisenonlinearFromSnFileWithHttpInfo(
       snMethod,
       ucs,
       uts,
@@ -359,6 +461,140 @@ export default class AnalysisApi {
   }
 
   /**
+   * Run Fatigue Failure Fawazellyin File
+   * @param {module:model/FatigueModel} snModel
+   * @param {Number} referenceAngle
+   * @param {Number} referenceStaticStrength
+   * @param {Number} desirableAngle
+   * @param {Number} targetStressRatio
+   * @param {Number} targetStaticStrength
+   * @param {File} sncFile
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/AnalysisResult} and HTTP response
+   */
+  runFatigueFailureFawazellyinFileWithHttpInfo(
+    snModel,
+    referenceAngle,
+    referenceStaticStrength,
+    desirableAngle,
+    targetStressRatio,
+    targetStaticStrength,
+    sncFile
+  ) {
+    let postBody = null;
+    // verify the required parameter 'snModel' is set
+    if (snModel === undefined || snModel === null) {
+      throw new Error(
+        "Missing the required parameter 'snModel' when calling runFatigueFailureFawazellyinFile"
+      );
+    }
+    // verify the required parameter 'referenceAngle' is set
+    if (referenceAngle === undefined || referenceAngle === null) {
+      throw new Error(
+        "Missing the required parameter 'referenceAngle' when calling runFatigueFailureFawazellyinFile"
+      );
+    }
+    // verify the required parameter 'referenceStaticStrength' is set
+    if (
+      referenceStaticStrength === undefined ||
+      referenceStaticStrength === null
+    ) {
+      throw new Error(
+        "Missing the required parameter 'referenceStaticStrength' when calling runFatigueFailureFawazellyinFile"
+      );
+    }
+    // verify the required parameter 'desirableAngle' is set
+    if (desirableAngle === undefined || desirableAngle === null) {
+      throw new Error(
+        "Missing the required parameter 'desirableAngle' when calling runFatigueFailureFawazellyinFile"
+      );
+    }
+    // verify the required parameter 'targetStressRatio' is set
+    if (targetStressRatio === undefined || targetStressRatio === null) {
+      throw new Error(
+        "Missing the required parameter 'targetStressRatio' when calling runFatigueFailureFawazellyinFile"
+      );
+    }
+    // verify the required parameter 'targetStaticStrength' is set
+    if (targetStaticStrength === undefined || targetStaticStrength === null) {
+      throw new Error(
+        "Missing the required parameter 'targetStaticStrength' when calling runFatigueFailureFawazellyinFile"
+      );
+    }
+    // verify the required parameter 'sncFile' is set
+    if (sncFile === undefined || sncFile === null) {
+      throw new Error(
+        "Missing the required parameter 'sncFile' when calling runFatigueFailureFawazellyinFile"
+      );
+    }
+
+    let pathParams = {};
+    let queryParams = {
+      snModel: snModel,
+      referenceAngle: referenceAngle,
+      referenceStaticStrength: referenceStaticStrength,
+      desirableAngle: desirableAngle,
+      targetStressRatio: targetStressRatio,
+      targetStaticStrength: targetStaticStrength,
+    };
+    let headerParams = {};
+    let formParams = {
+      sncFile: sncFile,
+    };
+
+    let authNames = [];
+    let contentTypes = ["multipart/form-data"];
+    let accepts = ["application/json"];
+    let returnType = AnalysisResult;
+    return this.apiClient.callApi(
+      "/analysis/fatigueFailure/fawazEllyin/file",
+      "POST",
+      pathParams,
+      queryParams,
+      headerParams,
+      formParams,
+      postBody,
+      authNames,
+      contentTypes,
+      accepts,
+      returnType,
+      null
+    );
+  }
+
+  /**
+   * Run Fatigue Failure Fawazellyin File
+   * @param {module:model/FatigueModel} snModel
+   * @param {Number} referenceAngle
+   * @param {Number} referenceStaticStrength
+   * @param {Number} desirableAngle
+   * @param {Number} targetStressRatio
+   * @param {Number} targetStaticStrength
+   * @param {File} sncFile
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/AnalysisResult}
+   */
+  runFatigueFailureFawazellyinFile(
+    snModel,
+    referenceAngle,
+    referenceStaticStrength,
+    desirableAngle,
+    targetStressRatio,
+    targetStaticStrength,
+    sncFile
+  ) {
+    return this.runFatigueFailureFawazellyinFileWithHttpInfo(
+      snModel,
+      referenceAngle,
+      referenceStaticStrength,
+      desirableAngle,
+      targetStressRatio,
+      targetStaticStrength,
+      sncFile
+    ).then(function (response_and_data) {
+      return response_and_data.data;
+    });
+  }
+
+  /**
    * Run Fatigue Failure File
    * @param {module:model/FatigueFailureMethod} method
    * @param {module:model/FatigueModel} snModel
@@ -367,7 +603,7 @@ export default class AnalysisApi {
    * @param {File} xFile
    * @param {File} yFile
    * @param {File} fFile
-   * @param {Object} opts Optional parameters, used by HashinRotem
+   * @param {Object} opts Optional parameters
    * @param {Number} opts.offAxisAngle2
    * @param {Number} opts.tensileTransverseStrength
    * @param {Number} opts.compressiveTransverseStrength
@@ -441,34 +677,18 @@ export default class AnalysisApi {
       snModel: snModel,
       desirableAngle: desirableAngle,
       offAxisAngle: offAxisAngle,
-      ...(opts.offAxisAngle2 != null && { offAxisAngle2: opts.offAxisAngle2 }),
-      ...(opts.tensileTransverseStrength != null && {
-        tensile_transverse_strength: opts.tensileTransverseStrength,
-      }),
-      ...(opts.compressiveTransverseStrength != null && {
-        compressive_transverse_strength: opts.compressiveTransverseStrength,
-      }),
-      ...(opts.shearStrength != null && { shear_strength: opts.shearStrength }),
-      ...(opts.tensileStrength1 != null && {
-        tensile_strength1: opts.tensileStrength1,
-      }),
-      ...(opts.compressiveStrength1 != null && {
-        compressive_strength1: opts.compressiveStrength1,
-      }),
-      ...(opts.tensileStrength2 != null && {
-        tensile_strength2: opts.tensileStrength2,
-      }),
-      ...(opts.compressiveStrength2 != null && {
-        compressive_strength2: opts.compressiveStrength2,
-      }),
-      ...(opts.tensileStrengthAtDesirableAngle != null && {
-        tensile_strength_at_desirable_angle:
-          opts.tensileStrengthAtDesirableAngle,
-      }),
-      ...(opts.compressiveStrengthAtDesirableAngle != null && {
-        compressive_strength_at_desirable_angle:
-          opts.compressiveStrengthAtDesirableAngle,
-      }),
+      offAxisAngle2: opts["offAxisAngle2"],
+      tensile_transverse_strength: opts["tensileTransverseStrength"],
+      compressive_transverse_strength: opts["compressiveTransverseStrength"],
+      shear_strength: opts["shearStrength"],
+      tensile_strength1: opts["tensileStrength1"],
+      compressive_strength1: opts["compressiveStrength1"],
+      tensile_strength2: opts["tensileStrength2"],
+      compressive_strength2: opts["compressiveStrength2"],
+      tensile_strength_at_desirable_angle:
+        opts["tensileStrengthAtDesirableAngle"],
+      compressive_strength_at_desirable_angle:
+        opts["compressiveStrengthAtDesirableAngle"],
     };
     let headerParams = {};
     let formParams = {
@@ -506,6 +726,17 @@ export default class AnalysisApi {
    * @param {File} xFile
    * @param {File} yFile
    * @param {File} fFile
+   * @param {Object} opts Optional parameters
+   * @param {Number} opts.offAxisAngle2
+   * @param {Number} opts.tensileTransverseStrength
+   * @param {Number} opts.compressiveTransverseStrength
+   * @param {Number} opts.shearStrength
+   * @param {Number} opts.tensileStrength1
+   * @param {Number} opts.compressiveStrength1
+   * @param {Number} opts.tensileStrength2
+   * @param {Number} opts.compressiveStrength2
+   * @param {Number} opts.tensileStrengthAtDesirableAngle
+   * @param {Number} opts.compressiveStrengthAtDesirableAngle
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/AnalysisResult}
    */
   runFatigueFailureFile(
@@ -533,54 +764,79 @@ export default class AnalysisApi {
   }
 
   /**
-   * Run Fatigue Failure ShokriehTaheri File
-   * @param {Number} referenceAngle
-   * @param {Number} referenceStressRatio
+   * Run Fatigue Failure Ftpf File
+   * @param {module:model/FatigueModel} snModel
    * @param {Number} desirableAngle
-   * @param {Number} targetStressRatio
-   * @param {Number} tensileAxialStrength
-   * @param {Number} compressiveAxialStrength
-   * @param {Number} tensileTransverseStrength
-   * @param {Number} compressiveTransverseStrength
-   * @param {Number} shearStrength
-   * @param {File} aggFile
+   * @param {Number} offAxisAngle
+   * @param {File} xFile
+   * @param {File} yFile
+   * @param {File} fFile
+   * @param {Object} opts Optional parameters
+   * @param {File} opts.xcFile
+   * @param {File} opts.ycFile
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/AnalysisResult} and HTTP response
    */
-  runFatigueFailureShokriehTaheriFileWithHttpInfo(
-    referenceAngle,
-    referenceStressRatio,
+  runFatigueFailureFtpfFileWithHttpInfo(
+    snModel,
     desirableAngle,
-    targetStressRatio,
-    tensileAxialStrength,
-    compressiveAxialStrength,
-    tensileTransverseStrength,
-    compressiveTransverseStrength,
-    shearStrength,
-    aggFile
+    offAxisAngle,
+    xFile,
+    yFile,
+    fFile,
+    opts
   ) {
+    opts = opts || {};
     let postBody = null;
-    // verify the required parameter 'aggFile' is set
-    if (aggFile === undefined || aggFile === null) {
+    // verify the required parameter 'snModel' is set
+    if (snModel === undefined || snModel === null) {
       throw new Error(
-        "Missing the required parameter 'aggFile' when calling runFatigueFailureShokriehTaheriFile"
+        "Missing the required parameter 'snModel' when calling runFatigueFailureFtpfFile"
+      );
+    }
+    // verify the required parameter 'desirableAngle' is set
+    if (desirableAngle === undefined || desirableAngle === null) {
+      throw new Error(
+        "Missing the required parameter 'desirableAngle' when calling runFatigueFailureFtpfFile"
+      );
+    }
+    // verify the required parameter 'offAxisAngle' is set
+    if (offAxisAngle === undefined || offAxisAngle === null) {
+      throw new Error(
+        "Missing the required parameter 'offAxisAngle' when calling runFatigueFailureFtpfFile"
+      );
+    }
+    // verify the required parameter 'xFile' is set
+    if (xFile === undefined || xFile === null) {
+      throw new Error(
+        "Missing the required parameter 'xFile' when calling runFatigueFailureFtpfFile"
+      );
+    }
+    // verify the required parameter 'yFile' is set
+    if (yFile === undefined || yFile === null) {
+      throw new Error(
+        "Missing the required parameter 'yFile' when calling runFatigueFailureFtpfFile"
+      );
+    }
+    // verify the required parameter 'fFile' is set
+    if (fFile === undefined || fFile === null) {
+      throw new Error(
+        "Missing the required parameter 'fFile' when calling runFatigueFailureFtpfFile"
       );
     }
 
     let pathParams = {};
     let queryParams = {
-      referenceAngle: referenceAngle,
-      referenceStressRatio: referenceStressRatio,
+      snModel: snModel,
       desirableAngle: desirableAngle,
-      targetStressRatio: targetStressRatio,
-      tensile_axial_strength: tensileAxialStrength,
-      compressive_axial_strength: compressiveAxialStrength,
-      tensile_transverse_strength: tensileTransverseStrength,
-      compressive_transverse_strength: compressiveTransverseStrength,
-      shear_strength: shearStrength,
+      offAxisAngle: offAxisAngle,
     };
     let headerParams = {};
     let formParams = {
-      aggFile: aggFile,
+      xFile: xFile,
+      yFile: yFile,
+      fFile: fFile,
+      xcFile: opts["xcFile"],
+      ycFile: opts["ycFile"],
     };
 
     let authNames = [];
@@ -588,7 +844,7 @@ export default class AnalysisApi {
     let accepts = ["application/json"];
     let returnType = AnalysisResult;
     return this.apiClient.callApi(
-      "/analysis/fatigueFailure/shokriehTaheri/file",
+      "/analysis/fatigueFailure/ftpf/file",
       "POST",
       pathParams,
       queryParams,
@@ -604,42 +860,256 @@ export default class AnalysisApi {
   }
 
   /**
-   * Run Fatigue Failure ShokriehTaheri File
-   * @param {Number} referenceAngle
-   * @param {Number} referenceStressRatio
+   * Run Fatigue Failure Ftpf File
+   * @param {module:model/FatigueModel} snModel
    * @param {Number} desirableAngle
-   * @param {Number} targetStressRatio
-   * @param {Number} tensileAxialStrength
-   * @param {Number} compressiveAxialStrength
-   * @param {Number} tensileTransverseStrength
-   * @param {Number} compressiveTransverseStrength
-   * @param {Number} shearStrength
-   * @param {File} aggFile
+   * @param {Number} offAxisAngle
+   * @param {File} xFile
+   * @param {File} yFile
+   * @param {File} fFile
+   * @param {Object} opts Optional parameters
+   * @param {File} opts.xcFile
+   * @param {File} opts.ycFile
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/AnalysisResult}
    */
-  runFatigueFailureShokriehTaheriFile(
-    referenceAngle,
-    referenceStressRatio,
+  runFatigueFailureFtpfFile(
+    snModel,
     desirableAngle,
-    targetStressRatio,
-    tensileAxialStrength,
-    compressiveAxialStrength,
-    tensileTransverseStrength,
-    compressiveTransverseStrength,
-    shearStrength,
-    aggFile
+    offAxisAngle,
+    xFile,
+    yFile,
+    fFile,
+    opts
   ) {
-    return this.runFatigueFailureShokriehTaheriFileWithHttpInfo(
-      referenceAngle,
-      referenceStressRatio,
+    return this.runFatigueFailureFtpfFileWithHttpInfo(
+      snModel,
       desirableAngle,
-      targetStressRatio,
-      tensileAxialStrength,
-      compressiveAxialStrength,
+      offAxisAngle,
+      xFile,
+      yFile,
+      fFile,
+      opts
+    ).then(function (response_and_data) {
+      return response_and_data.data;
+    });
+  }
+
+  /**
+   * Run Fatigue Failure Hashinrotem File
+   * @param {module:model/FatigueModel} snModel
+   * @param {Number} desirableAngle
+   * @param {Number} offAxisAngle1
+   * @param {Number} offAxisAngle2
+   * @param {Number} tensileTransverseStrength
+   * @param {Number} shearStrength
+   * @param {Number} tensileStrength1
+   * @param {Number} tensileStrength2
+   * @param {Number} tensileStrengthAtDesirableAngle
+   * @param {module:model/HashinRotemPanelType} panel2Type
+   * @param {module:model/HashinRotemPanelType} panel3Type
+   * @param {File} xFile
+   * @param {File} panel2File
+   * @param {File} panel3File
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/AnalysisResult} and HTTP response
+   */
+  runFatigueFailureHashinrotemFileWithHttpInfo(
+    snModel,
+    desirableAngle,
+    offAxisAngle1,
+    offAxisAngle2,
+    tensileTransverseStrength,
+    shearStrength,
+    tensileStrength1,
+    tensileStrength2,
+    tensileStrengthAtDesirableAngle,
+    panel2Type,
+    panel3Type,
+    xFile,
+    panel2File,
+    panel3File
+  ) {
+    let postBody = null;
+    // verify the required parameter 'snModel' is set
+    if (snModel === undefined || snModel === null) {
+      throw new Error(
+        "Missing the required parameter 'snModel' when calling runFatigueFailureHashinrotemFile"
+      );
+    }
+    // verify the required parameter 'desirableAngle' is set
+    if (desirableAngle === undefined || desirableAngle === null) {
+      throw new Error(
+        "Missing the required parameter 'desirableAngle' when calling runFatigueFailureHashinrotemFile"
+      );
+    }
+    // verify the required parameter 'offAxisAngle1' is set
+    if (offAxisAngle1 === undefined || offAxisAngle1 === null) {
+      throw new Error(
+        "Missing the required parameter 'offAxisAngle1' when calling runFatigueFailureHashinrotemFile"
+      );
+    }
+    // verify the required parameter 'offAxisAngle2' is set
+    if (offAxisAngle2 === undefined || offAxisAngle2 === null) {
+      throw new Error(
+        "Missing the required parameter 'offAxisAngle2' when calling runFatigueFailureHashinrotemFile"
+      );
+    }
+    // verify the required parameter 'tensileTransverseStrength' is set
+    if (
+      tensileTransverseStrength === undefined ||
+      tensileTransverseStrength === null
+    ) {
+      throw new Error(
+        "Missing the required parameter 'tensileTransverseStrength' when calling runFatigueFailureHashinrotemFile"
+      );
+    }
+    // verify the required parameter 'shearStrength' is set
+    if (shearStrength === undefined || shearStrength === null) {
+      throw new Error(
+        "Missing the required parameter 'shearStrength' when calling runFatigueFailureHashinrotemFile"
+      );
+    }
+    // verify the required parameter 'tensileStrength1' is set
+    if (tensileStrength1 === undefined || tensileStrength1 === null) {
+      throw new Error(
+        "Missing the required parameter 'tensileStrength1' when calling runFatigueFailureHashinrotemFile"
+      );
+    }
+    // verify the required parameter 'tensileStrength2' is set
+    if (tensileStrength2 === undefined || tensileStrength2 === null) {
+      throw new Error(
+        "Missing the required parameter 'tensileStrength2' when calling runFatigueFailureHashinrotemFile"
+      );
+    }
+    // verify the required parameter 'tensileStrengthAtDesirableAngle' is set
+    if (
+      tensileStrengthAtDesirableAngle === undefined ||
+      tensileStrengthAtDesirableAngle === null
+    ) {
+      throw new Error(
+        "Missing the required parameter 'tensileStrengthAtDesirableAngle' when calling runFatigueFailureHashinrotemFile"
+      );
+    }
+    // verify the required parameter 'panel2Type' is set
+    if (panel2Type === undefined || panel2Type === null) {
+      throw new Error(
+        "Missing the required parameter 'panel2Type' when calling runFatigueFailureHashinrotemFile"
+      );
+    }
+    // verify the required parameter 'panel3Type' is set
+    if (panel3Type === undefined || panel3Type === null) {
+      throw new Error(
+        "Missing the required parameter 'panel3Type' when calling runFatigueFailureHashinrotemFile"
+      );
+    }
+    // verify the required parameter 'xFile' is set
+    if (xFile === undefined || xFile === null) {
+      throw new Error(
+        "Missing the required parameter 'xFile' when calling runFatigueFailureHashinrotemFile"
+      );
+    }
+    // verify the required parameter 'panel2File' is set
+    if (panel2File === undefined || panel2File === null) {
+      throw new Error(
+        "Missing the required parameter 'panel2File' when calling runFatigueFailureHashinrotemFile"
+      );
+    }
+    // verify the required parameter 'panel3File' is set
+    if (panel3File === undefined || panel3File === null) {
+      throw new Error(
+        "Missing the required parameter 'panel3File' when calling runFatigueFailureHashinrotemFile"
+      );
+    }
+
+    let pathParams = {};
+    let queryParams = {
+      snModel: snModel,
+      desirableAngle: desirableAngle,
+      offAxisAngle1: offAxisAngle1,
+      offAxisAngle2: offAxisAngle2,
+      tensile_transverse_strength: tensileTransverseStrength,
+      shear_strength: shearStrength,
+      tensile_strength1: tensileStrength1,
+      tensile_strength2: tensileStrength2,
+      tensile_strength_at_desirable_angle: tensileStrengthAtDesirableAngle,
+      panel2Type: panel2Type,
+      panel3Type: panel3Type,
+    };
+    let headerParams = {};
+    let formParams = {
+      xFile: xFile,
+      panel2File: panel2File,
+      panel3File: panel3File,
+    };
+
+    let authNames = [];
+    let contentTypes = ["multipart/form-data"];
+    let accepts = ["application/json"];
+    let returnType = AnalysisResult;
+    return this.apiClient.callApi(
+      "/analysis/fatigueFailure/hashinRotem/file",
+      "POST",
+      pathParams,
+      queryParams,
+      headerParams,
+      formParams,
+      postBody,
+      authNames,
+      contentTypes,
+      accepts,
+      returnType,
+      null
+    );
+  }
+
+  /**
+   * Run Fatigue Failure Hashinrotem File
+   * @param {module:model/FatigueModel} snModel
+   * @param {Number} desirableAngle
+   * @param {Number} offAxisAngle1
+   * @param {Number} offAxisAngle2
+   * @param {Number} tensileTransverseStrength
+   * @param {Number} shearStrength
+   * @param {Number} tensileStrength1
+   * @param {Number} tensileStrength2
+   * @param {Number} tensileStrengthAtDesirableAngle
+   * @param {module:model/HashinRotemPanelType} panel2Type
+   * @param {module:model/HashinRotemPanelType} panel3Type
+   * @param {File} xFile
+   * @param {File} panel2File
+   * @param {File} panel3File
+   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/AnalysisResult}
+   */
+  runFatigueFailureHashinrotemFile(
+    snModel,
+    desirableAngle,
+    offAxisAngle1,
+    offAxisAngle2,
+    tensileTransverseStrength,
+    shearStrength,
+    tensileStrength1,
+    tensileStrength2,
+    tensileStrengthAtDesirableAngle,
+    panel2Type,
+    panel3Type,
+    xFile,
+    panel2File,
+    panel3File
+  ) {
+    return this.runFatigueFailureHashinrotemFileWithHttpInfo(
+      snModel,
+      desirableAngle,
+      offAxisAngle1,
+      offAxisAngle2,
       tensileTransverseStrength,
-      compressiveTransverseStrength,
       shearStrength,
-      aggFile
+      tensileStrength1,
+      tensileStrength2,
+      tensileStrengthAtDesirableAngle,
+      panel2Type,
+      panel3Type,
+      xFile,
+      panel2File,
+      panel3File
     ).then(function (response_and_data) {
       return response_and_data.data;
     });
@@ -670,6 +1140,60 @@ export default class AnalysisApi {
     aggFile
   ) {
     let postBody = null;
+    // verify the required parameter 'referenceAngle' is set
+    if (referenceAngle === undefined || referenceAngle === null) {
+      throw new Error(
+        "Missing the required parameter 'referenceAngle' when calling runFatigueFailureKawaiFile"
+      );
+    }
+    // verify the required parameter 'referenceStressRatio' is set
+    if (referenceStressRatio === undefined || referenceStressRatio === null) {
+      throw new Error(
+        "Missing the required parameter 'referenceStressRatio' when calling runFatigueFailureKawaiFile"
+      );
+    }
+    // verify the required parameter 'referenceStaticStrength' is set
+    if (
+      referenceStaticStrength === undefined ||
+      referenceStaticStrength === null
+    ) {
+      throw new Error(
+        "Missing the required parameter 'referenceStaticStrength' when calling runFatigueFailureKawaiFile"
+      );
+    }
+    // verify the required parameter 'desirableAngle' is set
+    if (desirableAngle === undefined || desirableAngle === null) {
+      throw new Error(
+        "Missing the required parameter 'desirableAngle' when calling runFatigueFailureKawaiFile"
+      );
+    }
+    // verify the required parameter 'targetStressRatio' is set
+    if (targetStressRatio === undefined || targetStressRatio === null) {
+      throw new Error(
+        "Missing the required parameter 'targetStressRatio' when calling runFatigueFailureKawaiFile"
+      );
+    }
+    // verify the required parameter 'tensileAxialStrength' is set
+    if (tensileAxialStrength === undefined || tensileAxialStrength === null) {
+      throw new Error(
+        "Missing the required parameter 'tensileAxialStrength' when calling runFatigueFailureKawaiFile"
+      );
+    }
+    // verify the required parameter 'tensileTransverseStrength' is set
+    if (
+      tensileTransverseStrength === undefined ||
+      tensileTransverseStrength === null
+    ) {
+      throw new Error(
+        "Missing the required parameter 'tensileTransverseStrength' when calling runFatigueFailureKawaiFile"
+      );
+    }
+    // verify the required parameter 'shearStrength' is set
+    if (shearStrength === undefined || shearStrength === null) {
+      throw new Error(
+        "Missing the required parameter 'shearStrength' when calling runFatigueFailureKawaiFile"
+      );
+    }
     // verify the required parameter 'aggFile' is set
     if (aggFile === undefined || aggFile === null) {
       throw new Error(
@@ -753,45 +1277,117 @@ export default class AnalysisApi {
   }
 
   /**
-   * Run Fatigue Failure FawazEllyin File
-   * @param {module:model/FatigueModel} snModel
+   * Run Fatigue Failure Shokriehtaheri File
    * @param {Number} referenceAngle
-   * @param {Number} referenceStaticStrength
+   * @param {Number} referenceStressRatio
    * @param {Number} desirableAngle
    * @param {Number} targetStressRatio
-   * @param {Number} targetStaticStrength
-   * @param {File} sncFile
+   * @param {Number} tensileAxialStrength
+   * @param {Number} compressiveAxialStrength
+   * @param {Number} tensileTransverseStrength
+   * @param {Number} compressiveTransverseStrength
+   * @param {Number} shearStrength
+   * @param {File} aggFile
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/AnalysisResult} and HTTP response
    */
-  runFatigueFailureFawazEllyinFileWithHttpInfo(
-    snModel,
+  runFatigueFailureShokriehtaheriFileWithHttpInfo(
     referenceAngle,
-    referenceStaticStrength,
+    referenceStressRatio,
     desirableAngle,
     targetStressRatio,
-    targetStaticStrength,
-    sncFile
+    tensileAxialStrength,
+    compressiveAxialStrength,
+    tensileTransverseStrength,
+    compressiveTransverseStrength,
+    shearStrength,
+    aggFile
   ) {
     let postBody = null;
-    // verify the required parameter 'sncFile' is set
-    if (sncFile === undefined || sncFile === null) {
+    // verify the required parameter 'referenceAngle' is set
+    if (referenceAngle === undefined || referenceAngle === null) {
       throw new Error(
-        "Missing the required parameter 'sncFile' when calling runFatigueFailureFawazEllyinFile"
+        "Missing the required parameter 'referenceAngle' when calling runFatigueFailureShokriehtaheriFile"
+      );
+    }
+    // verify the required parameter 'referenceStressRatio' is set
+    if (referenceStressRatio === undefined || referenceStressRatio === null) {
+      throw new Error(
+        "Missing the required parameter 'referenceStressRatio' when calling runFatigueFailureShokriehtaheriFile"
+      );
+    }
+    // verify the required parameter 'desirableAngle' is set
+    if (desirableAngle === undefined || desirableAngle === null) {
+      throw new Error(
+        "Missing the required parameter 'desirableAngle' when calling runFatigueFailureShokriehtaheriFile"
+      );
+    }
+    // verify the required parameter 'targetStressRatio' is set
+    if (targetStressRatio === undefined || targetStressRatio === null) {
+      throw new Error(
+        "Missing the required parameter 'targetStressRatio' when calling runFatigueFailureShokriehtaheriFile"
+      );
+    }
+    // verify the required parameter 'tensileAxialStrength' is set
+    if (tensileAxialStrength === undefined || tensileAxialStrength === null) {
+      throw new Error(
+        "Missing the required parameter 'tensileAxialStrength' when calling runFatigueFailureShokriehtaheriFile"
+      );
+    }
+    // verify the required parameter 'compressiveAxialStrength' is set
+    if (
+      compressiveAxialStrength === undefined ||
+      compressiveAxialStrength === null
+    ) {
+      throw new Error(
+        "Missing the required parameter 'compressiveAxialStrength' when calling runFatigueFailureShokriehtaheriFile"
+      );
+    }
+    // verify the required parameter 'tensileTransverseStrength' is set
+    if (
+      tensileTransverseStrength === undefined ||
+      tensileTransverseStrength === null
+    ) {
+      throw new Error(
+        "Missing the required parameter 'tensileTransverseStrength' when calling runFatigueFailureShokriehtaheriFile"
+      );
+    }
+    // verify the required parameter 'compressiveTransverseStrength' is set
+    if (
+      compressiveTransverseStrength === undefined ||
+      compressiveTransverseStrength === null
+    ) {
+      throw new Error(
+        "Missing the required parameter 'compressiveTransverseStrength' when calling runFatigueFailureShokriehtaheriFile"
+      );
+    }
+    // verify the required parameter 'shearStrength' is set
+    if (shearStrength === undefined || shearStrength === null) {
+      throw new Error(
+        "Missing the required parameter 'shearStrength' when calling runFatigueFailureShokriehtaheriFile"
+      );
+    }
+    // verify the required parameter 'aggFile' is set
+    if (aggFile === undefined || aggFile === null) {
+      throw new Error(
+        "Missing the required parameter 'aggFile' when calling runFatigueFailureShokriehtaheriFile"
       );
     }
 
     let pathParams = {};
     let queryParams = {
-      snModel: snModel,
       referenceAngle: referenceAngle,
-      referenceStaticStrength: referenceStaticStrength,
+      referenceStressRatio: referenceStressRatio,
       desirableAngle: desirableAngle,
       targetStressRatio: targetStressRatio,
-      targetStaticStrength: targetStaticStrength,
+      tensile_axial_strength: tensileAxialStrength,
+      compressive_axial_strength: compressiveAxialStrength,
+      tensile_transverse_strength: tensileTransverseStrength,
+      compressive_transverse_strength: compressiveTransverseStrength,
+      shear_strength: shearStrength,
     };
     let headerParams = {};
     let formParams = {
-      sncFile: sncFile,
+      aggFile: aggFile,
     };
 
     let authNames = [];
@@ -799,7 +1395,7 @@ export default class AnalysisApi {
     let accepts = ["application/json"];
     let returnType = AnalysisResult;
     return this.apiClient.callApi(
-      "/analysis/fatigueFailure/fawazEllyin/file",
+      "/analysis/fatigueFailure/shokriehTaheri/file",
       "POST",
       pathParams,
       queryParams,
@@ -815,33 +1411,42 @@ export default class AnalysisApi {
   }
 
   /**
-   * Run Fatigue Failure FawazEllyin File
-   * @param {module:model/FatigueModel} snModel
+   * Run Fatigue Failure Shokriehtaheri File
    * @param {Number} referenceAngle
-   * @param {Number} referenceStaticStrength
+   * @param {Number} referenceStressRatio
    * @param {Number} desirableAngle
    * @param {Number} targetStressRatio
-   * @param {Number} targetStaticStrength
-   * @param {File} sncFile
+   * @param {Number} tensileAxialStrength
+   * @param {Number} compressiveAxialStrength
+   * @param {Number} tensileTransverseStrength
+   * @param {Number} compressiveTransverseStrength
+   * @param {Number} shearStrength
+   * @param {File} aggFile
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/AnalysisResult}
    */
-  runFatigueFailureFawazEllyinFile(
-    snModel,
+  runFatigueFailureShokriehtaheriFile(
     referenceAngle,
-    referenceStaticStrength,
+    referenceStressRatio,
     desirableAngle,
     targetStressRatio,
-    targetStaticStrength,
-    sncFile
+    tensileAxialStrength,
+    compressiveAxialStrength,
+    tensileTransverseStrength,
+    compressiveTransverseStrength,
+    shearStrength,
+    aggFile
   ) {
-    return this.runFatigueFailureFawazEllyinFileWithHttpInfo(
-      snModel,
+    return this.runFatigueFailureShokriehtaheriFileWithHttpInfo(
       referenceAngle,
-      referenceStaticStrength,
+      referenceStressRatio,
       desirableAngle,
       targetStressRatio,
-      targetStaticStrength,
-      sncFile
+      tensileAxialStrength,
+      compressiveAxialStrength,
+      tensileTransverseStrength,
+      compressiveTransverseStrength,
+      shearStrength,
+      aggFile
     ).then(function (response_and_data) {
       return response_and_data.data;
     });
@@ -851,9 +1456,12 @@ export default class AnalysisApi {
    * Run Sn Curve File
    * @param {module:model/SnCurveMethod} method
    * @param {File} file
+   * @param {Object} opts Optional parameters
+   * @param {Number} opts.confidenceInterval
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/AnalysisResult} and HTTP response
    */
-  runSnCurveFileWithHttpInfo(method, file, confidenceInterval = null) {
+  runSnCurveFileWithHttpInfo(method, file, opts) {
+    opts = opts || {};
     let postBody = null;
     // verify the required parameter 'method' is set
     if (method === undefined || method === null) {
@@ -871,11 +1479,8 @@ export default class AnalysisApi {
     let pathParams = {};
     let queryParams = {
       method: method,
+      confidenceInterval: opts["confidenceInterval"],
     };
-
-    if (confidenceInterval !== null && confidenceInterval !== undefined) {
-      queryParams.confidenceInterval = confidenceInterval;
-    }
     let headerParams = {};
     let formParams = {
       file: file,
@@ -905,14 +1510,14 @@ export default class AnalysisApi {
    * Run Sn Curve File
    * @param {module:model/SnCurveMethod} method
    * @param {File} file
+   * @param {Object} opts Optional parameters
+   * @param {Number} opts.confidenceInterval
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/AnalysisResult}
    */
-  runSnCurveFile(method, file, confidenceInterval = null) {
-    return this.runSnCurveFileWithHttpInfo(
-      method,
-      file,
-      confidenceInterval
-    ).then(function (response_and_data) {
+  runSnCurveFile(method, file, opts) {
+    return this.runSnCurveFileWithHttpInfo(method, file, opts).then(function (
+      response_and_data
+    ) {
       return response_and_data.data;
     });
   }

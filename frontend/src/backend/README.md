@@ -105,7 +105,14 @@ var method = new Ccfatigue.CldMethod(); // {CldMethod}
 var ucs = 3.4; // {Number}
 var uts = 3.4; // {Number}
 var file = "/path/to/file"; // {File}
-api.runCldFile(method, ucs, uts, file).then(
+var opts = {
+  npReference: 3.4, // {Number}
+  m0Init: 3.4, // {Number}
+  dInit: 3.4, // {Number}
+  alphaTInit: 3.4, // {Number}
+  alphaCInit: 3.4, // {Number}
+};
+api.runCldFile(method, ucs, uts, file, opts).then(
   function (data) {
     console.log("API called successfully. Returned data: " + data);
   },
@@ -119,21 +126,30 @@ api.runCldFile(method, ucs, uts, file).then(
 
 All URIs are relative to _http://localhost_
 
-| Class                      | Method                                                                        | HTTP request                                                | Description                |
-| -------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------- | -------------------------- |
-| _Ccfatigue.AnalysisApi_    | [**runCldFile**](docs/AnalysisApi.md#runCldFile)                              | **POST** /analysis/cld/file                                 | Run Cld File               |
-| _Ccfatigue.AnalysisApi_    | [**runCycleCountingFile**](docs/AnalysisApi.md#runCycleCountingFile)          | **POST** /analysis/cycleCounting/file                       | Run Cycle Counting File    |
-| _Ccfatigue.AnalysisApi_    | [**runDamageSummationFile**](docs/AnalysisApi.md#runDamageSummationFile)      | **POST** /analysis/damageSummation/file                     | Run Damage Summation File  |
-| _Ccfatigue.AnalysisApi_    | [**runFatigueFailureFile**](docs/AnalysisApi.md#runFatigueFailureFile)        | **POST** /analysis/fatigueFailure/file                      | Run Fatigue Failure File   |
-| _Ccfatigue.AnalysisApi_    | [**runSnCurveFile**](docs/AnalysisApi.md#runSnCurveFile)                      | **POST** /analysis/snCurve/file                             | Run Sn Curve File          |
-| _Ccfatigue.DefaultApi_     | [**getUnits**](docs/DefaultApi.md#getUnits)                                   | **GET** /units                                              | Get Units                  |
-| _Ccfatigue.DefaultApi_     | [**root**](docs/DefaultApi.md#root)                                           | **GET** /                                                   | Root                       |
-| _Ccfatigue.ExperimentsApi_ | [**getExperiments**](docs/ExperimentsApi.md#getExperiments)                   | **GET** /experiments                                        | Get Experiments            |
-| _Ccfatigue.ExperimentsApi_ | [**getFatigueTest**](docs/ExperimentsApi.md#getFatigueTest)                   | **GET** /experiments/{experiment_id}/fatigue/{test_id}      | Get Fatigue Test           |
-| _Ccfatigue.ExperimentsApi_ | [**getFieldDistinct**](docs/ExperimentsApi.md#getFieldDistinct)               | **GET** /experiments/{field}/distinct                       | Get Field Distinct         |
-| _Ccfatigue.ExperimentsApi_ | [**getQuasiStaticTest**](docs/ExperimentsApi.md#getQuasiStaticTest)           | **GET** /experiments/{experiment_id}/quasi-static/{test_id} | Get Quasi Static Test      |
-| _Ccfatigue.ExperimentsApi_ | [**postDataPreprocessCheck**](docs/ExperimentsApi.md#postDataPreprocessCheck) | **POST** /experiments/data_preprocess_check                 | Post Data Preprocess Check |
-| _Ccfatigue.TestsApi_       | [**getTests**](docs/TestsApi.md#getTests)                                     | **GET** /tests                                              | Get Tests                  |
+| Class                      | Method                                                                                                                    | HTTP request                                                | Description                             |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | --------------------------------------- |
+| _Ccfatigue.AnalysisApi_    | [**runCldFile**](docs/AnalysisApi.md#runCldFile)                                                                          | **POST** /analysis/cld/file                                 | Run Cld File                            |
+| _Ccfatigue.AnalysisApi_    | [**runCldPiecewiselinearFromSnFile**](docs/AnalysisApi.md#runCldPiecewiselinearFromSnFile)                                | **POST** /analysis/cld/piecewiselinear-from-sn/file         | Run Cld Piecewiselinear From Sn File    |
+| _Ccfatigue.AnalysisApi_    | [**runCldPiecewisenonlinearFromSnFile**](docs/AnalysisApi.md#runCldPiecewisenonlinearFromSnFile)                          | **POST** /analysis/cld/piecewisenonlinear-from-sn/file      | Run Cld Piecewisenonlinear From Sn File |
+| _Ccfatigue.AnalysisApi_    | [**runCycleCountingFile**](docs/AnalysisApi.md#runCycleCountingFile)                                                      | **POST** /analysis/cycleCounting/file                       | Run Cycle Counting File                 |
+| _Ccfatigue.AnalysisApi_    | [**runDamageSummationFile**](docs/AnalysisApi.md#runDamageSummationFile)                                                  | **POST** /analysis/damageSummation/file                     | Run Damage Summation File               |
+| _Ccfatigue.AnalysisApi_    | [**runFatigueFailureFawazellyinFile**](docs/AnalysisApi.md#runFatigueFailureFawazellyinFile)                              | **POST** /analysis/fatigueFailure/fawazEllyin/file          | Run Fatigue Failure Fawazellyin File    |
+| _Ccfatigue.AnalysisApi_    | [**runFatigueFailureFile**](docs/AnalysisApi.md#runFatigueFailureFile)                                                    | **POST** /analysis/fatigueFailure/file                      | Run Fatigue Failure File                |
+| _Ccfatigue.AnalysisApi_    | [**runFatigueFailureFtpfFile**](docs/AnalysisApi.md#runFatigueFailureFtpfFile)                                            | **POST** /analysis/fatigueFailure/ftpf/file                 | Run Fatigue Failure Ftpf File           |
+| _Ccfatigue.AnalysisApi_    | [**runFatigueFailureHashinrotemFile**](docs/AnalysisApi.md#runFatigueFailureHashinrotemFile)                              | **POST** /analysis/fatigueFailure/hashinRotem/file          | Run Fatigue Failure Hashinrotem File    |
+| _Ccfatigue.AnalysisApi_    | [**runFatigueFailureKawaiFile**](docs/AnalysisApi.md#runFatigueFailureKawaiFile)                                          | **POST** /analysis/fatigueFailure/kawai/file                | Run Fatigue Failure Kawai File          |
+| _Ccfatigue.AnalysisApi_    | [**runFatigueFailureShokriehtaheriFile**](docs/AnalysisApi.md#runFatigueFailureShokriehtaheriFile)                        | **POST** /analysis/fatigueFailure/shokriehTaheri/file       | Run Fatigue Failure Shokriehtaheri File |
+| _Ccfatigue.AnalysisApi_    | [**runSnCurveFile**](docs/AnalysisApi.md#runSnCurveFile)                                                                  | **POST** /analysis/snCurve/file                             | Run Sn Curve File                       |
+| _Ccfatigue.DefaultApi_     | [**downloadZipDownloadsZipGet**](docs/DefaultApi.md#downloadZipDownloadsZipGet)                                           | **GET** /downloads_zip                                      | Download Zip                            |
+| _Ccfatigue.DefaultApi_     | [**getUnits**](docs/DefaultApi.md#getUnits)                                                                               | **GET** /units                                              | Get Units                               |
+| _Ccfatigue.DefaultApi_     | [**integrateDatasetExperimentsIntegrateDatasetPost**](docs/DefaultApi.md#integrateDatasetExperimentsIntegrateDatasetPost) | **POST** /experiments/integrate_dataset                     | Integrate Dataset                       |
+| _Ccfatigue.DefaultApi_     | [**root**](docs/DefaultApi.md#root)                                                                                       | **GET** /                                                   | Root                                    |
+| _Ccfatigue.ExperimentsApi_ | [**getExperiments**](docs/ExperimentsApi.md#getExperiments)                                                               | **GET** /experiments                                        | Get Experiments                         |
+| _Ccfatigue.ExperimentsApi_ | [**getFatigueTest**](docs/ExperimentsApi.md#getFatigueTest)                                                               | **GET** /experiments/{experiment_id}/fatigue/{test_id}      | Get Fatigue Test                        |
+| _Ccfatigue.ExperimentsApi_ | [**getFieldDistinct**](docs/ExperimentsApi.md#getFieldDistinct)                                                           | **GET** /experiments/{field}/distinct                       | Get Field Distinct                      |
+| _Ccfatigue.ExperimentsApi_ | [**getQuasiStaticTest**](docs/ExperimentsApi.md#getQuasiStaticTest)                                                       | **GET** /experiments/{experiment_id}/quasi-static/{test_id} | Get Quasi Static Test                   |
+| _Ccfatigue.ExperimentsApi_ | [**postDataPreprocessCheckV2**](docs/ExperimentsApi.md#postDataPreprocessCheckV2)                                         | **POST** /experiments/data_preprocess_check                 | Post Data Preprocess Check V2           |
+| _Ccfatigue.TestsApi_       | [**getTests**](docs/TestsApi.md#getTests)                                                                                 | **GET** /tests                                              | Get Tests                               |
 
 ## Documentation for Models
 
@@ -149,6 +165,7 @@ All URIs are relative to _http://localhost_
 - [Ccfatigue.FatigueModel](docs/FatigueModel.md)
 - [Ccfatigue.FatigueTest](docs/FatigueTest.md)
 - [Ccfatigue.HTTPValidationError](docs/HTTPValidationError.md)
+- [Ccfatigue.HashinRotemPanelType](docs/HashinRotemPanelType.md)
 - [Ccfatigue.HysteresisLoop](docs/HysteresisLoop.md)
 - [Ccfatigue.LocationInner](docs/LocationInner.md)
 - [Ccfatigue.PageExperimentModel](docs/PageExperimentModel.md)

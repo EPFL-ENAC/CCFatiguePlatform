@@ -27,6 +27,7 @@ import ExperimentModel from "./model/ExperimentModel";
 import FatigueFailureMethod from "./model/FatigueFailureMethod";
 import FatigueModel from "./model/FatigueModel";
 import FatigueTest from "./model/FatigueTest";
+import HashinRotemPanelType from "./model/HashinRotemPanelType";
 import HTTPValidationError from "./model/HTTPValidationError";
 import HysteresisLoop from "./model/HysteresisLoop";
 import LocationInner from "./model/LocationInner";
@@ -143,6 +144,12 @@ export {
    * @property {module:model/HTTPValidationError}
    */
   HTTPValidationError,
+
+  /**
+   * The HashinRotemPanelType model constructor.
+   * @property {module:model/HashinRotemPanelType}
+   */
+  HashinRotemPanelType,
 
   /**
    * The HysteresisLoop model constructor.

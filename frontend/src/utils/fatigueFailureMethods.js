@@ -21,6 +21,14 @@ export const FAF_COLUMNS = {
   shear: { label: "Shear / Off-axis (F)" },
 };
 
+// Params that always live in their own panel (angle + static strength at
+// that angle), separate from the per-column loading-direction cards, for
+// every method - not just HashinRotem.
+export const ANGLE_PANEL_PARAMS = [
+  "desirableAngle",
+  "tensileStrengthAtDesirableAngle",
+];
+
 // Sort order applied within a column/section so same-family fields cluster together
 export const FAF_GROUP_ORDER = [
   "tensile",
@@ -67,6 +75,18 @@ export const FAF_PARAMS = {
     section: "secondary",
     group: "angle",
   },
+  // FTPF-only: makes explicit whether the F file is a direct shear S-N
+  // curve or a measured off-axis curve to back-calculate shear strength
+  // from, rather than leaving it implicit in whether offAxisAngle is 0.
+  // No `column`/`section` - rendered by a dedicated template block (like
+  // hashinPanel2Type/hashinPanel3Type below) so it can sit above the file
+  // input, not after it like the generic per-column loop would place it.
+  ftpfFType: {
+    label: "Type",
+    type: "select",
+    items: ["Shear", "Off-axis"],
+    default: "Off-axis",
+  },
   tensileTransverseStrength: {
     label: "Tensile Transverse Strength",
     type: "number",
@@ -99,14 +119,6 @@ export const FAF_PARAMS = {
     section: "secondary",
     group: "tensile",
   },
-  compressiveStrength1: {
-    label: "Compressive Strength 1",
-    type: "number",
-    default: 83.64,
-    column: "shear",
-    section: "secondary",
-    group: "compressive",
-  },
   tensileStrength2: {
     label: "Tensile Strength 2",
     type: "number",
@@ -114,14 +126,6 @@ export const FAF_PARAMS = {
     column: "shear",
     section: "secondary",
     group: "tensile",
-  },
-  compressiveStrength2: {
-    label: "Compressive Strength 2",
-    type: "number",
-    default: 106.4,
-    column: "shear",
-    section: "secondary",
-    group: "compressive",
   },
   tensileStrengthAtDesirableAngle: {
     label: "Tensile Strength at Desirable Angle",
@@ -131,15 +135,22 @@ export const FAF_PARAMS = {
     section: "secondary",
     group: "tensile",
   },
-  compressiveStrengthAtDesirableAngle: {
-    label: "Compressive Strength at Desirable Angle",
-    type: "number",
-    default: 145.52,
-    column: "shear",
-    section: "secondary",
-    // Grouped with "angle" (not "compressive") so it renders right after
-    // Desirable Angle instead of with the other compressive fields.
-    group: "angle",
+  // Restricted per panel (rather than all 3 types on both) so the 4
+  // reconstruction cases stay reachable (Transverse+Shear=direct,
+  // Transverse+Off-axis=case2, Off-axis+Shear=case3, Off-axis+Off-
+  // axis=case1) while making a duplicate non-off-axis type unselectable
+  // in the first place, rather than caught after the fact by validation.
+  hashinPanel2Type: {
+    label: "Panel 2 Type",
+    type: "select",
+    items: ["Transverse", "Off-axis"],
+    default: "Transverse",
+  },
+  hashinPanel3Type: {
+    label: "Panel 3 Type",
+    type: "select",
+    items: ["Shear", "Off-axis"],
+    default: "Shear",
   },
   referenceAngle: {
     label: "Reference Angle",
@@ -238,63 +249,114 @@ export const FAF_FILES = {
       "Reference S-N curve, fitted at a single reference angle/stress ratio.",
     column: "shear",
   },
+  xcFile: {
+    label: "Longitudinal compression fatigue data (SNC json file)",
+    accept: ".json",
+    conventionPrefix: "SNC",
+    tooltip: "Longitudinal compression S-N curve (X').",
+    column: "longitudinal",
+  },
+  ycFile: {
+    label: "Transverse compression fatigue data (SNC json file)",
+    accept: ".json",
+    conventionPrefix: "SNC",
+    tooltip: "Transverse compression S-N curve (Y').",
+    column: "transverse",
+  },
+  // Dedicated to Hashin-Rotem - not shared with yFile/fFile (FTPF/Sims-
+  // Brogdon), since Hashin-Rotem's panel 2/3 meaning is user-selected
+  // (Transverse/Shear/Off-axis) rather than fixed, and sharing a file slot
+  // whose meaning differs per selected method would be ambiguous. No
+  // `column` - rendered by a dedicated template block, not the generic
+  // per-column loop.
+  hashinPanel2File: {
+    label: "Panel 2 fatigue data (SNC json file)",
+    accept: ".json",
+    conventionPrefix: "SNC",
+    tooltip: "Fatigue data for whichever type Panel 2 is set to.",
+  },
+  hashinPanel3File: {
+    label: "Panel 3 fatigue data (SNC json file)",
+    accept: ".json",
+    conventionPrefix: "SNC",
+    tooltip: "Fatigue data for whichever type Panel 3 is set to.",
+  },
 };
 
 // Method registry: id -> { files, params, run(api, values, files) }
 export const FAF_METHODS = {
-  FTPT: {
-    files: ["xFile", "yFile", "fFile"],
-    params: ["snModel", "desirableAngle", "offAxisAngle"],
+  FTPF: {
+    files: ["xFile", "yFile", "fFile", "xcFile", "ycFile"],
+    params: ["snModel", "desirableAngle", "offAxisAngle", "ftpfFType"],
+    // ftpfFType drives what's sent, not offAxisAngle directly - when the F
+    // file is "Shear" (direct shear S-N curve), off_axis_angle is always
+    // 0 regardless of whatever value sits in the shared offAxisAngle
+    // field (which may still be populated for e.g. SimsBrogdon).
     run: (api, v, f) =>
-      api.runFatigueFailureFile(
-        "FTPT",
+      api.runFatigueFailureFtpfFile(
         v.snModel,
         v.desirableAngle,
-        v.offAxisAngle,
+        v.ftpfFType === "Shear" ? 0 : v.offAxisAngle,
         f.xFile,
         f.yFile,
-        f.fFile
+        f.fFile,
+        {
+          xcFile: f.xcFile,
+          ycFile: f.ycFile,
+        }
       ),
   },
   HashinRotem: {
-    files: ["xFile", "yFile", "fFile"],
+    files: ["xFile", "hashinPanel2File", "hashinPanel3File"],
     params: [
       "snModel",
       "desirableAngle",
       "offAxisAngle",
       "offAxisAngle2",
       "tensileTransverseStrength",
-      "compressiveTransverseStrength",
       "shearStrength",
       "tensileStrength1",
-      "compressiveStrength1",
       "tensileStrength2",
-      "compressiveStrength2",
       "tensileStrengthAtDesirableAngle",
-      "compressiveStrengthAtDesirableAngle",
+      "hashinPanel2Type",
+      "hashinPanel3Type",
     ],
+    // Every one of the above is still required by run() below. Most of
+    // them shouldn't surface in the generic per-column cards for
+    // Hashin-Rotem specifically - offAxisAngle(2)/tensileStrength1/2 are
+    // already editable inline in Panel 2/3 (Off-axis case), and snModel
+    // just sends its default. tensileTransverseStrength/shearStrength are
+    // rendered unconditionally in the dedicated "Material Properties
+    // (Common)" card in FatigueFailure.vue instead of inline in Panel 2/3
+    // - they're used by reconstruct_s2f_s12f() in every case (direct,
+    // case 1/2/3), including configurations where no panel is set to
+    // Transverse/Shear, so gating their visibility on a panel's type
+    // would hide them exactly when they're still needed. desirableAngle
+    // and tensileStrengthAtDesirableAngle feed the verified S-N curve at
+    // the desired angle (hashin_equation_23 in faf_hashinrotem.py) so
+    // they stay in uiParams to keep showing in the shared "Desired Angle"
+    // panel. uiParams (rather than params) is what
+    // activeParamKeys/columnParams draw from, so this only affects what
+    // renders, not what's sent to the backend.
+    uiParams: ["desirableAngle", "tensileStrengthAtDesirableAngle"],
+    // Tension loading only - Hashin-Rotem doesn't support stress_ratio > 1
+    // compression-compression loading, so no compressive_* params here.
     run: (api, v, f) =>
-      api.runFatigueFailureFile(
-        "HashinRotem",
+      api.runFatigueFailureHashinrotemFile(
         v.snModel,
         v.desirableAngle,
         v.offAxisAngle,
+        v.offAxisAngle2,
+        v.tensileTransverseStrength,
+        v.shearStrength,
+        v.tensileStrength1,
+        v.tensileStrength2,
+        v.tensileStrengthAtDesirableAngle,
+        v.hashinPanel2Type,
+        v.hashinPanel3Type,
         f.xFile,
-        f.yFile,
-        f.fFile,
-        {
-          offAxisAngle2: v.offAxisAngle2,
-          tensileTransverseStrength: v.tensileTransverseStrength,
-          compressiveTransverseStrength: v.compressiveTransverseStrength,
-          shearStrength: v.shearStrength,
-          tensileStrength1: v.tensileStrength1,
-          compressiveStrength1: v.compressiveStrength1,
-          tensileStrength2: v.tensileStrength2,
-          compressiveStrength2: v.compressiveStrength2,
-          tensileStrengthAtDesirableAngle: v.tensileStrengthAtDesirableAngle,
-          compressiveStrengthAtDesirableAngle:
-            v.compressiveStrengthAtDesirableAngle,
-        }
+        f.hashinPanel2File,
+        f.hashinPanel3File
       ),
   },
   SimsBrogdon: {
@@ -325,7 +387,7 @@ export const FAF_METHODS = {
       "shearStrength",
     ],
     run: (api, v, f) =>
-      api.runFatigueFailureShokriehTaheriFile(
+      api.runFatigueFailureShokriehtaheriFile(
         v.referenceAngle,
         v.referenceStressRatio,
         v.desirableAngle,
@@ -349,7 +411,7 @@ export const FAF_METHODS = {
       "targetStaticStrength",
     ],
     run: (api, v, f) =>
-      api.runFatigueFailureFawazEllyinFile(
+      api.runFatigueFailureFawazellyinFile(
         v.snModel,
         v.referenceAngle,
         v.referenceStaticStrength,
@@ -392,4 +454,12 @@ export function getParamLabel(paramKey, methods) {
     .map((method) => param.labelOverrides && param.labelOverrides[method])
     .find((label) => label);
   return override || param.label;
+}
+
+export function getColumnLabel(columnKey, methods) {
+  const column = FAF_COLUMNS[columnKey];
+  const override = methods
+    .map((method) => column.labelOverrides && column.labelOverrides[method])
+    .find((label) => label);
+  return override || column.label;
 }

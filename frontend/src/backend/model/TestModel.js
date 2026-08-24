@@ -21,7 +21,6 @@ import ApiClient from "../ApiClient";
 class TestModel {
   /**
    * Constructs a new <code>TestModel</code>.
-   * Defines how test is seen on the API
    * @alias module:model/TestModel
    * @param id {Number}
    * @param experimentId {Number}
@@ -49,7 +48,6 @@ class TestModel {
    */
   static constructFromObject(data, obj) {
     if (data) {
-      console.log("TestModel received data:", data);
       obj = obj || new TestModel();
 
       if (data.hasOwnProperty("id")) {
@@ -73,14 +71,17 @@ class TestModel {
           "String"
         );
       }
+      if (data.hasOwnProperty("number_of_cycles")) {
+        obj["number_of_cycles"] = ApiClient.convertToType(
+          data["number_of_cycles"],
+          "Number"
+        );
+      }
       if (data.hasOwnProperty("maximum_load")) {
         obj["maximum_load"] = ApiClient.convertToType(
           data["maximum_load"],
           "Number"
         );
-      }
-      if (data.hasOwnProperty("frequency")) {
-        obj["frequency"] = ApiClient.convertToType(data["frequency"], "Number");
       }
       if (data.hasOwnProperty("run_out")) {
         obj["run_out"] = ApiClient.convertToType(data["run_out"], "Boolean");
@@ -91,8 +92,20 @@ class TestModel {
       if (data.hasOwnProperty("width")) {
         obj["width"] = ApiClient.convertToType(data["width"], "Number");
       }
+      if (data.hasOwnProperty("t")) {
+        obj["t"] = ApiClient.convertToType(data["t"], "Number");
+      }
+      if (data.hasOwnProperty("l_prime")) {
+        obj["l_prime"] = ApiClient.convertToType(data["l_prime"], "Number");
+      }
       if (data.hasOwnProperty("thickness")) {
         obj["thickness"] = ApiClient.convertToType(data["thickness"], "Number");
+      }
+      if (data.hasOwnProperty("initial_crack_length")) {
+        obj["initial_crack_length"] = ApiClient.convertToType(
+          data["initial_crack_length"],
+          "Number"
+        );
       }
       if (data.hasOwnProperty("temperature")) {
         obj["temperature"] = ApiClient.convertToType(
@@ -103,18 +116,14 @@ class TestModel {
       if (data.hasOwnProperty("humidity")) {
         obj["humidity"] = ApiClient.convertToType(data["humidity"], "Number");
       }
-      if (data.hasOwnProperty("initial_crack_length")) {
-        obj["initial_crack_length"] = ApiClient.convertToType(
-          data["initial_crack_length"],
+      if (data.hasOwnProperty("subset_size")) {
+        obj["subset_size"] = ApiClient.convertToType(
+          data["subset_size"],
           "Number"
         );
       }
-      /* add number of cycles */
-      if (data.hasOwnProperty("number_of_cycles")) {
-        obj["number_of_cycles"] = ApiClient.convertToType(
-          data["number_of_cycles"],
-          "Number"
-        );
+      if (data.hasOwnProperty("step_size")) {
+        obj["step_size"] = ApiClient.convertToType(data["step_size"], "Number");
       }
     }
     return obj;
@@ -142,14 +151,14 @@ TestModel.prototype["sequential_number"] = undefined;
 TestModel.prototype["specimen_name"] = undefined;
 
 /**
+ * @member {Number} number_of_cycles
+ */
+TestModel.prototype["number_of_cycles"] = undefined;
+
+/**
  * @member {Number} maximum_load
  */
 TestModel.prototype["maximum_load"] = undefined;
-
-/**
- * @member {Number} frequency
- */
-TestModel.prototype["frequency"] = undefined;
 
 /**
  * @member {Boolean} run_out
@@ -167,9 +176,24 @@ TestModel.prototype["length"] = undefined;
 TestModel.prototype["width"] = undefined;
 
 /**
+ * @member {Number} t
+ */
+TestModel.prototype["t"] = undefined;
+
+/**
+ * @member {Number} l_prime
+ */
+TestModel.prototype["l_prime"] = undefined;
+
+/**
  * @member {Number} thickness
  */
 TestModel.prototype["thickness"] = undefined;
+
+/**
+ * @member {Number} initial_crack_length
+ */
+TestModel.prototype["initial_crack_length"] = undefined;
 
 /**
  * @member {Number} temperature
@@ -182,13 +206,13 @@ TestModel.prototype["temperature"] = undefined;
 TestModel.prototype["humidity"] = undefined;
 
 /**
- * @member {Number} initial_crack_length
+ * @member {Number} subset_size
  */
-TestModel.prototype["initial_crack_length"] = undefined;
+TestModel.prototype["subset_size"] = undefined;
 
 /**
- * @member {Number} number_of_cycles
+ * @member {Number} step_size
  */
-TestModel.prototype["number_of_cycles"] = undefined;
+TestModel.prototype["step_size"] = undefined;
 
 export default TestModel;

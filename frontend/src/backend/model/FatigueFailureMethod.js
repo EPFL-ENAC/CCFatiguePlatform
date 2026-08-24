@@ -17,10 +17,10 @@
  */
 export default class FatigueFailureMethod {
   /**
-   * value: "FTPT"
+   * value: "FTPF"
    * @const
    */
-  FTPT = "FTPT";
+  FTPF = "FTPF";
 
   /**
    * value: "HashinRotem"

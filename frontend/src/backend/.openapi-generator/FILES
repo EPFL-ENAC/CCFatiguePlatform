@@ -23,6 +23,7 @@ docs/FatigueFailureMethod.md
 docs/FatigueModel.md
 docs/FatigueTest.md
 docs/HTTPValidationError.md
+docs/HashinRotemPanelType.md
 docs/HysteresisLoop.md
 docs/LocationInner.md
 docs/PageExperimentModel.md
@@ -48,6 +49,7 @@ model/FatigueFailureMethod.js
 model/FatigueModel.js
 model/FatigueTest.js
 model/HTTPValidationError.js
+model/HashinRotemPanelType.js
 model/HysteresisLoop.js
 model/LocationInner.js
 model/PageExperimentModel.js
@@ -74,6 +76,7 @@ test/model/FatigueFailureMethod.spec.js
 test/model/FatigueModel.spec.js
 test/model/FatigueTest.spec.js
 test/model/HTTPValidationError.spec.js
+test/model/HashinRotemPanelType.spec.js
 test/model/HysteresisLoop.spec.js
 test/model/LocationInner.spec.js
 test/model/PageExperimentModel.spec.js

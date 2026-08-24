@@ -28,6 +28,8 @@ import {
   DataZoomComponent,
   GridComponent,
   LegendComponent,
+  MarkLineComponent,
+  MarkPointComponent,
   TitleComponent,
   TooltipComponent,
 } from "echarts/components";
@@ -42,6 +44,8 @@ use([
   ScatterChart,
   GridComponent,
   LegendComponent,
+  MarkLineComponent,
+  MarkPointComponent,
   TitleComponent,
   TooltipComponent,
 ]);
@@ -95,6 +99,12 @@ export default {
     cycleCountXAxis: { type: Boolean, default: false },
     normalizedXAxis: { type: Boolean, default: false },
     normalizedYAxis: { type: Boolean, default: false },
+    // Opt-in, defaults to false everywhere else: skips the automatic
+    // "(x10^n)" axis-name suffix + scaled tick values that otherwise kick
+    // in once any Y value reaches >=1000 (see getAxisScaleExponent). Pair
+    // with axisLabelFormatter for fully plain tick labels too - this prop
+    // alone only fixes the axis name/scaling, not the per-tick formatting.
+    yAxisPlain: { type: Boolean, default: false },
     height: { type: Number, default: 480 },
     axisLabelFormatter: {
       type: Function,
@@ -241,7 +251,9 @@ export default {
       );
     },
     yAxisScaleExponent() {
-      if (this.isYLog || this.isNormalizedYAxis) return null;
+      if (this.isYLog || this.isNormalizedYAxis || this.yAxisPlain) {
+        return null;
+      }
       return getAxisScaleExponent(
         this.yAxisValues,
         this.effectiveYAxisMin,
@@ -349,6 +361,13 @@ export default {
           confine: true,
           formatter: (params) => {
             const formatter = this.tooltipFormatter;
+            // ECharts calls this with a single object (not an array) for
+            // item-triggered tooltips, e.g. hovering a markLine/markPoint
+            // directly rather than the underlying series - normalize so
+            // numeric values always go through `formatter` below instead
+            // of falling back to an unrounded raw value.
+            const paramList = Array.isArray(params) ? params : [params];
+            if (paramList.length === 0 || !paramList[0]) return "";
             let xLabel;
 
             if (
@@ -356,7 +375,7 @@ export default {
               this.xAxisName.toLowerCase().includes("cycle count") ||
               this.xAxisName.toLowerCase().includes("normalized cycles")
             ) {
-              const firstParam = params[0];
+              const firstParam = paramList[0];
               let rawX = null;
 
               if (
@@ -382,15 +401,18 @@ export default {
                 useGrouping: false,
               });
             } else {
-              xLabel = params[0].axisValueLabel;
+              xLabel =
+                paramList[0].axisValueLabel ??
+                formatter(Number(paramList[0].axisValue));
             }
 
             const rows = [`<strong>${xLabel}</strong>`];
 
-            for (const param of params) {
+            for (const param of paramList) {
               const rawY = Array.isArray(param.value)
                 ? param.value[1]
                 : param.value;
+              if (rawY == null) continue;
               rows.push(
                 `${param.marker}${param.seriesName}: ${formatter(Number(rawY))}`
               );
