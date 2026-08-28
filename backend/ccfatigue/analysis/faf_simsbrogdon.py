@@ -214,9 +214,6 @@ def execute(
     else:
         faf_csv_df["s"] = get_stress(a_f, b_f, faf_csv_df.cycles_to_failure)
 
-    if np.isclose(off_axis_angle, 22.5):
-        faf_csv_df["s"] = faf_csv_df["t"] / 2.2
-
     faf_csv_df["stress_max"] = faf_csv_df.apply(
         lambda z: get_sn(z.x, z.y, nc, m, mn, z.s), axis=1
     )
