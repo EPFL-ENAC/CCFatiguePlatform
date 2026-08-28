@@ -217,6 +217,7 @@ async def run_fatigue_failure_hashinrotem_file(
     tensile_strength1: float = Query(...),
     tensile_strength2: float = Query(...),
     tensile_strength_at_desirable_angle: float = Query(...),
+    tensile_axial_strength: float = Query(...),
     panel2_type: HashinRotemPanelType = Query(..., alias="panel2Type"),
     panel3_type: HashinRotemPanelType = Query(..., alias="panel3Type"),
 ) -> AnalysisResult:
@@ -234,6 +235,7 @@ async def run_fatigue_failure_hashinrotem_file(
             tensile_strength1,
             tensile_strength2,
             tensile_strength_at_desirable_angle,
+            tensile_axial_strength,
             panel2_type,
             panel3_type,
         )

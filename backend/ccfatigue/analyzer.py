@@ -412,6 +412,7 @@ def run_fatigue_failure_hashinrotem(
     tensile_strength1: float,
     tensile_strength2: float,
     tensile_strength_at_desirable_angle: float,
+    tensile_axial_strength: float,
     panel2_type: HashinRotemPanelType,
     panel3_type: HashinRotemPanelType,
 ) -> AnalysisResult:
@@ -437,6 +438,7 @@ def run_fatigue_failure_hashinrotem(
             tensile_strength1,
             tensile_strength2,
             tensile_strength_at_desirable_angle,
+            tensile_axial_strength,
             panel2_type,
             panel3_type,
         )
