@@ -1091,6 +1091,15 @@
           {
             "required": true,
             "schema": {
+              "title": "Tensile Axial Strength",
+              "type": "number"
+            },
+            "name": "tensile_axial_strength",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
               "$ref": "#/components/schemas/HashinRotemPanelType"
             },
             "name": "panel2Type",

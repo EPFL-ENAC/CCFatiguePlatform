@@ -61,6 +61,8 @@
                   (critical)
                 </span>
               </div>
+              <!-- eslint-disable-next-line vue/no-v-html -- static, hardcoded KaTeX output, no user input -->
+              <div class="formula-caption" v-html="fiberFormulaHtml"></div>
             </v-col>
             <v-col cols="12" sm="8">
               <simple-chart
@@ -101,6 +103,8 @@
                   (critical)
                 </span>
               </div>
+              <!-- eslint-disable-next-line vue/no-v-html -- static, hardcoded KaTeX output, no user input -->
+              <div class="formula-caption" v-html="matrixFormulaHtml"></div>
             </v-col>
             <v-col cols="12" sm="8">
               <envelope-chart
@@ -119,6 +123,9 @@
 </template>
 
 <script>
+import katex from "katex";
+import "katex/dist/katex.min.css";
+
 import EnvelopeChart from "@/components/charts/EnvelopeChart";
 import SimpleChart from "@/components/charts/SimpleChart";
 import { interpolateLogLog } from "@/utils/curveInterpolation";
@@ -126,6 +133,23 @@ import {
   buildQuadraticEnvelope,
   isInsideQuadraticEnvelope,
 } from "@/utils/envelopeGeometry";
+
+// Static formula reference shown under each gauge as a small caption -
+// rendered once via KaTeX (proper stacked fractions / radical) rather than
+// hand-built with <sub>/<sup>. Doesn't depend on component state, so these
+// live outside the component as plain constants instead of computed props.
+const FIBER_FORMULA_LATEX =
+  "FI_{\\text{fiber}} = \\dfrac{\\sigma_1}{\\sigma_1^{u}(N)}";
+const MATRIX_FORMULA_LATEX =
+  "FI_{\\text{matrix}} = \\sqrt{\\left(\\dfrac{\\sigma_2}{\\sigma_2^{u}(N)}\\right)^{2} " +
+  "+ \\left(\\dfrac{\\sigma_6}{\\sigma_6^{u}(N)}\\right)^{2}}";
+
+function renderFormula(latex) {
+  return katex.renderToString(latex, {
+    throwOnError: false,
+    displayMode: false,
+  });
+}
 
 export default {
   name: "HashinRotemSafety",
@@ -144,6 +168,12 @@ export default {
     };
   },
   computed: {
+    fiberFormulaHtml() {
+      return renderFormula(FIBER_FORMULA_LATEX);
+    },
+    matrixFormulaHtml() {
+      return renderFormula(MATRIX_FORMULA_LATEX);
+    },
     s1fAtN() {
       return interpolateLogLog(
         this.rows.map((r) => [r.cycles_to_failure, r.s1f]),
@@ -283,3 +313,21 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+/* Quick-reference formula under each gauge - deliberately smaller/quieter
+   than Vuetify's own text-caption (12px) so it reads as a legend, not as
+   part of the gauge's own label. KaTeX scales every internal measurement
+   (fraction bars, radical, sub/superscripts) off this font-size, so
+   shrinking it here is enough to keep the whole equation compact without
+   fighting KaTeX's own styles. */
+.formula-caption {
+  margin-top: 2px;
+  font-size: 13px;
+}
+
+/* v-html content isn't reachable by scoped styles without ::v-deep. */
+.formula-caption ::v-deep .katex {
+  color: #9e9e9e;
+}
+</style>

@@ -61,7 +61,19 @@
                   "
                   v-model="values.ftpfFType"
                   :items="FAF_PARAMS.ftpfFType.items"
-                  label="Type"
+                  :label="fTypeLabel('FTPF')"
+                  dense
+                  :disabled="loading"
+                  @change="updateOutput"
+                ></v-select>
+                <v-select
+                  v-if="
+                    columnKey === 'shear' &&
+                    selectedMethods.includes('SimsBrogdon')
+                  "
+                  v-model="values.simsBrogdonFType"
+                  :items="FAF_PARAMS.simsBrogdonFType.items"
+                  :label="fTypeLabel('SimsBrogdon')"
                   dense
                   :disabled="loading"
                   @change="updateOutput"
@@ -485,17 +497,19 @@ export default {
           (key) => keys.add(key)
         )
       );
-      // offAxisAngle is shared with SimsBrogdon (which always needs it),
-      // but for FTPF it's only meaningful when its Type selector is set to
-      // Off-axis - so only hide it when FTPF is the sole reason it would
-      // otherwise show.
-      if (
-        keys.has("offAxisAngle") &&
-        this.selectedMethods.includes("FTPF") &&
-        !this.selectedMethods.includes("SimsBrogdon") &&
-        this.values.ftpfFType === "Shear"
-      ) {
-        keys.delete("offAxisAngle");
+      // offAxisAngle is only meaningful for FTPF/SimsBrogdon when their
+      // respective Type selector is set to Off-axis - hide it unless at
+      // least one selected method that contributes it still needs it.
+      if (keys.has("offAxisAngle")) {
+        const ftpfNeedsIt =
+          this.selectedMethods.includes("FTPF") &&
+          this.values.ftpfFType !== "Shear";
+        const simsBrogdonNeedsIt =
+          this.selectedMethods.includes("SimsBrogdon") &&
+          this.values.simsBrogdonFType !== "Shear";
+        if (!ftpfNeedsIt && !simsBrogdonNeedsIt) {
+          keys.delete("offAxisAngle");
+        }
       }
       return Object.keys(FAF_PARAMS).filter((key) => keys.has(key));
     },
@@ -591,16 +605,32 @@ export default {
     hashinPanelFileLabel(panelType) {
       return `${panelType} fatigue data (SNC json file)`;
     },
-    // fFile is shared with SimsBrogdon (generic label), but FTPF makes its
-    // meaning explicit via the Type selector - reflect that in the label
-    // when FTPF is selected.
+    // fFile is shared between FTPF and SimsBrogdon, both of which make its
+    // meaning explicit via their own Type selector - reflect that in the
+    // label when either is selected (FTPF takes precedence if both are).
     fileLabel(fileKey) {
-      if (fileKey === "fFile" && this.selectedMethods.includes("FTPF")) {
-        return this.values.ftpfFType === "Shear"
-          ? "Shear fatigue data (SNC json file)"
-          : "Off-axis fatigue data (SNC json file)";
+      if (fileKey === "fFile") {
+        if (this.selectedMethods.includes("FTPF")) {
+          return this.values.ftpfFType === "Shear"
+            ? "Shear fatigue data (SNC json file)"
+            : "Off-axis fatigue data (SNC json file)";
+        }
+        if (this.selectedMethods.includes("SimsBrogdon")) {
+          return this.values.simsBrogdonFType === "Shear"
+            ? "Shear fatigue data (SNC json file)"
+            : "Off-axis fatigue data (SNC json file)";
+        }
       }
       return FAF_FILES[fileKey].label;
+    },
+    // Disambiguates the per-method "Type" selects when both FTPF and
+    // SimsBrogdon are selected at once - they share the same fFile column
+    // but each drives its own backend call independently.
+    fTypeLabel(method) {
+      const both =
+        this.selectedMethods.includes("FTPF") &&
+        this.selectedMethods.includes("SimsBrogdon");
+      return both ? `Type (${method})` : "Type";
     },
     conventionUrl(fileKey) {
       return `https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/${FAF_FILES[fileKey].conventionPrefix}_Data_Convention.md`;

@@ -62,7 +62,9 @@ export const FAF_PARAMS = {
     label: "Off Axis Angle",
     type: "number",
     default: 160,
-    labelOverrides: { HashinRotem: "Off Axis Angle 1" },
+    labelOverrides: {
+      HashinRotem: "Off Axis Angle 1",
+    },
     column: "shear",
     section: "secondary",
     group: "angle",
@@ -82,6 +84,16 @@ export const FAF_PARAMS = {
   // hashinPanel2Type/hashinPanel3Type below) so it can sit above the file
   // input, not after it like the generic per-column loop would place it.
   ftpfFType: {
+    label: "Type",
+    type: "select",
+    items: ["Shear", "Off-axis"],
+    default: "Off-axis",
+  },
+  // SimsBrogdon-only: same purpose as ftpfFType above - makes explicit
+  // whether the F file is a direct shear S-N curve or a measured off-axis
+  // curve to back-calculate shear strength from, rather than leaving it
+  // implicit in whether offAxisAngle is 0.
+  simsBrogdonFType: {
     label: "Type",
     type: "select",
     items: ["Shear", "Off-axis"],
@@ -318,6 +330,7 @@ export const FAF_METHODS = {
       "tensileStrength1",
       "tensileStrength2",
       "tensileStrengthAtDesirableAngle",
+      "tensileAxialStrength",
       "hashinPanel2Type",
       "hashinPanel3Type",
     ],
@@ -332,13 +345,19 @@ export const FAF_METHODS = {
     // case 1/2/3), including configurations where no panel is set to
     // Transverse/Shear, so gating their visibility on a panel's type
     // would hide them exactly when they're still needed. desirableAngle
-    // and tensileStrengthAtDesirableAngle feed the verified S-N curve at
-    // the desired angle (hashin_equation_23 in faf_hashinrotem.py) so
+    // and tensileStrengthAtDesirableAngle feed the off-axis fatigue
+    // function at the desired angle in faf_hashinrotem.py, so
     // they stay in uiParams to keep showing in the shared "Desired Angle"
-    // panel. uiParams (rather than params) is what
+    // panel. tensileAxialStrength is rendered in the longitudinal column
+    // as the static axial strength for the fiber-mode branch. uiParams
+    // (rather than params) is what
     // activeParamKeys/columnParams draw from, so this only affects what
     // renders, not what's sent to the backend.
-    uiParams: ["desirableAngle", "tensileStrengthAtDesirableAngle"],
+    uiParams: [
+      "desirableAngle",
+      "tensileStrengthAtDesirableAngle",
+      "tensileAxialStrength",
+    ],
     // Tension loading only - Hashin-Rotem doesn't support stress_ratio > 1
     // compression-compression loading, so no compressive_* params here.
     run: (api, v, f) =>
@@ -352,6 +371,7 @@ export const FAF_METHODS = {
         v.tensileStrength1,
         v.tensileStrength2,
         v.tensileStrengthAtDesirableAngle,
+        v.tensileAxialStrength,
         v.hashinPanel2Type,
         v.hashinPanel3Type,
         f.xFile,
@@ -361,13 +381,17 @@ export const FAF_METHODS = {
   },
   SimsBrogdon: {
     files: ["xFile", "yFile", "fFile"],
-    params: ["snModel", "desirableAngle", "offAxisAngle"],
+    params: ["snModel", "desirableAngle", "offAxisAngle", "simsBrogdonFType"],
+    // simsBrogdonFType drives what's sent, not offAxisAngle directly - when
+    // the F file is "Shear" (direct shear S-N curve), off_axis_angle is
+    // always 0 regardless of whatever value sits in the shared
+    // offAxisAngle field (which may still be populated for e.g. FTPF).
     run: (api, v, f) =>
       api.runFatigueFailureFile(
         "SimsBrogdon",
         v.snModel,
         v.desirableAngle,
-        v.offAxisAngle,
+        v.simsBrogdonFType === "Shear" ? 0 : v.offAxisAngle,
         f.xFile,
         f.yFile,
         f.fFile

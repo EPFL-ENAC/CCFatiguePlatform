@@ -886,47 +886,70 @@ export default {
       Promise.all([
         parseFile(this.file),
         ...methodsSnapshot.map((method) => {
+          let call;
           if (method === "PiecewiseLinear" && this.snCurveMethod) {
-            return this.$analysisApi
-              .runCldPiecewiseLinearFromSnFile(
-                this.snCurveMethod,
-                this.ucs,
-                this.uts,
-                this.file
-              )
-              .then((result) => ({ method, result }));
-          }
-          if (method === "PiecewiseNonLinear" && this.snCurveMethod) {
-            return this.$analysisApi
-              .runCldPiecewiseNonLinearFromSnFile(
-                this.snCurveMethod,
-                this.ucs,
-                this.uts,
-                this.file
-              )
-              .then((result) => ({ method, result }));
-          }
-          const opts = {};
-          if (method === "Boerstra") {
-            opts.npReference = this.npReference;
-          }
+            call = this.$analysisApi.runCldPiecewiselinearFromSnFile(
+              this.snCurveMethod,
+              this.ucs,
+              this.uts,
+              this.file
+            );
+          } else if (method === "PiecewiseNonLinear" && this.snCurveMethod) {
+            call = this.$analysisApi.runCldPiecewisenonlinearFromSnFile(
+              this.snCurveMethod,
+              this.ucs,
+              this.uts,
+              this.file
+            );
+          } else {
+            const opts = {};
+            if (method === "Boerstra") {
+              opts.npReference = this.npReference;
+            }
 
-          return this.$analysisApi
-            .runCldFile(
+            call = this.$analysisApi.runCldFile(
               method,
               this.ucs,
               this.uts,
               this.file,
               Object.keys(opts).length > 0 ? opts : undefined
-            )
-            .then((result) => ({ method, result }));
+            );
+          }
+
+          // Isolate each method's failure so one bad method (e.g. Harris
+          // diverging with the current UCS/UTS) doesn't blank out the
+          // others that succeeded.
+          return call
+            .then((result) => ({ method, result }))
+            .catch((error) => {
+              const detail =
+                error?.response?.data?.detail ||
+                error?.response?.data?.message ||
+                error?.message ||
+                "failed";
+              return { method, error: detail };
+            });
         }),
       ])
         .then((results) => {
           if (currentRequestId !== this.requestId) return;
 
-          const [parsedInput, ...methodResults] = results;
+          const [parsedInput, ...methodOutcomes] = results;
           this.parsedInputData = parsedInput.data;
+
+          const methodResults = methodOutcomes.filter((r) => r.result);
+          const methodFailures = methodOutcomes.filter((r) => r.error);
+
+          this.errorMessages = methodFailures.length
+            ? methodFailures.map(({ method, error }) => `${method}: ${error}`)
+            : null;
+
+          if (methodResults.length === 0) {
+            this.outputs = {};
+            this.series = [];
+            this.cldDataByMethod = {};
+            return;
+          }
 
           this.outputs = Object.fromEntries(
             methodResults.map(({ method, result }) => [method, result])
@@ -1014,7 +1037,6 @@ export default {
               data: scatterPoints,
             },
           ];
-          this.errorMessages = null;
           this.maybeRunExpSn();
         })
         .catch((error) => {

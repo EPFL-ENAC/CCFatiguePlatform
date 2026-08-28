@@ -905,6 +905,7 @@ export default class AnalysisApi {
    * @param {Number} tensileStrength1
    * @param {Number} tensileStrength2
    * @param {Number} tensileStrengthAtDesirableAngle
+   * @param {Number} tensileAxialStrength
    * @param {module:model/HashinRotemPanelType} panel2Type
    * @param {module:model/HashinRotemPanelType} panel3Type
    * @param {File} xFile
@@ -922,6 +923,7 @@ export default class AnalysisApi {
     tensileStrength1,
     tensileStrength2,
     tensileStrengthAtDesirableAngle,
+    tensileAxialStrength,
     panel2Type,
     panel3Type,
     xFile,
@@ -989,6 +991,12 @@ export default class AnalysisApi {
         "Missing the required parameter 'tensileStrengthAtDesirableAngle' when calling runFatigueFailureHashinrotemFile"
       );
     }
+    // verify the required parameter 'tensileAxialStrength' is set
+    if (tensileAxialStrength === undefined || tensileAxialStrength === null) {
+      throw new Error(
+        "Missing the required parameter 'tensileAxialStrength' when calling runFatigueFailureHashinrotemFile"
+      );
+    }
     // verify the required parameter 'panel2Type' is set
     if (panel2Type === undefined || panel2Type === null) {
       throw new Error(
@@ -1031,6 +1039,7 @@ export default class AnalysisApi {
       tensile_strength1: tensileStrength1,
       tensile_strength2: tensileStrength2,
       tensile_strength_at_desirable_angle: tensileStrengthAtDesirableAngle,
+      tensile_axial_strength: tensileAxialStrength,
       panel2Type: panel2Type,
       panel3Type: panel3Type,
     };
@@ -1072,6 +1081,7 @@ export default class AnalysisApi {
    * @param {Number} tensileStrength1
    * @param {Number} tensileStrength2
    * @param {Number} tensileStrengthAtDesirableAngle
+   * @param {Number} tensileAxialStrength
    * @param {module:model/HashinRotemPanelType} panel2Type
    * @param {module:model/HashinRotemPanelType} panel3Type
    * @param {File} xFile
@@ -1089,6 +1099,7 @@ export default class AnalysisApi {
     tensileStrength1,
     tensileStrength2,
     tensileStrengthAtDesirableAngle,
+    tensileAxialStrength,
     panel2Type,
     panel3Type,
     xFile,
@@ -1105,6 +1116,7 @@ export default class AnalysisApi {
       tensileStrength1,
       tensileStrength2,
       tensileStrengthAtDesirableAngle,
+      tensileAxialStrength,
       panel2Type,
       panel3Type,
       xFile,
