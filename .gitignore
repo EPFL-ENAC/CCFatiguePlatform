@@ -34,3 +34,6 @@ node_modules/
 
 CCFatigue_modules/
 .DS_Store
+
+# Local, disposable playground for running fatigue-failure criteria directly.
+/backend/tests/

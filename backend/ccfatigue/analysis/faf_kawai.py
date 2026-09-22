@@ -14,22 +14,13 @@ public reference for this file was found in the current CCFatiguePlatform
 repository.
 """
 
-from itertools import chain
 from typing import Optional
 
 import numpy as np
 import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 
-LIST_CYCLES_TO_FAILURE = list(
-    chain(
-        range(1, 1000, 50),
-        range(1000, 1001),
-        range(10000, 2000000, 10000),
-        range(2000000, 20000001, 1000000),
-    )
-)
-
+from ccfatigue.analysis.utils.faf import LIST_CYCLES_TO_FAILURE
 
 def get_omega(
     angle: float,
@@ -60,7 +51,7 @@ def get_omega(
 
 
 def get_normalized_stress(
-    stress_max, reference_stress_ratio: float, reference_static_strength: float
+    stress_max, stress_ratio, reference_omega: float
 ):
     """
     Kawai normalized (reversed) stress ratio, called RSigma in the original
@@ -77,9 +68,10 @@ def get_normalized_stress(
     -------
         normalized_stress: float
     """
-    ratio = stress_max / reference_static_strength
-    normalized_stress = (0.5 * (1 - reference_stress_ratio) * ratio) / (
-        1 - 0.5 * (1 + reference_stress_ratio) * ratio
+
+    ratio = stress_max * reference_omega
+    normalized_stress = (0.5 * (1 - stress_ratio) * ratio) / (
+        1 - 0.5 * (1 + stress_ratio) * ratio
     )
     return normalized_stress
 
@@ -98,8 +90,16 @@ def get_nstar(log_normalized_stress: pd.Series, log_reversals: pd.Series) -> flo
     -------
         nstar: float
     """
-    count = len(log_normalized_stress)
-    nstar = -(log_reversals.sum() - count) / log_normalized_stress.sum()
+    y = log_normalized_stress - log_normalized_stress.mean()
+    x = log_reversals - log_reversals.mean()
+    nstar = - (x ** 2).sum() / (x * y).sum()
+
+    #intercept at (0,1)
+    #nstar = - (log_reversals.sum() - len(log_reversals)) / log_normalized_stress.sum()
+    
+    #intercept at (0,0)
+    #nstar = - log_reversals.sum() / log_normalized_stress.sum()
+
     return nstar
 
 
@@ -119,7 +119,7 @@ def get_stress_max(
     -------
         stress_max: float
     """
-    sigma = (2 * cycles_to_failure) ** (-1 / nstar)
+    sigma = (2 * cycles_to_failure) ** (-1. / nstar)
     stress_max = (2 * sigma) / (
         omega * ((1 - target_stress_ratio) + (1 + target_stress_ratio) * sigma)
     )
@@ -175,10 +175,14 @@ def execute(
     -------
         None
     """
-    if not abs(target_stress_ratio) < 1:
+    if not (-1 <= target_stress_ratio < 1):
         raise NotImplementedError(f"target_stress_ratio={target_stress_ratio}")
 
     agg_df = pd.read_csv(agg_input_csv_file)
+
+    if ((agg_df.stress_ratio >= 1) | (agg_df.stress_ratio < -1)).any():
+        raise ValueError("Kawai: Can't calculate normalized stress: at least one data point has R < 0 or R > 1")
+
 
     target_angle_rad = np.radians(desirable_angle)
     omega = get_omega(
@@ -188,38 +192,38 @@ def execute(
         shear_strength,
     )
 
+    reference_omega = get_omega(np.radians(reference_angle),tensile_axial_strength,tensile_transverse_strength,shear_strength)
     agg_df["normalized_stress"] = get_normalized_stress(
-        agg_df.stress_max, reference_stress_ratio, reference_static_strength
+        agg_df.stress_max, agg_df.stress_ratio, reference_omega
     )
+
     agg_df["log_normalized_stress"] = np.log10(agg_df.normalized_stress)
     agg_df["log_reversals"] = np.log10(2 * agg_df.cycles_to_failure)
 
     faf_csv_df = pd.DataFrame()
     faf_json_records = []
 
-    for reference_group_stress_ratio, group_df in agg_df.groupby("stress_ratio"):
-        nstar = get_nstar(group_df.log_normalized_stress, group_df.log_reversals)
+    nstar = get_nstar(agg_df.log_normalized_stress, agg_df.log_reversals)
+    curve_df = pd.DataFrame(LIST_CYCLES_TO_FAILURE, columns=["cycles_to_failure"])
+    curve_df["stress_ratio"] = target_stress_ratio
+    curve_df["stress_max"] = get_stress_max(
+        nstar,
+        omega,
+        target_stress_ratio,
+        curve_df.cycles_to_failure,
+    )
+    faf_csv_df = pd.concat([faf_csv_df, curve_df])
 
-        curve_df = pd.DataFrame(LIST_CYCLES_TO_FAILURE, columns=["cycles_to_failure"])
-        curve_df["stress_ratio"] = reference_group_stress_ratio
-        curve_df["stress_max"] = get_stress_max(
-            nstar,
-            omega,
-            target_stress_ratio,
-            curve_df.cycles_to_failure,
-        )
-        faf_csv_df = pd.concat([faf_csv_df, curve_df])
-
-        faf_json_records.append(
-            {
-                "stress_ratio": reference_group_stress_ratio,
-                "reference_angle": reference_angle,
-                "target_stress_ratio": target_stress_ratio,
-                "desirable_angle": desirable_angle,
-                "nstar": nstar,
-                "omega": omega,
-            }
-        )
+    faf_json_records.append(
+        {
+            #"stress_ratio": reference_stress_ratio,
+            "reference_angle": reference_angle,
+            "target_stress_ratio": target_stress_ratio,
+            "desirable_angle": desirable_angle,
+            "nstar": nstar,
+            "omega": omega,
+        }
+    )
 
     faf_json_df = pd.DataFrame(faf_json_records)
 

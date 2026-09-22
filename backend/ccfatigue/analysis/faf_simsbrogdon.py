@@ -20,16 +20,7 @@ import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 
 import ccfatigue.analysis.utils.faf as faf
-
-LIST_CYCLES_TO_FAILURE = list(
-    chain(
-        range(1, 1000, 50),
-        range(1000, 1001),
-        range(10000, 2000000, 10000),
-        range(2000000, 20000001, 1000000),
-    )
-)
-
+from ccfatigue.analysis.utils.faf import LIST_CYCLES_TO_FAILURE
 
 def get_loglog_stress(a: float, b: float, cycles_to_failure) -> float:
     """
@@ -85,22 +76,19 @@ def get_sn(x: float, y: float, nc: float, m: float, mn: float, s: float) -> floa
     return sn
 
 
-def get_ssqr(x: float, y: float, tnc: float, tm: float, tmn: float, t: float) -> float:
+def get_invSsqr(x: float, y: float, cosA4 : float, sinA4 : float, cosA2sinA2 : float, t : float) -> float:
     """
     Parameters
     ----------
-        x: float
+        x: float                static strength in x dir
         y: float
-        tnc: float
-        tm: float
-        tmn: float
-        t: float
+        off_axis_rad : float    offaxis angle
     Returns
     -------
         ssqr: float
     """
-    ssqr = -((tnc / x**2) + (tm / y**2) - (tmn / x**2) - (1 / t**2)) / tmn
-    return ssqr
+    invSsqr = -((cosA4 / x**2) + (sinA4 / y**2) - (cosA2sinA2 / x**2) - (1 / t**2)) / cosA2sinA2
+    return invSsqr
 
 
 def execute(
@@ -157,28 +145,32 @@ def execute(
     theta = np.radians(desirable_angle)
     off_axis_rad = np.radians(off_axis_angle)
 
-    tm = np.sin(off_axis_rad) ** 4
-    tnc = np.cos(off_axis_rad) ** 4
-    tmn = np.sin(off_axis_rad) ** 2 * np.cos(off_axis_rad) ** 2
+    cosO4 = np.cos(theta) ** 4
+    sinO4 = np.sin(theta) ** 4
+    cosO2sinO2 = np.sin(theta) ** 2 * np.cos(theta) ** 2
 
-    nc = np.cos(theta) ** 4
-    m = np.sin(theta) ** 4
-    mn = np.sin(theta) ** 2 * np.cos(theta) ** 2
+    cosA4 = np.cos(off_axis_rad) ** 4
+    sinA4 = np.sin(off_axis_rad) ** 4
+    cosA2sinA2 = np.sin(off_axis_rad) ** 2 * np.cos(off_axis_rad) ** 2
 
-    stress_ratio = float(r_x) if np.isclose((r_x + r_y + r_f) / 3, r_x) else 1
-    confidence_interval = (
-        float(snc_x_df.iloc[0].confidence_interval)
-        if np.isclose(
-            (
-                snc_x_df.iloc[0].confidence_interval
-                + snc_y_df.iloc[0].confidence_interval
-                + snc_f_df.iloc[0].confidence_interval
-            )
-            / 3,
-            snc_x_df.iloc[0].confidence_interval,
+    #R and CI consistency check
+    if not ( np.isclose(r_x,r_y) and np.isclose(r_x,r_f)):
+        raise ValueError(
+            "Sims Brogdon: input files disagree on stress_ratio "
+            f"(X={r_x}, panel2={r_y}, panel3={r_f})."
         )
-        else 0
-    )
+    stress_ratio = r_x
+
+    ci1 = float(snc_x_df.iloc[0].confidence_interval)
+    ci2 = float(snc_y_df.iloc[0].confidence_interval)
+    cia = float(snc_f_df.iloc[0].confidence_interval)
+
+    if not ( np.isclose(ci1,ci2) and np.isclose(ci1,cia)):
+            raise ValueError(
+                "Sims Brogdon: input files disagree on confidence_interval "
+                f"(X={ci1}, panel2={ci2}, panel3={cia})."
+            )
+    confidence_interval = ci1
 
     faf_json_df = pd.DataFrame(
         {"stress_ratio": [stress_ratio], "confidence_interval": [confidence_interval]}
@@ -199,23 +191,24 @@ def execute(
     faf_csv_df["x"] = get_stress(a_x, b_x, faf_csv_df.cycles_to_failure)
     faf_csv_df["y"] = get_stress(a_y, b_y, faf_csv_df.cycles_to_failure)
 
+    #off axis = 0 means f_curve is a shear curve
     if not np.isclose(off_axis_angle, 0):
-
+        #calculate 1/S^2 from the off axis curve
         faf_csv_df["t"] = get_stress(a_f, b_f, faf_csv_df.cycles_to_failure)
 
         faf_csv_df["ssqr"] = faf_csv_df.apply(
-            lambda z: get_ssqr(z.x, z.y, tnc, tm, tmn, z.t), axis=1
+            lambda z: get_invSsqr(z.x, z.y, cosA4, sinA4, cosA2sinA2, z.t), axis=1
         )
 
-        # Remove rows where ssqr < 0
-        faf_csv_df.drop(faf_csv_df[faf_csv_df.ssqr < 0].index, inplace=True)
+        # Remove bad rows
+        faf_csv_df.drop(faf_csv_df[faf_csv_df.ssqr <= 0].index, inplace=True)
         faf_csv_df["s"] = 1 / np.sqrt(faf_csv_df.ssqr)
 
     else:
         faf_csv_df["s"] = get_stress(a_f, b_f, faf_csv_df.cycles_to_failure)
 
     faf_csv_df["stress_max"] = faf_csv_df.apply(
-        lambda z: get_sn(z.x, z.y, nc, m, mn, z.s), axis=1
+        lambda z: get_sn(z.x, z.y, cosO4, sinO4, cosO2sinO2, z.s), axis=1
     )
 
     # Create output files

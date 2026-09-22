@@ -18,15 +18,7 @@ import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 
 import ccfatigue.analysis.utils.faf as faf
-
-LIST_CYCLES_TO_FAILURE = list(
-    chain(
-        range(1, 1000, 50),
-        range(1000, 1001),
-        range(10000, 2000000, 10000),
-        range(2000000, 20000001, 1000000),
-    )
-)
+from ccfatigue.analysis.utils.faf import LIST_CYCLES_TO_FAILURE
 
 
 def get_loglog_stress(a: float, b: float, cycles_to_failure) -> float:

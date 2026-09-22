@@ -37,14 +37,7 @@ from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 import ccfatigue.analysis.utils.faf as faf
 from ccfatigue.model import HashinRotemPanelType
 
-LIST_CYCLES_TO_FAILURE = list(
-    chain(
-        range(1, 1000, 50),
-        range(1000, 1001),
-        range(10000, 2000000, 10000),
-        range(2000000, 20000001, 1000000),
-    )
-)
+from ccfatigue.analysis.utils.faf import LIST_CYCLES_TO_FAILURE
 
 # Absolute tolerance used to guard denominators/radicands that would
 # otherwise blow up (division by ~0) or go slightly negative under a square
@@ -553,16 +546,14 @@ def execute(
     # silently papered over by falling back to stress_ratio=1 / CI=0 -
     # producing a full, plausible-looking curve computed from mutually
     # inconsistent data. Raise instead and name the conflicting values.
-    r_avg = (r1 + r2 + ra) / 3
-    if not np.isclose(r_avg, r1):
+    if not ( np.isclose(r1,r2) and np.isclose(r1,ra)):
         raise ValueError(
             "HashinRotem: input files disagree on stress_ratio "
             f"(X={r1}, panel2={r2}, panel3={ra})."
         )
     stress_ratio = r1
 
-    ci_avg = (ci1 + ci2 + cia) / 3
-    if not np.isclose(ci_avg, ci1):
+    if not ( np.isclose(ci1,ci2) and np.isclose(ci1,cia)):
         raise ValueError(
             "HashinRotem: input files disagree on confidence_interval "
             f"(X={ci1}, panel2={ci2}, panel3={cia})."
@@ -617,6 +608,7 @@ def execute(
         cycles_to_failure=cycles,
         on_invalid_point=on_invalid_point,
     )
+
 
     # --- Failure mode selection (book Eqs. 6.1, 6.2a, 6.2b) ---------------
     # f_A(N): axial fatigue function, feeds the fiber mode (Eq. 6.2a). Under
@@ -686,6 +678,7 @@ def execute(
             "failure_mode/stress_max, as specified - this disagreement "
             "needs human review."
         )
+
 
     faf_csv_df["failure_mode"] = pd.Series(
         np.select([fiber_governs, matrix_governs], ["fiber", "matrix"], default=np.nan),
