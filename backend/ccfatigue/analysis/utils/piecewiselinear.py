@@ -26,7 +26,7 @@ def calculate_stress_amplitude(stress_ratio: float, stress_max: float) -> float:
     """
     # https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/cde13599121bceb95d579adfe3e56056ba622d60/CCFatigue_modules/3_CLD/Piecewise-Linear/CLD-Piecewise-Linear.for#L80
     stress_amplitude = 0
-    if abs(stress_ratio) > 1:
+    if stress_ratio > 1:
         stress_amplitude = (1 - (1 / stress_ratio)) * stress_max / 2
     else:
         stress_amplitude = (1 - stress_ratio) * stress_max / 2

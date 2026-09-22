@@ -34,9 +34,6 @@ OUTPUT_CSV_FILE = os.path.join(DATA_DIR, OUTPUT_CSV_FILENAME)
 DEFAULT_UCS = 27.1
 DEFAULT_UTS = 27.7
 
-# Cycles for the isolines (the lines of the CLD)
-CLD_CYCLES_COUNT = [10**x for x in range(3, 10)]  # = 1e3, 1e4, ..., 1e9
-
 
 def execute(
     snc_csv_input_file: FilePath | ReadCsvBuffer,
@@ -74,14 +71,8 @@ def execute(
             f"Missing required SNC columns: {', '.join(sorted(missing_columns))}"
         )
 
-    # Keep only the cycles used to build the CLD
-    snc_df = snc_df[snc_df["cycles_to_failure"].isin(CLD_CYCLES_COUNT)].copy()
-
     if snc_df.empty:
-        raise ValueError(
-            "No SNC rows found for the required CLD cycles: "
-            f"{', '.join(str(x) for x in CLD_CYCLES_COUNT)}"
-        )
+        raise ValueError("No rows found in SNC input file.")
 
     # Calculate stress amplitude sigma_a from SNC points
     snc_df["stress_amplitude"] = snc_df.apply(
@@ -102,7 +93,8 @@ def execute(
     cld_df = pd.DataFrame()
 
     # Build one CLD polyline per life level
-    for cycles_to_failure in CLD_CYCLES_COUNT:
+    all_n = sorted(snc_df["cycles_to_failure"].unique())
+    for cycles_to_failure in all_n:
         group = snc_df[snc_df["cycles_to_failure"] == cycles_to_failure].copy()
 
         if group.empty:

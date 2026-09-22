@@ -32,7 +32,10 @@
         <v-card class="content-card pa-3" elevation="3" rounded="lg">
           <v-card-text class="pa-0 content-wrapper">
             <keep-alive>
-              <component :is="currentComponent" />
+              <component
+                :is="currentComponent"
+                @go-to-module="selectedModule = $event"
+              />
             </keep-alive>
           </v-card-text>
         </v-card>

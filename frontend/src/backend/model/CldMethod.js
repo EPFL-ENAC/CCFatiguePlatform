@@ -23,10 +23,34 @@ export default class CldMethod {
   Harris = "Harris";
 
   /**
+   * value: "SimplifiedHarris"
+   * @const
+   */
+  SimplifiedHarris = "SimplifiedHarris";
+
+  /**
    * value: "PiecewiseLinear"
    * @const
    */
   PiecewiseLinear = "PiecewiseLinear";
+
+  /**
+   * value: "PiecewiseNonLinear"
+   * @const
+   */
+  PiecewiseNonLinear = "PiecewiseNonLinear";
+
+  /**
+   * value: "Kawai"
+   * @const
+   */
+  Kawai = "Kawai";
+
+  /**
+   * value: "Boerstra"
+   * @const
+   */
+  Boerstra = "Boerstra";
 
   /**
    * Returns a <code>CldMethod</code> enum value from a Javascript object name.

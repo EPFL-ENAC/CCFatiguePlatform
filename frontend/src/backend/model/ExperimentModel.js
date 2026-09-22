@@ -21,15 +21,13 @@ import ApiClient from "../ApiClient";
 class ExperimentModel {
   /**
    * Constructs a new <code>ExperimentModel</code>.
-   * Defines how experiment is seen on the API
    * @alias module:model/ExperimentModel
    * @param id {Number}
    * @param researcher {String}
    * @param experimentType {String}
-   * @param fracture {Boolean}
    */
-  constructor(id, researcher, experimentType, fracture) {
-    ExperimentModel.initialize(this, id, researcher, experimentType, fracture);
+  constructor(id, researcher, experimentType) {
+    ExperimentModel.initialize(this, id, researcher, experimentType);
   }
 
   /**
@@ -37,11 +35,10 @@ class ExperimentModel {
    * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
    * Only for internal use.
    */
-  static initialize(obj, id, researcher, experimentType, fracture) {
+  static initialize(obj, id, researcher, experimentType) {
     obj["id"] = id;
     obj["researcher"] = researcher;
     obj["experiment_type"] = experimentType;
-    obj["fracture"] = fracture;
   }
 
   /**
@@ -79,12 +76,6 @@ class ExperimentModel {
           "String"
         );
       }
-      if (data.hasOwnProperty("fracture_mode_fm")) {
-        obj["fracture_mode_fm"] = ApiClient.convertToType(
-          data["fracture_mode_fm"],
-          "String"
-        );
-      }
       if (data.hasOwnProperty("fa_experiment_type")) {
         obj["fa_experiment_type"] = ApiClient.convertToType(
           data["fa_experiment_type"],
@@ -97,16 +88,28 @@ class ExperimentModel {
           "String"
         );
       }
-      if (data.hasOwnProperty("measuring_equipment")) {
-        obj["measuring_equipment"] = ApiClient.convertToType(
-          data["measuring_equipment"],
+      if (data.hasOwnProperty("ot_experiment_type")) {
+        obj["ot_experiment_type"] = ApiClient.convertToType(
+          data["ot_experiment_type"],
           "String"
         );
       }
-      if (data.hasOwnProperty("reliability_level")) {
-        obj["reliability_level"] = ApiClient.convertToType(
-          data["reliability_level"],
-          "Number"
+      if (data.hasOwnProperty("ot_add_info")) {
+        obj["ot_add_info"] = ApiClient.convertToType(
+          data["ot_add_info"],
+          "String"
+        );
+      }
+      if (data.hasOwnProperty("fracture_mode_fm")) {
+        obj["fracture_mode_fm"] = ApiClient.convertToType(
+          data["fracture_mode_fm"],
+          "String"
+        );
+      }
+      if (data.hasOwnProperty("fm_add_info")) {
+        obj["fm_add_info"] = ApiClient.convertToType(
+          data["fm_add_info"],
+          "String"
         );
       }
       if (data.hasOwnProperty("control_mode")) {
@@ -115,15 +118,51 @@ class ExperimentModel {
           "String"
         );
       }
+      if (data.hasOwnProperty("fatigue_loading_type_flt")) {
+        obj["fatigue_loading_type_flt"] = ApiClient.convertToType(
+          data["fatigue_loading_type_flt"],
+          "String"
+        );
+      }
+      if (data.hasOwnProperty("flt_add_info")) {
+        obj["flt_add_info"] = ApiClient.convertToType(
+          data["flt_add_info"],
+          "String"
+        );
+      }
+      if (data.hasOwnProperty("measuring_equipment")) {
+        obj["measuring_equipment"] = ApiClient.convertToType(
+          data["measuring_equipment"],
+          "String"
+        );
+      }
+      if (data.hasOwnProperty("loading_rate")) {
+        obj["loading_rate"] = ApiClient.convertToType(
+          data["loading_rate"],
+          "Number"
+        );
+      }
       if (data.hasOwnProperty("publication_doi")) {
         obj["publication_doi"] = ApiClient.convertToType(
           data["publication_doi"],
           "String"
         );
       }
+      if (data.hasOwnProperty("material_tested")) {
+        obj["material_tested"] = ApiClient.convertToType(
+          data["material_tested"],
+          "String"
+        );
+      }
       if (data.hasOwnProperty("material_type_sample_type")) {
         obj["material_type_sample_type"] = ApiClient.convertToType(
           data["material_type_sample_type"],
+          "String"
+        );
+      }
+      if (data.hasOwnProperty("sample_type_add_info")) {
+        obj["sample_type_add_info"] = ApiClient.convertToType(
+          data["sample_type_add_info"],
           "String"
         );
       }
@@ -142,7 +181,7 @@ class ExperimentModel {
       if (data.hasOwnProperty("material_type_area_density")) {
         obj["material_type_area_density"] = ApiClient.convertToType(
           data["material_type_area_density"],
-          "Number"
+          "String"
         );
       }
       if (data.hasOwnProperty("material_type_resin")) {
@@ -163,18 +202,81 @@ class ExperimentModel {
           "String"
         );
       }
-      if (data.hasOwnProperty("laminates_and_assemblies_fiber_volume_ratio")) {
-        obj["laminates_and_assemblies_fiber_volume_ratio"] =
-          ApiClient.convertToType(
-            data["laminates_and_assemblies_fiber_volume_ratio"],
-            "Number"
-          );
+      if (data.hasOwnProperty("other_polymers_add_info")) {
+        obj["other_polymers_add_info"] = ApiClient.convertToType(
+          data["other_polymers_add_info"],
+          "String"
+        );
+      }
+      if (data.hasOwnProperty("curing_time")) {
+        obj["curing_time"] = ApiClient.convertToType(
+          data["curing_time"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("curing_temperature")) {
+        obj["curing_temperature"] = ApiClient.convertToType(
+          data["curing_temperature"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("curing_pressure")) {
+        obj["curing_pressure"] = ApiClient.convertToType(
+          data["curing_pressure"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("postcuring_time")) {
+        obj["postcuring_time"] = ApiClient.convertToType(
+          data["postcuring_time"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("postcuring_temperature")) {
+        obj["postcuring_temperature"] = ApiClient.convertToType(
+          data["postcuring_temperature"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("postcuring_pressure")) {
+        obj["postcuring_pressure"] = ApiClient.convertToType(
+          data["postcuring_pressure"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("glue")) {
+        obj["glue"] = ApiClient.convertToType(data["glue"], "String");
+      }
+      if (data.hasOwnProperty("glue_curing_time")) {
+        obj["glue_curing_time"] = ApiClient.convertToType(
+          data["glue_curing_time"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("glue_curing_temperature")) {
+        obj["glue_curing_temperature"] = ApiClient.convertToType(
+          data["glue_curing_temperature"],
+          "Number"
+        );
+      }
+      if (data.hasOwnProperty("glue_curing_pressure")) {
+        obj["glue_curing_pressure"] = ApiClient.convertToType(
+          data["glue_curing_pressure"],
+          "Number"
+        );
       }
       if (data.hasOwnProperty("laminates_and_assemblies_stacking_sequence")) {
         obj["laminates_and_assemblies_stacking_sequence"] =
           ApiClient.convertToType(
             data["laminates_and_assemblies_stacking_sequence"],
             "String"
+          );
+      }
+      if (data.hasOwnProperty("laminates_and_assemblies_fiber_volume_ratio")) {
+        obj["laminates_and_assemblies_fiber_volume_ratio"] =
+          ApiClient.convertToType(
+            data["laminates_and_assemblies_fiber_volume_ratio"],
+            "Number"
           );
       }
       if (data.hasOwnProperty("fatigue_r_ratio")) {
@@ -186,69 +288,6 @@ class ExperimentModel {
       if (data.hasOwnProperty("fatigue_frequency")) {
         obj["fatigue_frequency"] = ApiClient.convertToType(
           data["fatigue_frequency"],
-          "Number"
-        );
-      }
-      /* add fatigue control mode */
-      if (data.hasOwnProperty("fatigue_loading_type_flt")) {
-        obj["fatigue_loading_type_flt"] = ApiClient.convertToType(
-          data["fatigue_loading_type_flt"],
-          "String"
-        );
-      }
-      /* add loading rate */
-      if (data.hasOwnProperty("loading_rate")) {
-        obj["loading_rate"] = ApiClient.convertToType(
-          data["loading_rate"],
-          "Number"
-        );
-      }
-      /* add curing time */
-      if (data.hasOwnProperty("curing_time")) {
-        obj["curing_time"] = ApiClient.convertToType(
-          data["curing_time"],
-          "Number"
-        );
-      }
-      /* add curing temperature */
-      if (data.hasOwnProperty("curing_temperature")) {
-        obj["curing_temperature"] = ApiClient.convertToType(
-          data["curing_temperature"],
-          "Number"
-        );
-      }
-      /* add curing pressure */
-      if (data.hasOwnProperty("curing_pressure")) {
-        obj["curing_pressure"] = ApiClient.convertToType(
-          data["curing_pressure"],
-          "Number"
-        );
-      }
-      /* add material tested */
-      if (data.hasOwnProperty("material_tested")) {
-        obj["material_tested"] = ApiClient.convertToType(
-          data["material_tested"],
-          "String"
-        );
-      }
-      /* add postcuring time */
-      if (data.hasOwnProperty("postcuring_time")) {
-        obj["postcuring_time"] = ApiClient.convertToType(
-          data["postcuring_time"],
-          "Number"
-        );
-      }
-      /* add postcuring temperature */
-      if (data.hasOwnProperty("postcuring_temperature")) {
-        obj["postcuring_temperature"] = ApiClient.convertToType(
-          data["postcuring_temperature"],
-          "Number"
-        );
-      }
-      /* add postcuring pressure */
-      if (data.hasOwnProperty("postcuring_pressure")) {
-        obj["postcuring_pressure"] = ApiClient.convertToType(
-          data["postcuring_pressure"],
           "Number"
         );
       }
@@ -283,39 +322,34 @@ ExperimentModel.prototype["date"] = undefined;
 ExperimentModel.prototype["experiment_type"] = undefined;
 
 /**
- * @member {Boolean} fracture
+ * @member {String} fa_experiment_type
  */
-ExperimentModel.prototype["fracture"] = undefined;
+ExperimentModel.prototype["fa_experiment_type"] = undefined;
 
 /**
- * @member {String} fracture_mode
+ * @member {String} qs_experiment_type
  */
-ExperimentModel.prototype["fracture_mode"] = undefined;
+ExperimentModel.prototype["qs_experiment_type"] = undefined;
 
 /**
- * @member {String} fatigue_test_type
+ * @member {String} ot_experiment_type
  */
-ExperimentModel.prototype["fatigue_test_type"] = undefined;
+ExperimentModel.prototype["ot_experiment_type"] = undefined;
 
 /**
- * @member {String} quasi_static_test_type
+ * @member {String} ot_add_info
  */
-ExperimentModel.prototype["quasi_static_test_type"] = undefined;
+ExperimentModel.prototype["ot_add_info"] = undefined;
 
 /**
- * @member {String} temperature_test_type
+ * @member {String} fracture_mode_fm
  */
-ExperimentModel.prototype["temperature_test_type"] = undefined;
+ExperimentModel.prototype["fracture_mode_fm"] = undefined;
 
 /**
- * @member {String} measuring_equipment
+ * @member {String} fm_add_info
  */
-ExperimentModel.prototype["measuring_equipment"] = undefined;
-
-/**
- * @member {Number} reliability_level
- */
-ExperimentModel.prototype["reliability_level"] = undefined;
+ExperimentModel.prototype["fm_add_info"] = undefined;
 
 /**
  * @member {String} control_mode
@@ -323,19 +357,24 @@ ExperimentModel.prototype["reliability_level"] = undefined;
 ExperimentModel.prototype["control_mode"] = undefined;
 
 /**
- * @member {String} publication_title
+ * @member {String} fatigue_loading_type_flt
  */
-ExperimentModel.prototype["publication_title"] = undefined;
+ExperimentModel.prototype["fatigue_loading_type_flt"] = undefined;
 
 /**
- * @member {String} publication_author
+ * @member {String} flt_add_info
  */
-ExperimentModel.prototype["publication_author"] = undefined;
+ExperimentModel.prototype["flt_add_info"] = undefined;
 
 /**
- * @member {String} publication_year
+ * @member {String} measuring_equipment
  */
-ExperimentModel.prototype["publication_year"] = undefined;
+ExperimentModel.prototype["measuring_equipment"] = undefined;
+
+/**
+ * @member {Number} loading_rate
+ */
+ExperimentModel.prototype["loading_rate"] = undefined;
 
 /**
  * @member {String} publication_doi
@@ -343,14 +382,19 @@ ExperimentModel.prototype["publication_year"] = undefined;
 ExperimentModel.prototype["publication_doi"] = undefined;
 
 /**
- * @member {String} publication_images_repository
+ * @member {String} material_tested
  */
-ExperimentModel.prototype["publication_images_repository"] = undefined;
+ExperimentModel.prototype["material_tested"] = undefined;
 
 /**
  * @member {String} material_type_sample_type
  */
 ExperimentModel.prototype["material_type_sample_type"] = undefined;
+
+/**
+ * @member {String} sample_type_add_info
+ */
+ExperimentModel.prototype["sample_type_add_info"] = undefined;
 
 /**
  * @member {String} material_type_fiber_material
@@ -363,7 +407,7 @@ ExperimentModel.prototype["material_type_fiber_material"] = undefined;
 ExperimentModel.prototype["material_type_fiber_form"] = undefined;
 
 /**
- * @member {Number} material_type_area_density
+ * @member {String} material_type_area_density
  */
 ExperimentModel.prototype["material_type_area_density"] = undefined;
 
@@ -383,20 +427,64 @@ ExperimentModel.prototype["material_type_hardener"] = undefined;
 ExperimentModel.prototype["material_type_mixing_ratio"] = undefined;
 
 /**
- * @member {Number} laminates_and_assemblies_curing_time
+ * @member {String} other_polymers_add_info
  */
-ExperimentModel.prototype["laminates_and_assemblies_curing_time"] = undefined;
+ExperimentModel.prototype["other_polymers_add_info"] = undefined;
 
 /**
- * @member {Number} laminates_and_assemblies_curing_temperature
+ * @member {Number} curing_time
  */
-ExperimentModel.prototype["laminates_and_assemblies_curing_temperature"] =
-  undefined;
+ExperimentModel.prototype["curing_time"] = undefined;
 
 /**
- * @member {Number} laminates_and_assemblies_curing_pressure
+ * @member {Number} curing_temperature
  */
-ExperimentModel.prototype["laminates_and_assemblies_curing_pressure"] =
+ExperimentModel.prototype["curing_temperature"] = undefined;
+
+/**
+ * @member {Number} curing_pressure
+ */
+ExperimentModel.prototype["curing_pressure"] = undefined;
+
+/**
+ * @member {Number} postcuring_time
+ */
+ExperimentModel.prototype["postcuring_time"] = undefined;
+
+/**
+ * @member {Number} postcuring_temperature
+ */
+ExperimentModel.prototype["postcuring_temperature"] = undefined;
+
+/**
+ * @member {Number} postcuring_pressure
+ */
+ExperimentModel.prototype["postcuring_pressure"] = undefined;
+
+/**
+ * @member {String} glue
+ */
+ExperimentModel.prototype["glue"] = undefined;
+
+/**
+ * @member {Number} glue_curing_time
+ */
+ExperimentModel.prototype["glue_curing_time"] = undefined;
+
+/**
+ * @member {Number} glue_curing_temperature
+ */
+ExperimentModel.prototype["glue_curing_temperature"] = undefined;
+
+/**
+ * @member {Number} glue_curing_pressure
+ */
+ExperimentModel.prototype["glue_curing_pressure"] = undefined;
+
+/**
+ * @member {String} laminates_and_assemblies_stacking_sequence
+ */
+ExperimentModel.prototype["laminates_and_assemblies_stacking_sequence"] =
   undefined;
 
 /**
@@ -406,24 +494,13 @@ ExperimentModel.prototype["laminates_and_assemblies_fiber_volume_ratio"] =
   undefined;
 
 /**
- * @member {String} laminates_and_assemblies_stacking_sequence
+ * @member {Number} fatigue_r_ratio
  */
-ExperimentModel.prototype["laminates_and_assemblies_stacking_sequence"] =
-  undefined;
+ExperimentModel.prototype["fatigue_r_ratio"] = undefined;
 
 /**
- * @member {Number} measurement_measuring_points
+ * @member {Number} fatigue_frequency
  */
-ExperimentModel.prototype["measurement_measuring_points"] = undefined;
-
-/**
- * @member {Number} dic_analysis_subset_size
- */
-ExperimentModel.prototype["dic_analysis_subset_size"] = undefined;
-
-/**
- * @member {Number} dic_analysis_step_size
- */
-ExperimentModel.prototype["dic_analysis_step_size"] = undefined;
+ExperimentModel.prototype["fatigue_frequency"] = undefined;
 
 export default ExperimentModel;

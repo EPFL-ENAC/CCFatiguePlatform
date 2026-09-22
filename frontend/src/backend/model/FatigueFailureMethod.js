@@ -17,10 +17,40 @@
  */
 export default class FatigueFailureMethod {
   /**
-   * value: "FTPT"
+   * value: "FTPF"
    * @const
    */
-  FTPT = "FTPT";
+  FTPF = "FTPF";
+
+  /**
+   * value: "HashinRotem"
+   * @const
+   */
+  HashinRotem = "HashinRotem";
+
+  /**
+   * value: "ShokriehTaheri"
+   * @const
+   */
+  ShokriehTaheri = "ShokriehTaheri";
+
+  /**
+   * value: "FawazEllyin"
+   * @const
+   */
+  FawazEllyin = "FawazEllyin";
+
+  /**
+   * value: "SimsBrogdon"
+   * @const
+   */
+  SimsBrogdon = "SimsBrogdon";
+
+  /**
+   * value: "Kawai"
+   * @const
+   */
+  Kawai = "Kawai";
 
   /**
    * Returns a <code>FatigueFailureMethod</code> enum value from a Javascript object name.

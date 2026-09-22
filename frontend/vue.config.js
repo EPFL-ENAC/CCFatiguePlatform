@@ -1,11 +1,19 @@
 module.exports = {
   configureWebpack: {
     devtool: "source-map",
+    watchOptions: {
+      poll: 1000,
+      aggregateTimeout: 300,
+    },
   },
   transpileDependencies: ["vuetify"],
   devServer: {
+    hot: true,
+    liveReload: true,
+    watchFiles: ["src/**/*"],
     client: {
       logging: "verbose",
+      overlay: true,
     },
     proxy: {
       "/api": {

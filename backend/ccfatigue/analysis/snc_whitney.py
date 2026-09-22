@@ -13,13 +13,16 @@ from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 from scipy import stats
 from scipy.optimize import brentq
 
-LIST_CYCLES_TO_FAILURE = list(
-    chain(
-        range(1, 1000, 50),
-        range(1000, 1001),
-        range(10000, 2000000, 10000),
-        range(3000000, 20000000, 1000000),
-        range(30000000, 1400000000, 100000000),
+LIST_CYCLES_TO_FAILURE = sorted(
+    set(
+        chain(
+            range(1, 1000, 50),
+            range(1000, 1001),
+            range(10000, 2000000, 10000),
+            range(3000000, 20000000, 1000000),
+            range(30000000, 1400000000, 100000000),
+            [100_000_000, 1_000_000_000],  # 10^8 and 10^9 missing from above range
+        )
     )
 )
 
@@ -222,9 +225,9 @@ def execute(
                 ~level_df["is_runout"], "cycles_to_failure"
             ].to_numpy(dtype=float)
 
-            runouts = level_df.loc[
-                level_df["is_runout"], "cycles_to_failure"
-            ].to_numpy(dtype=float)
+            runouts = level_df.loc[level_df["is_runout"], "cycles_to_failure"].to_numpy(
+                dtype=float
+            )
 
             r_i = len(failures)
 
@@ -276,7 +279,9 @@ def execute(
         stress_levels = np.array(
             [rec["stress_max"] for rec in level_records], dtype=float
         )
-        n0_levels = np.array([q0 * rec["n_hat_i"] for rec in level_records], dtype=float)
+        n0_levels = np.array(
+            [q0 * rec["n_hat_i"] for rec in level_records], dtype=float
+        )
 
         log_sigma = np.log10(stress_levels)
         log_n0 = np.log10(n0_levels)

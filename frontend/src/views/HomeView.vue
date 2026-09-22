@@ -26,7 +26,6 @@
         visualization of existing data and provides an intuitive environment for
         storage of composite materials testings. The database offers access to:
       </p>
-
       <ul>
         <li>Complete experimental setup of experiments</li>
         <li>Raw experimental data files</li>

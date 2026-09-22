@@ -1,18 +1,27 @@
 import os
 
+import ccfatigue.analysis.cld_boerstra as cld_boerstra
 import ccfatigue.analysis.cld_harris as cld_harris
+import ccfatigue.analysis.cld_kawai as cld_kawai
 import ccfatigue.analysis.cld_piecewiselinear as cld_piecewiselinear
+import ccfatigue.analysis.cld_piecewisenonlinear as cld_piecewisenonlinear
+import ccfatigue.analysis.cyc_rainflow as cyc_rainflow
 import ccfatigue.analysis.cyc_rangemean as cyc_rangemean
 import ccfatigue.analysis.cyc_rangepair as cyc_rangepair
 import ccfatigue.analysis.cyc_simplifiedrainflow as cyc_simplifiedrainflow
 import ccfatigue.analysis.das_harris as das_harris
 import ccfatigue.analysis.das_piecewiselinear as das_piecewiselinear
+import ccfatigue.analysis.faf_fawazellyin as faf_fawazellyin
 import ccfatigue.analysis.faf_ftpf as faf_ftpf
 import ccfatigue.analysis.faf_hashinrotem as faf_hashinrotem
+import ccfatigue.analysis.faf_kawai as faf_kawai
+import ccfatigue.analysis.faf_shokriehtaheri as faf_shokriehtaheri
+import ccfatigue.analysis.faf_simsbrogdon as faf_simsbrogdon
 import ccfatigue.analysis.snc_linlog as snc_linlog
 import ccfatigue.analysis.snc_loglog as snc_loglog
 import ccfatigue.analysis.snc_sendeckyj as snc_sendeckyj
 import ccfatigue.analysis.utils.faf as faf
+from ccfatigue.model import HashinRotemPanelType
 
 SRC_DIR = os.path.dirname(os.path.realpath(__file__))
 DATA_DIR = os.path.join(SRC_DIR, "..", "..", "Data", "samples")
@@ -25,6 +34,8 @@ SNC_CSV_2_INPUT_FILE = os.path.join(DATA_DIR, "SNC_sample_2022-10.csv")
 SNC_JSON_F1_INPUT_FILE = os.path.join(DATA_DIR, "SNC_sampleF_2022-10.json")
 SNC_JSON_X1_INPUT_FILE = os.path.join(DATA_DIR, "SNC_sampleX_2022-10.json")
 SNC_JSON_Y1_INPUT_FILE = os.path.join(DATA_DIR, "SNC_sampleY_2022-10.json")
+SNC_JSON_XC1_INPUT_FILE = os.path.join(DATA_DIR, "SNC_sampleXC_2022-10.json")
+SNC_JSON_YC1_INPUT_FILE = os.path.join(DATA_DIR, "SNC_sampleYC_2022-10.json")
 SNC_JSON_F2_INPUT_FILE = os.path.join(DATA_DIR, "SNC_sampleF_2022-11.json")
 SNC_JSON_X2_INPUT_FILE = os.path.join(DATA_DIR, "SNC_sampleX_2022-11.json")
 SNC_JSON_Y2_INPUT_FILE = os.path.join(DATA_DIR, "SNC_sampleY_2022-11.json")
@@ -45,6 +56,11 @@ CYC_RANGEPAIR_CSV_OUTPUT_FILE = os.path.join(
 # Mod 1 - Cycle counting - Simplified Rainflow
 CYC_SIMPLIFIEDRAINFLOW_CSV_OUTPUT_FILE = os.path.join(
     OUTPUT_DIR, "CYC_sample_2022-11_SimplifiedRainflow.csv"
+)
+
+# Mod 1 - Cycle counting - Rainflow
+CYC_RAINFLOW_CSV_OUTPUT_FILE = os.path.join(
+    OUTPUT_DIR, "CYC_sample_2022-11_Rainflow.csv"
 )
 
 # Mod 2 - S-N Curve - LogLog
@@ -77,6 +93,25 @@ CLD_PIECEWISELINEAR_OUTPUT_CSV_FILE = os.path.join(
 CLD_PIECEWISELINEAR_UCS = 27.1
 CLD_PIECEWISELINEAR_UTS = 27.7
 
+# Mod 3 - Constant life diagram - Piecewise Non-Linear
+CLD_PIECEWISENONLINEAR_OUTPUT_CSV_FILE = os.path.join(
+    OUTPUT_DIR, "CLD_sample_2022-09_PiecewiseNonLinear.csv"
+)
+CLD_PIECEWISENONLINEAR_UCS = 27.1
+CLD_PIECEWISENONLINEAR_UTS = 27.7
+
+# Mod 3 - Constant life diagram - Kawai
+CLD_KAWAI_OUTPUT_CSV_FILE = os.path.join(OUTPUT_DIR, "CLD_sample_2022-09_Kawai.csv")
+CLD_KAWAI_UCS = 27.1
+CLD_KAWAI_UTS = 27.7
+
+# Mod 3 - Constant life diagram - Boerstra
+CLD_BOERSTRA_OUTPUT_CSV_FILE = os.path.join(
+    OUTPUT_DIR, "CLD_sample_2022-09_Boerstra.csv"
+)
+CLD_BOERSTRA_UCS = 27.1
+CLD_BOERSTRA_UTS = 27.7
+
 # Mod 4 - Fatigue failture - FTPF
 FAF_FTPF_CSV_OUTPUT_FILE = os.path.join(OUTPUT_DIR, "FAF_sample_2022-10_ftpf.csv")
 FAF_FTPF_JSON_OUTPUT_FILE = os.path.join(OUTPUT_DIR, "FAF_sample_2022-10_ftpf.json")
@@ -93,17 +128,64 @@ FAF_HASHINROTEM_JSON_OUTPUT_FILE = os.path.join(
 FAF_HASHINROTEM_DESIRABLE_ANGLE = 75
 FAF_HASHINROTEM_OFF_AXIS_ANGLE1 = 90
 FAF_HASHINROTEM_OFF_AXIS_ANGLE2 = 45
-# "tensile_axial_strength": 244.84
-# "compressive_axial_strength": 216.68,
+FAF_HASHINROTEM_TENSILE_AXIAL_STRENGTH = 244.84
 FAF_HASHINROTEM_TENSILE_TRANSVERSE_STRENGTH = 84.94
-FAF_HASHINROTEM_COMPRESSIVE_TRANSVERSE_STRENGTH = 83.64
 FAF_HASHINROTEM_SHEAR_STRENGTH = 61.38
 FAF_HASHINROTEM_TENSILE_STRENGTH1 = 84.94
-FAF_HASHINROTEM_COMPRESSIVE_STRENGTH1 = 83.64
 FAF_HASHINROTEM_TENSILE_STRENGTH2 = 139.12
-FAF_HASHINROTEM_COMPRESSIVE_STRENGTH2 = 106.4
 FAF_HASHINROTEM_TENSILE_STRENGTH_AT_DESIRABLE_ANGLE = 89.47
-FAF_HASHINROTEM_COMPRESSIVE_STRENGTH_AT_DESIRABLE_ANGLE = 145.52
+
+# Mod 4 - Fatigue failture - Shokrieh-Taheri
+FAF_SHOKRIEHTAHERI_CSV_OUTPUT_FILE = os.path.join(
+    OUTPUT_DIR, "FAF_sample_2022-09_ShokriehTaheri.csv"
+)
+FAF_SHOKRIEHTAHERI_JSON_OUTPUT_FILE = os.path.join(
+    OUTPUT_DIR, "FAF_sample_2022-09_ShokriehTaheri.json"
+)
+FAF_SHOKRIEHTAHERI_REFERENCE_ANGLE = 90
+FAF_SHOKRIEHTAHERI_REFERENCE_STRESS_RATIO = 0.1
+FAF_SHOKRIEHTAHERI_DESIRABLE_ANGLE = 75
+FAF_SHOKRIEHTAHERI_TARGET_STRESS_RATIO = 0.1
+FAF_SHOKRIEHTAHERI_TENSILE_AXIAL_STRENGTH = 244.84
+FAF_SHOKRIEHTAHERI_COMPRESSIVE_AXIAL_STRENGTH = 216.68
+FAF_SHOKRIEHTAHERI_TENSILE_TRANSVERSE_STRENGTH = 84.94
+FAF_SHOKRIEHTAHERI_COMPRESSIVE_TRANSVERSE_STRENGTH = 83.64
+FAF_SHOKRIEHTAHERI_SHEAR_STRENGTH = 61.38
+
+# Mod 4 - Fatigue failture - Fawaz-Ellyin
+FAF_FAWAZELLYIN_CSV_OUTPUT_FILE = os.path.join(
+    OUTPUT_DIR, "FAF_sample_2022-10_FawazEllyin.csv"
+)
+FAF_FAWAZELLYIN_JSON_OUTPUT_FILE = os.path.join(
+    OUTPUT_DIR, "FAF_sample_2022-10_FawazEllyin.json"
+)
+FAF_FAWAZELLYIN_REFERENCE_ANGLE = 0
+FAF_FAWAZELLYIN_REFERENCE_STATIC_STRENGTH = 244.84
+FAF_FAWAZELLYIN_DESIRABLE_ANGLE = 30
+FAF_FAWAZELLYIN_TARGET_STRESS_RATIO = 0.5
+FAF_FAWAZELLYIN_TARGET_STATIC_STRENGTH = 139.12
+
+# Mod 4 - Fatigue failture - Sims-Brogdon
+FAF_SIMSBROGDON_CSV_OUTPUT_FILE = os.path.join(
+    OUTPUT_DIR, "FAF_sample_2022-10_SimsBrogdon.csv"
+)
+FAF_SIMSBROGDON_JSON_OUTPUT_FILE = os.path.join(
+    OUTPUT_DIR, "FAF_sample_2022-10_SimsBrogdon.json"
+)
+FAF_SIMSBROGDON_DESIRABLE_ANGLE = 30
+FAF_SIMSBROGDON_OFF_AXIS_ANGLE = 160
+
+# Mod 4 - Fatigue failture - Kawai
+FAF_KAWAI_CSV_OUTPUT_FILE = os.path.join(OUTPUT_DIR, "FAF_sample_2022-09_Kawai.csv")
+FAF_KAWAI_JSON_OUTPUT_FILE = os.path.join(OUTPUT_DIR, "FAF_sample_2022-09_Kawai.json")
+FAF_KAWAI_REFERENCE_ANGLE = 90
+FAF_KAWAI_REFERENCE_STRESS_RATIO = 0.1
+FAF_KAWAI_REFERENCE_STATIC_STRENGTH = 244.84
+FAF_KAWAI_DESIRABLE_ANGLE = 75
+FAF_KAWAI_TARGET_STRESS_RATIO = 0.1
+FAF_KAWAI_TENSILE_AXIAL_STRENGTH = 244.84
+FAF_KAWAI_TENSILE_TRANSVERSE_STRENGTH = 84.94
+FAF_KAWAI_SHEAR_STRENGTH = 61.38
 
 # Mod 5 - Damage summation - Harris
 DAS_HARRIS_OUTPUT_DAS_CSV_FILE = os.path.join(
@@ -143,6 +225,10 @@ def test_cyc_simplifiedrainflow():
     cyc_simplifiedrainflow.execute(
         LDS_CSV_1_INPUT_FILE, CYC_SIMPLIFIEDRAINFLOW_CSV_OUTPUT_FILE
     )
+
+
+def test_cyc_rainflow():
+    cyc_rainflow.execute(LDS_CSV_1_INPUT_FILE, CYC_RAINFLOW_CSV_OUTPUT_FILE)
 
 
 # Module 2 - S-N curve
@@ -189,6 +275,33 @@ def test_cld_piecewiselinear() -> None:
     )
 
 
+def test_cld_piecewisenonlinear() -> None:
+    cld_piecewisenonlinear.execute(
+        SNC_CSV_1_INPUT_FILE,
+        CLD_PIECEWISENONLINEAR_OUTPUT_CSV_FILE,
+        CLD_PIECEWISENONLINEAR_UCS,
+        CLD_PIECEWISENONLINEAR_UTS,
+    )
+
+
+def test_cld_kawai() -> None:
+    cld_kawai.execute(
+        SNC_CSV_1_INPUT_FILE,
+        CLD_KAWAI_OUTPUT_CSV_FILE,
+        CLD_KAWAI_UCS,
+        CLD_KAWAI_UTS,
+    )
+
+
+def test_cld_boerstra() -> None:
+    cld_boerstra.execute(
+        SNC_CSV_1_INPUT_FILE,
+        CLD_BOERSTRA_OUTPUT_CSV_FILE,
+        ucs=CLD_BOERSTRA_UCS,
+        uts=CLD_BOERSTRA_UTS,
+    )
+
+
 # Module 4 - Fatigue failture
 
 
@@ -202,6 +315,8 @@ def test_faf_ftpf():
         faf.FatigueModel.LOG_LOG,
         FAF_FTPF_DESIRABLE_ANGLE,
         FAF_FTPF_OFF_AXIS_ANGLE,
+        SNC_JSON_XC1_INPUT_FILE,
+        SNC_JSON_YC1_INPUT_FILE,
     )
 
 
@@ -217,14 +332,73 @@ def test_faf_hashin_rotem():
         FAF_HASHINROTEM_OFF_AXIS_ANGLE1,
         FAF_HASHINROTEM_OFF_AXIS_ANGLE2,
         FAF_HASHINROTEM_TENSILE_TRANSVERSE_STRENGTH,
-        FAF_HASHINROTEM_COMPRESSIVE_TRANSVERSE_STRENGTH,
         FAF_HASHINROTEM_SHEAR_STRENGTH,
         FAF_HASHINROTEM_TENSILE_STRENGTH1,
-        FAF_HASHINROTEM_COMPRESSIVE_STRENGTH1,
         FAF_HASHINROTEM_TENSILE_STRENGTH2,
-        FAF_HASHINROTEM_COMPRESSIVE_STRENGTH2,
         FAF_HASHINROTEM_TENSILE_STRENGTH_AT_DESIRABLE_ANGLE,
-        FAF_HASHINROTEM_COMPRESSIVE_STRENGTH_AT_DESIRABLE_ANGLE,
+        FAF_HASHINROTEM_TENSILE_AXIAL_STRENGTH,
+        HashinRotemPanelType.TRANSVERSE,
+        HashinRotemPanelType.SHEAR,
+    )
+
+
+def test_faf_shokriehtaheri():
+    faf_shokriehtaheri.execute(
+        AGG_CSV_INPUT_FILE,
+        FAF_SHOKRIEHTAHERI_CSV_OUTPUT_FILE,
+        FAF_SHOKRIEHTAHERI_JSON_OUTPUT_FILE,
+        FAF_SHOKRIEHTAHERI_REFERENCE_ANGLE,
+        FAF_SHOKRIEHTAHERI_REFERENCE_STRESS_RATIO,
+        FAF_SHOKRIEHTAHERI_DESIRABLE_ANGLE,
+        FAF_SHOKRIEHTAHERI_TARGET_STRESS_RATIO,
+        FAF_SHOKRIEHTAHERI_TENSILE_AXIAL_STRENGTH,
+        FAF_SHOKRIEHTAHERI_COMPRESSIVE_AXIAL_STRENGTH,
+        FAF_SHOKRIEHTAHERI_TENSILE_TRANSVERSE_STRENGTH,
+        FAF_SHOKRIEHTAHERI_COMPRESSIVE_TRANSVERSE_STRENGTH,
+        FAF_SHOKRIEHTAHERI_SHEAR_STRENGTH,
+    )
+
+
+def test_faf_fawazellyin():
+    faf_fawazellyin.execute(
+        SNC_JSON_X1_INPUT_FILE,
+        FAF_FAWAZELLYIN_CSV_OUTPUT_FILE,
+        FAF_FAWAZELLYIN_JSON_OUTPUT_FILE,
+        faf.FatigueModel.LOG_LOG,
+        FAF_FAWAZELLYIN_REFERENCE_ANGLE,
+        FAF_FAWAZELLYIN_REFERENCE_STATIC_STRENGTH,
+        FAF_FAWAZELLYIN_DESIRABLE_ANGLE,
+        FAF_FAWAZELLYIN_TARGET_STRESS_RATIO,
+        FAF_FAWAZELLYIN_TARGET_STATIC_STRENGTH,
+    )
+
+
+def test_faf_simsbrogdon():
+    faf_simsbrogdon.execute(
+        SNC_JSON_X1_INPUT_FILE,
+        SNC_JSON_Y1_INPUT_FILE,
+        SNC_JSON_F1_INPUT_FILE,
+        FAF_SIMSBROGDON_CSV_OUTPUT_FILE,
+        FAF_SIMSBROGDON_JSON_OUTPUT_FILE,
+        faf.FatigueModel.LOG_LOG,
+        FAF_SIMSBROGDON_DESIRABLE_ANGLE,
+        FAF_SIMSBROGDON_OFF_AXIS_ANGLE,
+    )
+
+
+def test_faf_kawai():
+    faf_kawai.execute(
+        AGG_CSV_INPUT_FILE,
+        FAF_KAWAI_CSV_OUTPUT_FILE,
+        FAF_KAWAI_JSON_OUTPUT_FILE,
+        FAF_KAWAI_REFERENCE_ANGLE,
+        FAF_KAWAI_REFERENCE_STRESS_RATIO,
+        FAF_KAWAI_REFERENCE_STATIC_STRENGTH,
+        FAF_KAWAI_DESIRABLE_ANGLE,
+        FAF_KAWAI_TARGET_STRESS_RATIO,
+        FAF_KAWAI_TENSILE_AXIAL_STRENGTH,
+        FAF_KAWAI_TENSILE_TRANSVERSE_STRENGTH,
+        FAF_KAWAI_SHEAR_STRENGTH,
     )
 
 

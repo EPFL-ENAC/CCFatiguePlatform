@@ -8,14 +8,24 @@ import pandas as pd
 from pandas._typing import ReadCsvBuffer, WriteBuffer
 from pandas.core.frame import DataFrame
 
+import ccfatigue.analysis.cld_boerstra as cld_boerstra
 import ccfatigue.analysis.cld_harris as cld_harris
+import ccfatigue.analysis.cld_kawai as cld_kawai
 import ccfatigue.analysis.cld_piecewiselinear as cld_piecewiselinear
+import ccfatigue.analysis.cld_piecewisenonlinear as cld_piecewisenonlinear
+import ccfatigue.analysis.cld_simplified_harris as cld_simplified_harris
+import ccfatigue.analysis.cyc_rainflow as cyc_rainflow
 import ccfatigue.analysis.cyc_rangemean as cyc_rangemean
 import ccfatigue.analysis.cyc_rangepair as cyc_rangepair
 import ccfatigue.analysis.cyc_simplifiedrainflow as cyc_simplifiedrainflow
 import ccfatigue.analysis.das_harris as das_harris
 import ccfatigue.analysis.das_piecewiselinear as das_piecewiselinear
+import ccfatigue.analysis.faf_fawazellyin as faf_fawazellyin
 import ccfatigue.analysis.faf_ftpf as faf_ftpf
+import ccfatigue.analysis.faf_hashinrotem as faf_hashinrotem
+import ccfatigue.analysis.faf_kawai as faf_kawai
+import ccfatigue.analysis.faf_shokriehtaheri as faf_shokriehtaheri
+import ccfatigue.analysis.faf_simsbrogdon as faf_simsbrogdon
 import ccfatigue.analysis.snc_linlog as snc_linlog
 import ccfatigue.analysis.snc_loglog as snc_loglog
 import ccfatigue.analysis.snc_sendeckyj as snc_sendeckyj
@@ -27,6 +37,7 @@ from ccfatigue.model import (
     CycleCountingMethod,
     DamageSummationMethod,
     FatigueFailureMethod,
+    HashinRotemPanelType,
     SnCurveMethod,
 )
 
@@ -171,6 +182,37 @@ def run_sn_curve(
             raise Exception(f"unknown method {method}")
     return output
 
+
+def run_cld_piecewiselinear_from_sn(
+    file: SpooledTemporaryFile[bytes] | IO,
+    sn_method: SnCurveMethod,
+    ucs: float,
+    uts: float,
+    confidence_interval: float | None = None,
+) -> AnalysisResult:
+    snc_result = run_sn_curve(file, sn_method, confidence_interval)
+    snc_buffer = io.BytesIO(snc_result.csv_data)
+    return run_python(
+        lambda inp, csv_out, _: cld_piecewiselinear.execute(inp, csv_out, ucs, uts),
+        snc_buffer,
+    )
+
+
+def run_cld_piecewisenonlinear_from_sn(
+    file: SpooledTemporaryFile[bytes] | IO,
+    sn_method: SnCurveMethod,
+    ucs: float,
+    uts: float,
+    confidence_interval: float | None = None,
+) -> AnalysisResult:
+    snc_result = run_sn_curve(file, sn_method, confidence_interval)
+    snc_buffer = io.BytesIO(snc_result.csv_data)
+    return run_python(
+        lambda inp, csv_out, _: cld_piecewisenonlinear.execute(inp, csv_out, ucs, uts),
+        snc_buffer,
+    )
+
+
 def run_cycle_counting(
     file: SpooledTemporaryFile[bytes] | IO,
     method: CycleCountingMethod,
@@ -193,6 +235,11 @@ def run_cycle_counting(
                 ),
                 file,
             )
+        case CycleCountingMethod.RAINFLOW:
+            output = run_python(
+                lambda input, csv_output, _: cyc_rainflow.execute(input, csv_output),
+                file,
+            )
         case _:
             raise Exception(f"unknown method {method}")
     return output.csv_data
@@ -203,12 +250,28 @@ def run_cld(
     method: CldMethod,
     ucs: float,
     uts: float,
-) -> bytes:
+    np_reference: float | None = None,
+    m0_init: float | None = None,
+    d_init: float | None = None,
+    alpha_t_init: float | None = None,
+    alpha_c_init: float | None = None,
+) -> AnalysisResult:
     match method:
         case CldMethod.HARRIS:
             output = run_python(
-                lambda input, csv_output, _: cld_harris.execute(
-                    input, csv_output, ucs, uts
+                lambda input, csv_output, json_output: cld_harris.execute(
+                    input,
+                    csv_output,
+                    json_output,
+                    ucs,
+                    uts,
+                ),
+                file,
+            )
+        case CldMethod.SIMPLIFIED_HARRIS:
+            output = run_python(
+                lambda input, csv_output, json_output: cld_simplified_harris.execute(
+                    input, csv_output, json_output, ucs, uts
                 ),
                 file,
             )
@@ -219,9 +282,39 @@ def run_cld(
                 ),
                 file,
             )
+        case CldMethod.PIECEWISENONLINEAR:
+            output = run_python(
+                lambda input, csv_output, _: cld_piecewisenonlinear.execute(
+                    input, csv_output, ucs, uts
+                ),
+                file,
+            )
+        case CldMethod.KAWAI:
+            output = run_python(
+                lambda input, csv_output, _: cld_kawai.execute(
+                    input, csv_output, ucs, uts
+                ),
+                file,
+            )
+        case CldMethod.BOERSTRA:
+            output = run_python(
+                lambda input, csv_output, json_output: cld_boerstra.execute(
+                    input,
+                    csv_output,
+                    json_output,
+                    ucs,
+                    uts,
+                    np_reference,
+                    m0_init,
+                    d_init,
+                    alpha_t_init,
+                    alpha_c_init,
+                ),
+                file,
+            )
         case _:
             raise Exception(f"unknown method {method}")
-    return output.csv_data
+    return output
 
 
 def run_fatigue_failure(
@@ -232,11 +325,21 @@ def run_fatigue_failure(
     snModel: FatigueModel,
     desirable_angle: float,
     off_axis_angle: float,
+    off_axis_angle2: float | None = None,
+    tensile_transverse_strength: float | None = None,
+    compressive_transverse_strength: float | None = None,
+    shear_strength: float | None = None,
+    tensile_strength1: float | None = None,
+    compressive_strength1: float | None = None,
+    tensile_strength2: float | None = None,
+    compressive_strength2: float | None = None,
+    tensile_strength_at_desirable_angle: float | None = None,
+    compressive_strength_at_desirable_angle: float | None = None,
 ) -> AnalysisResult:
     match method:
-        case FatigueFailureMethod.FTPT:
+        case FatigueFailureMethod.SIMS_BROGDON:
             output = run_python_3(
-                lambda x_input, y_input, f_input, csv, json: faf_ftpf.execute(
+                lambda x_input, y_input, f_input, csv, json: faf_simsbrogdon.execute(
                     x_input,
                     y_input,
                     f_input,
@@ -253,6 +356,183 @@ def run_fatigue_failure(
         case _:
             raise Exception(f"unknown method {method}")
     return output
+
+
+def run_fatigue_failure_ftpf(
+    x_file: SpooledTemporaryFile[bytes] | IO,
+    y_file: SpooledTemporaryFile[bytes] | IO,
+    f_file: SpooledTemporaryFile[bytes] | IO,
+    snModel: FatigueModel,
+    desirable_angle: float,
+    off_axis_angle: float,
+    xc_file: SpooledTemporaryFile[bytes] | IO | None = None,
+    yc_file: SpooledTemporaryFile[bytes] | IO | None = None,
+) -> AnalysisResult:
+    with (
+        NamedTemporaryFile() as output_csv_file,
+        NamedTemporaryFile() as output_json_file,
+    ):
+        x_file.seek(0)
+        y_file.seek(0)
+        f_file.seek(0)
+        if xc_file is not None:
+            xc_file.seek(0)
+        if yc_file is not None:
+            yc_file.seek(0)
+        faf_ftpf.execute(
+            x_file,
+            y_file,
+            f_file,
+            output_csv_file,
+            output_json_file,
+            snModel,
+            desirable_angle,
+            off_axis_angle,
+            xc_file,
+            yc_file,
+        )
+        output_csv_file.seek(0)
+        output_json_file.seek(0)
+        return AnalysisResult(
+            csv_data=output_csv_file.read(),
+            json_data=output_json_file.read(),
+        )
+
+
+def run_fatigue_failure_hashinrotem(
+    x_file: SpooledTemporaryFile[bytes] | IO,
+    panel2_file: SpooledTemporaryFile[bytes] | IO,
+    panel3_file: SpooledTemporaryFile[bytes] | IO,
+    snModel: FatigueModel,
+    desirable_angle: float,
+    off_axis_angle1: float,
+    off_axis_angle2: float,
+    tensile_transverse_strength: float,
+    shear_strength: float,
+    tensile_strength1: float,
+    tensile_strength2: float,
+    tensile_strength_at_desirable_angle: float,
+    tensile_axial_strength: float,
+    panel2_type: HashinRotemPanelType,
+    panel3_type: HashinRotemPanelType,
+) -> AnalysisResult:
+    with (
+        NamedTemporaryFile() as output_csv_file,
+        NamedTemporaryFile() as output_json_file,
+    ):
+        x_file.seek(0)
+        panel2_file.seek(0)
+        panel3_file.seek(0)
+        faf_hashinrotem.execute(
+            x_file,
+            panel2_file,
+            panel3_file,
+            output_csv_file,
+            output_json_file,
+            snModel,
+            desirable_angle,
+            off_axis_angle1,
+            off_axis_angle2,
+            tensile_transverse_strength,
+            shear_strength,
+            tensile_strength1,
+            tensile_strength2,
+            tensile_strength_at_desirable_angle,
+            tensile_axial_strength,
+            panel2_type,
+            panel3_type,
+        )
+        output_csv_file.seek(0)
+        output_json_file.seek(0)
+        return AnalysisResult(
+            csv_data=output_csv_file.read(),
+            json_data=output_json_file.read(),
+        )
+
+
+def run_fatigue_failure_shokriehtaheri(
+    agg_file: SpooledTemporaryFile[bytes] | IO,
+    reference_angle: float,
+    reference_stress_ratio: float,
+    desirable_angle: float,
+    target_stress_ratio: float,
+    tensile_axial_strength: float,
+    compressive_axial_strength: float,
+    tensile_transverse_strength: float,
+    compressive_transverse_strength: float,
+    shear_strength: float,
+) -> AnalysisResult:
+    return run_python(
+        lambda input, csv_output, json_output: faf_shokriehtaheri.execute(
+            input,
+            csv_output,
+            json_output,
+            reference_angle,
+            reference_stress_ratio,
+            desirable_angle,
+            target_stress_ratio,
+            tensile_axial_strength,
+            compressive_axial_strength,
+            tensile_transverse_strength,
+            compressive_transverse_strength,
+            shear_strength,
+        ),
+        agg_file,
+    )
+
+
+def run_fatigue_failure_fawazellyin(
+    snc_file: SpooledTemporaryFile[bytes] | IO,
+    sn_model: FatigueModel,
+    reference_angle: float,
+    reference_static_strength: float,
+    desirable_angle: float,
+    target_stress_ratio: float,
+    target_static_strength: float,
+) -> AnalysisResult:
+    return run_python(
+        lambda input, csv_output, json_output: faf_fawazellyin.execute(
+            input,
+            csv_output,
+            json_output,
+            sn_model,
+            reference_angle,
+            reference_static_strength,
+            desirable_angle,
+            target_stress_ratio,
+            target_static_strength,
+        ),
+        snc_file,
+    )
+
+
+def run_fatigue_failure_kawai(
+    agg_file: SpooledTemporaryFile[bytes] | IO,
+    reference_angle: float,
+    reference_stress_ratio: float,
+    reference_static_strength: float,
+    desirable_angle: float,
+    target_stress_ratio: float,
+    tensile_axial_strength: float,
+    tensile_transverse_strength: float,
+    shear_strength: float,
+) -> AnalysisResult:
+    return run_python(
+        lambda input, csv_output, json_output: faf_kawai.execute(
+            input,
+            csv_output,
+            json_output,
+            reference_angle,
+            reference_stress_ratio,
+            reference_static_strength,
+            desirable_angle,
+            target_stress_ratio,
+            tensile_axial_strength,
+            tensile_transverse_strength,
+            shear_strength,
+        ),
+        agg_file,
+    )
 
 
 def run_damage_summation(

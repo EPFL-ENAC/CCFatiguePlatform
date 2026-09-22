@@ -99,7 +99,7 @@ def get_stress_amplitude_case2(
 
 
 def get_stress_amplitude_case3(
-    r_prime: float, uts: float, r_1cc: float, sigma_a_1cc: float
+    r_prime: float, ucs: float, r_1cc: float, sigma_a_1cc: float
 ) -> float:
     """
     Get stress amplitude for given r' when r' < all known r
@@ -108,8 +108,8 @@ def get_stress_amplitude_case3(
     ----------
         r_prime
             r' = (1 + R') / (1 - R')
-        uts
-            Ultimate tensile stress (UTS)
+        ucs
+            Ultimate compressive stress (UCS)
         r_1cc
             r_1CC = (1 + R_1CC) / (1 - R_1CC)
         sigma_a_1cc
@@ -118,7 +118,7 @@ def get_stress_amplitude_case3(
     -------
         sigma_prime_a
     """
-    sigma_prime_a = uts / ((uts / sigma_a_1cc) - r_prime + r_1cc)
+    sigma_prime_a = ucs / ((ucs / sigma_a_1cc) - r_prime + r_1cc)
     return sigma_prime_a
 
 
@@ -195,7 +195,7 @@ def calculate_sigma_a_prime(stress_ratio, known_stress_ratios_df, uts, ucs):
     # If R' > all known R (bigger according to sectors rule)
     if r_is_bigger(stress_ratio, known_stress_ratios[0]):
         stress_amplitudes = known_stress_ratios_df.loc[
-            known_stress_ratios_df.stress_ratio == known_stress_ratios[0].stress_ratio
+            known_stress_ratios_df.stress_ratio == known_stress_ratios[0]
         ].apply(
             lambda x: get_stress_amplitude_case1(
                 get_lowercase_r(stress_ratio),
@@ -209,12 +209,11 @@ def calculate_sigma_a_prime(stress_ratio, known_stress_ratios_df, uts, ucs):
     # If R' < all known R
     elif r_is_bigger(known_stress_ratios[-1], stress_ratio):
         stress_amplitudes = known_stress_ratios_df.loc[
-            known_stress_ratios_df.stress_ratio == known_stress_ratios[-1].stress_ratio
+            known_stress_ratios_df.stress_ratio == known_stress_ratios[-1]
         ].apply(
             lambda x: get_stress_amplitude_case3(
                 get_lowercase_r(stress_ratio),
                 ucs,
-                uts,
                 get_lowercase_r(known_stress_ratios[-1]),
                 x.stress_amplitude,  # type: ignore
             ),

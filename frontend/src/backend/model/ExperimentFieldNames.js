@@ -17,10 +17,64 @@
  */
 export default class ExperimentFieldNames {
   /**
-   * value: "fracture_mode"
+   * value: "experiment_type"
    * @const
    */
-  fracture_mode = "fracture_mode";
+  experiment_type = "experiment_type";
+
+  /**
+   * value: "fa_experiment_type"
+   * @const
+   */
+  fa_experiment_type = "fa_experiment_type";
+
+  /**
+   * value: "qs_experiment_type"
+   * @const
+   */
+  qs_experiment_type = "qs_experiment_type";
+
+  /**
+   * value: "ot_experiment_type"
+   * @const
+   */
+  ot_experiment_type = "ot_experiment_type";
+
+  /**
+   * value: "fracture_mode_fm"
+   * @const
+   */
+  fracture_mode_fm = "fracture_mode_fm";
+
+  /**
+   * value: "control_mode"
+   * @const
+   */
+  control_mode = "control_mode";
+
+  /**
+   * value: "fatigue_loading_type_flt"
+   * @const
+   */
+  fatigue_loading_type_flt = "fatigue_loading_type_flt";
+
+  /**
+   * value: "material_tested"
+   * @const
+   */
+  material_tested = "material_tested";
+
+  /**
+   * value: "material_type_sample_type"
+   * @const
+   */
+  material_type_sample_type = "material_type_sample_type";
+
+  /**
+   * value: "sample_type_add_info"
+   * @const
+   */
+  sample_type_add_info = "sample_type_add_info";
 
   /**
    * value: "material_type_fiber_material"
@@ -29,10 +83,46 @@ export default class ExperimentFieldNames {
   material_type_fiber_material = "material_type_fiber_material";
 
   /**
+   * value: "material_type_fiber_form"
+   * @const
+   */
+  material_type_fiber_form = "material_type_fiber_form";
+
+  /**
+   * value: "material_type_area_density"
+   * @const
+   */
+  material_type_area_density = "material_type_area_density";
+
+  /**
    * value: "material_type_resin"
    * @const
    */
   material_type_resin = "material_type_resin";
+
+  /**
+   * value: "material_type_hardener"
+   * @const
+   */
+  material_type_hardener = "material_type_hardener";
+
+  /**
+   * value: "material_type_mixing_ratio"
+   * @const
+   */
+  material_type_mixing_ratio = "material_type_mixing_ratio";
+
+  /**
+   * value: "other_polymers_add_info"
+   * @const
+   */
+  other_polymers_add_info = "other_polymers_add_info";
+
+  /**
+   * value: "glue"
+   * @const
+   */
+  glue = "glue";
 
   /**
    * value: "laminates_and_assemblies_stacking_sequence"
@@ -40,6 +130,43 @@ export default class ExperimentFieldNames {
    */
   laminates_and_assemblies_stacking_sequence =
     "laminates_and_assemblies_stacking_sequence";
+
+  /**
+   * value: "laminates_and_assemblies_fiber_volume_ratio"
+   * @const
+   */
+  laminates_and_assemblies_fiber_volume_ratio =
+    "laminates_and_assemblies_fiber_volume_ratio";
+
+  /**
+   * value: "fatigue_r_ratio"
+   * @const
+   */
+  fatigue_r_ratio = "fatigue_r_ratio";
+
+  /**
+   * value: "fatigue_frequency"
+   * @const
+   */
+  fatigue_frequency = "fatigue_frequency";
+
+  /**
+   * value: "curing_time"
+   * @const
+   */
+  curing_time = "curing_time";
+
+  /**
+   * value: "curing_temperature"
+   * @const
+   */
+  curing_temperature = "curing_temperature";
+
+  /**
+   * value: "curing_pressure"
+   * @const
+   */
+  curing_pressure = "curing_pressure";
 
   /**
    * Returns a <code>ExperimentFieldNames</code> enum value from a Javascript object name.
