@@ -90,16 +90,19 @@ def get_nstar(log_normalized_stress: pd.Series, log_reversals: pd.Series) -> flo
     -------
         nstar: float
     """
-    y = log_normalized_stress - log_normalized_stress.mean()
-    x = log_reversals - log_reversals.mean()
-    nstar = - (x ** 2).sum() / (x * y).sum()
+    #TODO: understand what fitting has to be used
+    #y = log_normalized_stress - log_normalized_stress.mean()
+    #x = log_reversals - log_reversals.mean()
+    #nstar = - (x ** 2).sum() / (x * y).sum()
 
     #intercept at (0,1)
     #nstar = - (log_reversals.sum() - len(log_reversals)) / log_normalized_stress.sum()
     
     #intercept at (0,0)
-    #nstar = - log_reversals.sum() / log_normalized_stress.sum()
+    nstar = -log_reversals.sum() / log_normalized_stress.sum()
 
+    #nstar, intercept = np.polyfit(log_normalized_stress, log_reversals, deg=1)
+    #print(10 ** intercept)
     return nstar
 
 
@@ -176,7 +179,7 @@ def execute(
         None
     """
     if not (-1 <= target_stress_ratio < 1):
-        raise NotImplementedError(f"target_stress_ratio={target_stress_ratio}")
+        raise ValueError(f"Kawai: Invalid target stress ratio R={target_stress_ratio} (must be in the [-1,1) interval")
 
     agg_df = pd.read_csv(agg_input_csv_file)
 
@@ -193,6 +196,7 @@ def execute(
     )
 
     reference_omega = get_omega(np.radians(reference_angle),tensile_axial_strength,tensile_transverse_strength,shear_strength)
+    
     agg_df["normalized_stress"] = get_normalized_stress(
         agg_df.stress_max, agg_df.stress_ratio, reference_omega
     )
