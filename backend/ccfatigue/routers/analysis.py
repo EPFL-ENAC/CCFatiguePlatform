@@ -129,45 +129,23 @@ async def run_cld_piecewisenonlinear_from_sn_file(
         )
 
 
-@router.post("/fatigueFailure/file", response_model=AnalysisResult)
-async def run_fatigue_failure_file(
-    x_file: UploadFile = File(..., alias="xFile"),
-    y_file: UploadFile = File(..., alias="yFile"),
-    f_file: UploadFile = File(..., alias="fFile"),
+@router.post("/fatigueFailure/material/file", response_model=AnalysisResult)
+async def run_fatigue_failure_material_file(
+    material_file: UploadFile = File(..., alias="materialFile"),
     method: FatigueFailureMethod = Query(...),
-    sn_model: FatigueModel = Query(..., alias="snModel"),
-    desirable_angle: float = Query(..., alias="desirableAngle"),
-    off_axis_angle: float = Query(..., alias="offAxisAngle"),
-    off_axis_angle2: float | None = Query(default=None, alias="offAxisAngle2"),
-    tensile_transverse_strength: float | None = Query(default=None),
-    compressive_transverse_strength: float | None = Query(default=None),
-    shear_strength: float | None = Query(default=None),
-    tensile_strength1: float | None = Query(default=None),
-    compressive_strength1: float | None = Query(default=None),
-    tensile_strength2: float | None = Query(default=None),
-    compressive_strength2: float | None = Query(default=None),
-    tensile_strength_at_desirable_angle: float | None = Query(default=None),
-    compressive_strength_at_desirable_angle: float | None = Query(default=None),
+    target_angle: float = Query(..., alias="targetAngle"),
+    target_stress_ratio: float | None = Query(None, alias="targetStressRatio"),
+    target_static_strength: float | None = Query(None, alias="targetStaticStrength"),
+    agg_file: UploadFile | None = File(None, alias="aggFile"),
 ) -> AnalysisResult:
     try:
         return run_fatigue_failure(
-            x_file.file,
-            y_file.file,
-            f_file.file,
+            material_file.file,
             method,
-            sn_model,
-            desirable_angle,
-            off_axis_angle,
-            off_axis_angle2,
-            tensile_transverse_strength,
-            compressive_transverse_strength,
-            shear_strength,
-            tensile_strength1,
-            compressive_strength1,
-            tensile_strength2,
-            compressive_strength2,
-            tensile_strength_at_desirable_angle,
-            compressive_strength_at_desirable_angle,
+            target_angle,
+            target_stress_ratio,
+            target_static_strength,
+            agg_file.file if agg_file is not None else None,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

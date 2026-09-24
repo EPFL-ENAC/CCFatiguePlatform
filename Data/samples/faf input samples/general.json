@@ -1,0 +1,74 @@
+{
+  "static_strengths": [
+    { "angle": 0.0, "value": 1236.09 },
+    { "angle": 90.0, "value": 28.45 },
+    { "angle": 15.0, "value": 142.98 },
+    { "type": "compressive", "angle": 0.0, "value": 1236.09 },
+    { "type": "compressive", "angle": 90.0, "value": 28.45 },
+    { "type": "shear", "value": 37.96 }
+  ],
+  "SN_curves": [
+    {
+      "angle": 0.0,
+      "stress_ratio": 0.1,
+      "model": "loglog",
+      "a": 1740.0,
+      "b": 0.0786,
+      "confidence_interval": 50,
+      "lrsq": 0.0,
+      "fp": 0.0
+    },
+    {
+      "angle": 90.0,
+      "stress_ratio": 0.1,
+      "model": "loglog",
+      "a": 41.04,
+      "b": 0.086,
+      "confidence_interval": 50,
+      "lrsq": 0.0,
+      "fp": 0.0
+    },
+    {
+      "angle": 15.0,
+      "stress_ratio": 0.1,
+      "model": "loglog",
+      "a": 221.25,
+      "b": 0.1022,
+      "confidence_interval": 50,
+      "lrsq": 0.0,
+      "fp": 0.0
+    },
+    {
+      "type": "shear",
+      "stress_ratio": 0.1,
+      "model": "loglog",
+      "a": 64.35,
+      "b": 0.1118,
+      "confidence_interval": 50,
+      "lrsq": 0.0,
+      "fp": 0.0
+    },
+    {
+      "type": "compressive",
+      "angle": 0.0,
+      "stress_ratio": 10.0,
+      "model": "loglog",
+      "a": 1740.0,
+      "b": 0.0786,
+      "confidence_interval": 50,
+      "lrsq": 0.0,
+      "fp": 0.0
+    },
+    {
+      "type": "compressive",
+      "angle": 90.0,
+      "stress_ratio": 10.0,
+      "model": "loglog",
+      "a": 41.04,
+      "b": 0.086,
+      "confidence_interval": 50,
+      "lrsq": 0.0,
+      "fp": 0.0
+    }
+  ]
+}

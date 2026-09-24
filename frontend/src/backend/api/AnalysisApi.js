@@ -595,6 +595,73 @@ export default class AnalysisApi {
   }
 
   /**
+   * Run a fatigue-failure analysis from a combined material JSON file.
+   * @param {module:model/FatigueFailureMethod} method
+   * @param {Number} targetAngle
+   * @param {File} materialFile
+   * @param {Object} opts Optional parameters
+   * @param {Number} opts.targetStressRatio
+   * @param {Number} opts.targetStaticStrength
+   * @param {File} opts.aggFile
+   * @return {Promise} an object containing data and the HTTP response
+   */
+  runFatigueFailureMaterialFileWithHttpInfo(
+    method,
+    targetAngle,
+    materialFile,
+    opts
+  ) {
+    opts = opts || {};
+    const required = {
+      method,
+      targetAngle,
+      materialFile,
+    };
+    Object.keys(required).forEach((name) => {
+      if (required[name] === undefined || required[name] === null) {
+        throw new Error(
+          `Missing the required parameter '${name}' when calling runFatigueFailureMaterialFile`
+        );
+      }
+    });
+
+    return this.apiClient.callApi(
+      "/analysis/fatigueFailure/material/file",
+      "POST",
+      {},
+      {
+        method,
+        targetAngle,
+        targetStressRatio: opts["targetStressRatio"],
+        targetStaticStrength: opts["targetStaticStrength"],
+      },
+      {},
+      { materialFile, aggFile: opts["aggFile"] },
+      null,
+      [],
+      ["multipart/form-data"],
+      ["application/json"],
+      AnalysisResult,
+      null
+    );
+  }
+
+  /**
+   * Run a fatigue-failure analysis from a combined material JSON file.
+   * @return {Promise} a Promise with data of type AnalysisResult
+   */
+  runFatigueFailureMaterialFile(method, targetAngle, materialFile, opts) {
+    return this.runFatigueFailureMaterialFileWithHttpInfo(
+      method,
+      targetAngle,
+      materialFile,
+      opts
+    ).then(function (response_and_data) {
+      return response_and_data.data;
+    });
+  }
+
+  /**
    * Run Fatigue Failure File
    * @param {module:model/FatigueFailureMethod} method
    * @param {module:model/FatigueModel} snModel
