@@ -13,8 +13,9 @@ from dataclasses import dataclass
 from io import BytesIO
 from typing import IO, Any, Iterable
 
-from ccfatigue.analysis.utils.faf import FatigueModel
+from ccfatigue.analysis.utils.faf import FatigueModel, LoadType
 
+import numpy as np
 
 ANGLE_TOLERANCE = 1e-9
 
@@ -35,19 +36,21 @@ def _positive_number(value: Any, path: str) -> float:
     return result
 
 
-def _load_type(value: Any, path: str, *, default: str = "tensile") -> str:
+def _load_type(
+    value: Any, path: str, *, default: LoadType = LoadType.T
+) -> LoadType:
     if value is None:
         return default
     if not isinstance(value, str):
         raise ValueError(f"{path} must be a string.")
     normalized = value.strip().lower().replace("_", "-")
     aliases = {
-        "normal": "tensile",
-        "tension": "tensile",
-        "tensile": "tensile",
-        "compression": "compressive",
-        "compressive": "compressive",
-        "shear": "shear",
+        "normal": LoadType.T,
+        "tension": LoadType.T,
+        "tensile": LoadType.T,
+        "compression": LoadType.C,
+        "compressive": LoadType.C,
+        "shear": LoadType.S,
     }
     try:
         return aliases[normalized]
@@ -73,15 +76,15 @@ def _fatigue_model(value: Any, path: str) -> FatigueModel:
 
 @dataclass(frozen=True)
 class StaticStrength:
-    load_type: str
+    load_type: LoadType
     value: float
     angle: float | None
 
 
 @dataclass(frozen=True)
 class SNCurve:
-    load_type: str
-    angle: float | None
+    load_type: LoadType
+    angle: float
     stress_ratio: float
     model: FatigueModel
     a: float
@@ -103,6 +106,15 @@ class SNCurve:
         if self.fp is not None:
             record["fp"] = self.fp
         return BytesIO(json.dumps([record]).encode("utf-8"))
+
+    def stress_max(self,N):
+        if self.model == FatigueModel.LIN_LOG:
+            return self.a + self.b * np.log10(N)
+        else:
+            return self.a * N ** (-self.b)
+
+
+        
 
 
 @dataclass(frozen=True)
@@ -150,7 +162,7 @@ class FatigueFailureMaterial:
             raise ValueError(f"{path}.value is required.")
         value = _positive_number(item["value"], f"{path}.value")
         angle = None
-        if load_type != "shear":
+        if load_type != LoadType.S:
             if "angle" not in item:
                 raise ValueError(f"{path}.angle is required for {load_type} strength.")
             angle = _number(item["angle"], f"{path}.angle")
@@ -165,7 +177,7 @@ class FatigueFailureMaterial:
             raise ValueError(f"{path} must be an object.")
         load_type = _load_type(item.get("type"), f"{path}.type")
         angle = None
-        if load_type != "shear":
+        if load_type != LoadType.S:
             if "angle" not in item:
                 raise ValueError(f"{path}.angle is required for {load_type} curve.")
             angle = _number(item["angle"], f"{path}.angle")

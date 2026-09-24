@@ -31,8 +31,7 @@ import ccfatigue.analysis.snc_linlog as snc_linlog
 import ccfatigue.analysis.snc_loglog as snc_loglog
 import ccfatigue.analysis.snc_sendeckyj as snc_sendeckyj
 import ccfatigue.analysis.snc_whitney as snc_whitney
-from ccfatigue.analysis.utils.faf import FatigueModel
-from ccfatigue.fatigue_failure_input import FatigueFailureMaterial
+from ccfatigue.utils.fatigue_failure_input import FatigueFailureMaterial
 from ccfatigue.model import (
     AnalysisResult,
     CldMethod,
@@ -318,9 +317,43 @@ def run_cld(
             raise Exception(f"unknown method {method}")
     return output
 
-"""
 
-"""
+def _validate_target_angle(target_angle: float) -> None:
+    if not math.isfinite(target_angle):
+        raise ValueError("Target angle must be finite.")
+
+
+def _require_target_stress_ratio(
+    method: FatigueFailureMethod, target_stress_ratio: float | None
+) -> float:
+    if target_stress_ratio is None or not math.isfinite(target_stress_ratio):
+        raise ValueError(f"{method.value} requires a finite target stress ratio.")
+    return target_stress_ratio
+
+
+def _require_target_static_strength(
+    method: FatigueFailureMethod, target_static_strength: float | None
+) -> float:
+    if (
+        target_static_strength is None
+        or not math.isfinite(target_static_strength)
+        or target_static_strength <= 0
+    ):
+        raise ValueError(
+            f"{method.value} requires a target static strength greater than zero."
+        )
+    return target_static_strength
+
+
+def _require_agg_file(
+    method: FatigueFailureMethod,
+    agg_file: SpooledTemporaryFile[bytes] | IO | None,
+) -> SpooledTemporaryFile[bytes] | IO:
+    if agg_file is None:
+        raise ValueError(f"{method.value} requires an AGG CSV file.")
+    return agg_file
+
+
 def run_fatigue_failure(
     material_file: SpooledTemporaryFile[bytes] | IO,
     method: FatigueFailureMethod,
@@ -329,243 +362,80 @@ def run_fatigue_failure(
     target_static_strength: float | None = None,
     agg_file: SpooledTemporaryFile[bytes] | IO | None = None,
 ) -> AnalysisResult:
-    """Run a fatigue-failure method from material JSON and optional AGG data."""
+    """Dispatch a fatigue-failure analysis to its method-specific runner."""
 
-    # check1 : checks that all the needed files are present
-    if not math.isfinite(target_angle):
-        raise ValueError("Target angle must be finite.")
-
-    methods_needing_target_ratio = {
-        FatigueFailureMethod.SHOKRIEH_TAHERI,
-        FatigueFailureMethod.FAWAZ_ELLYIN,
-        FatigueFailureMethod.KAWAI,
+    runners = {
+        FatigueFailureMethod.FTPF: run_fatigue_failure_ftpf,
+        FatigueFailureMethod.HASHIN_ROTEM: run_fatigue_failure_hashinrotem,
+        FatigueFailureMethod.SIMS_BROGDON: run_fatigue_failure_simsbrogdon,
+        FatigueFailureMethod.SHOKRIEH_TAHERI: run_fatigue_failure_shokriehtaheri,
+        FatigueFailureMethod.FAWAZ_ELLYIN: run_fatigue_failure_fawazellyin,
+        FatigueFailureMethod.KAWAI: run_fatigue_failure_kawai,
     }
-    if method in methods_needing_target_ratio and (
-        target_stress_ratio is None or not math.isfinite(target_stress_ratio)
-    ):
-        raise ValueError(f"{method.value} requires a finite target stress ratio.")
-
-    methods_needing_target_strength = {
-        FatigueFailureMethod.HASHIN_ROTEM,
-        FatigueFailureMethod.FAWAZ_ELLYIN,
-    }
-    if method in methods_needing_target_strength and (
-        target_static_strength is None
-        or not math.isfinite(target_static_strength)
-        or target_static_strength <= 0
-    ):
-        raise ValueError(
-            f"{method.value} requires a target static strength greater than zero."
-        )
-
-    methods_needing_agg_file = {
-        FatigueFailureMethod.SHOKRIEH_TAHERI,
-        FatigueFailureMethod.KAWAI,
-    }
-
-    if method in methods_needing_agg_file and agg_file is None:
-        raise ValueError(f"{method.value} requires an AGG CSV file.")
-    # end check 1
-
-    #imports the material
-    material = FatigueFailureMaterial.from_file(material_file)
-
-    match method:
-        case FatigueFailureMethod.FTPF:
-            source_stress_ratio = material.primary_stress_ratio()
-            x_curve = material.curve(
-                "tensile", angle=0, stress_ratio=source_stress_ratio
-            )
-            y_curve = material.curve(
-                "tensile", angle=90, stress_ratio=source_stress_ratio
-            )
-            f_curve, off_axis_angle = material.shear_or_off_axis_curve(
-                source_stress_ratio
-            )
-            xc_curve = material.curve(
-                "compressive",
-                angle=0,
-                stress_ratio=source_stress_ratio,
-                allow_ratio_fallback=True,
-            )
-            yc_curve = material.curve(
-                "compressive",
-                angle=90,
-                stress_ratio=source_stress_ratio,
-                allow_ratio_fallback=True,
-            )
-            sn_model = material.common_model(
-                (x_curve, y_curve, f_curve, xc_curve, yc_curve)
-            )
-            return run_fatigue_failure_ftpf(
-                x_curve.as_file(),
-                y_curve.as_file(),
-                f_curve.as_file(),
-                sn_model,
-                target_angle,
-                off_axis_angle,
-                xc_curve.as_file(),
-                yc_curve.as_file(),
-            )
-
-        case FatigueFailureMethod.HASHIN_ROTEM:
-            source_stress_ratio = material.primary_stress_ratio()
-            x_curve = material.curve(
-                "tensile", angle=0, stress_ratio=source_stress_ratio
-            )
-            (
-                panel2_curve,
-                panel3_curve,
-                panel2_type,
-                panel3_type,
-                tensile_strength1,
-                tensile_strength2,
-            ) = material.transverse_and_shear_curves(source_stress_ratio)
-            sn_model = material.common_model(
-                (x_curve, panel2_curve, panel3_curve)
-            )
-            return run_fatigue_failure_hashinrotem(
-                x_curve.as_file(),
-                panel2_curve.as_file(),
-                panel3_curve.as_file(),
-                sn_model,
-                target_angle,
-                panel2_curve.angle or 0,
-                panel3_curve.angle or 0,
-                material.strength("tensile", 90),
-                material.strength("shear"),
-                tensile_strength1,
-                tensile_strength2,
-                float(target_static_strength),
-                material.strength("tensile", 0),
-                HashinRotemPanelType(panel2_type),
-                HashinRotemPanelType(panel3_type),
-            )
-
-        case FatigueFailureMethod.SIMS_BROGDON:
-            source_stress_ratio = material.primary_stress_ratio()
-            x_curve = material.curve(
-                "tensile", angle=0, stress_ratio=source_stress_ratio
-            )
-            y_curve = material.curve(
-                "tensile", angle=90, stress_ratio=source_stress_ratio
-            )
-            f_curve, off_axis_angle = material.shear_or_off_axis_curve(
-                source_stress_ratio
-            )
-            sn_model = material.common_model((x_curve, y_curve, f_curve))
-            return run_python_3(
-                lambda x_input, y_input, f_input, csv, json: faf_simsbrogdon.execute(
-                    x_input,
-                    y_input,
-                    f_input,
-                    csv,
-                    json,
-                    sn_model,
-                    target_angle,
-                    off_axis_angle,
-                ),
-                x_curve.as_file(),
-                y_curve.as_file(),
-                f_curve.as_file(),
-            )
-
-        case FatigueFailureMethod.SHOKRIEH_TAHERI:
-            curves = material.reference_curve_group(target_angle)
-            reference_curve = next(
-                (
-                    curve
-                    for curve in curves
-                    if abs(curve.stress_ratio - float(target_stress_ratio)) < 1e-9
-                ),
-                curves[0],
-            )
-            return run_fatigue_failure_shokriehtaheri(
-                agg_file,
-                float(reference_curve.angle),
-                reference_curve.stress_ratio,
-                target_angle,
-                float(target_stress_ratio),
-                material.strength("tensile", 0),
-                material.strength("compressive", 0),
-                material.strength("tensile", 90),
-                material.strength("compressive", 90),
-                material.strength("shear"),
-            )
-
-        case FatigueFailureMethod.FAWAZ_ELLYIN:
-            curve = material.reference_curve(
-                target_angle, float(target_stress_ratio)
-            )
-            return run_fatigue_failure_fawazellyin(
-                curve.as_file(),
-                curve.model,
-                float(curve.angle),
-                material.strength(curve.load_type, curve.angle),
-                target_angle,
-                float(target_stress_ratio),
-                float(target_static_strength),
-            )
-
-        case FatigueFailureMethod.KAWAI:
-            curves = material.reference_curve_group(target_angle)
-            reference_curve = next(
-                (
-                    curve
-                    for curve in curves
-                    if abs(curve.stress_ratio - float(target_stress_ratio)) < 1e-9
-                ),
-                curves[0],
-            )
-            reference_angle = float(reference_curve.angle)
-            return run_fatigue_failure_kawai(
-                agg_file,
-                reference_angle,
-                reference_curve.stress_ratio,
-                material.strength("tensile", reference_angle),
-                target_angle,
-                float(target_stress_ratio),
-                material.strength("tensile", 0),
-                material.strength("tensile", 90),
-                material.strength("shear"),
-            )
-
-        case _:
-            raise Exception(f"unknown method {method}")
+    try:
+        runner = runners[method]
+    except KeyError as exc:
+        raise ValueError(f"unknown method {method}") from exc
+    return runner(
+        material_file,
+        target_angle,
+        target_static_strength,
+        target_stress_ratio,
+        agg_file,
+    )
 
 
 def run_fatigue_failure_ftpf(
-    x_file: SpooledTemporaryFile[bytes] | IO,
-    y_file: SpooledTemporaryFile[bytes] | IO,
-    f_file: SpooledTemporaryFile[bytes] | IO,
-    snModel: FatigueModel,
-    desirable_angle: float,
-    off_axis_angle: float,
-    xc_file: SpooledTemporaryFile[bytes] | IO | None = None,
-    yc_file: SpooledTemporaryFile[bytes] | IO | None = None,
+    material: SpooledTemporaryFile[bytes] | IO,
+    target_angle: float,
+    target_static_strength: float | None = None,
+    target_stress_ratio: float | None = None,
+    agg_file: SpooledTemporaryFile[bytes] | IO | None = None,
 ) -> AnalysisResult:
+    _validate_target_angle(target_angle)
+    material_data = FatigueFailureMaterial.from_file(material)
+
+    source_stress_ratio = material_data.primary_stress_ratio()
+    x_curve = material_data.curve(
+        "tensile", angle=0, stress_ratio=source_stress_ratio
+    )
+    y_curve = material_data.curve(
+        "tensile", angle=90, stress_ratio=source_stress_ratio
+    )
+    f_curve, off_axis_angle = material_data.shear_or_off_axis_curve(
+        source_stress_ratio
+    )
+    xc_curve = material_data.curve(
+        "compressive",
+        angle=0,
+        stress_ratio=source_stress_ratio,
+        allow_ratio_fallback=True,
+    )
+    yc_curve = material_data.curve(
+        "compressive",
+        angle=90,
+        stress_ratio=source_stress_ratio,
+        allow_ratio_fallback=True,
+    )
+    sn_model = material_data.common_model(
+        (x_curve, y_curve, f_curve, xc_curve, yc_curve)
+    )
+
     with (
         NamedTemporaryFile() as output_csv_file,
         NamedTemporaryFile() as output_json_file,
     ):
-        x_file.seek(0)
-        y_file.seek(0)
-        f_file.seek(0)
-        if xc_file is not None:
-            xc_file.seek(0)
-        if yc_file is not None:
-            yc_file.seek(0)
         faf_ftpf.execute(
-            x_file,
-            y_file,
-            f_file,
+            x_curve.as_file(),
+            y_curve.as_file(),
+            f_curve.as_file(),
             output_csv_file,
             output_json_file,
-            snModel,
-            desirable_angle,
+            sn_model,
+            target_angle,
             off_axis_angle,
-            xc_file,
-            yc_file,
+            xc_curve.as_file(),
+            yc_curve.as_file(),
         )
         output_csv_file.seek(0)
         output_json_file.seek(0)
@@ -576,47 +446,54 @@ def run_fatigue_failure_ftpf(
 
 
 def run_fatigue_failure_hashinrotem(
-    x_file: SpooledTemporaryFile[bytes] | IO,
-    panel2_file: SpooledTemporaryFile[bytes] | IO,
-    panel3_file: SpooledTemporaryFile[bytes] | IO,
-    snModel: FatigueModel,
-    desirable_angle: float,
-    off_axis_angle1: float,
-    off_axis_angle2: float,
-    tensile_transverse_strength: float,
-    shear_strength: float,
-    tensile_strength1: float,
-    tensile_strength2: float,
-    tensile_strength_at_desirable_angle: float,
-    tensile_axial_strength: float,
-    panel2_type: HashinRotemPanelType,
-    panel3_type: HashinRotemPanelType,
+    material: SpooledTemporaryFile[bytes] | IO,
+    target_angle: float,
+    target_static_strength: float | None = None,
+    target_stress_ratio: float | None = None,
+    agg_file: SpooledTemporaryFile[bytes] | IO | None = None,
 ) -> AnalysisResult:
+    _validate_target_angle(target_angle)
+    target_static_strength = _require_target_static_strength(
+        FatigueFailureMethod.HASHIN_ROTEM, target_static_strength
+    )
+    material_data = FatigueFailureMaterial.from_file(material)
+
+    source_stress_ratio = material_data.primary_stress_ratio()
+    x_curve = material_data.curve(
+        "tensile", angle=0, stress_ratio=source_stress_ratio
+    )
+    (
+        panel2_curve,
+        panel3_curve,
+        panel2_type,
+        panel3_type,
+        tensile_strength1,
+        tensile_strength2,
+    ) = material_data.transverse_and_shear_curves(source_stress_ratio)
+    sn_model = material_data.common_model((x_curve, panel2_curve, panel3_curve))
+
     with (
         NamedTemporaryFile() as output_csv_file,
         NamedTemporaryFile() as output_json_file,
     ):
-        x_file.seek(0)
-        panel2_file.seek(0)
-        panel3_file.seek(0)
         faf_hashinrotem.execute(
-            x_file,
-            panel2_file,
-            panel3_file,
+            x_curve.as_file(),
+            panel2_curve.as_file(),
+            panel3_curve.as_file(),
             output_csv_file,
             output_json_file,
-            snModel,
-            desirable_angle,
-            off_axis_angle1,
-            off_axis_angle2,
-            tensile_transverse_strength,
-            shear_strength,
+            sn_model,
+            target_angle,
+            panel2_curve.angle or 0,
+            panel3_curve.angle or 0,
+            material_data.strength("tensile", 90),
+            material_data.strength("shear"),
             tensile_strength1,
             tensile_strength2,
-            tensile_strength_at_desirable_angle,
-            tensile_axial_strength,
-            panel2_type,
-            panel3_type,
+            target_static_strength,
+            material_data.strength("tensile", 0),
+            HashinRotemPanelType(panel2_type),
+            HashinRotemPanelType(panel3_type),
         )
         output_csv_file.seek(0)
         output_json_file.seek(0)
@@ -626,86 +503,166 @@ def run_fatigue_failure_hashinrotem(
         )
 
 
-def run_fatigue_failure_shokriehtaheri(
-    agg_file: SpooledTemporaryFile[bytes] | IO,
-    reference_angle: float,
-    reference_stress_ratio: float,
-    desirable_angle: float,
-    target_stress_ratio: float,
-    tensile_axial_strength: float,
-    compressive_axial_strength: float,
-    tensile_transverse_strength: float,
-    compressive_transverse_strength: float,
-    shear_strength: float,
+def run_fatigue_failure_simsbrogdon(
+    material: SpooledTemporaryFile[bytes] | IO,
+    target_angle: float,
+    target_static_strength: float | None = None,
+    target_stress_ratio: float | None = None,
+    agg_file: SpooledTemporaryFile[bytes] | IO | None = None,
 ) -> AnalysisResult:
+    _validate_target_angle(target_angle)
+    material_data = FatigueFailureMaterial.from_file(material)
+
+    source_stress_ratio = material_data.primary_stress_ratio()
+    x_curve = material_data.curve(
+        "tensile", angle=0, stress_ratio=source_stress_ratio
+    )
+    y_curve = material_data.curve(
+        "tensile", angle=90, stress_ratio=source_stress_ratio
+    )
+    f_curve, off_axis_angle = material_data.shear_or_off_axis_curve(
+        source_stress_ratio
+    )
+    sn_model = material_data.common_model((x_curve, y_curve, f_curve))
+    return run_python_3(
+        lambda x_input, y_input, f_input, csv, json: faf_simsbrogdon.execute(
+            x_input,
+            y_input,
+            f_input,
+            csv,
+            json,
+            sn_model,
+            target_angle,
+            off_axis_angle,
+        ),
+        x_curve.as_file(),
+        y_curve.as_file(),
+        f_curve.as_file(),
+    )
+
+
+def run_fatigue_failure_shokriehtaheri(
+    material: SpooledTemporaryFile[bytes] | IO,
+    target_angle: float,
+    target_static_strength: float | None = None,
+    target_stress_ratio: float | None = None,
+    agg_file: SpooledTemporaryFile[bytes] | IO | None = None,
+) -> AnalysisResult:
+    _validate_target_angle(target_angle)
+    target_stress_ratio = _require_target_stress_ratio(
+        FatigueFailureMethod.SHOKRIEH_TAHERI, target_stress_ratio
+    )
+    agg_file = _require_agg_file(FatigueFailureMethod.SHOKRIEH_TAHERI, agg_file)
+    material_data = FatigueFailureMaterial.from_file(material)
+
+    curves = material_data.reference_curve_group(target_angle)
+    reference_curve = next(
+        (
+            curve
+            for curve in curves
+            if math.isclose(
+                curve.stress_ratio,
+                target_stress_ratio,
+                rel_tol=0,
+                abs_tol=1e-9,
+            )
+        ),
+        curves[0],
+    )
     return run_python(
         lambda input, csv_output, json_output: faf_shokriehtaheri.execute(
             input,
             csv_output,
             json_output,
-            reference_angle,
-            reference_stress_ratio,
-            desirable_angle,
+            float(reference_curve.angle),
+            reference_curve.stress_ratio,
+            target_angle,
             target_stress_ratio,
-            tensile_axial_strength,
-            compressive_axial_strength,
-            tensile_transverse_strength,
-            compressive_transverse_strength,
-            shear_strength,
+            material_data.strength("tensile", 0),
+            material_data.strength("compressive", 0),
+            material_data.strength("tensile", 90),
+            material_data.strength("compressive", 90),
+            material_data.strength("shear"),
         ),
         agg_file,
     )
 
 
 def run_fatigue_failure_fawazellyin(
-    snc_file: SpooledTemporaryFile[bytes] | IO,
-    sn_model: FatigueModel,
-    reference_angle: float,
-    reference_static_strength: float,
-    desirable_angle: float,
-    target_stress_ratio: float,
-    target_static_strength: float,
+    material: SpooledTemporaryFile[bytes] | IO,
+    target_angle: float,
+    target_static_strength: float | None = None,
+    target_stress_ratio: float | None = None,
+    agg_file: SpooledTemporaryFile[bytes] | IO | None = None,
 ) -> AnalysisResult:
+    _validate_target_angle(target_angle)
+    target_static_strength = _require_target_static_strength(
+        FatigueFailureMethod.FAWAZ_ELLYIN, target_static_strength
+    )
+    target_stress_ratio = _require_target_stress_ratio(
+        FatigueFailureMethod.FAWAZ_ELLYIN, target_stress_ratio
+    )
+    material_data = FatigueFailureMaterial.from_file(material)
+    curve = material_data.reference_curve(target_angle, target_stress_ratio)
+
     return run_python(
         lambda input, csv_output, json_output: faf_fawazellyin.execute(
             input,
             csv_output,
             json_output,
-            sn_model,
-            reference_angle,
-            reference_static_strength,
-            desirable_angle,
+            curve.model,
+            float(curve.angle),
+            material_data.strength(curve.load_type, curve.angle),
+            target_angle,
             target_stress_ratio,
             target_static_strength,
         ),
-        snc_file,
+        curve.as_file(),
     )
 
 
 def run_fatigue_failure_kawai(
-    agg_file: SpooledTemporaryFile[bytes] | IO,
-    reference_angle: float,
-    reference_stress_ratio: float,
-    reference_static_strength: float,
-    desirable_angle: float,
-    target_stress_ratio: float,
-    tensile_axial_strength: float,
-    tensile_transverse_strength: float,
-    shear_strength: float,
+    material: SpooledTemporaryFile[bytes] | IO,
+    target_angle: float,
+    target_static_strength: float | None = None,
+    target_stress_ratio: float | None = None,
+    agg_file: SpooledTemporaryFile[bytes] | IO | None = None,
 ) -> AnalysisResult:
+    _validate_target_angle(target_angle)
+    target_stress_ratio = _require_target_stress_ratio(
+        FatigueFailureMethod.KAWAI, target_stress_ratio
+    )
+    agg_file = _require_agg_file(FatigueFailureMethod.KAWAI, agg_file)
+    material_data = FatigueFailureMaterial.from_file(material)
+
+    curves = material_data.reference_curve_group(target_angle)
+    reference_curve = next(
+        (
+            curve
+            for curve in curves
+            if math.isclose(
+                curve.stress_ratio,
+                target_stress_ratio,
+                rel_tol=0,
+                abs_tol=1e-9,
+            )
+        ),
+        curves[0],
+    )
+    reference_angle = float(reference_curve.angle)
     return run_python(
         lambda input, csv_output, json_output: faf_kawai.execute(
             input,
             csv_output,
             json_output,
             reference_angle,
-            reference_stress_ratio,
-            reference_static_strength,
-            desirable_angle,
+            reference_curve.stress_ratio,
+            material_data.strength("tensile", reference_angle),
+            target_angle,
             target_stress_ratio,
-            tensile_axial_strength,
-            tensile_transverse_strength,
-            shear_strength,
+            material_data.strength("tensile", 0),
+            material_data.strength("tensile", 90),
+            material_data.strength("shear"),
         ),
         agg_file,
     )

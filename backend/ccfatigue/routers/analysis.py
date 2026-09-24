@@ -5,7 +5,6 @@ Handle /analysis requests
 from fastapi import APIRouter, File, HTTPException, Query, UploadFile
 
 from ccfatigue.analyzer import (
-    FatigueModel,
     run_cld,
     run_cld_piecewiselinear_from_sn,
     run_cld_piecewisenonlinear_from_sn,
@@ -17,6 +16,7 @@ from ccfatigue.analyzer import (
     run_fatigue_failure_hashinrotem,
     run_fatigue_failure_kawai,
     run_fatigue_failure_shokriehtaheri,
+    run_fatigue_failure_simsbrogdon,
     run_sn_curve,
 )
 from ccfatigue.model import (
@@ -25,7 +25,6 @@ from ccfatigue.model import (
     CycleCountingMethod,
     DamageSummationMethod,
     FatigueFailureMethod,
-    HashinRotemPanelType,
     SnCurveMethod,
 )
 
@@ -155,25 +154,19 @@ async def run_fatigue_failure_material_file(
 
 @router.post("/fatigueFailure/ftpf/file", response_model=AnalysisResult)
 async def run_fatigue_failure_ftpf_file(
-    x_file: UploadFile = File(..., alias="xFile"),
-    y_file: UploadFile = File(..., alias="yFile"),
-    f_file: UploadFile = File(..., alias="fFile"),
-    sn_model: FatigueModel = Query(..., alias="snModel"),
-    desirable_angle: float = Query(..., alias="desirableAngle"),
-    off_axis_angle: float = Query(..., alias="offAxisAngle"),
-    xc_file: UploadFile | None = File(default=None, alias="xcFile"),
-    yc_file: UploadFile | None = File(default=None, alias="ycFile"),
+    material_file: UploadFile = File(..., alias="materialFile"),
+    target_angle: float = Query(..., alias="targetAngle"),
+    target_static_strength: float | None = Query(None, alias="targetStaticStrength"),
+    target_stress_ratio: float | None = Query(None, alias="targetStressRatio"),
+    agg_file: UploadFile | None = File(None, alias="aggFile"),
 ) -> AnalysisResult:
     try:
         return run_fatigue_failure_ftpf(
-            x_file.file,
-            y_file.file,
-            f_file.file,
-            sn_model,
-            desirable_angle,
-            off_axis_angle,
-            xc_file.file if xc_file is not None else None,
-            yc_file.file if yc_file is not None else None,
+            material_file.file,
+            target_angle,
+            target_static_strength,
+            target_stress_ratio,
+            agg_file.file if agg_file is not None else None,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -183,39 +176,19 @@ async def run_fatigue_failure_ftpf_file(
 
 @router.post("/fatigueFailure/hashinRotem/file", response_model=AnalysisResult)
 async def run_fatigue_failure_hashinrotem_file(
-    x_file: UploadFile = File(..., alias="xFile"),
-    panel2_file: UploadFile = File(..., alias="panel2File"),
-    panel3_file: UploadFile = File(..., alias="panel3File"),
-    sn_model: FatigueModel = Query(..., alias="snModel"),
-    desirable_angle: float = Query(..., alias="desirableAngle"),
-    off_axis_angle1: float = Query(..., alias="offAxisAngle1"),
-    off_axis_angle2: float = Query(..., alias="offAxisAngle2"),
-    tensile_transverse_strength: float = Query(...),
-    shear_strength: float = Query(...),
-    tensile_strength1: float = Query(...),
-    tensile_strength2: float = Query(...),
-    tensile_strength_at_desirable_angle: float = Query(...),
-    tensile_axial_strength: float = Query(...),
-    panel2_type: HashinRotemPanelType = Query(..., alias="panel2Type"),
-    panel3_type: HashinRotemPanelType = Query(..., alias="panel3Type"),
+    material_file: UploadFile = File(..., alias="materialFile"),
+    target_angle: float = Query(..., alias="targetAngle"),
+    target_static_strength: float | None = Query(None, alias="targetStaticStrength"),
+    target_stress_ratio: float | None = Query(None, alias="targetStressRatio"),
+    agg_file: UploadFile | None = File(None, alias="aggFile"),
 ) -> AnalysisResult:
     try:
         return run_fatigue_failure_hashinrotem(
-            x_file.file,
-            panel2_file.file,
-            panel3_file.file,
-            sn_model,
-            desirable_angle,
-            off_axis_angle1,
-            off_axis_angle2,
-            tensile_transverse_strength,
-            shear_strength,
-            tensile_strength1,
-            tensile_strength2,
-            tensile_strength_at_desirable_angle,
-            tensile_axial_strength,
-            panel2_type,
-            panel3_type,
+            material_file.file,
+            target_angle,
+            target_static_strength,
+            target_stress_ratio,
+            agg_file.file if agg_file is not None else None,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -225,29 +198,19 @@ async def run_fatigue_failure_hashinrotem_file(
 
 @router.post("/fatigueFailure/shokriehTaheri/file", response_model=AnalysisResult)
 async def run_fatigue_failure_shokriehtaheri_file(
-    agg_file: UploadFile = File(..., alias="aggFile"),
-    reference_angle: float = Query(..., alias="referenceAngle"),
-    reference_stress_ratio: float = Query(..., alias="referenceStressRatio"),
-    desirable_angle: float = Query(..., alias="desirableAngle"),
-    target_stress_ratio: float = Query(..., alias="targetStressRatio"),
-    tensile_axial_strength: float = Query(...),
-    compressive_axial_strength: float = Query(...),
-    tensile_transverse_strength: float = Query(...),
-    compressive_transverse_strength: float = Query(...),
-    shear_strength: float = Query(...),
+    material_file: UploadFile = File(..., alias="materialFile"),
+    target_angle: float = Query(..., alias="targetAngle"),
+    target_static_strength: float | None = Query(None, alias="targetStaticStrength"),
+    target_stress_ratio: float | None = Query(None, alias="targetStressRatio"),
+    agg_file: UploadFile | None = File(None, alias="aggFile"),
 ) -> AnalysisResult:
     try:
         return run_fatigue_failure_shokriehtaheri(
-            agg_file.file,
-            reference_angle,
-            reference_stress_ratio,
-            desirable_angle,
+            material_file.file,
+            target_angle,
+            target_static_strength,
             target_stress_ratio,
-            tensile_axial_strength,
-            compressive_axial_strength,
-            tensile_transverse_strength,
-            compressive_transverse_strength,
-            shear_strength,
+            agg_file.file if agg_file is not None else None,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -257,23 +220,19 @@ async def run_fatigue_failure_shokriehtaheri_file(
 
 @router.post("/fatigueFailure/fawazEllyin/file", response_model=AnalysisResult)
 async def run_fatigue_failure_fawazellyin_file(
-    snc_file: UploadFile = File(..., alias="sncFile"),
-    sn_model: FatigueModel = Query(..., alias="snModel"),
-    reference_angle: float = Query(..., alias="referenceAngle"),
-    reference_static_strength: float = Query(..., alias="referenceStaticStrength"),
-    desirable_angle: float = Query(..., alias="desirableAngle"),
-    target_stress_ratio: float = Query(..., alias="targetStressRatio"),
-    target_static_strength: float = Query(..., alias="targetStaticStrength"),
+    material_file: UploadFile = File(..., alias="materialFile"),
+    target_angle: float = Query(..., alias="targetAngle"),
+    target_static_strength: float | None = Query(None, alias="targetStaticStrength"),
+    target_stress_ratio: float | None = Query(None, alias="targetStressRatio"),
+    agg_file: UploadFile | None = File(None, alias="aggFile"),
 ) -> AnalysisResult:
     try:
         return run_fatigue_failure_fawazellyin(
-            snc_file.file,
-            sn_model,
-            reference_angle,
-            reference_static_strength,
-            desirable_angle,
-            target_stress_ratio,
+            material_file.file,
+            target_angle,
             target_static_strength,
+            target_stress_ratio,
+            agg_file.file if agg_file is not None else None,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -283,32 +242,46 @@ async def run_fatigue_failure_fawazellyin_file(
 
 @router.post("/fatigueFailure/kawai/file", response_model=AnalysisResult)
 async def run_fatigue_failure_kawai_file(
-    agg_file: UploadFile = File(..., alias="aggFile"),
-    reference_angle: float = Query(..., alias="referenceAngle"),
-    reference_stress_ratio: float = Query(..., alias="referenceStressRatio"),
-    reference_static_strength: float = Query(..., alias="referenceStaticStrength"),
-    desirable_angle: float = Query(..., alias="desirableAngle"),
-    target_stress_ratio: float = Query(..., alias="targetStressRatio"),
-    tensile_axial_strength: float = Query(...),
-    tensile_transverse_strength: float = Query(...),
-    shear_strength: float = Query(...),
+    material_file: UploadFile = File(..., alias="materialFile"),
+    target_angle: float = Query(..., alias="targetAngle"),
+    target_static_strength: float | None = Query(None, alias="targetStaticStrength"),
+    target_stress_ratio: float | None = Query(None, alias="targetStressRatio"),
+    agg_file: UploadFile | None = File(None, alias="aggFile"),
 ) -> AnalysisResult:
     try:
         return run_fatigue_failure_kawai(
-            agg_file.file,
-            reference_angle,
-            reference_stress_ratio,
-            reference_static_strength,
-            desirable_angle,
+            material_file.file,
+            target_angle,
+            target_static_strength,
             target_stress_ratio,
-            tensile_axial_strength,
-            tensile_transverse_strength,
-            shear_strength,
+            agg_file.file if agg_file is not None else None,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Kawai failed: {str(e)}")
+
+
+@router.post("/fatigueFailure/simsBrogdon/file", response_model=AnalysisResult)
+async def run_fatigue_failure_simsbrogdon_file(
+    material_file: UploadFile = File(..., alias="materialFile"),
+    target_angle: float = Query(..., alias="targetAngle"),
+    target_static_strength: float | None = Query(None, alias="targetStaticStrength"),
+    target_stress_ratio: float | None = Query(None, alias="targetStressRatio"),
+    agg_file: UploadFile | None = File(None, alias="aggFile"),
+) -> AnalysisResult:
+    try:
+        return run_fatigue_failure_simsbrogdon(
+            material_file.file,
+            target_angle,
+            target_static_strength,
+            target_stress_ratio,
+            agg_file.file if agg_file is not None else None,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"SimsBrogdon failed: {str(e)}")
 
 
 @router.post("/damageSummation/file", response_model=bytes)
