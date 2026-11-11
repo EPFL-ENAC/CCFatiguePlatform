@@ -16,7 +16,7 @@
           <v-file-input
             v-model="file"
             show-size
-            accept=".csv"
+            :accept="fileInputAccept"
             :error-messages="errorMessages"
             :disabled="loading"
             :label="fileInputLabel"
@@ -310,6 +310,7 @@ import SimpleChart from "@/components/charts/SimpleChart";
 import InfoTooltip from "@/components/InfoTooltip";
 import { getOutputFileName } from "@/utils/analysis";
 import { parseFile, parserConfig } from "@/utils/papaparse";
+import { parseSncFile } from "@/utils/snCurve";
 import download from "downloadjs";
 import { groupBy } from "lodash";
 import { parse, unparse } from "papaparse";
@@ -374,13 +375,21 @@ export default {
     },
 
     fileInputLabel() {
-      if (
-        (this.isPiecewiseLinear || this.isPiecewiseNonLinear) &&
-        this.snCurveMethod
-      ) {
+      if (this.usesAggInput) {
         return "AGG csv file (raw fatigue test data)";
       }
-      return "SNC csv file";
+      return "SNC CSV or SN_curves JSON file";
+    },
+
+    fileInputAccept() {
+      return this.usesAggInput ? ".csv" : ".csv,.json";
+    },
+
+    usesAggInput() {
+      return (
+        (this.isPiecewiseLinear || this.isPiecewiseNonLinear) &&
+        !!this.snCurveMethod
+      );
     },
 
     downloadDisabled() {
@@ -884,7 +893,9 @@ export default {
       this.expSnData = null;
 
       Promise.all([
-        parseFile(this.file),
+        this.usesAggInput
+          ? parseFile(this.file)
+          : parseSncFile(this.file, parseFile),
         ...methodsSnapshot.map((method) => {
           let call;
           if (method === "PiecewiseLinear" && this.snCurveMethod) {

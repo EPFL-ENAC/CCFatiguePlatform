@@ -5,6 +5,11 @@ class FatigueModel(str, Enum):
     LIN_LOG = "Lin-Log"
     LOG_LOG = "Log-Log"
 
+class LoadType(str, Enum):
+    S = "shear"
+    T = "tensile"
+    C = "compressive"
+
 # 100, 200, ... , 900, 1000, 2000, ... 9000, 10000, 2000 etc
 # last number is this list is 2*10^7
 # [for picking starting i] i = 9 * x -> 10^x, i0 = 18 -> N0 = 100, i0 = 27 -> N0 = 1000

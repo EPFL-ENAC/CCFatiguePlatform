@@ -23,8 +23,9 @@ from ccfatigue.model import (
     AnalysisResult,
     CldMethod,
     CycleCountingMethod,
-    DamageSummationMethod,
+    DamageSummationInputType,
     FatigueFailureMethod,
+    SnCurveLoadType,
     SnCurveMethod,
 )
 
@@ -47,9 +48,19 @@ async def run_sn_curve_file(
     file: UploadFile = File(...),
     method: SnCurveMethod = Query(...),
     confidence_interval: float | None = Query(None, alias="confidenceInterval"),
+    load_type: SnCurveLoadType = Query(
+        SnCurveLoadType.TENSILE, alias="loadType"
+    ),
+    angle: float | None = Query(0),
 ) -> AnalysisResult:
     try:
-        return run_sn_curve(file.file, method, confidence_interval)
+        return run_sn_curve(
+            file.file,
+            method,
+            confidence_interval,
+            load_type,
+            angle,
+        )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
@@ -284,10 +295,45 @@ async def run_fatigue_failure_simsbrogdon_file(
         raise HTTPException(status_code=500, detail=f"SimsBrogdon failed: {str(e)}")
 
 
-@router.post("/damageSummation/file", response_model=bytes)
+@router.post("/damageSummation/file", response_model=AnalysisResult)
 async def run_damage_summation_file(
-    snc_file: UploadFile = File(..., alias="sncFile"),
-    cyc_file: UploadFile = File(..., alias="cycFile"),
-    method: DamageSummationMethod = Query(...),
-) -> bytes:
-    return run_damage_summation(snc_file.file, cyc_file.file, method)
+    load_history_file: UploadFile = File(..., alias="loadHistoryFile"),
+    fatigue_data_file: UploadFile = File(..., alias="fatigueDataFile"),
+    fatigue_data_type: DamageSummationInputType = Query(..., alias="fatigueDataType"),
+    cycle_counting_method: CycleCountingMethod = Query(
+        ..., alias="cycleCountingMethod"
+    ),
+    cld_method: CldMethod = Query(..., alias="cldMethod"),
+    ucs: float = Query(..., gt=0),
+    uts: float = Query(..., gt=0),
+    sn_curve_method: SnCurveMethod | None = Query(None, alias="snCurveMethod"),
+    confidence_interval: float | None = Query(None, alias="confidenceInterval"),
+    load_type: SnCurveLoadType = Query(
+        SnCurveLoadType.TENSILE, alias="loadType"
+    ),
+    angle: float | None = Query(0),
+    factor_min: float = Query(0.4, alias="factorMin", gt=0),
+    factor_max: float = Query(1.4, alias="factorMax", gt=0),
+    factor_count: int = Query(11, alias="factorCount", ge=1, le=100),
+) -> AnalysisResult:
+    try:
+        return run_damage_summation(
+            load_history_file.file,
+            fatigue_data_file.file,
+            fatigue_data_type,
+            cycle_counting_method,
+            cld_method,
+            ucs,
+            uts,
+            sn_curve_method,
+            confidence_interval,
+            load_type,
+            angle,
+            factor_min,
+            factor_max,
+            factor_count,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Damage summation failed: {e}")

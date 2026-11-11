@@ -36,4 +36,5 @@ CCFatigue_modules/
 .DS_Store
 
 # Local, disposable playground for running fatigue-failure criteria directly.
-/backend/tests/
+/backend/tests/*
+!/backend/tests/test_damage_summation.py

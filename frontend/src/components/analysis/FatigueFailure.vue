@@ -49,7 +49,7 @@
             label="Aggregate fatigue data (AGG CSV file)"
             show-size
             :disabled="loading"
-            @change="updateOutput"
+            @change="onAggFileChange"
           >
             <template #append>
               <info-tooltip>
@@ -61,8 +61,13 @@
         </v-col>
       </v-row>
 
-      <v-alert v-if="materialPreviewError" type="error" dense text>
-        {{ materialPreviewError }}
+      <v-alert v-if="inputValidationErrors.length > 0" type="error" dense text>
+        <div class="font-weight-medium">Input validation failed</div>
+        <ul class="mb-0 mt-1 pl-5">
+          <li v-for="(message, index) in inputValidationErrors" :key="index">
+            {{ message }}
+          </li>
+        </ul>
       </v-alert>
 
       <v-row v-if="materialPreview" class="mb-2">
@@ -253,9 +258,12 @@ import SimpleChart from "@/components/charts/SimpleChart";
 import InfoTooltip from "@/components/InfoTooltip";
 import {
   FAF_METHODS,
+  fatigueFailureErrorMessage,
+  findAggFileProblems,
+  findMissingFatigueFailureInformation,
   runFatigueFailureMethod,
 } from "@/utils/fatigueFailureMethods";
-import { parserConfig } from "@/utils/papaparse";
+import { parseFile, parserConfig } from "@/utils/papaparse";
 import download from "downloadjs";
 import { parse } from "papaparse";
 
@@ -275,8 +283,13 @@ export default {
       selectedMethods: ["FTPF"],
       materialFile: null,
       aggFile: null,
+      aggParseResult: null,
+      aggPreviewError: null,
+      aggReadPending: false,
+      materialData: null,
       materialPreview: null,
       materialPreviewError: null,
+      materialReadPending: false,
       values: {
         targetAngle: 30,
         targetStressRatio: 0.1,
@@ -304,30 +317,85 @@ export default {
         (method) => FAF_METHODS[method].targetStaticStrength
       );
     },
-    runnableMethods() {
-      if (!this.materialFile || !Number.isFinite(this.values.targetAngle)) {
+    materialValidationErrors() {
+      if (this.materialPreviewError) return [this.materialPreviewError];
+      if (
+        !this.materialFile ||
+        this.materialReadPending ||
+        !this.materialData
+      ) {
         return [];
       }
-      return this.selectedMethods.filter((method) => {
-        const requirements = FAF_METHODS[method];
-        if (requirements.aggFile && !this.aggFile) {
-          return false;
-        }
-        if (
-          requirements.targetStressRatio &&
-          !Number.isFinite(this.values.targetStressRatio)
-        ) {
-          return false;
-        }
-        if (
-          requirements.targetStaticStrength &&
-          (!Number.isFinite(this.values.targetStaticStrength) ||
-            this.values.targetStaticStrength <= 0)
-        ) {
-          return false;
-        }
-        return true;
-      });
+      return findMissingFatigueFailureInformation(
+        this.materialData,
+        this.selectedMethods,
+        this.values
+      );
+    },
+    aggValidationErrors() {
+      if (!this.needsAggFile) return [];
+      if (!this.aggFile) {
+        return [
+          "Aggregate fatigue data: an AGG CSV file is required by the selected method.",
+        ];
+      }
+      if (this.aggPreviewError) return [this.aggPreviewError];
+      if (this.aggReadPending || !this.aggParseResult) return [];
+      return findAggFileProblems(this.aggParseResult, this.selectedMethods);
+    },
+    targetValidationErrors() {
+      if (this.selectedMethods.length === 0) return [];
+      const problems = [];
+      if (!Number.isFinite(this.values.targetAngle)) {
+        problems.push(
+          "Target conditions: target angle must be a finite number."
+        );
+      }
+      if (
+        this.needsTargetStressRatio &&
+        !Number.isFinite(this.values.targetStressRatio)
+      ) {
+        problems.push(
+          "Target conditions: target stress ratio must be a finite number."
+        );
+      }
+      if (
+        this.selectedMethods.includes("Kawai") &&
+        Number.isFinite(this.values.targetStressRatio) &&
+        (this.values.targetStressRatio < -1 ||
+          this.values.targetStressRatio >= 1)
+      ) {
+        problems.push("Kawai: target stress ratio must satisfy -1 ≤ R < 1.");
+      }
+      if (
+        this.needsTargetStaticStrength &&
+        (!Number.isFinite(this.values.targetStaticStrength) ||
+          this.values.targetStaticStrength <= 0)
+      ) {
+        problems.push(
+          "Target conditions: static strength at the target angle must be greater than zero."
+        );
+      }
+      return problems;
+    },
+    inputValidationErrors() {
+      return [
+        ...this.materialValidationErrors,
+        ...this.aggValidationErrors,
+        ...this.targetValidationErrors,
+      ];
+    },
+    runnableMethods() {
+      if (
+        !this.materialFile ||
+        !this.materialData ||
+        this.materialReadPending ||
+        this.aggReadPending ||
+        this.inputValidationErrors.length > 0
+      ) {
+        return [];
+      }
+      return this.selectedMethods;
     },
     outputMethods() {
       return Object.keys(this.outputs);
@@ -336,32 +404,57 @@ export default {
   methods: {
     async onMaterialFileChange() {
       const file = this.materialFile;
+      this.materialData = null;
       this.materialPreview = null;
       this.materialPreviewError = null;
+      this.materialReadPending = Boolean(file);
 
       if (file) {
         try {
           const parsed = JSON.parse(await file.text());
-          if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-            throw new Error("The JSON root must be an object.");
-          }
           if (this.materialFile !== file) {
             return;
           }
-          this.materialPreview = {
-            staticStrengths: Array.isArray(parsed.static_strengths)
-              ? parsed.static_strengths
-              : [],
-            snCurves: Array.isArray(parsed.SN_curves) ? parsed.SN_curves : [],
-          };
+          this.materialData = parsed;
+          if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+            this.materialPreview = {
+              staticStrengths: Array.isArray(parsed.static_strengths)
+                ? parsed.static_strengths
+                : [],
+              snCurves: Array.isArray(parsed.SN_curves) ? parsed.SN_curves : [],
+            };
+          }
         } catch (error) {
           if (this.materialFile !== file) {
             return;
           }
-          this.materialPreviewError = `Could not display material file: ${error.message}`;
+          this.materialPreviewError = `Material file: ${error.message}`;
         }
       }
 
+      this.materialReadPending = false;
+      this.updateOutput();
+    },
+    async onAggFileChange() {
+      const file = this.aggFile;
+      this.aggParseResult = null;
+      this.aggPreviewError = null;
+      this.aggReadPending = Boolean(file);
+
+      if (file) {
+        try {
+          const parseResult = await parseFile(file);
+          if (this.aggFile !== file) return;
+          this.aggParseResult = parseResult;
+        } catch (error) {
+          if (this.aggFile !== file) return;
+          this.aggPreviewError = `AGG file: ${
+            error?.message || "could not read the CSV file"
+          }.`;
+        }
+      }
+
+      this.aggReadPending = false;
       this.updateOutput();
     },
     normalizedLoadType(item) {
@@ -460,12 +553,7 @@ export default {
       results.forEach((result, index) => {
         const method = runnable[index];
         if (result.status === "rejected") {
-          const error = result.reason;
-          errorsByMethod[method] =
-            error?.body?.detail ||
-            error?.body?.message ||
-            error?.message ||
-            "Invalid input";
+          errorsByMethod[method] = fatigueFailureErrorMessage(result.reason);
           return;
         }
 

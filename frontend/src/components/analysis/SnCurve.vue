@@ -60,6 +60,29 @@
       <v-row align="end">
         <v-col>
           <v-select
+            v-model="loadType"
+            label="Loading type"
+            :items="loadTypeOptions"
+            item-text="text"
+            item-value="value"
+            :disabled="loading"
+            @change="updateOutput"
+          />
+        </v-col>
+
+        <v-col v-if="loadType !== 'shear'">
+          <v-text-field
+            v-model.number="angle"
+            label="Material angle [°]"
+            type="number"
+            :error-messages="curveMetadataError"
+            :disabled="loading"
+            @change="updateOutput"
+          />
+        </v-col>
+
+        <v-col>
+          <v-select
             v-model="selectedMethods"
             label="Select S-N curve method(s)"
             :items="methods"
@@ -365,6 +388,13 @@ export default {
 
       methods,
       selectedMethods: [methods[0]],
+      loadType: "tensile",
+      angle: 0,
+      loadTypeOptions: [
+        { text: "Tensile", value: "tensile" },
+        { text: "Compressive", value: "compressive" },
+        { text: "Shear", value: "shear" },
+      ],
       rRatios: [],
       selectedRRatios: [],
       outputs: {},
@@ -400,10 +430,18 @@ export default {
     downloadDisabled() {
       return (
         this.loading ||
+        !!this.curveMetadataError ||
         !this.outputs ||
         Object.keys(this.outputs).length === 0 ||
         this.selectedMethods.length !== 1
       );
+    },
+
+    curveMetadataError() {
+      if (this.loadType === "shear") return null;
+      return Number.isFinite(this.angle)
+        ? null
+        : "A finite material angle is required.";
     },
 
     isLogY() {
@@ -941,6 +979,7 @@ export default {
 
       const fits =
         (Array.isArray(json) && json) ||
+        (Array.isArray(json.SN_curves) && json.SN_curves) ||
         (Array.isArray(json.results) && json.results) ||
         (Array.isArray(json.fits) && json.fits) ||
         null;
@@ -1056,7 +1095,11 @@ export default {
     },
 
     updateOutput() {
-      if (!this.file || this.selectedMethods.length === 0) {
+      if (
+        !this.file ||
+        this.selectedMethods.length === 0 ||
+        this.curveMetadataError
+      ) {
         this.outputs = {};
         this.series = [];
         return;
@@ -1103,8 +1146,16 @@ export default {
                   ? this.whitneyProbability
                   : undefined;
 
+              const opts = {
+                loadType: this.loadType,
+                angle: this.loadType === "shear" ? undefined : this.angle,
+              };
+              if (confidenceToSend !== undefined) {
+                opts.confidenceInterval = confidenceToSend;
+              }
+
               return this.$analysisApi
-                .runSnCurveFile(method, this.file, confidenceToSend)
+                .runSnCurveFile(method, this.file, opts)
                 .then((result) => {
                   const parsedResult = parse(result.csv_data, parserConfig);
 

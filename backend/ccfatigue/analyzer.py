@@ -19,8 +19,7 @@ import ccfatigue.analysis.cyc_rainflow as cyc_rainflow
 import ccfatigue.analysis.cyc_rangemean as cyc_rangemean
 import ccfatigue.analysis.cyc_rangepair as cyc_rangepair
 import ccfatigue.analysis.cyc_simplifiedrainflow as cyc_simplifiedrainflow
-import ccfatigue.analysis.das_harris as das_harris
-import ccfatigue.analysis.das_piecewiselinear as das_piecewiselinear
+import ccfatigue.analysis.damage_summation as damage_summation
 import ccfatigue.analysis.faf_fawazellyin as faf_fawazellyin
 import ccfatigue.analysis.faf_ftpf as faf_ftpf
 import ccfatigue.analysis.faf_hashinrotem as faf_hashinrotem
@@ -31,14 +30,20 @@ import ccfatigue.analysis.snc_linlog as snc_linlog
 import ccfatigue.analysis.snc_loglog as snc_loglog
 import ccfatigue.analysis.snc_sendeckyj as snc_sendeckyj
 import ccfatigue.analysis.snc_whitney as snc_whitney
+from ccfatigue.analysis.utils.snc_data import (
+    build_sn_curve_csv,
+    build_sn_curve_document,
+    prepare_cld_snc_input,
+)
 from ccfatigue.utils.fatigue_failure_input import FatigueFailureMaterial
 from ccfatigue.model import (
     AnalysisResult,
     CldMethod,
     CycleCountingMethod,
-    DamageSummationMethod,
+    DamageSummationInputType,
     FatigueFailureMethod,
     HashinRotemPanelType,
+    SnCurveLoadType,
     SnCurveMethod,
 )
 
@@ -139,6 +144,8 @@ def run_sn_curve(
     file: SpooledTemporaryFile[bytes] | IO,
     method: SnCurveMethod,
     confidence_interval: float | None = None,
+    load_type: SnCurveLoadType = SnCurveLoadType.TENSILE,
+    angle: float | None = 0,
 ) -> AnalysisResult:
     match method:
         case SnCurveMethod.LIN_LOG:
@@ -181,7 +188,16 @@ def run_sn_curve(
             )
         case _:
             raise Exception(f"unknown method {method}")
-    return output
+    json_data = build_sn_curve_document(
+        output.json_data,
+        method,
+        load_type,
+        angle,
+    )
+    return AnalysisResult(
+        csv_data=build_sn_curve_csv(output.csv_data, json_data),
+        json_data=json_data,
+    )
 
 
 def run_cld_piecewiselinear_from_sn(
@@ -257,6 +273,7 @@ def run_cld(
     alpha_t_init: float | None = None,
     alpha_c_init: float | None = None,
 ) -> AnalysisResult:
+    snc_input = prepare_cld_snc_input(file)
     match method:
         case CldMethod.HARRIS:
             output = run_python(
@@ -267,35 +284,35 @@ def run_cld(
                     ucs,
                     uts,
                 ),
-                file,
+                snc_input,
             )
         case CldMethod.SIMPLIFIED_HARRIS:
             output = run_python(
                 lambda input, csv_output, json_output: cld_simplified_harris.execute(
                     input, csv_output, json_output, ucs, uts
                 ),
-                file,
+                snc_input,
             )
         case CldMethod.PIECEWISELINEAR:
             output = run_python(
                 lambda input, csv_output, _: cld_piecewiselinear.execute(
                     input, csv_output, ucs, uts
                 ),
-                file,
+                snc_input,
             )
         case CldMethod.PIECEWISENONLINEAR:
             output = run_python(
                 lambda input, csv_output, _: cld_piecewisenonlinear.execute(
                     input, csv_output, ucs, uts
                 ),
-                file,
+                snc_input,
             )
         case CldMethod.KAWAI:
             output = run_python(
                 lambda input, csv_output, _: cld_kawai.execute(
                     input, csv_output, ucs, uts
                 ),
-                file,
+                snc_input,
             )
         case CldMethod.BOERSTRA:
             output = run_python(
@@ -311,7 +328,7 @@ def run_cld(
                     alpha_t_init,
                     alpha_c_init,
                 ),
-                file,
+                snc_input,
             )
         case _:
             raise Exception(f"unknown method {method}")
@@ -669,31 +686,63 @@ def run_fatigue_failure_kawai(
 
 
 def run_damage_summation(
-    snc_file: SpooledTemporaryFile[bytes] | IO,
-    cyc_file: SpooledTemporaryFile[bytes] | IO,
-    method: DamageSummationMethod,
-) -> bytes:
-    match method:
-        case DamageSummationMethod.HARRIS:
-            output = run_python_2(
-                lambda snc_input, cyc_input, csv_output, _: das_harris.execute(
-                    snc_input,
-                    cyc_input,
-                    csv_output,
-                ),
-                snc_file,
-                cyc_file,
-            )
-        case DamageSummationMethod.PIECEWISELINEAR:
-            output = run_python_2(
-                lambda snc_input, cyc_input, csv_output, _: das_piecewiselinear.execute(
-                    snc_input,
-                    cyc_input,
-                    csv_output,
-                ),
-                snc_file,
-                cyc_file,
-            )
-        case _:
-            raise Exception(f"unknown method {method}")
-    return output.csv_data
+    load_history_file: SpooledTemporaryFile[bytes] | IO,
+    fatigue_data_file: SpooledTemporaryFile[bytes] | IO,
+    fatigue_data_type: DamageSummationInputType,
+    cycle_counting_method: CycleCountingMethod,
+    cld_method: CldMethod,
+    ucs: float,
+    uts: float,
+    sn_curve_method: SnCurveMethod | None = None,
+    confidence_interval: float | None = None,
+    load_type: SnCurveLoadType = SnCurveLoadType.TENSILE,
+    angle: float | None = 0,
+    factor_min: float = 0.4,
+    factor_max: float = 1.4,
+    factor_count: int = 11,
+) -> AnalysisResult:
+    """Run the paper's uniaxial damage-summation workflow end to end.
+
+    Existing module entry points produce the CYC, SNC, and CLD intermediate
+    representations.  Only the final CLD inversion and Miner summation live in
+    :mod:`ccfatigue.analysis.damage_summation`.
+    """
+
+    cycle_csv = run_cycle_counting(load_history_file, cycle_counting_method)
+
+    if fatigue_data_type == DamageSummationInputType.AGG:
+        if sn_curve_method is None:
+            raise ValueError("An S-N curve method is required for AGG input.")
+        snc_result = run_sn_curve(
+            fatigue_data_file,
+            sn_curve_method,
+            confidence_interval,
+            load_type,
+            angle,
+        )
+        snc_input: IO[bytes] = io.BytesIO(snc_result.csv_data)
+        sn_method_label = sn_curve_method.value
+    elif fatigue_data_type == DamageSummationInputType.SNC:
+        fatigue_data_file.seek(0)
+        snc_input = io.BytesIO(fatigue_data_file.read())
+        sn_method_label = "supplied SNC"
+    else:
+        raise ValueError(f"Unknown fatigue data type: {fatigue_data_type}")
+
+    cld_result = run_cld(snc_input, cld_method, ucs, uts)
+    return run_python_2(
+        lambda cyc_input, cld_input, csv_output, json_output: damage_summation.execute(
+            cyc_input,
+            cld_input,
+            csv_output,
+            json_output,
+            factor_min,
+            factor_max,
+            factor_count,
+            cycle_counting_method.value,
+            sn_method_label,
+            cld_method.value,
+        ),
+        io.BytesIO(cycle_csv),
+        io.BytesIO(cld_result.csv_data),
+    )

@@ -387,46 +387,64 @@ export default class AnalysisApi {
 
   /**
    * Run Damage Summation File
-   * @param {module:model/DamageSummationMethod} method
-   * @param {File} sncFile
-   * @param {File} cycFile
-   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link File} and HTTP response
+   * @param {File} loadHistoryFile
+   * @param {File} fatigueDataFile
+   * @param {Object} opts Pipeline and material parameters
+   * @return {Promise} a Promise containing an AnalysisResult and HTTP response
    */
-  runDamageSummationFileWithHttpInfo(method, sncFile, cycFile) {
+  runDamageSummationFileWithHttpInfo(loadHistoryFile, fatigueDataFile, opts) {
+    opts = opts || {};
     let postBody = null;
-    // verify the required parameter 'method' is set
-    if (method === undefined || method === null) {
+    if (loadHistoryFile === undefined || loadHistoryFile === null) {
       throw new Error(
-        "Missing the required parameter 'method' when calling runDamageSummationFile"
+        "Missing loadHistoryFile when calling runDamageSummationFile"
       );
     }
-    // verify the required parameter 'sncFile' is set
-    if (sncFile === undefined || sncFile === null) {
+    if (fatigueDataFile === undefined || fatigueDataFile === null) {
       throw new Error(
-        "Missing the required parameter 'sncFile' when calling runDamageSummationFile"
-      );
-    }
-    // verify the required parameter 'cycFile' is set
-    if (cycFile === undefined || cycFile === null) {
-      throw new Error(
-        "Missing the required parameter 'cycFile' when calling runDamageSummationFile"
+        "Missing fatigueDataFile when calling runDamageSummationFile"
       );
     }
 
+    [
+      "fatigueDataType",
+      "cycleCountingMethod",
+      "cldMethod",
+      "ucs",
+      "uts",
+    ].forEach((parameter) => {
+      if (opts[parameter] === undefined || opts[parameter] === null) {
+        throw new Error(
+          `Missing ${parameter} when calling runDamageSummationFile`
+        );
+      }
+    });
+
     let pathParams = {};
     let queryParams = {
-      method: method,
+      fatigueDataType: opts["fatigueDataType"],
+      cycleCountingMethod: opts["cycleCountingMethod"],
+      snCurveMethod: opts["snCurveMethod"],
+      cldMethod: opts["cldMethod"],
+      ucs: opts["ucs"],
+      uts: opts["uts"],
+      confidenceInterval: opts["confidenceInterval"],
+      loadType: opts["loadType"],
+      angle: opts["angle"],
+      factorMin: opts["factorMin"],
+      factorMax: opts["factorMax"],
+      factorCount: opts["factorCount"],
     };
     let headerParams = {};
     let formParams = {
-      sncFile: sncFile,
-      cycFile: cycFile,
+      loadHistoryFile: loadHistoryFile,
+      fatigueDataFile: fatigueDataFile,
     };
 
     let authNames = [];
     let contentTypes = ["multipart/form-data"];
     let accepts = ["application/json"];
-    let returnType = File;
+    let returnType = AnalysisResult;
     return this.apiClient.callApi(
       "/analysis/damageSummation/file",
       "POST",
@@ -445,16 +463,16 @@ export default class AnalysisApi {
 
   /**
    * Run Damage Summation File
-   * @param {module:model/DamageSummationMethod} method
-   * @param {File} sncFile
-   * @param {File} cycFile
-   * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link File}
+   * @param {File} loadHistoryFile
+   * @param {File} fatigueDataFile
+   * @param {Object} opts Pipeline and material parameters
+   * @return {Promise} a Promise containing an AnalysisResult
    */
-  runDamageSummationFile(method, sncFile, cycFile) {
+  runDamageSummationFile(loadHistoryFile, fatigueDataFile, opts) {
     return this.runDamageSummationFileWithHttpInfo(
-      method,
-      sncFile,
-      cycFile
+      loadHistoryFile,
+      fatigueDataFile,
+      opts
     ).then(function (response_and_data) {
       return response_and_data.data;
     });
@@ -1537,6 +1555,8 @@ export default class AnalysisApi {
    * @param {File} file
    * @param {Object} opts Optional parameters
    * @param {Number} opts.confidenceInterval
+   * @param {String} opts.loadType
+   * @param {Number} opts.angle
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/AnalysisResult} and HTTP response
    */
   runSnCurveFileWithHttpInfo(method, file, opts) {
@@ -1559,6 +1579,8 @@ export default class AnalysisApi {
     let queryParams = {
       method: method,
       confidenceInterval: opts["confidenceInterval"],
+      loadType: opts["loadType"],
+      angle: opts["angle"],
     };
     let headerParams = {};
     let formParams = {
@@ -1591,6 +1613,8 @@ export default class AnalysisApi {
    * @param {File} file
    * @param {Object} opts Optional parameters
    * @param {Number} opts.confidenceInterval
+   * @param {String} opts.loadType
+   * @param {Number} opts.angle
    * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/AnalysisResult}
    */
   runSnCurveFile(method, file, opts) {

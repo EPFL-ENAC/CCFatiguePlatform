@@ -45,6 +45,12 @@ class SnCurveMethod(str, Enum):
     WHITNEY = "Whitney"
 
 
+class SnCurveLoadType(str, Enum):
+    TENSILE = "tensile"
+    COMPRESSIVE = "compressive"
+    SHEAR = "shear"
+
+
 class AnalysisResult(BaseModel):
     csv_data: bytes
     json_data: bytes
@@ -84,3 +90,8 @@ class HashinRotemPanelType(str, Enum):
 class DamageSummationMethod(str, Enum):
     HARRIS = "Harris"
     PIECEWISELINEAR = "PiecewiseLinear"
+
+
+class DamageSummationInputType(str, Enum):
+    AGG = "AGG"
+    SNC = "SNC"
