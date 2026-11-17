@@ -36,8 +36,26 @@
             <template #append>
               <info-tooltip>
                 The file must contain the <code>static_strengths</code> and
-                <code>SN_curves</code> arrays shown in
-                <code>Data/samples/templates/general.json</code>.
+                <code>SN_curves</code> arrays. See the
+                <a
+                  href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/SNC_Data_Convention.md"
+                  target="_blank"
+                  rel="noopener"
+                  class="text-decoration-underline"
+                  style="color: blue; text-transform: none; min-width: 0"
+                >
+                  SNC Data Convention
+                </a>
+                and the
+                <a
+                  href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/samples/faf%20input%20samples/general.json"
+                  target="_blank"
+                  rel="noopener"
+                  class="text-decoration-underline"
+                  style="color: blue; text-transform: none; min-width: 0"
+                >
+                  complete material JSON example</a
+                >.
               </info-tooltip>
             </template>
           </v-file-input>
@@ -54,7 +72,15 @@
             <template #append>
               <info-tooltip>
                 Required by Kawai and Shokrieh–Taheri. The CSV must follow the
-                AGG data convention.
+                <a
+                  href="/downloads/AGG_Data_Convention.pdf"
+                  target="_blank"
+                  rel="noopener"
+                  class="text-decoration-underline"
+                  style="color: blue; text-transform: none; min-width: 0"
+                >
+                  AGG Data Convention (PDF)</a
+                >.
               </info-tooltip>
             </template>
           </v-file-input>
@@ -158,7 +184,14 @@
                 type="number"
                 :disabled="loading"
                 @change="updateOutput"
-              ></v-text-field>
+              >
+                <template #append>
+                  <info-tooltip>
+                    Laminate or material direction at which the selected failure
+                    methods are evaluated.
+                  </info-tooltip>
+                </template>
+              </v-text-field>
             </v-col>
             <v-col v-if="needsTargetStressRatio" cols="12" md="4">
               <v-text-field
@@ -167,7 +200,14 @@
                 type="number"
                 :disabled="loading"
                 @change="updateOutput"
-              ></v-text-field>
+              >
+                <template #append>
+                  <info-tooltip>
+                    Target stress ratio defined as minimum stress divided by
+                    maximum stress.
+                  </info-tooltip>
+                </template>
+              </v-text-field>
             </v-col>
             <v-col v-if="needsTargetStaticStrength" cols="12" md="4">
               <v-text-field
@@ -177,7 +217,15 @@
                 min="0"
                 :disabled="loading"
                 @change="updateOutput"
-              ></v-text-field>
+              >
+                <template #append>
+                  <info-tooltip>
+                    Positive static-strength magnitude at the target angle, in
+                    MPa. Required only by methods that cannot derive it from the
+                    uploaded material data.
+                  </info-tooltip>
+                </template>
+              </v-text-field>
             </v-col>
           </v-row>
         </v-card-text>
@@ -241,6 +289,10 @@
           See the
           <a
             href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/FAF_Data_Convention.md"
+            target="_blank"
+            rel="noopener"
+            class="text-decoration-underline"
+            style="color: blue; text-transform: none; min-width: 0"
             >FAF Data Convention</a
           >
         </info-tooltip>

@@ -6,12 +6,14 @@
     <v-card-text>
       <v-row dense>
         <v-col cols="12" sm="3">
-          <v-text-field
-            v-model.number="n"
-            label="Cycles N"
-            type="number"
-            dense
-          ></v-text-field>
+          <v-text-field v-model.number="n" label="Cycles N" type="number" dense>
+            <template #append>
+              <info-tooltip>
+                Lifetime at which the fiber and matrix fatigue strengths are
+                evaluated.
+              </info-tooltip>
+            </template>
+          </v-text-field>
         </v-col>
         <v-col cols="12" sm="3">
           <v-text-field
@@ -19,7 +21,13 @@
             label="Applied σ1 [MPa]"
             type="number"
             dense
-          ></v-text-field>
+          >
+            <template #append>
+              <info-tooltip>
+                Applied normal stress in the fiber direction.
+              </info-tooltip>
+            </template>
+          </v-text-field>
         </v-col>
         <v-col cols="12" sm="3">
           <v-text-field
@@ -27,7 +35,14 @@
             label="Applied σ2 [MPa]"
             type="number"
             dense
-          ></v-text-field>
+          >
+            <template #append>
+              <info-tooltip>
+                Applied transverse normal stress used by the matrix-mode
+                criterion.
+              </info-tooltip>
+            </template>
+          </v-text-field>
         </v-col>
         <v-col cols="12" sm="3">
           <v-text-field
@@ -35,7 +50,13 @@
             label="Applied σ6 [MPa]"
             type="number"
             dense
-          ></v-text-field>
+          >
+            <template #append>
+              <info-tooltip>
+                Applied in-plane shear stress used by the matrix-mode criterion.
+              </info-tooltip>
+            </template>
+          </v-text-field>
         </v-col>
       </v-row>
 
@@ -128,6 +149,7 @@ import "katex/dist/katex.min.css";
 
 import EnvelopeChart from "@/components/charts/EnvelopeChart";
 import SimpleChart from "@/components/charts/SimpleChart";
+import InfoTooltip from "@/components/InfoTooltip";
 import { interpolateLogLog } from "@/utils/curveInterpolation";
 import {
   buildQuadraticEnvelope,
@@ -153,7 +175,7 @@ function renderFormula(latex) {
 
 export default {
   name: "HashinRotemSafety",
-  components: { EnvelopeChart, SimpleChart },
+  components: { EnvelopeChart, InfoTooltip, SimpleChart },
   props: {
     // Parsed HashinRotem FAF CSV rows: { cycles_to_failure, s1f, s2f,
     // s12f, ... }

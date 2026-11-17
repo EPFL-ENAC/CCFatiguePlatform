@@ -78,7 +78,14 @@
             :error-messages="curveMetadataError"
             :disabled="loading"
             @change="updateOutput"
-          />
+          >
+            <template #append>
+              <info-tooltip>
+                Material orientation represented by the uploaded tests. It is
+                stored in the fitted-curve metadata.
+              </info-tooltip>
+            </template>
+          </v-text-field>
         </v-col>
 
         <v-col>
@@ -233,7 +240,14 @@
                   hide-details
                   :disabled="loading"
                   @change="updateOutput"
-                />
+                >
+                  <template #append>
+                    <info-tooltip>
+                      Reliability percentile used to evaluate the Sendeckyj
+                      curve. Enter a value from 1 to 99 percent.
+                    </info-tooltip>
+                  </template>
+                </v-text-field>
               </div>
 
               <div v-if="card.method === 'Whitney'" class="mb-3">
@@ -251,7 +265,14 @@
                   hide-details
                   :disabled="loading"
                   @change="updateOutput"
-                />
+                >
+                  <template #append>
+                    <info-tooltip>
+                      Reliability percentile used to evaluate the Whitney curve.
+                      Enter a value from 1 to 99 percent.
+                    </info-tooltip>
+                  </template>
+                </v-text-field>
               </div>
             </div>
           </v-card>

@@ -27,7 +27,24 @@
               show-size
               :disabled="loading"
               @change="clearOutput"
-            />
+            >
+              <template #append>
+                <info-tooltip>
+                  Upload an LDS CSV with one <code>stress_max</code> value per
+                  load-history point. Values are used exactly as supplied; no
+                  zero-level offset or unit conversion is applied. See the
+                  <a
+                    href="/downloads/LDS_Data_Convention.pdf"
+                    target="_blank"
+                    rel="noopener"
+                    class="text-decoration-underline"
+                    style="color: blue; text-transform: none; min-width: 0"
+                  >
+                    LDS Data Convention (PDF)</a
+                  >.
+                </info-tooltip>
+              </template>
+            </v-file-input>
 
             <v-select
               v-model="fatigueDataType"
@@ -46,7 +63,41 @@
               show-size
               :disabled="loading"
               @change="clearOutput"
-            />
+            >
+              <template #append>
+                <info-tooltip>
+                  <span v-if="usesAggInput">
+                    Upload raw constant-amplitude test data containing
+                    <code>stress_ratio</code>, <code>stress_max</code>, and
+                    <code>cycles_to_failure</code>. The selected S-N method fits
+                    curves from these points. See the
+                    <a
+                      href="/downloads/AGG_Data_Convention.pdf"
+                      target="_blank"
+                      rel="noopener"
+                      class="text-decoration-underline"
+                      style="color: blue; text-transform: none; min-width: 0"
+                    >
+                      AGG Data Convention (PDF)</a
+                    >.
+                  </span>
+                  <span v-else>
+                    Upload fitted S-N curves as an SNC CSV or SN-curves JSON.
+                    Each curve must identify its stress ratio and provide the
+                    parameters needed to evaluate stress versus cycles. See the
+                    <a
+                      href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/SNC_Data_Convention.md"
+                      target="_blank"
+                      rel="noopener"
+                      class="text-decoration-underline"
+                      style="color: blue; text-transform: none; min-width: 0"
+                    >
+                      SNC Data Convention</a
+                    >.
+                  </span>
+                </info-tooltip>
+              </template>
+            </v-file-input>
 
             <v-row dense>
               <v-col cols="12" sm="6">
@@ -57,7 +108,14 @@
                   min="0"
                   :disabled="loading"
                   @change="clearOutput"
-                />
+                >
+                  <template #append>
+                    <info-tooltip>
+                      Enter the positive magnitude of the ultimate compressive
+                      strength in MPa.
+                    </info-tooltip>
+                  </template>
+                </v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
                 <v-text-field
@@ -67,7 +125,14 @@
                   min="0"
                   :disabled="loading"
                   @change="clearOutput"
-                />
+                >
+                  <template #append>
+                    <info-tooltip>
+                      Enter the positive magnitude of the ultimate tensile
+                      strength in MPa.
+                    </info-tooltip>
+                  </template>
+                </v-text-field>
               </v-col>
             </v-row>
           </v-card>
@@ -124,7 +189,15 @@
                     type="number"
                     :disabled="loading"
                     @change="clearOutput"
-                  />
+                  >
+                    <template #append>
+                      <info-tooltip>
+                        Material orientation associated with every uploaded AGG
+                        curve. It is stored as curve metadata and is not used
+                        for shear loading.
+                      </info-tooltip>
+                    </template>
+                  </v-text-field>
                 </v-col>
               </v-row>
 
@@ -137,7 +210,14 @@
                 max="99.99"
                 :disabled="loading"
                 @change="clearOutput"
-              />
+              >
+                <template #append>
+                  <info-tooltip>
+                    Reliability percentile used by the selected statistical S-N
+                    fitting method. It must be between 0 and 100 percent.
+                  </info-tooltip>
+                </template>
+              </v-text-field>
             </template>
           </v-card>
         </v-col>
@@ -160,7 +240,14 @@
               step="0.1"
               :disabled="loading"
               @change="clearOutput"
-            />
+            >
+              <template #append>
+                <info-tooltip>
+                  Smallest multiplier applied to every value in the uploaded
+                  load history.
+                </info-tooltip>
+              </template>
+            </v-text-field>
           </v-col>
           <v-col cols="12" sm="4">
             <v-text-field
@@ -171,7 +258,14 @@
               step="0.1"
               :disabled="loading"
               @change="clearOutput"
-            />
+            >
+              <template #append>
+                <info-tooltip>
+                  Largest multiplier applied to every value in the uploaded load
+                  history.
+                </info-tooltip>
+              </template>
+            </v-text-field>
           </v-col>
           <v-col cols="12" sm="4">
             <v-text-field
@@ -183,7 +277,14 @@
               step="1"
               :disabled="loading"
               @change="clearOutput"
-            />
+            >
+              <template #append>
+                <info-tooltip>
+                  Number of evenly spaced scale factors evaluated between the
+                  minimum and maximum, including both endpoints.
+                </info-tooltip>
+              </template>
+            </v-text-field>
           </v-col>
         </v-row>
       </v-card>
@@ -273,7 +374,21 @@
     </v-card-text>
 
     <v-card-actions v-if="output" class="justify-end px-4 pb-4">
-      <v-btn text color="primary" @click="downloadCsv">Download DAS CSV</v-btn>
+      <v-btn text color="primary" @click="downloadCsv">
+        Download DAS CSV
+        <info-tooltip>
+          See the
+          <a
+            href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/DAS_Data_Convention.md"
+            target="_blank"
+            rel="noopener"
+            class="text-decoration-underline"
+            style="color: blue; text-transform: none; min-width: 0"
+          >
+            DAS Data Convention</a
+          >.
+        </info-tooltip>
+      </v-btn>
       <v-btn text color="primary" @click="downloadJson">
         Download analysis details
       </v-btn>
