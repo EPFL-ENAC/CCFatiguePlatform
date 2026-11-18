@@ -3,32 +3,24 @@
 CCFatigue - Module 4 - Fatigue Failure - faf_kawai.py
 This code takes in raw multi-stress-ratio fatigue data (AGG format) and outputs FAF data
 
-Kawai normalizes off-axis fatigue data recorded at several stress ratios
-into a single normalized-stress-vs-reversals curve (fitted independently
-per reference stress ratio group, forced through the fixed point
-RSigma=1, 2N=10), then re-expands each fitted curve for a target
-(desirable) angle and stress ratio using a Tsai-Hill-type strength
-combination factor (Omega).
-Translated from a Fortran source (program KW) provided by the user; no
-public reference for this file was found in the current CCFatiguePlatform
-repository.
+Kawai normalizes fatigue data recorded at one reference angle and one or more
+stress ratios into a single master S-N curve.  The implementation uses a
+free-intercept least-squares fit in log space and stores the result as
+
+    normalized_stress = A * cycles_to_failure ** (-1 / nstar)
+
+The master curve is then transformed to a target angle and stress ratio using
+the Kawai orientation factor (Omega). The equations follow Kawai (2004),
+bundled with the backend tests as ``tests/data/kawai.pdf``.
 """
 
-from itertools import chain
 from typing import Optional
 
 import numpy as np
 import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 
-LIST_CYCLES_TO_FAILURE = list(
-    chain(
-        range(1, 1000, 50),
-        range(1000, 1001),
-        range(10000, 2000000, 10000),
-        range(2000000, 20000001, 1000000),
-    )
-)
+from ccfatigue.analysis.utils.faf import LIST_CYCLES_TO_FAILURE
 
 
 def get_omega(
@@ -59,59 +51,88 @@ def get_omega(
     return omega
 
 
-def get_normalized_stress(
-    stress_max, reference_stress_ratio: float, reference_static_strength: float
-):
+def get_normalized_stress(stress_max, stress_ratio, reference_omega: float):
     """
     Kawai normalized (reversed) stress ratio, called RSigma in the original
     Fortran.
     Parameters
     ----------
         stress_max: float
-            Applied cyclic stress amplitude (sigma_a) [MPa]
-        reference_stress_ratio: float
-            Reference stress ratio (R) [-]
-        reference_static_strength: float
-            Static strength associated with the reference stress ratio [MPa]
+            Maximum applied cyclic stress [MPa]
+        stress_ratio: float
+            Stress ratio for each input row (R) [-]
+        reference_omega: float
+            Orientation factor at the common reference angle [1/MPa]
     Returns
     -------
         normalized_stress: float
     """
-    ratio = stress_max / reference_static_strength
-    normalized_stress = (0.5 * (1 - reference_stress_ratio) * ratio) / (
-        1 - 0.5 * (1 + reference_stress_ratio) * ratio
+
+    ratio = stress_max * reference_omega
+    normalized_stress = (0.5 * (1 - stress_ratio) * ratio) / (
+        1 - 0.5 * (1 + stress_ratio) * ratio
     )
     return normalized_stress
 
 
-def get_nstar(log_normalized_stress: pd.Series, log_reversals: pd.Series) -> float:
+def get_master_curve_parameters(
+    log_normalized_stress: pd.Series, log_reversals: pd.Series
+) -> tuple[float, float]:
     """
-    Fit nstar (the S-N curve exponent) by forcing the fitted line through
-    the fixed point (log_normalized_stress=0, log_reversals=1).
+    Fit the Kawai master curve by least squares in log space.
+
+    The regression performed is
+
+        log10(2*N) = slope * log10(normalized_stress) + intercept
+
+    It is returned in the directly evaluable form
+
+        normalized_stress = A * N ** (-1/nstar)
+
     Parameters
     ----------
         log_normalized_stress: pd.Series
-            log10(RSigma) for every point in the group
+            log10(normalized_stress) for every input point
         log_reversals: pd.Series
             log10(2*cycles_to_failure) for every point in the group
     Returns
     -------
+        a: float
+            Master-curve coefficient A (normalized stress at N=1)
         nstar: float
+            Positive master-curve exponent
     """
-    count = len(log_normalized_stress)
-    nstar = -(log_reversals.sum() - count) / log_normalized_stress.sum()
-    return nstar
+    slope, log_reversal_intercept = np.polyfit(
+        log_normalized_stress, log_reversals, deg=1
+    )
+    nstar = -float(slope)
+    reversal_intercept = 10 ** float(log_reversal_intercept)
+    a = (reversal_intercept / 2) ** (1 / nstar)
+    return a, nstar
 
 
 def get_stress_max(
-    nstar: float, omega: float, target_stress_ratio: float, cycles_to_failure
+    a: float,
+    nstar: float,
+    omega: float,
+    target_stress_ratio: float,
+    cycles_to_failure,
 ):
     """
     Invert the Kawai master curve back to a physical stress amplitude at a
     target angle/stress ratio (SPN in the original Fortran).
+
+    The normalized master curve is evaluated as
+
+        normalized_stress = A * N ** (-1/nstar)
+
+    and then transformed using Kawai's equation 23.
     Parameters
     ----------
+        a: float
+            Master-curve coefficient A
         nstar: float
+            Positive master-curve exponent
         omega: float
         target_stress_ratio: float
         cycles_to_failure: float
@@ -119,9 +140,13 @@ def get_stress_max(
     -------
         stress_max: float
     """
-    sigma = (2 * cycles_to_failure) ** (-1 / nstar)
-    stress_max = (2 * sigma) / (
-        omega * ((1 - target_stress_ratio) + (1 + target_stress_ratio) * sigma)
+    normalized_stress = a * cycles_to_failure ** (-1 / nstar)
+    stress_max = (2 * normalized_stress) / (
+        omega
+        * (
+            (1 - target_stress_ratio)
+            + (1 + target_stress_ratio) * normalized_stress
+        )
     )
     return stress_max
 
@@ -142,13 +167,12 @@ def execute(
     """
     Execute the Kawai algorithm.
 
-    The reference data (agg_input_csv_file) may contain several stress
-    ratio groups (e.g. R=0.1, R=-1, ...). Each group is normalized with the
-    SAME reference_stress_ratio/reference_static_strength, then fitted
-    independently in log-log (reversals) space, and each resulting curve is
-    re-expanded at the target (desirable_angle, target_stress_ratio) -
-    producing one predicted curve per reference stress ratio group, so
-    results can be cross-checked across groups.
+    1. Normalize AGG stresses recorded at one reference angle. Rows may have
+       different stress ratios; each row uses its own stress ratio.
+    2. Fit one master curve to all normalized points:
+       normalized_stress = A * N ** (-1/nstar).
+    3. Evaluate that analytical master curve on the output cycle grid and
+       transform it to the requested angle and stress ratio.
     Parameters
     ----------
         agg_input_csv_file: FilePath | ReadCsvBuffer
@@ -156,14 +180,16 @@ def execute(
         faf_output_csv_file: FilePath | WriteBuffer
             output (FAF CSV)
         faf_output_json_file: FilePath | WriteBuffer
-            output (FAF json)
+            Output metadata. ``a`` and ``nstar`` define the normalized master
+            curve ``Sigma(N) = a * N ** (-1/nstar)``.
         reference_angle: float
             Off-axis angle of the reference (tested) data [degrees]
         reference_stress_ratio: float
-            Stress ratio (R) used to normalize every group's applied stress
-            [-]
+            Reference material-curve stress ratio retained for API metadata;
+            normalization uses each AGG row's stress ratio instead.
         reference_static_strength: float
-            Static strength associated with reference_stress_ratio [MPa]
+            Reference static strength retained for API compatibility. The
+            Kawai normalization uses the strengths in the orientation factor.
         desirable_angle: float
             Target/design angle [degrees]
         target_stress_ratio: float
@@ -175,10 +201,19 @@ def execute(
     -------
         None
     """
-    if not abs(target_stress_ratio) < 1:
-        raise NotImplementedError(f"target_stress_ratio={target_stress_ratio}")
+    if not (-1 <= target_stress_ratio < 1):
+        raise ValueError(
+            f"Kawai: Invalid target stress ratio R={target_stress_ratio} "
+            "(must be in the [-1,1) interval)"
+        )
 
     agg_df = pd.read_csv(agg_input_csv_file)
+
+    if ((agg_df.stress_ratio >= 1) | (agg_df.stress_ratio < -1)).any():
+        raise ValueError(
+            "Kawai: Can't calculate normalized stress: at least one data "
+            "point has R < -1 or R >= 1"
+        )
 
     target_angle_rad = np.radians(desirable_angle)
     omega = get_omega(
@@ -188,38 +223,48 @@ def execute(
         shear_strength,
     )
 
-    agg_df["normalized_stress"] = get_normalized_stress(
-        agg_df.stress_max, reference_stress_ratio, reference_static_strength
+    reference_omega = get_omega(
+        np.radians(reference_angle),
+        tensile_axial_strength,
+        tensile_transverse_strength,
+        shear_strength,
     )
+
+    agg_df["normalized_stress"] = get_normalized_stress(
+        agg_df.stress_max, agg_df.stress_ratio, reference_omega
+    )
+
     agg_df["log_normalized_stress"] = np.log10(agg_df.normalized_stress)
     agg_df["log_reversals"] = np.log10(2 * agg_df.cycles_to_failure)
 
     faf_csv_df = pd.DataFrame()
     faf_json_records = []
 
-    for reference_group_stress_ratio, group_df in agg_df.groupby("stress_ratio"):
-        nstar = get_nstar(group_df.log_normalized_stress, group_df.log_reversals)
+    a, nstar = get_master_curve_parameters(
+        agg_df.log_normalized_stress, agg_df.log_reversals
+    )
+    curve_df = pd.DataFrame(LIST_CYCLES_TO_FAILURE, columns=["cycles_to_failure"])
+    curve_df["stress_ratio"] = target_stress_ratio
+    curve_df["stress_max"] = get_stress_max(
+        a,
+        nstar,
+        omega,
+        target_stress_ratio,
+        curve_df.cycles_to_failure,
+    )
+    faf_csv_df = pd.concat([faf_csv_df, curve_df])
 
-        curve_df = pd.DataFrame(LIST_CYCLES_TO_FAILURE, columns=["cycles_to_failure"])
-        curve_df["stress_ratio"] = reference_group_stress_ratio
-        curve_df["stress_max"] = get_stress_max(
-            nstar,
-            omega,
-            target_stress_ratio,
-            curve_df.cycles_to_failure,
-        )
-        faf_csv_df = pd.concat([faf_csv_df, curve_df])
-
-        faf_json_records.append(
-            {
-                "stress_ratio": reference_group_stress_ratio,
-                "reference_angle": reference_angle,
-                "target_stress_ratio": target_stress_ratio,
-                "desirable_angle": desirable_angle,
-                "nstar": nstar,
-                "omega": omega,
-            }
-        )
+    faf_json_records.append(
+        {
+            "reference_angle": reference_angle,
+            "reference_stress_ratio": reference_stress_ratio,
+            "target_stress_ratio": target_stress_ratio,
+            "desirable_angle": desirable_angle,
+            "a": a,
+            "nstar": nstar,
+            "omega": omega,
+        }
+    )
 
     faf_json_df = pd.DataFrame(faf_json_records)
 

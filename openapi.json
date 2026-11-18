@@ -458,6 +458,29 @@
             },
             "name": "confidenceInterval",
             "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SnCurveLoadType"
+                }
+              ],
+              "default": "tensile"
+            },
+            "name": "loadType",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Angle",
+              "type": "number",
+              "default": 0
+            },
+            "name": "angle",
+            "in": "query"
           }
         ],
         "requestBody": {
@@ -764,13 +787,13 @@
         }
       }
     },
-    "/analysis/fatigueFailure/file": {
+    "/analysis/fatigueFailure/material/file": {
       "post": {
         "tags": [
           "analysis"
         ],
-        "summary": "Run Fatigue Failure File",
-        "operationId": "run_fatigue_failure_file",
+        "summary": "Run Fatigue Failure Material File",
+        "operationId": "run_fatigue_failure_material_file",
         "parameters": [
           {
             "required": true,
@@ -783,117 +806,28 @@
           {
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/FatigueModel"
-            },
-            "name": "snModel",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Desirableangle",
+              "title": "Targetangle",
               "type": "number"
             },
-            "name": "desirableAngle",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Offaxisangle",
-              "type": "number"
-            },
-            "name": "offAxisAngle",
+            "name": "targetAngle",
             "in": "query"
           },
           {
             "required": false,
             "schema": {
-              "title": "Offaxisangle2",
+              "title": "Targetstressratio",
               "type": "number"
             },
-            "name": "offAxisAngle2",
+            "name": "targetStressRatio",
             "in": "query"
           },
           {
             "required": false,
             "schema": {
-              "title": "Tensile Transverse Strength",
+              "title": "Targetstaticstrength",
               "type": "number"
             },
-            "name": "tensile_transverse_strength",
-            "in": "query"
-          },
-          {
-            "required": false,
-            "schema": {
-              "title": "Compressive Transverse Strength",
-              "type": "number"
-            },
-            "name": "compressive_transverse_strength",
-            "in": "query"
-          },
-          {
-            "required": false,
-            "schema": {
-              "title": "Shear Strength",
-              "type": "number"
-            },
-            "name": "shear_strength",
-            "in": "query"
-          },
-          {
-            "required": false,
-            "schema": {
-              "title": "Tensile Strength1",
-              "type": "number"
-            },
-            "name": "tensile_strength1",
-            "in": "query"
-          },
-          {
-            "required": false,
-            "schema": {
-              "title": "Compressive Strength1",
-              "type": "number"
-            },
-            "name": "compressive_strength1",
-            "in": "query"
-          },
-          {
-            "required": false,
-            "schema": {
-              "title": "Tensile Strength2",
-              "type": "number"
-            },
-            "name": "tensile_strength2",
-            "in": "query"
-          },
-          {
-            "required": false,
-            "schema": {
-              "title": "Compressive Strength2",
-              "type": "number"
-            },
-            "name": "compressive_strength2",
-            "in": "query"
-          },
-          {
-            "required": false,
-            "schema": {
-              "title": "Tensile Strength At Desirable Angle",
-              "type": "number"
-            },
-            "name": "tensile_strength_at_desirable_angle",
-            "in": "query"
-          },
-          {
-            "required": false,
-            "schema": {
-              "title": "Compressive Strength At Desirable Angle",
-              "type": "number"
-            },
-            "name": "compressive_strength_at_desirable_angle",
+            "name": "targetStaticStrength",
             "in": "query"
           }
         ],
@@ -901,7 +835,7 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/Body_run_fatigue_failure_file_analysis_fatigueFailure_file_post"
+                "$ref": "#/components/schemas/Body_run_fatigue_failure_material_file_analysis_fatigueFailure_material_file_post"
               }
             }
           },
@@ -942,27 +876,28 @@
           {
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/FatigueModel"
+              "title": "Targetangle",
+              "type": "number"
             },
-            "name": "snModel",
+            "name": "targetAngle",
             "in": "query"
           },
           {
-            "required": true,
+            "required": false,
             "schema": {
-              "title": "Desirableangle",
+              "title": "Targetstaticstrength",
               "type": "number"
             },
-            "name": "desirableAngle",
+            "name": "targetStaticStrength",
             "in": "query"
           },
           {
-            "required": true,
+            "required": false,
             "schema": {
-              "title": "Offaxisangle",
+              "title": "Targetstressratio",
               "type": "number"
             },
-            "name": "offAxisAngle",
+            "name": "targetStressRatio",
             "in": "query"
           }
         ],
@@ -1011,106 +946,28 @@
           {
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/FatigueModel"
-            },
-            "name": "snModel",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Desirableangle",
+              "title": "Targetangle",
               "type": "number"
             },
-            "name": "desirableAngle",
+            "name": "targetAngle",
             "in": "query"
           },
           {
-            "required": true,
+            "required": false,
             "schema": {
-              "title": "Offaxisangle1",
+              "title": "Targetstaticstrength",
               "type": "number"
             },
-            "name": "offAxisAngle1",
+            "name": "targetStaticStrength",
             "in": "query"
           },
           {
-            "required": true,
+            "required": false,
             "schema": {
-              "title": "Offaxisangle2",
+              "title": "Targetstressratio",
               "type": "number"
             },
-            "name": "offAxisAngle2",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Tensile Transverse Strength",
-              "type": "number"
-            },
-            "name": "tensile_transverse_strength",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Shear Strength",
-              "type": "number"
-            },
-            "name": "shear_strength",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Tensile Strength1",
-              "type": "number"
-            },
-            "name": "tensile_strength1",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Tensile Strength2",
-              "type": "number"
-            },
-            "name": "tensile_strength2",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Tensile Strength At Desirable Angle",
-              "type": "number"
-            },
-            "name": "tensile_strength_at_desirable_angle",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Tensile Axial Strength",
-              "type": "number"
-            },
-            "name": "tensile_axial_strength",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/HashinRotemPanelType"
-            },
-            "name": "panel2Type",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/HashinRotemPanelType"
-            },
-            "name": "panel3Type",
+            "name": "targetStressRatio",
             "in": "query"
           }
         ],
@@ -1159,82 +1016,28 @@
           {
             "required": true,
             "schema": {
-              "title": "Referenceangle",
+              "title": "Targetangle",
               "type": "number"
             },
-            "name": "referenceAngle",
+            "name": "targetAngle",
             "in": "query"
           },
           {
-            "required": true,
+            "required": false,
             "schema": {
-              "title": "Referencestressratio",
+              "title": "Targetstaticstrength",
               "type": "number"
             },
-            "name": "referenceStressRatio",
+            "name": "targetStaticStrength",
             "in": "query"
           },
           {
-            "required": true,
-            "schema": {
-              "title": "Desirableangle",
-              "type": "number"
-            },
-            "name": "desirableAngle",
-            "in": "query"
-          },
-          {
-            "required": true,
+            "required": false,
             "schema": {
               "title": "Targetstressratio",
               "type": "number"
             },
             "name": "targetStressRatio",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Tensile Axial Strength",
-              "type": "number"
-            },
-            "name": "tensile_axial_strength",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Compressive Axial Strength",
-              "type": "number"
-            },
-            "name": "compressive_axial_strength",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Tensile Transverse Strength",
-              "type": "number"
-            },
-            "name": "tensile_transverse_strength",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Compressive Transverse Strength",
-              "type": "number"
-            },
-            "name": "compressive_transverse_strength",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Shear Strength",
-              "type": "number"
-            },
-            "name": "shear_strength",
             "in": "query"
           }
         ],
@@ -1283,54 +1086,28 @@
           {
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/FatigueModel"
-            },
-            "name": "snModel",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Referenceangle",
+              "title": "Targetangle",
               "type": "number"
             },
-            "name": "referenceAngle",
+            "name": "targetAngle",
             "in": "query"
           },
           {
-            "required": true,
-            "schema": {
-              "title": "Referencestaticstrength",
-              "type": "number"
-            },
-            "name": "referenceStaticStrength",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Desirableangle",
-              "type": "number"
-            },
-            "name": "desirableAngle",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Targetstressratio",
-              "type": "number"
-            },
-            "name": "targetStressRatio",
-            "in": "query"
-          },
-          {
-            "required": true,
+            "required": false,
             "schema": {
               "title": "Targetstaticstrength",
               "type": "number"
             },
             "name": "targetStaticStrength",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Targetstressratio",
+              "type": "number"
+            },
+            "name": "targetStressRatio",
             "in": "query"
           }
         ],
@@ -1379,73 +1156,28 @@
           {
             "required": true,
             "schema": {
-              "title": "Referenceangle",
+              "title": "Targetangle",
               "type": "number"
             },
-            "name": "referenceAngle",
+            "name": "targetAngle",
             "in": "query"
           },
           {
-            "required": true,
+            "required": false,
             "schema": {
-              "title": "Referencestressratio",
+              "title": "Targetstaticstrength",
               "type": "number"
             },
-            "name": "referenceStressRatio",
+            "name": "targetStaticStrength",
             "in": "query"
           },
           {
-            "required": true,
-            "schema": {
-              "title": "Referencestaticstrength",
-              "type": "number"
-            },
-            "name": "referenceStaticStrength",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Desirableangle",
-              "type": "number"
-            },
-            "name": "desirableAngle",
-            "in": "query"
-          },
-          {
-            "required": true,
+            "required": false,
             "schema": {
               "title": "Targetstressratio",
               "type": "number"
             },
             "name": "targetStressRatio",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Tensile Axial Strength",
-              "type": "number"
-            },
-            "name": "tensile_axial_strength",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Tensile Transverse Strength",
-              "type": "number"
-            },
-            "name": "tensile_transverse_strength",
-            "in": "query"
-          },
-          {
-            "required": true,
-            "schema": {
-              "title": "Shear Strength",
-              "type": "number"
-            },
-            "name": "shear_strength",
             "in": "query"
           }
         ],
@@ -1454,6 +1186,76 @@
             "multipart/form-data": {
               "schema": {
                 "$ref": "#/components/schemas/Body_run_fatigue_failure_kawai_file_analysis_fatigueFailure_kawai_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analysis/fatigueFailure/simsBrogdon/file": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run Fatigue Failure Simsbrogdon File",
+        "operationId": "run_fatigue_failure_simsbrogdon_file",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Targetangle",
+              "type": "number"
+            },
+            "name": "targetAngle",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Targetstaticstrength",
+              "type": "number"
+            },
+            "name": "targetStaticStrength",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Targetstressratio",
+              "type": "number"
+            },
+            "name": "targetStressRatio",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_fatigue_failure_simsbrogdon_file_analysis_fatigueFailure_simsBrogdon_file_post"
               }
             }
           },
@@ -1494,9 +1296,119 @@
           {
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/DamageSummationMethod"
+              "$ref": "#/components/schemas/DamageSummationInputType"
             },
-            "name": "method",
+            "name": "fatigueDataType",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CycleCountingMethod"
+            },
+            "name": "cycleCountingMethod",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CldMethod"
+            },
+            "name": "cldMethod",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Ucs",
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            "name": "ucs",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Uts",
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            "name": "uts",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/SnCurveMethod"
+            },
+            "name": "snCurveMethod",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Confidenceinterval",
+              "type": "number"
+            },
+            "name": "confidenceInterval",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SnCurveLoadType"
+                }
+              ],
+              "default": "tensile"
+            },
+            "name": "loadType",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Angle",
+              "type": "number",
+              "default": 0
+            },
+            "name": "angle",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Factormin",
+              "exclusiveMinimum": 0.0,
+              "type": "number",
+              "default": 0.4
+            },
+            "name": "factorMin",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Factormax",
+              "exclusiveMinimum": 0.0,
+              "type": "number",
+              "default": 1.4
+            },
+            "name": "factorMax",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Factorcount",
+              "maximum": 100.0,
+              "minimum": 1.0,
+              "type": "integer",
+              "default": 11
+            },
+            "name": "factorCount",
             "in": "query"
           }
         ],
@@ -1516,9 +1428,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Response Run Damage Summation File Analysis Damagesummation File Post",
-                  "type": "string",
-                  "format": "binary"
+                  "$ref": "#/components/schemas/AnalysisResult"
                 }
               }
             }
@@ -1738,18 +1648,18 @@
       "Body_run_damage_summation_file_analysis_damageSummation_file_post": {
         "title": "Body_run_damage_summation_file_analysis_damageSummation_file_post",
         "required": [
-          "sncFile",
-          "cycFile"
+          "loadHistoryFile",
+          "fatigueDataFile"
         ],
         "type": "object",
         "properties": {
-          "sncFile": {
-            "title": "Sncfile",
+          "loadHistoryFile": {
+            "title": "Loadhistoryfile",
             "type": "string",
             "format": "binary"
           },
-          "cycFile": {
-            "title": "Cycfile",
+          "fatigueDataFile": {
+            "title": "Fatiguedatafile",
             "type": "string",
             "format": "binary"
           }
@@ -1758,38 +1668,17 @@
       "Body_run_fatigue_failure_fawazellyin_file_analysis_fatigueFailure_fawazEllyin_file_post": {
         "title": "Body_run_fatigue_failure_fawazellyin_file_analysis_fatigueFailure_fawazEllyin_file_post",
         "required": [
-          "sncFile"
+          "materialFile"
         ],
         "type": "object",
         "properties": {
-          "sncFile": {
-            "title": "Sncfile",
-            "type": "string",
-            "format": "binary"
-          }
-        }
-      },
-      "Body_run_fatigue_failure_file_analysis_fatigueFailure_file_post": {
-        "title": "Body_run_fatigue_failure_file_analysis_fatigueFailure_file_post",
-        "required": [
-          "xFile",
-          "yFile",
-          "fFile"
-        ],
-        "type": "object",
-        "properties": {
-          "xFile": {
-            "title": "Xfile",
+          "materialFile": {
+            "title": "Materialfile",
             "type": "string",
             "format": "binary"
           },
-          "yFile": {
-            "title": "Yfile",
-            "type": "string",
-            "format": "binary"
-          },
-          "fFile": {
-            "title": "Ffile",
+          "aggFile": {
+            "title": "Aggfile",
             "type": "string",
             "format": "binary"
           }
@@ -1798,34 +1687,17 @@
       "Body_run_fatigue_failure_ftpf_file_analysis_fatigueFailure_ftpf_file_post": {
         "title": "Body_run_fatigue_failure_ftpf_file_analysis_fatigueFailure_ftpf_file_post",
         "required": [
-          "xFile",
-          "yFile",
-          "fFile"
+          "materialFile"
         ],
         "type": "object",
         "properties": {
-          "xFile": {
-            "title": "Xfile",
+          "materialFile": {
+            "title": "Materialfile",
             "type": "string",
             "format": "binary"
           },
-          "yFile": {
-            "title": "Yfile",
-            "type": "string",
-            "format": "binary"
-          },
-          "fFile": {
-            "title": "Ffile",
-            "type": "string",
-            "format": "binary"
-          },
-          "xcFile": {
-            "title": "Xcfile",
-            "type": "string",
-            "format": "binary"
-          },
-          "ycFile": {
-            "title": "Ycfile",
+          "aggFile": {
+            "title": "Aggfile",
             "type": "string",
             "format": "binary"
           }
@@ -1834,24 +1706,17 @@
       "Body_run_fatigue_failure_hashinrotem_file_analysis_fatigueFailure_hashinRotem_file_post": {
         "title": "Body_run_fatigue_failure_hashinrotem_file_analysis_fatigueFailure_hashinRotem_file_post",
         "required": [
-          "xFile",
-          "panel2File",
-          "panel3File"
+          "materialFile"
         ],
         "type": "object",
         "properties": {
-          "xFile": {
-            "title": "Xfile",
+          "materialFile": {
+            "title": "Materialfile",
             "type": "string",
             "format": "binary"
           },
-          "panel2File": {
-            "title": "Panel2File",
-            "type": "string",
-            "format": "binary"
-          },
-          "panel3File": {
-            "title": "Panel3File",
+          "aggFile": {
+            "title": "Aggfile",
             "type": "string",
             "format": "binary"
           }
@@ -1860,10 +1725,34 @@
       "Body_run_fatigue_failure_kawai_file_analysis_fatigueFailure_kawai_file_post": {
         "title": "Body_run_fatigue_failure_kawai_file_analysis_fatigueFailure_kawai_file_post",
         "required": [
-          "aggFile"
+          "materialFile"
         ],
         "type": "object",
         "properties": {
+          "materialFile": {
+            "title": "Materialfile",
+            "type": "string",
+            "format": "binary"
+          },
+          "aggFile": {
+            "title": "Aggfile",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "Body_run_fatigue_failure_material_file_analysis_fatigueFailure_material_file_post": {
+        "title": "Body_run_fatigue_failure_material_file_analysis_fatigueFailure_material_file_post",
+        "required": [
+          "materialFile"
+        ],
+        "type": "object",
+        "properties": {
+          "materialFile": {
+            "title": "Materialfile",
+            "type": "string",
+            "format": "binary"
+          },
           "aggFile": {
             "title": "Aggfile",
             "type": "string",
@@ -1874,10 +1763,34 @@
       "Body_run_fatigue_failure_shokriehtaheri_file_analysis_fatigueFailure_shokriehTaheri_file_post": {
         "title": "Body_run_fatigue_failure_shokriehtaheri_file_analysis_fatigueFailure_shokriehTaheri_file_post",
         "required": [
-          "aggFile"
+          "materialFile"
         ],
         "type": "object",
         "properties": {
+          "materialFile": {
+            "title": "Materialfile",
+            "type": "string",
+            "format": "binary"
+          },
+          "aggFile": {
+            "title": "Aggfile",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "Body_run_fatigue_failure_simsbrogdon_file_analysis_fatigueFailure_simsBrogdon_file_post": {
+        "title": "Body_run_fatigue_failure_simsbrogdon_file_analysis_fatigueFailure_simsBrogdon_file_post",
+        "required": [
+          "materialFile"
+        ],
+        "type": "object",
+        "properties": {
+          "materialFile": {
+            "title": "Materialfile",
+            "type": "string",
+            "format": "binary"
+          },
           "aggFile": {
             "title": "Aggfile",
             "type": "string",
@@ -1923,11 +1836,11 @@
         "type": "string",
         "description": "An enumeration."
       },
-      "DamageSummationMethod": {
-        "title": "DamageSummationMethod",
+      "DamageSummationInputType": {
+        "title": "DamageSummationInputType",
         "enum": [
-          "Harris",
-          "PiecewiseLinear"
+          "AGG",
+          "SNC"
         ],
         "type": "string",
         "description": "An enumeration."
@@ -2171,15 +2084,6 @@
         "type": "string",
         "description": "An enumeration."
       },
-      "FatigueModel": {
-        "title": "FatigueModel",
-        "enum": [
-          "Lin-Log",
-          "Log-Log"
-        ],
-        "type": "string",
-        "description": "An enumeration."
-      },
       "FatigueTest": {
         "title": "FatigueTest",
         "required": [
@@ -2372,16 +2276,6 @@
             }
           }
         }
-      },
-      "HashinRotemPanelType": {
-        "title": "HashinRotemPanelType",
-        "enum": [
-          "Transverse",
-          "Shear",
-          "Off-axis"
-        ],
-        "type": "string",
-        "description": "An enumeration."
       },
       "HysteresisLoop": {
         "title": "HysteresisLoop",
@@ -2644,6 +2538,16 @@
             "type": "number"
           }
         }
+      },
+      "SnCurveLoadType": {
+        "title": "SnCurveLoadType",
+        "enum": [
+          "tensile",
+          "compressive",
+          "shear"
+        ],
+        "type": "string",
+        "description": "An enumeration."
       },
       "SnCurveMethod": {
         "title": "SnCurveMethod",

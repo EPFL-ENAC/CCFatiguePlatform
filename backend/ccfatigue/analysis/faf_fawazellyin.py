@@ -21,15 +21,8 @@ import pandas as pd
 from pandas._typing import FilePath, ReadCsvBuffer, WriteBuffer
 
 import ccfatigue.analysis.utils.faf as faf
+from ccfatigue.analysis.utils.faf import LIST_CYCLES_TO_FAILURE
 
-LIST_CYCLES_TO_FAILURE = list(
-    chain(
-        range(1, 1000, 50),
-        range(1000, 1001),
-        range(10000, 2000000, 10000),
-        range(2000000, 20000001, 1000000),
-    )
-)
 
 
 def get_static_strength_transform(

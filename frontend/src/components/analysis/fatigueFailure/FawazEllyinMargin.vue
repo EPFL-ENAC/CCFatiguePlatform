@@ -15,7 +15,14 @@
             label="Applied equivalent stress σeq,app [MPa]"
             type="number"
             dense
-          ></v-text-field>
+          >
+            <template #append>
+              <info-tooltip>
+                Equivalent applied-stress magnitude used to calculate the
+                failure index at the lifetime selected by the slider.
+              </info-tooltip>
+            </template>
+          </v-text-field>
         </v-col>
         <v-col cols="12" sm="8">
           <div class="text-caption grey--text text--darken-1">
@@ -50,11 +57,12 @@
 
 <script>
 import SimpleChart from "@/components/charts/SimpleChart";
+import InfoTooltip from "@/components/InfoTooltip";
 import { interpolateLogLog } from "@/utils/curveInterpolation";
 
 export default {
   name: "FawazEllyinMargin",
-  components: { SimpleChart },
+  components: { InfoTooltip, SimpleChart },
   props: {
     // Parsed FawazEllyin FAF CSV rows: { cycles_to_failure, stress_max, ... }
     rows: { type: Array, default: () => [] },

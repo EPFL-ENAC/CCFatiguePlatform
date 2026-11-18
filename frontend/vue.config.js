@@ -17,7 +17,8 @@ module.exports = {
     },
     proxy: {
       "/api": {
-        target: "http://localhost:8000",
+        // Uvicorn's local dev server listens on IPv4; localhost may resolve to ::1.
+        target: "http://127.0.0.1:8000",
         changeOrigin: true,
         pathRewrite: { "^/api": "" },
         logLevel: "debug", // Most verbose logging
