@@ -1,4 +1,9 @@
+import io
+import json
 import os
+
+import pandas as pd
+import pytest
 
 import ccfatigue.analysis.cld_boerstra as cld_boerstra
 import ccfatigue.analysis.cld_harris as cld_harris
@@ -21,7 +26,17 @@ import ccfatigue.analysis.snc_linlog as snc_linlog
 import ccfatigue.analysis.snc_loglog as snc_loglog
 import ccfatigue.analysis.snc_sendeckyj as snc_sendeckyj
 import ccfatigue.analysis.utils.faf as faf
-from ccfatigue.model import HashinRotemPanelType
+from ccfatigue.analysis.utils.snc_data import (
+    prepare_cld_snc_input,
+    sn_curve_document_to_csv,
+)
+from ccfatigue.analyzer import run_cld, run_sn_curve
+from ccfatigue.model import (
+    CldMethod,
+    HashinRotemPanelType,
+    SnCurveLoadType,
+    SnCurveMethod,
+)
 
 SRC_DIR = os.path.dirname(os.path.realpath(__file__))
 DATA_DIR = os.path.join(SRC_DIR, "..", "..", "Data", "samples")
@@ -254,6 +269,146 @@ def test_snc_sendeckyj():
     )
 
 
+def test_snc_analyzer_outputs_canonical_curve_objects():
+    with open(AGG_CSV_INPUT_FILE, "rb") as source:
+        result = run_sn_curve(
+            source,
+            SnCurveMethod.LOG_LOG,
+            load_type=SnCurveLoadType.COMPRESSIVE,
+            angle=30,
+        )
+
+    curves = json.loads(result.json_data)["SN_curves"]
+    assert curves
+    assert {curve["type"] for curve in curves} == {"compressive"}
+    assert {curve["angle"] for curve in curves} == {30.0}
+    assert {curve["model"] for curve in curves} == {"Log-Log"}
+    assert all("a" in curve and "b" in curve for curve in curves)
+
+    samples = pd.read_csv(io.BytesIO(result.csv_data))
+    assert samples.columns.tolist() == [
+        "type",
+        "angle",
+        "stress_ratio",
+        "model",
+        "confidence_interval",
+        "cycles_to_failure",
+        "stress_max",
+        "stress_lowerbound",
+        "stress_upperbound",
+    ]
+    assert set(samples["type"]) == {"compressive"}
+    assert set(samples["angle"]) == {30.0}
+    assert set(samples["model"]) == {"Log-Log"}
+    assert set(samples["confidence_interval"]) == {50.0}
+
+
+def test_canonical_snc_document_expands_to_sampled_rows():
+    document = {
+        "SN_curves": [
+            {
+                "type": "tensile",
+                "angle": 0,
+                "stress_ratio": 0.1,
+                "model": "Log-Log",
+                "a": 100,
+                "b": 0.1,
+                "confidence_interval": 50,
+            }
+        ]
+    }
+    csv_file = sn_curve_document_to_csv(
+        io.BytesIO(json.dumps(document).encode()), [100, 1000]
+    )
+    rows = pd.read_csv(csv_file)
+
+    assert rows.columns.tolist() == [
+        "type",
+        "angle",
+        "stress_ratio",
+        "model",
+        "confidence_interval",
+        "cycles_to_failure",
+        "stress_max",
+    ]
+    assert set(rows["type"]) == {"tensile"}
+    assert set(rows["angle"]) == {0.0}
+    assert set(rows["model"]) == {"Log-Log"}
+    assert set(rows["confidence_interval"]) == {50.0}
+    assert rows["cycles_to_failure"].tolist() == [100, 1000]
+    assert rows["stress_max"].tolist() == pytest.approx(
+        [100 * 100**-0.1, 100 * 1000**-0.1]
+    )
+
+
+def test_cld_analyzer_accepts_canonical_snc_document():
+    with open(AGG_CSV_INPUT_FILE, "rb") as source:
+        sn_result = run_sn_curve(source, SnCurveMethod.LOG_LOG)
+
+    cld_result = run_cld(
+        io.BytesIO(sn_result.json_data),
+        CldMethod.PIECEWISELINEAR,
+        ucs=250,
+        uts=250,
+    )
+    rows = pd.read_csv(io.BytesIO(cld_result.csv_data))
+
+    assert not rows.empty
+    assert set(rows.columns) == {
+        "cycles_to_failure",
+        "stress_amplitude",
+        "stress_mean",
+    }
+
+
+def test_cld_rejects_canonical_curves_from_multiple_directions():
+    curves = [
+        {
+            "type": "tensile",
+            "angle": angle,
+            "stress_ratio": stress_ratio,
+            "model": "Log-Log",
+            "a": 100,
+            "b": 0.1,
+            "confidence_interval": 50,
+        }
+        for angle, stress_ratio in ((0, -1), (90, 0.1))
+    ]
+
+    with pytest.raises(ValueError, match="multiple material directions"):
+        sn_curve_document_to_csv(io.BytesIO(json.dumps({"SN_curves": curves}).encode()))
+
+
+def test_cld_accepts_legacy_snc_csv_without_curve_metadata():
+    source = io.BytesIO(b"stress_ratio,cycles_to_failure,stress_max\n0.1,1000,80\n")
+
+    assert prepare_cld_snc_input(source) is source
+
+
+def test_cld_rejects_enriched_csv_from_multiple_directions():
+    source = io.BytesIO(
+        b"type,angle,stress_ratio,model,confidence_interval,"
+        b"cycles_to_failure,stress_max\n"
+        b"tensile,0,0.1,Log-Log,50,1000,80\n"
+        b"tensile,90,-1,Log-Log,50,1000,60\n"
+    )
+
+    with pytest.raises(ValueError, match="multiple material directions"):
+        prepare_cld_snc_input(source)
+
+
+def test_cld_rejects_conflicting_csv_metadata_for_same_curve():
+    source = io.BytesIO(
+        b"type,angle,stress_ratio,model,confidence_interval,"
+        b"cycles_to_failure,stress_max\n"
+        b"tensile,0,0.1,Log-Log,50,1000,80\n"
+        b"tensile,0,0.1,Lin-Log,50,10000,70\n"
+    )
+
+    with pytest.raises(ValueError, match="conflicting metadata"):
+        prepare_cld_snc_input(source)
+
+
 # Module 3 - Constant life diagram
 
 
@@ -261,6 +416,7 @@ def test_cld_harris() -> None:
     cld_harris.execute(
         SNC_CSV_1_INPUT_FILE,
         CLD_HARRIS_OUTPUT_CLD_CSV_FILE,
+        None,
         CLD_HARRIS_UCS,
         CLD_HARRIS_UTS,
     )

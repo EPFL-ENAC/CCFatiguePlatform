@@ -16,7 +16,7 @@
           <v-file-input
             v-model="file"
             show-size
-            accept=".csv"
+            :accept="fileInputAccept"
             :error-messages="errorMessages"
             :disabled="loading"
             :label="fileInputLabel"
@@ -24,11 +24,18 @@
           >
             <template #append>
               <info-tooltip>
-                See the
-                <a
-                  href="https://github.com/EPFL-ENAC/CCFatiguePlatform/blob/develop/Data/SNC_Data_Convention.md"
-                  >SNC Data Convention</a
-                >
+                <span v-if="snCurveMethod">
+                  Upload raw constant-amplitude test data following the
+                  <a href="/downloads/AGG_Data_Convention.pdf" target="_blank"
+                    >AGG Data Convention</a
+                  >. The selected S-N method fits the curves before building the
+                  CLD.
+                </span>
+                <span v-else>
+                  Upload fitted S-N curves as an SNC CSV or SN-curves JSON. Rows
+                  must provide stress ratio, cycles to failure, and maximum
+                  stress.
+                </span>
               </info-tooltip>
             </template>
           </v-file-input>
@@ -54,7 +61,14 @@
             label="UCS"
             type="number"
             @change="updateOutput"
-          ></v-text-field>
+          >
+            <template #append>
+              <info-tooltip>
+                Positive magnitude of the ultimate compressive strength in MPa.
+                It defines the compression endpoint of the CLD.
+              </info-tooltip>
+            </template>
+          </v-text-field>
         </v-col>
         <v-col>
           <v-text-field
@@ -62,7 +76,14 @@
             label="UTS"
             type="number"
             @change="updateOutput"
-          ></v-text-field>
+          >
+            <template #append>
+              <info-tooltip>
+                Positive magnitude of the ultimate tensile strength in MPa. It
+                defines the tension endpoint of the CLD.
+              </info-tooltip>
+            </template>
+          </v-text-field>
         </v-col>
         <v-col v-if="isPiecewiseLinear || isPiecewiseNonLinear">
           <v-select
@@ -146,7 +167,14 @@
                 class="mb-2"
                 :disabled="loading"
                 @change="updateOutput"
-              />
+              >
+                <template #append>
+                  <info-tooltip>
+                    Optional reference lifetime used to initialize the Boerstra
+                    fit. Leave empty to use the method default.
+                  </info-tooltip>
+                </template>
+              </v-text-field>
 
               <v-divider class="mb-3" />
               <div class="param-section-label mb-2">Fitted values</div>
@@ -203,7 +231,15 @@
                   hide-details="auto"
                   hint="e.g. 0.1, -1, 0.5"
                   persistent-hint
-                />
+                >
+                  <template #append>
+                    <info-tooltip>
+                      Stress ratio defined as minimum stress divided by maximum
+                      stress. The table reports the CLD intersection along this
+                      loading direction.
+                    </info-tooltip>
+                  </template>
+                </v-text-field>
               </v-col>
               <v-col cols="12" md="3">
                 <v-text-field
@@ -217,7 +253,14 @@
                   hide-details="auto"
                   hint="optional — e.g. 500 000"
                   persistent-hint
-                />
+                >
+                  <template #append>
+                    <info-tooltip>
+                      Optional lifetime to add to the standard CLD cycle levels
+                      in the intersection table.
+                    </info-tooltip>
+                  </template>
+                </v-text-field>
               </v-col>
               <v-col v-if="showExpSnMethodSelector" cols="12" md="3">
                 <v-select
@@ -310,6 +353,7 @@ import SimpleChart from "@/components/charts/SimpleChart";
 import InfoTooltip from "@/components/InfoTooltip";
 import { getOutputFileName } from "@/utils/analysis";
 import { parseFile, parserConfig } from "@/utils/papaparse";
+import { parseSncFile } from "@/utils/snCurve";
 import download from "downloadjs";
 import { groupBy } from "lodash";
 import { parse, unparse } from "papaparse";
@@ -374,13 +418,21 @@ export default {
     },
 
     fileInputLabel() {
-      if (
-        (this.isPiecewiseLinear || this.isPiecewiseNonLinear) &&
-        this.snCurveMethod
-      ) {
+      if (this.usesAggInput) {
         return "AGG csv file (raw fatigue test data)";
       }
-      return "SNC csv file";
+      return "SNC CSV or SN_curves JSON file";
+    },
+
+    fileInputAccept() {
+      return this.usesAggInput ? ".csv" : ".csv,.json";
+    },
+
+    usesAggInput() {
+      return (
+        (this.isPiecewiseLinear || this.isPiecewiseNonLinear) &&
+        !!this.snCurveMethod
+      );
     },
 
     downloadDisabled() {
@@ -884,7 +936,9 @@ export default {
       this.expSnData = null;
 
       Promise.all([
-        parseFile(this.file),
+        this.usesAggInput
+          ? parseFile(this.file)
+          : parseSncFile(this.file, parseFile),
         ...methodsSnapshot.map((method) => {
           let call;
           if (method === "PiecewiseLinear" && this.snCurveMethod) {

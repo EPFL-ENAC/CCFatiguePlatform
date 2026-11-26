@@ -28,6 +28,9 @@ EPSILON = (
     1e-12  # A small value to prevent division by zero and log of zero in calculations.
 )
 
+#max radius to search grid, must me bigger than the maximum amount the coordinate descent can move in a single step, 200 is ok for most cases
+_NP_SEARCH_RADIUS_STEPS = 200 
+
 
 @dataclass(frozen=True)
 class BoerstraParameters:
@@ -108,6 +111,10 @@ def _fit_parameters(
     uts: float,
     ucs: float,
     np_fixed: float | None = None,
+    m0_init: float | None = None,
+    d_init: float | None = None,
+    alpha_t_init: float | None = None,
+    alpha_c_init: float | None = None,
 ) -> BoerstraParameters:
     """
     Direct translation of the Fortran Boerstra coordinate descent.
@@ -126,11 +133,11 @@ def _fit_parameters(
 
     # Starting values from the Fortran source
     m0, D, Np, aT, aC = (
-        10.0,
-        100.0,
+        m0_init if m0_init is not None else 10.0,
+        d_init if d_init is not None else 100.0,
         np_fixed if np_fixed is not None else 100.0,
-        0.1,
-        0.1,
+        alpha_t_init if alpha_t_init is not None else 0.1,
+        alpha_c_init if alpha_c_init is not None else 0.1,
     )
 
     def _sdt(Sap, fac, Np_arg, m_arg) -> np.ndarray:
@@ -156,10 +163,7 @@ def _fit_parameters(
         dn = np.where(ok, dN, 1.0)
         dt = np.where(ok, np.sign(ds) / np.sqrt(1.0 / ds**2 + 1.0 / dn**2), 0.0)
 
-        nv = ok.sum(axis=1)
-        mu = (dt * ok).sum(axis=1) / np.maximum(nv, 1)
-        var = ((dt - mu[:, None]) ** 2 * ok).sum(axis=1) / np.maximum(nv - 1, 1)
-        return np.where(nv >= 2, np.sqrt(var), np.inf)
+        return np.std(dt, axis=1, ddof=1)
 
     D_arr = np.arange(100.0, 1001.0, 1.0)  # (901,)   — fixed grids
     m0_arr = 1.0 + np.arange(381) * 0.05  # (381,)
@@ -237,8 +241,8 @@ def _fit_parameters(
                 # in one iteration, so this is numerically equivalent to the
                 # full search while reducing the sweep from 10 000 → ≤ 401 candidates.
                 Np_idx = int(round((Np - 1.0) / 1000.0))
-                lo = max(0, Np_idx - 200)
-                hi = min(len(Np_arr), Np_idx + 201)
+                lo = max(0, Np_idx - _NP_SEARCH_RADIUS_STEPS)
+                hi = min(len(Np_arr), Np_idx + _NP_SEARCH_RADIUS_STEPS + 1)
                 Np = _sdt_Np_sweep(m_1d, fac, Np_arr[lo:hi])
 
         # Sweep αC: 0.05 → 5, step 0.01  (496 candidates)
@@ -401,7 +405,7 @@ def execute(
     uts = abs(float(uts))
 
     snc_df = _prepare_input(snc_csv_input_file, uts, ucs)
-    params = _fit_parameters(snc_df, uts, ucs, np_fixed=np_reference)
+    params = _fit_parameters(snc_df, uts, ucs, np_reference,m0_init,d_init,alpha_t_init,alpha_c_init)
 
     cld_df = pd.DataFrame()
 

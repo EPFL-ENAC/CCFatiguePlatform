@@ -1,0 +1,11 @@
+{
+  "type": "tensile",
+  "angle": 0.0,
+  "stress_ratio": 0.1,
+  "model": "loglog",
+  "a": 1740.0,
+  "b": 0.0786,
+  "confidence_interval": 50,
+  "lrsq": 0.0,
+  "fp": 0.0
+}

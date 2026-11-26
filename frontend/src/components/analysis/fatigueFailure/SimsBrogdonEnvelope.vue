@@ -17,7 +17,13 @@
             dense
             hint="Envelope evaluated at this N"
             persistent-hint
-          ></v-text-field>
+          >
+            <template #append>
+              <info-tooltip>
+                Lifetime at which the Tsai-Hill fatigue envelope is evaluated.
+              </info-tooltip>
+            </template>
+          </v-text-field>
         </v-col>
         <v-col cols="12" sm="3">
           <v-text-field
@@ -25,7 +31,13 @@
             label="Applied σ1 [MPa]"
             type="number"
             dense
-          ></v-text-field>
+          >
+            <template #append>
+              <info-tooltip>
+                Applied normal stress in material direction 1.
+              </info-tooltip>
+            </template>
+          </v-text-field>
         </v-col>
         <v-col cols="12" sm="3">
           <v-text-field
@@ -33,7 +45,13 @@
             label="Applied σ2 [MPa]"
             type="number"
             dense
-          ></v-text-field>
+          >
+            <template #append>
+              <info-tooltip>
+                Applied normal stress in material direction 2.
+              </info-tooltip>
+            </template>
+          </v-text-field>
         </v-col>
         <v-col cols="12" sm="3">
           <div class="text-caption grey--text text--darken-1">
@@ -68,6 +86,7 @@
 
 <script>
 import EnvelopeChart from "@/components/charts/EnvelopeChart";
+import InfoTooltip from "@/components/InfoTooltip";
 import { interpolateLogLog } from "@/utils/curveInterpolation";
 import {
   buildQuadraticEnvelope,
@@ -76,7 +95,7 @@ import {
 
 export default {
   name: "SimsBrogdonEnvelope",
-  components: { EnvelopeChart },
+  components: { EnvelopeChart, InfoTooltip },
   props: {
     // Parsed SimsBrogdon FAF CSV rows: { cycles_to_failure, x, y, s, ... }
     rows: { type: Array, default: () => [] },
